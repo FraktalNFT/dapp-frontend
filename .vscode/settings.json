@@ -1,0 +1,6 @@
+{
+  "prettier.arrowParens": "avoid",
+  "prettier.singleQuote": false,
+  "prettier.bracketSpacing": true,
+  "prettier.tabWidth": 2
+}
