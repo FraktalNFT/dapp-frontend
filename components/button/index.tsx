@@ -16,6 +16,7 @@ const FrakButton: React.FC<ButtonProps & { isOutlined?: boolean }> = ({
       borderColor={!isOutlined ? "transparent" : "black.900"}
       rounded="full"
       _hover={{ background: "black.900", color: "white.900" }}
+      _active={{ background: "black.900", color: "white.900" }}
       {...rest}
     >
       {children}
