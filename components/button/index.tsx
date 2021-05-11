@@ -1,12 +1,13 @@
 import { Button, ButtonProps } from "@chakra-ui/button";
+import { forwardRef } from "react";
 
-const FrakButton: React.FC<ButtonProps & { isOutlined?: boolean }> = ({
-  isOutlined,
-  children,
-  ...rest
-}) => {
+const FrakButton = forwardRef<
+  HTMLButtonElement,
+  ButtonProps & { isOutlined?: boolean }
+>(({ isOutlined, children, ...rest }, ref) => {
   return (
     <Button
+      ref={ref}
       className="medium-16"
       minH="4.8rem"
       px="2.4rem"
@@ -22,6 +23,6 @@ const FrakButton: React.FC<ButtonProps & { isOutlined?: boolean }> = ({
       {children}
     </Button>
   );
-};
+});
 
 export default FrakButton;
