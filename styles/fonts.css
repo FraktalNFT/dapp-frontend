@@ -1,152 +1,152 @@
 .semi-48 {
   /* Desk/Semi 48-64 */
-  font-family: Inter;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 4.8rem;
-  line-height: 6.4rem;
+  font-family: Inter !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  font-size: 4.8rem !important;
+  line-height: 6.4rem !important;
   /* identical to box height, or 133% */
 }
 
 .semi-32 {
   /* Desk/Semi 32–40 */
-  font-family: Inter;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 3.2rem;
-  line-height: 4rem;
+  font-family: Inter !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  font-size: 3.2rem !important;
+  line-height: 4rem !important;
   /* identical to box height, or 125% */
 }
 
 .semi-21 {
   /* Desk/Regular 21–32 */
-  font-family: Inter;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 2.1rem;
-  line-height: 3.2rem;
+  font-family: Inter !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-size: 2.1rem !important;
+  line-height: 3.2rem !important;
   /* identical to box height, or 152% */
 }
 
 .medium-16 {
   /* Desk/Medium 16-24 */
-  font-family: Inter;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 1.6rem;
-  line-height: 2.4rem;
+  font-family: Inter !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  font-size: 1.6rem !important;
+  line-height: 2.4rem !important;
   /* identical to box height, or 150% */
 }
 
 .regular-16 {
   /* Desk/Regular 16–24 */
-  font-family: Inter;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 1.6rem;
-  line-height: 2.4rem;
+  font-family: Inter !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-size: 1.6rem !important;
+  line-height: 2.4rem !important;
   /* identical to box height, or 150% */
-  letter-spacing: 0.02em;
+  letter-spacing: 0.02em !important;
 }
 
 .regular-14 {
   /* Desk/Regular 14–20 */
-  font-family: Inter;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 1.4rem;
-  line-height: 2rem;
+  font-family: Inter !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-size: 1.4rem !important;
+  line-height: 2rem !important;
   /* identical to box height, or 143% */
 }
 
 .medium-upper-14 {
   /* Desk/Medium Uppercase 14–14 */
-  font-family: Roboto Mono;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 1.4rem;
-  line-height: 1.4rem;
+  font-family: Roboto Mono !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  font-size: 1.4rem !important;
+  line-height: 1.4rem !important;
   /* identical to box height, or 100% */
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  letter-spacing: 1px !important;
+  text-transform: uppercase !important;
 
-  color: #c4c4c4;
+  color: #c4c4c4 !important;
 }
 
 .semi-16 {
   /* Desk/Semi 16–24 */
-  font-family: Inter;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 1.6rem;
-  line-height: 2.4rem;
+  font-family: Inter !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  font-size: 1.6rem !important;
+  line-height: 2.4rem !important;
   /* identical to box height, or 150% */
 }
 
 .med-upper-12 {
   /* Desk/Med Upper 12–14 */
-  font-family: Inter;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 1.2rem;
-  line-height: 1.4rem;
+  font-family: Inter !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  font-size: 1.2rem !important;
+  line-height: 1.4rem !important;
   /* identical to box height, or 117% */
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  letter-spacing: 1px !important;
+  text-transform: uppercase !important;
 }
 
 .medium-mob-32 {
   /* Mob/Medium 32–40 */
-  font-family: Roboto Mono;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 3.2rem;
-  line-height: 4rem;
+  font-family: Roboto Mono !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  font-size: 3.2rem !important;
+  line-height: 4rem !important;
   /* identical to box height, or 125% */
-  color: #c4c4c4;
+  color: #c4c4c4 !important;
 }
 
 .regular-mob-14 {
   /* Mob/Regular 14–20 */
-  font-family: Roboto Mono;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 1.4rem;
-  line-height: 2rem;
+  font-family: Roboto Mono !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-size: 1.4rem !important;
+  line-height: 2rem !important;
   /* identical to box height, or 143% */
-  color: #c4c4c4;
+  color: #c4c4c4 !important;
 }
 
 .medium-mob-14 {
   /* Mob/Medium 14–20 */
-  font-family: Roboto Mono;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 1.4rem;
-  line-height: 2rem;
+  font-family: Roboto Mono !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  font-size: 1.4rem !important;
+  line-height: 2rem !important;
   /* identical to box height, or 143% */
-  color: #c4c4c4;
+  color: #c4c4c4 !important;
 }
 
 .medium-mob-upper-10 {
   /* Mob/Medium Uppercase 10–10 */
-  font-family: Roboto Mono;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 1rem;
-  line-height: 1rem;
+  font-family: Roboto Mono !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  font-size: 1rem !important;
+  line-height: 1rem !important;
   /* identical to box height, or 100% */
-  letter-spacing: 2px;
-  color: #c4c4c4;
+  letter-spacing: 2px !important;
+  color: #c4c4c4 !important;
 }
 
 .jos-bold-56 {
   /* Land/Josefina Bold 56-56 */
-  font-family: Inter;
-  font-style: normal;
-  font-weight: bold;
-  font-size: 4.8rem;
-  line-height: 5.6rem;
+  font-family: Inter !important;
+  font-style: normal !important;
+  font-weight: bold !important;
+  font-size: 4.8rem !important;
+  line-height: 5.6rem !important;
   /* identical to box height, or 117% */
-  color: #000000;
+  color: #000000 !important;
 }

@@ -1,4 +1,7 @@
-import { Box, ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { ChakraProvider, extendTheme, VStack } from "@chakra-ui/react";
+import Header from "../components/header";
+import Footer from "../components/footer";
+
 import "../styles/globals.css";
 import "../styles/fonts.css";
 
@@ -22,7 +25,11 @@ const customTheme = extendTheme({
 function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider theme={customTheme}>
-      <Component {...pageProps} />
+      <Header />
+      <VStack pt="6.4rem" flex={1}>
+        <Component {...pageProps} />
+      </VStack>
+      <Footer />
     </ChakraProvider>
   );
 }
