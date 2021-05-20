@@ -1,0 +1,122 @@
+.goBack {
+  text-align: center;
+  color: #985cff;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.header {
+  margin-top: 8px;
+  font-size: 48px;
+  line-height: 64px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.NFTCard {
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 0px 0px 4px 4px;
+}
+
+.cardHeader {
+  color: #e0e0e0;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.cardText {
+  margin-top: 4px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+}
+
+.auctionCard {
+  display: flex;
+  padding: 24px 24px 70px 24px;
+  position: relative;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  display: flex;
+}
+
+.auctionCardHeader {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.auctionCardDetailsContainer {
+  display: flex;
+  margin-top: 16px;
+}
+
+.auctionCardDetailsNumber {
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 40px;
+}
+
+.auctionCardDetailsText {
+  margin-top: 4px;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.02em;
+}
+
+.auctionCardDivider {
+  background-color: #9f66e3;
+  height: 109px;
+  width: 1px;
+  margin-right: 32px;
+}
+
+.contributeContainer {
+  position: absolute;
+  bottom: -32px;
+  left: calc(50% - 160px);
+  width: 320px;
+  height: 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 32px;
+  background-color: #fff;
+}
+
+.contributeHeader {
+  letter-spacing: 1px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 14px;
+}
+
+.contributeInput {
+  margin-top: 5px;
+  font-size: 20px;
+  line-height: 20px;
+  font-weight: 500;
+  width: 100px;
+}
+
+.contributInput::placeholder {
+  color: #e0e0e0;
+}
+
+.contributeCTA {
+  flex-shrink: 0;
+  background-color: #e0e0e0;
+  border-radius: 24px;
+  padding: 12px 24px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+}

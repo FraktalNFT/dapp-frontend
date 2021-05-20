@@ -19,7 +19,7 @@ const demoNFTItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
     imageURL: "/filler-image-1.png",
     contributions: BigNumber.from(5).div(100),
     createdAt: new Date().toISOString(),
-    countdown: new Date("05-25-2021"),
+    countdown: new Date("06-25-2021"),
   })
 );
 
@@ -74,7 +74,9 @@ export default function Home() {
             gap="3.2rem"
           >
             {demoNFTItemsFull.map(item => (
-              <NFTItem key={item.id} item={item} />
+              <NextLink href={`/nft/${item.id}`}>
+                <NFTItem key={item.id} item={item} />
+              </NextLink>
             ))}
           </Grid>
           <Pagination pageCount={21} handlePageClick={() => {}} />
