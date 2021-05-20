@@ -40,9 +40,13 @@ export default function Home() {
         <title>Fraktal - Marketplace</title>
       </Head>
       <HStack w="96.4rem" spacing="0" justifyContent="space-between" mb="4rem">
-        <Box position="relative">
+        <Box position="relative" w={"110px"}>
           {!selectionMode ? (
-            <FrakButton isOutlined onClick={() => setSelectionMode(true)}>
+            <FrakButton
+              style={{ minWidth: "200px" }}
+              isOutlined
+              onClick={() => setSelectionMode(true)}
+            >
               Sort: {sortType}
             </FrakButton>
           ) : (
