@@ -18,6 +18,7 @@ const FrakButton = forwardRef<
       rounded="full"
       _hover={{ background: "black.900", color: "white.900" }}
       _active={{ background: "black.900", color: "white.900" }}
+      _disabled={{ background: "#E0E0E0 !important" }}
       {...rest}
     >
       {children}

@@ -1,0 +1,33 @@
+.header {
+  font-weight: 600;
+  font-size: 48px;
+  line-height: 64px;
+  text-align: center;
+}
+
+.inputHeader {
+  color: #656464;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 14px;
+  letter-spacing: 1px;
+}
+
+.input {
+  border: 2px solid #e0e0e0;
+  border-radius: 4px;
+  width: 466px;
+  height: 64px;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 16px;
+}
+
+.uploadContainer {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 24px;
+  width: 466px;
+  position: relative;
+}
