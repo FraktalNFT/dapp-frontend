@@ -21,20 +21,28 @@ const useStyles = createUseStyles({
 
 const Header = () => {
   const [walletModal, setWalletModal] = useState(false);
+  const [walletAddress, setWalletAddress] = useState(undefined);
   const styles = useStyles();
   // TODO: Make wallet connection functional
-  const walletAddress = undefined;
   // const walletAddress = "undefined";
 
+  const connectWallet = () => {
+    setWalletAddress(true);
+    setWalletModal(false);
+  };
+
   return (
-    <Box minH="10rem" py="2.6rem" as="header" bg={"white"} id={"header"}>
+    <Box minH="10rem" py="2.6rem" as="header" bg={"white"}>
       <Modal open={walletModal} onClose={() => setWalletModal(false)}>
         <VStack p="24px" w="600px" minH="248px" spacing={"24px"}>
           <div className={styles.modalHeader}>Connect Your Wallet</div>
-          <div className={styles.modalButton}>Connect to MetaMask</div>
+          <div className={styles.modalButton} onClick={() => connectWallet()}>
+            Connect to MetaMask
+          </div>
           <div
             className={styles.modalButton}
             style={{ border: "2px solid #559AF7", marginBottom: "8px" }}
+            onClick={() => connectWallet()}
           >
             Use WalletConnect
           </div>

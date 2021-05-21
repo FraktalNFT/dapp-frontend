@@ -26,7 +26,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider theme={customTheme}>
       <Header />
-      <VStack maxW="96.4rem" mx="auto" pt="6.4rem" flex={1}>
+      <VStack maxW="96.4rem" mx="auto" pt="6.4rem" flex={1} id={"app"}>
         <Component {...pageProps} />
       </VStack>
       <Footer />

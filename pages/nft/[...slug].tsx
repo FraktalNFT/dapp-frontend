@@ -1,4 +1,4 @@
-import { Box, HStack, VStack } from "@chakra-ui/layout";
+import { HStack, VStack } from "@chakra-ui/layout";
 import React from "react";
 import Head from "next/head";
 import Link from "next/link";

@@ -21,7 +21,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-ReactModal.setAppElement("#header");
+ReactModal.setAppElement("#app");
 
 const Modal: React.FC<Props> = ({ open, onClose, children }) => {
   return (
