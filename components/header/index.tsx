@@ -65,7 +65,7 @@ const Header = () => {
             <NextLink href="/mint-nft">
               <Link className="semi-16">Mint NFT</Link>
             </NextLink>
-            <NextLink href="/marketplace">
+            <NextLink href="/">
               <Link className="semi-16">Marketplace</Link>
             </NextLink>
             <NextLink href="/artists">

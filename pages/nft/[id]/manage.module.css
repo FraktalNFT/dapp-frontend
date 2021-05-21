@@ -75,3 +75,51 @@
   left: calc(50% - 200px);
   z-index: 2;
 }
+
+.offerContainer {
+  position: relative;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  padding: 24px;
+  width: 640px;
+}
+
+.offerText {
+  position: "relative";
+  text-align: center;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.offerCTAContainer {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.offerInfo {
+  width: 599px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  position: absolute;
+  top: -18px;
+  padding: 8px;
+  color: #656464;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.claimContainer {
+  position: absolute;
+  top: -32px;
+  left: calc(50% - 160px);
+  border-radius: 32px;
+  border: 2px solid #e0e0e0;
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  background-color: white;
+  align-items: center;
+  width: 320px;
+}
