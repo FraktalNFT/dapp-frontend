@@ -5,7 +5,7 @@ import Link from "next/link";
 import { BigNumber } from "ethers";
 import { Image } from "@chakra-ui/image";
 import moment from "moment";
-import styles from "./nft.module.css";
+import styles from "./auction.module.css";
 
 export default function NFTview() {
   const exampleNFT = {

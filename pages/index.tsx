@@ -12,7 +12,7 @@ import { FrakCard } from "../types";
 const SORT_TYPES = ["Popular", "Ending Soonest", "Newly Listed"];
 
 // TODO: hardcoded stuff as of now
-const demoNFTItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
+const demoNFTItemsFull: FrakCard[] = Array.from({ length: 3 }).map(
   (_, index) => ({
     id: index + 1,
     name: "Golden Fries Cascade",
@@ -74,7 +74,7 @@ export default function Home() {
             gap="3.2rem"
           >
             {demoNFTItemsFull.map(item => (
-              <NextLink href={`/nft/${item.id}`}>
+              <NextLink href={`/nft/${item.id}/auction`}>
                 <NFTItem key={item.id} item={item} />
               </NextLink>
             ))}
