@@ -1,0 +1,69 @@
+.header {
+  text-align: center;
+  font-size: 48px;
+  line-height: 64px;
+  font-weight: 600;
+}
+
+.descText {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  text-align: center;
+}
+
+.header2 {
+  margin-top: 80px !important;
+  text-align: center;
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 600;
+}
+
+.subText {
+  text-align: center;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.claimContainer {
+  width: 320px;
+  height: 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 32px;
+  background-color: #fff;
+}
+
+.claimHeader {
+  letter-spacing: 1px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 14px;
+}
+
+.claimAmount {
+  margin-top: 5px;
+  font-size: 20px;
+  line-height: 20px;
+  font-weight: 500;
+  width: 100px;
+}
+
+.claimCTA {
+  flex-shrink: 0;
+  background-color: #000;
+  border-radius: 24px;
+  text-align: center;
+  padding: 12px 24px;
+  width: 140px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 24px;
+}

@@ -13,10 +13,13 @@
     "@emotion/styled": "^11",
     "ethers": "^5.1.4",
     "framer-motion": "^4",
+    "moment": "^2.29.1",
     "next": "10.2.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-icons": "^4.2.0"
+    "react-icons": "^4.2.0",
+    "react-jss": "^10.6.0",
+    "react-modal": "^3.13.1"
   },
   "devDependencies": {
     "@types/react": "^17.0.5",

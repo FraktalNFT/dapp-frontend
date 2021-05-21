@@ -1,0 +1,21 @@
+.searchContainer {
+  border-radius: 32px;
+  border: 2px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 300px;
+  padding: 12px 16px 12px 24px;
+}
+
+.searchInput {
+  margin-right: 16px;
+  width: 100%;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.searchInput::placeholder {
+  color: #e0e0e0;
+}

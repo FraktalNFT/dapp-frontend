@@ -6,9 +6,10 @@ import React from "react";
 import { FrakCard } from "../../types";
 import FrakButton from "../button";
 
-const NFTItem: React.FC<StackProps & { item: FrakCard }> = ({
+const NFTItem: React.FC<StackProps & { item: FrakCard; CTAText?: string }> = ({
   item,
   onClick,
+  CTAText,
 }) => {
   return (
     <VStack
@@ -21,7 +22,7 @@ const NFTItem: React.FC<StackProps & { item: FrakCard }> = ({
       onClick={onClick}
     >
       <Box minH="30rem" w="100%" position="relative">
-        <Image src="/filler-image-1.png" width="100%" height="100%" />
+        <Image src={item.imageURL} width="100%" height="100%" />
         {item.countdown && (
           <VStack
             spacing="0"
@@ -59,7 +60,7 @@ const NFTItem: React.FC<StackProps & { item: FrakCard }> = ({
           {item.name}
         </Text>
         <FrakButton className="semi-16" py=".8rem" px="5.6rem">
-          Invest
+          {CTAText || "Invest"}
         </FrakButton>
       </Center>
     </VStack>
