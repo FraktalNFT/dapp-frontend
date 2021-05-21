@@ -19,6 +19,10 @@ export default function ClosedNFTView() {
     createdAt: new Date().toISOString(),
     countdown: new Date("06-25-2021"),
   };
+
+  let offerMade = false;
+  let acceptedOffer = false;
+  let rejectedOffer = false;
   return (
     <VStack spacing="0" mb="12.8rem">
       <Head>
@@ -50,82 +54,108 @@ export default function ClosedNFTView() {
               </div>
             </div>
           </div>
-          <div className={styles.auctionCard}>
-            <div style={{ marginRight: "52px" }}>
-              <div className={styles.auctionCardHeader}>Date Ended</div>
-              <div className={styles.auctionCardDetailsContainer}>
-                <div style={{ marginRight: "48px" }}>
-                  <div className={styles.auctionCardDetailsNumber}>
-                    15 Mar 2021
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className={styles.auctionCardDivider} />
-            <div style={{ marginRight: "24px" }}>
-              <div className={styles.auctionCardHeader}>Contributed total</div>
-              <div className={styles.auctionCardDetailsContainer}>
-                <div style={{ marginRight: "60px" }}>
-                  <div className={styles.auctionCardDetailsNumber}>125.25</div>
-                  <div className={styles.auctionCardDetailsText}>ETH</div>
-                </div>
-                <div>
-                  <div className={styles.auctionCardDetailsNumber}>45</div>
-                  <div className={styles.auctionCardDetailsText}>People</div>
-                </div>
-              </div>
-            </div>
-            <div
-              className={styles.CTAContainer}
-              style={{ bottom: makeOffer ? "-32px" : "-24px" }}
-            >
-              {!makeOffer ? (
-                <>
-                  <FrakButton
-                    isOutlined
-                    style={{
-                      width: "192px",
-                      backgroundColor: "white",
-                      marginRight: "32px",
-                    }}
-                    onClick={() => setMakeOffer(true)}
-                  >
-                    Make Offer
-                  </FrakButton>
-                  <FrakButton
-                    isOutlined
-                    style={{
-                      width: "192px",
-                      backgroundColor: "white",
-                    }}
-                  >
-                    Send Payment
-                  </FrakButton>
-                </>
-              ) : (
-                <>
-                  <div
-                    className={styles.contributeContainer}
-                    style={{ marginRight: "16px" }}
-                  >
-                    <div style={{ marginLeft: "24px" }}>
-                      <div className={styles.contributeHeader}>ETH</div>
-                      <input
-                        className={styles.contributeInput}
-                        type="number"
-                        placeholder={"0.01"}
-                      />
+          <div>
+            <div className={styles.auctionCard}>
+              <div style={{ marginRight: "52px" }}>
+                <div className={styles.auctionCardHeader}>Date Ended</div>
+                <div className={styles.auctionCardDetailsContainer}>
+                  <div style={{ marginRight: "48px" }}>
+                    <div className={styles.auctionCardDetailsNumber}>
+                      15 Mar 2021
                     </div>
-                    <div className={styles.contributeCTA}>Make offer</div>
                   </div>
-                  <Image
-                    src="/outlinedClose.png"
-                    w="48px"
-                    h="48px"
-                    cursor="pointer"
-                    onClick={() => setMakeOffer(false)}
-                  />
-                </>
+                </div>
+              </div>
+              <div className={styles.auctionCardDivider} />
+              <div style={{ marginRight: "24px" }}>
+                <div className={styles.auctionCardHeader}>
+                  Contributed total
+                </div>
+                <div className={styles.auctionCardDetailsContainer}>
+                  <div style={{ marginRight: "60px" }}>
+                    <div className={styles.auctionCardDetailsNumber}>
+                      125.25
+                    </div>
+                    <div className={styles.auctionCardDetailsText}>ETH</div>
+                  </div>
+                  <div>
+                    <div className={styles.auctionCardDetailsNumber}>45</div>
+                    <div className={styles.auctionCardDetailsText}>People</div>
+                  </div>
+                </div>
+              </div>
+              <div
+                className={styles.CTAContainer}
+                style={{ bottom: makeOffer ? "-32px" : "-24px" }}
+              >
+                {!makeOffer ? (
+                  <>
+                    <FrakButton
+                      isOutlined
+                      style={{
+                        width: "192px",
+                        backgroundColor: "white",
+                        marginRight: "32px",
+                      }}
+                      onClick={() => setMakeOffer(true)}
+                    >
+                      Make Offer
+                    </FrakButton>
+                    <FrakButton
+                      isOutlined
+                      style={{
+                        width: "192px",
+                        backgroundColor: "white",
+                      }}
+                    >
+                      Send Payment
+                    </FrakButton>
+                  </>
+                ) : (
+                  <>
+                    <div
+                      className={styles.contributeContainer}
+                      style={{ marginRight: "16px" }}
+                    >
+                      <div style={{ marginLeft: "24px" }}>
+                        <div className={styles.contributeHeader}>ETH</div>
+                        <input
+                          className={styles.contributeInput}
+                          type="number"
+                          placeholder={"0.01"}
+                        />
+                      </div>
+                      <div className={styles.contributeCTA}>Make offer</div>
+                    </div>
+                    <Image
+                      src="/outlinedClose.png"
+                      w="48px"
+                      h="48px"
+                      cursor="pointer"
+                      onClick={() => setMakeOffer(false)}
+                    />
+                  </>
+                )}
+              </div>
+            </div>
+            <div style={{ marginTop: "40px" }}>
+              {(offerMade || acceptedOffer || rejectedOffer) && (
+                <div
+                  className={styles.actionCard}
+                  style={{
+                    border: acceptedOffer
+                      ? "2px solid #00C4B8"
+                      : rejectedOffer
+                      ? "2px solid #FF0000"
+                      : "none",
+                  }}
+                >
+                  {offerMade
+                    ? "Your offer for 5.12 ETH has been made."
+                    : acceptedOffer
+                    ? "Your offer has been accepted."
+                    : "Your offer has been rejected."}
+                </div>
               )}
             </div>
           </div>
