@@ -22,14 +22,14 @@ export default function ArtistsView() {
   };
 
   // TODO: hardcoded stuff as of now
-  const demoArtistItemsFull: FrakCard[] = Array.from({ length: 3 }).map(
+  const demoArtistItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
     (_, index) => ({
       id: index + 1,
-      name: "Golden Fries Cascade",
+      name: "beople.eth",
       imageURL: "/filler-image-1.png",
-      contributions: BigNumber.from(5).div(100),
+      //contributions: BigNumber.from(5).div(100),
       createdAt: new Date().toISOString(),
-      countdown: new Date("06-25-2021"),
+      //countdown: new Date("06-25-2021"),
     })
   );
   return (
@@ -74,8 +74,8 @@ export default function ArtistsView() {
         gap="3.2rem"
       >
         {demoArtistItemsFull.map(item => (
-          <NextLink href={`/nft/${item.id}/auction`}>
-            <NFTItem key={item.id} item={item} />
+          <NextLink href={`/artist/${item.id}`}>
+            <NFTItem key={item.id} item={item} CTAText="View 3 NFTs" />
           </NextLink>
         ))}
       </Grid>
