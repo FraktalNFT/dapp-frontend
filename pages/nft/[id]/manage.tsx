@@ -7,7 +7,7 @@ import { Image } from "@chakra-ui/image";
 import styles from "./manage.module.css";
 import Button from "../../../components/button";
 
-export default function ManageView() {
+export default function ManageNFTView() {
   const [view, setView] = useState("accepted");
 
   const exampleNFT = {

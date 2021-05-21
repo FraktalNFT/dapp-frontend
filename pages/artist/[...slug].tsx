@@ -35,7 +35,7 @@ export default function ArtistView() {
             gap="3.2rem"
           >
             {demoNFTItemsFull.map(item => (
-              <NextLink href={`/nft/${item.id}/auction`}>
+              <NextLink href={`/nft/${item.id}/closed`}>
                 <NFTItem key={item.id} item={item} CTAText="See More" />
               </NextLink>
             ))}
