@@ -7,7 +7,7 @@ import { Image } from "@chakra-ui/image";
 import moment from "moment";
 import styles from "./auction.module.css";
 
-export default function NFTview() {
+export default function NFTView() {
   const exampleNFT = {
     id: 0,
     name: "Golden Fries Cascade",
