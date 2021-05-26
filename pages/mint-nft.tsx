@@ -1,7 +1,7 @@
 import { VStack } from "@chakra-ui/layout";
 import React, { useState } from "react";
 import Head from "next/head";
-import styles from "./mint-nft.module.css";
+import styles from "../styles/mint-nft.module.css";
 import Button from "../components/button";
 import { HStack } from "@chakra-ui/layout";
 import { Image } from "@chakra-ui/image";
@@ -9,15 +9,15 @@ import { Image } from "@chakra-ui/image";
 export default function MintNFTView() {
   const [image, setImage] = useState(null);
   return (
-    <VStack spacing="0" mb="12.8rem">
+    <VStack spacing='0' mb='12.8rem'>
       <Head>
         <title>Fraktal - Mint NFT</title>
       </Head>
       <div className={styles.header}>Mint NFT</div>
       <HStack
-        spacing="32px"
-        marginTop="40px !important"
-        alignItems="flex-start"
+        spacing='32px'
+        marginTop='40px !important'
+        alignItems='flex-start'
       >
         <div>
           <div className={styles.inputHeader}>NAME</div>
@@ -73,7 +73,7 @@ export default function MintNFTView() {
                     alignItems: "center",
                   }}
                 >
-                  <Image src={image} w={"180px"} h="240px" />
+                  <Image src={image} w={"180px"} h='240px' />
                 </div>
               </>
             )}

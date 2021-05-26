@@ -25,7 +25,7 @@ const demoNFTItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
 
 const demoNFTItemsEmpty = [];
 
-export default function Home() {
+const Home: React.FC = () => {
   const [selectionMode, setSelectionMode] = useState(false);
   const [sortType, setSortType] = useState("Popular");
 
@@ -35,12 +35,12 @@ export default function Home() {
   };
 
   return (
-    <VStack spacing="0" mb="12.8rem">
+    <VStack spacing='0' mb='12.8rem'>
       <Head>
         <title>Fraktal - Marketplace</title>
       </Head>
-      <HStack w="96.4rem" spacing="0" justifyContent="space-between" mb="4rem">
-        <Box position="relative" w={"110px"}>
+      <HStack w='96.4rem' spacing='0' justifyContent='space-between' mb='4rem'>
+        <Box position='relative' w={"110px"}>
           {!selectionMode ? (
             <FrakButton
               style={{ minWidth: "200px" }}
@@ -53,29 +53,29 @@ export default function Home() {
             <Dropdown
               items={SORT_TYPES}
               onItemClick={handleSortSelect}
-              position="absolute"
-              mt="-3rem"
-              zIndex="1"
+              position='absolute'
+              mt='-3rem'
+              zIndex='1'
             />
           )}
         </Box>
-        <Text className="semi-48">Marketplace</Text>
-        <NextLink href="/list-nft">
+        <Text className='semi-48'>Marketplace</Text>
+        <NextLink href='/list-nft'>
           <FrakButton>List NFT</FrakButton>
         </NextLink>
       </HStack>
       {demoNFTItemsFull.length ? (
         <>
           <Grid
-            margin="0 !important"
-            mb="5.6rem !important"
-            w="100%"
-            templateColumns="repeat(3, 1fr)"
-            gap="3.2rem"
+            margin='0 !important'
+            mb='5.6rem !important'
+            w='100%'
+            templateColumns='repeat(3, 1fr)'
+            gap='3.2rem'
           >
             {demoNFTItemsFull.map(item => (
-              <NextLink href={`/nft/${item.id}/auction`}>
-                <NFTItem key={item.id} item={item} />
+              <NextLink key={item.id} href={`/nft/${item.id}/auction`}>
+                <NFTItem item={item} />
               </NextLink>
             ))}
           </Grid>
@@ -83,13 +83,15 @@ export default function Home() {
         </>
       ) : (
         <VStack>
-          <Text className="medium-16">Whoops, no NFTs are for sale.</Text>
-          <Text className="medium-16">Check back later or list your own!</Text>
-          <NextLink href="/mint-nft">
-            <FrakButton mt="1.6rem !important">Mint NFT</FrakButton>
+          <Text className='medium-16'>Whoops, no NFTs are for sale.</Text>
+          <Text className='medium-16'>Check back later or list your own!</Text>
+          <NextLink href='/mint-nft'>
+            <FrakButton mt='1.6rem !important'>Mint NFT</FrakButton>
           </NextLink>
         </VStack>
       )}
     </VStack>
   );
-}
+};
+
+export default Home;

@@ -8,7 +8,7 @@ import NFTItem from "../components/nft-item";
 import Dropdown from "../components/dropdown";
 import FrakButton from "../components/button";
 import Pagination from "../components/pagination";
-import styles from "./artists.module.css";
+import styles from "../styles/artists.module.css";
 import { Image } from "@chakra-ui/image";
 
 export default function ArtistsView() {
@@ -33,12 +33,12 @@ export default function ArtistsView() {
     })
   );
   return (
-    <VStack spacing="0" mb="12.8rem">
+    <VStack spacing='0' mb='12.8rem'>
       <Head>
         <title>Fraktal - Artists</title>
       </Head>
-      <HStack w="96.4rem" spacing="0" justifyContent="space-between" mb="4rem">
-        <Box position="relative" w={"280px"}>
+      <HStack w='96.4rem' spacing='0' justifyContent='space-between' mb='4rem'>
+        <Box position='relative' w={"280px"}>
           {!selectionMode ? (
             <FrakButton
               style={{ minWidth: "200px" }}
@@ -51,31 +51,31 @@ export default function ArtistsView() {
             <Dropdown
               items={SORT_TYPES}
               onItemClick={handleSortSelect}
-              position="absolute"
-              mt="-3rem"
-              zIndex="1"
+              position='absolute'
+              mt='-3rem'
+              zIndex='1'
             />
           )}
         </Box>
-        <Text className="semi-48">Artists</Text>
+        <Text className='semi-48'>Artists</Text>
         <div className={styles.searchContainer}>
           <input
             placeholder={"Search ENS or ETH address "}
             className={styles.searchInput}
           />
-          <Image src="/search.svg" />
+          <Image src='/search.svg' />
         </div>
       </HStack>
       <Grid
-        margin="0 !important"
-        mb="5.6rem !important"
-        w="100%"
-        templateColumns="repeat(3, 1fr)"
-        gap="3.2rem"
+        margin='0 !important'
+        mb='5.6rem !important'
+        w='100%'
+        templateColumns='repeat(3, 1fr)'
+        gap='3.2rem'
       >
         {demoArtistItemsFull.map(item => (
           <NextLink href={`/artist/${item.id}`}>
-            <NFTItem key={item.id} item={item} CTAText="View 3 NFTs" />
+            <NFTItem key={item.id} item={item} CTAText='View 3 NFTs' />
           </NextLink>
         ))}
       </Grid>

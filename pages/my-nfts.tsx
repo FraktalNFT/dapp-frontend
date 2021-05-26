@@ -5,7 +5,7 @@ import { BigNumber } from "ethers";
 import { FrakCard } from "../types";
 import NFTItem from "../components/nft-item";
 import NextLink from "next/link";
-import styles from "./my-nfts.module.css";
+import styles from "../styles/my-nfts.module.css";
 import FrakButton from "../components/button";
 
 export default function MyNFTsView() {
@@ -30,20 +30,20 @@ export default function MyNFTsView() {
     })
   );
   return (
-    <VStack spacing="0" mb="12.8rem">
+    <VStack spacing='0' mb='12.8rem'>
       <Head>
         <title>Fraktal - My NFTs</title>
       </Head>
       <div className={styles.header}>My NFTs</div>
       {demoNFTItemsFull.length ? (
         <Grid
-          mt="40px !important"
-          ml="0"
-          mr="0"
-          mb="5.6rem !important"
-          w="100%"
-          templateColumns="repeat(3, 1fr)"
-          gap="3.2rem"
+          mt='40px !important'
+          ml='0'
+          mr='0'
+          mb='5.6rem !important'
+          w='100%'
+          templateColumns='repeat(3, 1fr)'
+          gap='3.2rem'
         >
           {demoNFTItemsFull.map(item => (
             <NFTItem key={item.id} item={item} CTAText={"List on Market"} />
@@ -81,13 +81,13 @@ export default function MyNFTsView() {
             </div>
           </div>
           <Grid
-            mt="40px !important"
-            ml="0"
-            mr="0"
-            mb="5.6rem !important"
-            w="100%"
-            templateColumns="repeat(3, 1fr)"
-            gap="3.2rem"
+            mt='40px !important'
+            ml='0'
+            mr='0'
+            mb='5.6rem !important'
+            w='100%'
+            templateColumns='repeat(3, 1fr)'
+            gap='3.2rem'
           >
             {demoNFTFraktionsFull.map(item => (
               <NextLink href={`/nft/${item.id}/manage`} key={item.id}>
