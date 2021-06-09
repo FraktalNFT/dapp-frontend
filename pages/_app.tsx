@@ -1,9 +1,11 @@
-import { ChakraProvider, extendTheme, VStack } from "@chakra-ui/react";
+import { Box, ChakraProvider, extendTheme, VStack } from "@chakra-ui/react";
 import Header from "../components/header";
 import Footer from "../components/footer";
 
 import "../styles/globals.css";
 import "../styles/fonts.css";
+import Web3ContextProvider from "../contexts/Web3Context";
+import Layout from "../components/layout";
 
 const customTheme = extendTheme({
   colors: {
@@ -25,11 +27,14 @@ const customTheme = extendTheme({
 function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider theme={customTheme}>
-      <Header />
-      <VStack maxW="96.4rem" mx="auto" pt="6.4rem" flex={1} id={"app"}>
-        <Component {...pageProps} />
-      </VStack>
-      <Footer />
+      <Web3ContextProvider>
+        <Layout>
+          <VStack maxW='96.4rem' mx='auto' pt='6.4rem' flex={1} id='app'>
+            <Component {...pageProps} />
+          </VStack>
+          <Footer />
+        </Layout>
+      </Web3ContextProvider>
     </ChakraProvider>
   );
 }

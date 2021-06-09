@@ -21,7 +21,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-ReactModal.setAppElement("#app");
+typeof window !== "undefined" && ReactModal.setAppElement("#app");
 
 const Modal: React.FC<Props> = ({ open, onClose, children }) => {
   return (
@@ -29,10 +29,10 @@ const Modal: React.FC<Props> = ({ open, onClose, children }) => {
       <div style={{ position: "relative" }}>
         <Image
           pos={"absolute"}
-          top="24px"
-          right="24px"
-          src="/close.svg"
-          cursor="pointer"
+          top='24px'
+          right='24px'
+          src='/close.svg'
+          cursor='pointer'
           onClick={onClose}
         />
         {children}
