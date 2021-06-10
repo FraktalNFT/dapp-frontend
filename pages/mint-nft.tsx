@@ -4,30 +4,36 @@ import Head from "next/head";
 import styles from "../styles/mint-nft.module.css";
 import Button from "../components/button";
 import { HStack } from "@chakra-ui/layout";
-import { Image } from "@chakra-ui/image";
+import { Image as ImageComponent }  from "@chakra-ui/image";
 // import {useExternalContractLoader} from "/hooks/externalContractLoader"; //wasn't found.. WTF?!?
 import { Contract } from "@ethersproject/contracts";
 import { useWeb3Context } from "/contexts/Web3Context";
+import {utils} from "ethers";
+
 
 const contracts = [{providerChainId:1, address:'NA'},{providerChainId:5, address:'0x1941a9207c0145693b66ec2a67bc6cfecced794a'}]
-const mintAbi = [  {
-    constant: false,
-    inputs: [
-      { internalType: "address", name: "_to", type: "address" },
-      { internalType: "bytes32", name: "tokenURI", type: "bytes32" },
-    ],
-    name: "mint",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  }];
+const mintAbi = [
+  "function mint(address _to, string memory tokenURI) public"
+  ];
 
+  // { Json Version
+  //   constant: false,
+  //   inputs: [
+  //     { internalType: "address", name: "_to", type: "address" },
+  //     { internalType: "bytes32", name: "tokenURI", type: "bytes32" },
+  //   ],
+  //   name: "mint",
+  //   outputs: [],
+  //   payable: false,
+  //   stateMutability: "nonpayable",
+  //   type: "function",
+  // }
 
 
 export default function MintNFTView() {
-  const { providerChainId, provider } = useWeb3Context();
-  const [image, setImage] = useState(null);
+  const { providerChainId, provider, account } = useWeb3Context();
+  const [imageData, setImageData] = useState(null);
+  const [imageSize, setImageSize] = useState([]);
   const [contract, setContract] = useState(null);
   const [name, setName] = useState();
   const [description, setDescription] = useState();
@@ -59,18 +65,23 @@ export default function MintNFTView() {
   },[provider, optionalBytecode])
 
 
-  // async function createNFT(){
+  async function createNFT(){
+      let formated = utils.formatBytes32String('ethereum')
+      let gas = await contract.estimateGas.mint(account, formated) // keeps failing for cannot estimate gas
+      console.log(gas)
+
+    // i need the image cid
+    // upload data IPFS (and pin it w Pinata)
     // send tx,
     // show tx hash
     // get events
-    // upload data IPFS (and pin it w Pinata)
-    //
-  // }
+
+  }
 
   function openLocal(){
     document.getElementById('imageInput').files = null;
     document.getElementById('imageInput').click()
-// test type?
+// test type? or add accept attributes in input?
   }
 
   async function addFile(){
@@ -78,10 +89,15 @@ export default function MintNFTView() {
     let reader = new FileReader();
     reader.readAsDataURL(selectedFile);
     reader.onloadend = function () {
-        setImage(reader.result)
-      };
+        setImageData(reader.result)
+        var image = new Image();
+        image.src = reader.result;
+        image.onload = function() {
+          setImageSize(this.width, this.height)
+          }};
   }
 
+  const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
 
   return (
     <VStack spacing='0' mb='12.8rem'>
@@ -95,21 +111,20 @@ export default function MintNFTView() {
         alignItems='flex-start'
       >
         <div>
-{/*          <button onClick={()=>console.log(nameInput())}>test</button>*/}
           <div className={styles.inputHeader}>NAME</div>
           <input className={styles.input}  id="nameIn"  onChange={(e)=>setName(e.target.value)}/>
           <div className={styles.inputHeader} style={{ marginTop: "32px" }}>
             DESCRIPTION (OPTIONAL)
           </div>
           <input className={styles.input} id="descriptionIn"   onChange={(e)=>setDescription(e.target.value)}/>
-          <Button disabled={!image || !name} style={{ display: "block", marginTop: "40px" }} onClick={()=>createNFT()}>
+          <Button disabled={!imageData || !name} style={{ display: "block", marginTop: "40px" }} onClick={()=>createNFT()}>
             Create NFT
           </Button>
         </div>
         <div>
           <div className={styles.inputHeader}>UPLOAD FILE</div>
           <div className={styles.uploadContainer}>
-            {!image ? (
+            {!imageData ? (
               <div>
                 <div style={{ textAlign: "center", fontWeight: 500 }}>
                   PNG, GIF, WEBP, MP4 or MP3. Max 30mb.
@@ -131,7 +146,7 @@ export default function MintNFTView() {
                   <Button
                     isOutlined
                     style={{ width: "160px" }}
-                    onClick={() => openLocal()} //setImage("/filler-image-1.png")
+                    onClick={() => openLocal()}
                   >
                     Choose file
                   </Button>
@@ -139,7 +154,7 @@ export default function MintNFTView() {
               </div>
             ) : (
               <>
-                <Image
+                <ImageComponent
                   src={"/trash.svg"}
                   style={{
                     position: "absolute",
@@ -147,7 +162,7 @@ export default function MintNFTView() {
                     right: "24px",
                     cursor: "pointer",
                   }}
-                  onClick={() => setImage(null)}
+                  onClick={() => setImageData(null)}
                 />
                 <div
                   style={{
@@ -156,7 +171,7 @@ export default function MintNFTView() {
                     alignItems: "center",
                   }}
                 >
-                  <Image src={image} w={"180px"} h='240px' />
+                  <ImageComponent src={imageData} w={"200px"} h={proportionalImage(200)} />
                 </div>
               </>
             )}
