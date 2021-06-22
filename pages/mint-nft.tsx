@@ -9,11 +9,12 @@ import { Image as ImageComponent }  from "@chakra-ui/image";
 import { Contract } from "@ethersproject/contracts";
 import { useWeb3Context } from "/contexts/Web3Context";
 import {utils} from "ethers";
-
+const ethers = require('ethers');
 
 const contracts = [{providerChainId:1, address:'NA'},{providerChainId:5, address:'0x1941a9207c0145693b66ec2a67bc6cfecced794a'}]
+// only ABI funct needed to mint
 const mintAbi = [
-  "function mint(address _to, string memory tokenURI) public"
+  "function mint(address _to, string tokenURI)"
   ];
 
   // { Json Version
@@ -38,22 +39,28 @@ export default function MintNFTView() {
   const [name, setName] = useState();
   const [description, setDescription] = useState();
 
+  const transactionOptions = { // hardcoded forced for error on automatic gas estimation (Goerli stuff??)
+      gasLimit: 600000,
+      gasPrice: ethers.utils.parseUnits('100.0', 'gwei')
+  }
+
+
   let optionalBytecode;
   useEffect(()=>{
-    let address = contracts.find(x=>x.providerChainId === providerChainId).address;
-    async function loadContract() {
+    let address = contracts.find(x=>x.providerChainId === providerChainId).address; // contract specific providerChainId
+    async function loadContract() { //Load contract instance
       if (typeof provider !== "undefined" && address && mintAbi) {
         try {
           let signer;
           const accounts = await provider.listAccounts();
           if (accounts && accounts.length > 0) {
-            signer = provider.getSigner();
+            signer = provider.getSigner();// get signer
           } else {
-            signer = provider;
+            signer = provider; // or use RPC (cannot sign tx's. should call a connect warning)
           }
 
           const customContract = new Contract(address, mintAbi, signer);
-          if (optionalBytecode) customContract.bytecode = optionalBytecode;
+          if (optionalBytecode) customContract.bytecode = optionalBytecode; // for overwriting contract instance
 
           setContract(customContract);
         } catch (e) {
@@ -66,38 +73,47 @@ export default function MintNFTView() {
 
 
   async function createNFT(){
-      let formated = utils.formatBytes32String('ethereum')
-      let gas = await contract.estimateGas.mint(account, formated) // keeps failing for cannot estimate gas
-      console.log(gas)
+      let formatted = 'QmecvmnYsC3WsegU8RLy9nRSRE5dqTv3gPjKU4spBLpmRX'; //fake stuff for tests
+      // utils.formatBytes32String('ethereum') // it has to be a bytes32 type
+      let receipt;
+      let tx = await contract.mint(account, formatted, transactionOptions) // fails on cannot estimate gas. with pre-settings passes.
+      try{
+        receipt = await tx.wait();
+      }catch(e){
+        receipt = 'Error: ',e.toString() //test this
+      }
+      console.log('Transaction receipt');
+      console.log(receipt);
 
     // i need the image cid
     // upload data IPFS (and pin it w Pinata)
     // send tx,
     // show tx hash
+    // add to metamask tokens received
     // get events
-
+    // navigate to market?
   }
 
-  function openLocal(){
+  function openLocal(){ // Opens the file browser.. implement tests of the file here or include into front
     document.getElementById('imageInput').files = null;
     document.getElementById('imageInput').click()
 // test type? or add accept attributes in input?
   }
 
   async function addFile(){
-    const selectedFile = document.getElementById('imageInput').files[0];
-    let reader = new FileReader();
+    const selectedFile = document.getElementById('imageInput').files[0]; // gots whatever file was uploaded
+    let reader = new FileReader(); // read it
     reader.readAsDataURL(selectedFile);
     reader.onloadend = function () {
         setImageData(reader.result)
-        var image = new Image();
+        var image = new Image(); // for sizing info
         image.src = reader.result;
         image.onload = function() {
           setImageSize(this.width, this.height)
           }};
   }
 
-  const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
+  const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width} // for sizes adjustments
 
   return (
     <VStack spacing='0' mb='12.8rem'>
