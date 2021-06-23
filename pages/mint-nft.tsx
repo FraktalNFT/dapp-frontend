@@ -8,9 +8,9 @@ import { Image as ImageComponent }  from "@chakra-ui/image";
 import { Contract } from "@ethersproject/contracts";
 import { useWeb3Context } from "/contexts/Web3Context";
 import {utils} from "ethers";
-// import {useExternalContractLoader} from "/hooks/externalContractLoader"; //wasn't found.. WTF?!?
 // import {useIpfsContext} from '/contexts/IpfsContext';
-import {config} from '../default';
+import {pinByHash} from '../utils/pinataPinner';
+
 const Buffer = require('buffer/').Buffer  // note: the trailing slash is important!
 const { create, globSource } = require('ipfs-http-client')
 
@@ -59,13 +59,15 @@ export default function MintNFTView() {
   // get events
   // navigate to market?
 
+
   useEffect(()=>{
     const ipfsClient = create({
       host: "ipfs.infura.io",
       port: "5001",
       protocol: "https",})
-    console.log(ipfsClient)
+    // console.log(ipfsClient)
     setIpfsNode(ipfsClient)
+    console.log('Pinata api: ',process.env.REACT_APP_Pinata_ApiKey)
   },[])
 
   let optionalBytecode;
@@ -96,7 +98,11 @@ export default function MintNFTView() {
 
 
   async function createNFT(metadata){
+      // let cid = metadata.image.split('https://ipfs.io/ipfs/')
       console.log('args: ',account, metadata)
+      let metadataCid = await upload(metadata) // it does not upload the object!!
+      await pinByHash(metadataCid.cid.toString())
+      console.log(metadataCid)
       let receipt;
 
       // let tx = await contract.mint(account, formatted, transactionOptions) // fails on cannot estimate gas. with pre-settings passes.
@@ -122,8 +128,8 @@ export default function MintNFTView() {
     hashAlg: 'sha2-256'
   }
 
-  async function uploadFile(){
-    let added = await ipfsNode.add(file); //, ipfsAddOptions for V1 CIDs
+  async function upload(){
+    let added = await ipfsNode.add(file); // , ipfsAddOptions for V1 CIDs
     // console.log('ADDED',added)
     return added;
   }
@@ -133,13 +139,13 @@ export default function MintNFTView() {
     let url
     let imageUpload
     try{
-      imageUpload = await uploadFile();
-      let imageCid = imageUpload.path
-      console.log('image uploaded to',imageUpload)
+      imageUpload = await upload(file);
     }catch(e){
       console.log('Error: ',e)
       return 'Error uploading the file'
     }
+
+    await pinByHash(imageUpload.cid.toString())
     return [imageUpload.path, imageUpload.cid];
   }
 
@@ -148,14 +154,15 @@ export default function MintNFTView() {
     let reader = new FileReader(); // read it
     let imageCid
     let metadata
-    reader.readAsArrayBuffer(file);
-    reader.onloadend = async function(){
-      let results = await uploadToIpfs()
-      // console.log(results)
-      // ipfsNode.pin.remote.add(results[1], { service: 'pinata' }) // need to configure pinata (method not supported?? see minty!)
-      metadata = await {name:name, description:description, image:`https://ipfs.io/ipfs/${results[0]}`}
-      createNFT(metadata);
-      }
+    let results = await uploadToIpfs()
+    metadata = await {name:name, description:description, image:results[0]}//`https://ipfs.io/ipfs/${results[0]}`
+    createNFT(metadata);
+
+    // reader.readAsArrayBuffer(file);
+    // reader.onloadend = async function(){
+    //   // console.log(results)
+    //   // ipfsNode.pin.remote.add(results[1], { service: 'pinata' }) // need to configure pinata (method not supported?? see minty!)
+    //   }
   }
 
   async function addFile(){ // preparation of the file (front-end exclusive)
