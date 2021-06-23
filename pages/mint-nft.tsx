@@ -8,10 +8,8 @@ import { Image as ImageComponent }  from "@chakra-ui/image";
 import { Contract } from "@ethersproject/contracts";
 import { useWeb3Context } from "/contexts/Web3Context";
 import {utils} from "ethers";
-// import {useIpfsContext} from '/contexts/IpfsContext';
 import {pinByHash} from '../utils/pinataPinner';
 
-const Buffer = require('buffer/').Buffer  // note: the trailing slash is important!
 const { create, globSource } = require('ipfs-http-client')
 
 
@@ -40,8 +38,7 @@ const mintAbi = [
 export default function MintNFTView() {
   const { providerChainId, provider, account } = useWeb3Context();
   const [ipfsNode, setIpfsNode] = useState();
-  // useIpfsContext();
-  const [imageData, setImageData] = useState(null);
+  const [imageData, setImageData] = useState(null); // used?
   const [imageSize, setImageSize] = useState([]);
   const [contract, setContract] = useState(null);
   const [name, setName] = useState();
@@ -52,22 +49,17 @@ export default function MintNFTView() {
       gasPrice: ethers.utils.parseUnits('100.0', 'gwei')
   }
 
-  // upload data IPFS (and pin it w Pinata)
-  // send tx,
   // show tx hash
   // add to metamask tokens received
   // get events
   // navigate to market?
-
 
   useEffect(()=>{
     const ipfsClient = create({
       host: "ipfs.infura.io",
       port: "5001",
       protocol: "https",})
-    // console.log(ipfsClient)
     setIpfsNode(ipfsClient)
-    console.log('Pinata api: ',process.env.REACT_APP_Pinata_ApiKey)
   },[])
 
   let optionalBytecode;
@@ -98,11 +90,9 @@ export default function MintNFTView() {
 
 
   async function createNFT(metadata){
-      // let cid = metadata.image.split('https://ipfs.io/ipfs/')
-      console.log('args: ',account, metadata)
-      let metadataCid = await upload(metadata) // it does not upload the object!!
-      await pinByHash(metadataCid.cid.toString())
-      console.log(metadataCid)
+      let metadataCid = await upload(JSON.stringify(metadata)) // it does not upload the object!!
+      let formatted = metadataCid.cid.toString()
+      await pinByHash(formatted) //Pinata
       let receipt;
 
       // let tx = await contract.mint(account, formatted, transactionOptions) // fails on cannot estimate gas. with pre-settings passes.
@@ -128,14 +118,14 @@ export default function MintNFTView() {
     hashAlg: 'sha2-256'
   }
 
-  async function upload(){
-    let added = await ipfsNode.add(file); // , ipfsAddOptions for V1 CIDs
+  async function upload(data){
+    let added = await ipfsNode.add(data); // , ipfsAddOptions for V1 CIDs
     // console.log('ADDED',added)
     return added;
   }
 
 
-  async function uploadToIpfs(){
+  async function uploadImageToIpfs(){
     let url
     let imageUpload
     try{
@@ -145,29 +135,23 @@ export default function MintNFTView() {
       return 'Error uploading the file'
     }
 
-    await pinByHash(imageUpload.cid.toString())
-    return [imageUpload.path, imageUpload.cid];
+    await pinByHash(imageUpload.cid.toString()) // Pinata
+    return imageUpload.path;
   }
 
 
   async function prepareNftData(){
-    let reader = new FileReader(); // read it
     let imageCid
     let metadata
-    let results = await uploadToIpfs()
-    metadata = await {name:name, description:description, image:results[0]}//`https://ipfs.io/ipfs/${results[0]}`
+    let results = await uploadImageToIpfs()
+    metadata = await {name:name, description:description, image:`https://ipfs.io/ipfs/${results}`}
     createNFT(metadata);
-
-    // reader.readAsArrayBuffer(file);
-    // reader.onloadend = async function(){
-    //   // console.log(results)
-    //   // ipfsNode.pin.remote.add(results[1], { service: 'pinata' }) // need to configure pinata (method not supported?? see minty!)
-    //   }
   }
 
   async function addFile(){ // preparation of the file (front-end exclusive)
     const selectedFile = document.getElementById('imageInput').files[0];
     setFile(selectedFile)
+    // All this is to manage image issues
     let reader = new FileReader(); // read it
     reader.readAsDataURL(selectedFile); //
     reader.onloadend = function () {
