@@ -6,6 +6,7 @@ import "../styles/globals.css";
 import "../styles/fonts.css";
 import Web3ContextProvider from "../contexts/Web3Context";
 import Layout from "../components/layout";
+// import {IpfsProvider} from '../contexts/IpfsContext';
 
 const customTheme = extendTheme({
   colors: {

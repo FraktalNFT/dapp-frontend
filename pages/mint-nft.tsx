@@ -5,13 +5,19 @@ import styles from "../styles/mint-nft.module.css";
 import Button from "../components/button";
 import { HStack } from "@chakra-ui/layout";
 import { Image as ImageComponent }  from "@chakra-ui/image";
-// import {useExternalContractLoader} from "/hooks/externalContractLoader"; //wasn't found.. WTF?!?
 import { Contract } from "@ethersproject/contracts";
 import { useWeb3Context } from "/contexts/Web3Context";
 import {utils} from "ethers";
+// import {useExternalContractLoader} from "/hooks/externalContractLoader"; //wasn't found.. WTF?!?
+// import {useIpfsContext} from '/contexts/IpfsContext';
+import {config} from '../default';
+const Buffer = require('buffer/').Buffer  // note: the trailing slash is important!
+const { create, globSource } = require('ipfs-http-client')
+
+
 const ethers = require('ethers');
 
-const contracts = [{providerChainId:1, address:'NA'},{providerChainId:5, address:'0x1941a9207c0145693b66ec2a67bc6cfecced794a'}]
+const contracts = [{providerChainId:1, address:'0x0000000000000000000000000000000000000000'},{providerChainId:5, address:'0x1941a9207c0145693b66ec2a67bc6cfecced794a'}]
 // only ABI funct needed to mint
 const mintAbi = [
   "function mint(address _to, string tokenURI)"
@@ -33,17 +39,34 @@ const mintAbi = [
 
 export default function MintNFTView() {
   const { providerChainId, provider, account } = useWeb3Context();
+  const [ipfsNode, setIpfsNode] = useState();
+  // useIpfsContext();
   const [imageData, setImageData] = useState(null);
   const [imageSize, setImageSize] = useState([]);
   const [contract, setContract] = useState(null);
   const [name, setName] = useState();
   const [description, setDescription] = useState();
-
+  const [file, setFile] = useState();
   const transactionOptions = { // hardcoded forced for error on automatic gas estimation (Goerli stuff??)
       gasLimit: 600000,
       gasPrice: ethers.utils.parseUnits('100.0', 'gwei')
   }
 
+  // upload data IPFS (and pin it w Pinata)
+  // send tx,
+  // show tx hash
+  // add to metamask tokens received
+  // get events
+  // navigate to market?
+
+  useEffect(()=>{
+    const ipfsClient = create({
+      host: "ipfs.infura.io",
+      port: "5001",
+      protocol: "https",})
+    console.log(ipfsClient)
+    setIpfsNode(ipfsClient)
+  },[])
 
   let optionalBytecode;
   useEffect(()=>{
@@ -72,26 +95,19 @@ export default function MintNFTView() {
   },[provider, optionalBytecode])
 
 
-  async function createNFT(){
-      let formatted = 'QmecvmnYsC3WsegU8RLy9nRSRE5dqTv3gPjKU4spBLpmRX'; //fake stuff for tests
-      // utils.formatBytes32String('ethereum') // it has to be a bytes32 type
+  async function createNFT(metadata){
+      console.log('args: ',account, metadata)
       let receipt;
-      let tx = await contract.mint(account, formatted, transactionOptions) // fails on cannot estimate gas. with pre-settings passes.
-      try{
-        receipt = await tx.wait();
-      }catch(e){
-        receipt = 'Error: ',e.toString() //test this
-      }
-      console.log('Transaction receipt');
-      console.log(receipt);
 
-    // i need the image cid
-    // upload data IPFS (and pin it w Pinata)
-    // send tx,
-    // show tx hash
-    // add to metamask tokens received
-    // get events
-    // navigate to market?
+      // let tx = await contract.mint(account, formatted, transactionOptions) // fails on cannot estimate gas. with pre-settings passes.
+      // try{
+      //   receipt = await tx.wait();
+      // }catch(e){
+      //   receipt = 'Error: ',e.toString() //test this
+      // }
+      // console.log('Transaction receipt');
+      // console.log(receipt);
+
   }
 
   function openLocal(){ // Opens the file browser.. implement tests of the file here or include into front
@@ -100,17 +116,61 @@ export default function MintNFTView() {
 // test type? or add accept attributes in input?
   }
 
-  async function addFile(){
-    const selectedFile = document.getElementById('imageInput').files[0]; // gots whatever file was uploaded
+  // ipfs.add parameters for more deterministic CIDs
+  const ipfsAddOptions = {
+    cidVersion: 1,
+    hashAlg: 'sha2-256'
+  }
+
+  async function uploadFile(){
+    let added = await ipfsNode.add(file); //, ipfsAddOptions for V1 CIDs
+    // console.log('ADDED',added)
+    return added;
+  }
+
+
+  async function uploadToIpfs(){
+    let url
+    let imageUpload
+    try{
+      imageUpload = await uploadFile();
+      let imageCid = imageUpload.path
+      console.log('image uploaded to',imageUpload)
+    }catch(e){
+      console.log('Error: ',e)
+      return 'Error uploading the file'
+    }
+    return [imageUpload.path, imageUpload.cid];
+  }
+
+
+  async function prepareNftData(){
     let reader = new FileReader(); // read it
-    reader.readAsDataURL(selectedFile);
+    let imageCid
+    let metadata
+    reader.readAsArrayBuffer(file);
+    reader.onloadend = async function(){
+      let results = await uploadToIpfs()
+      // console.log(results)
+      // ipfsNode.pin.remote.add(results[1], { service: 'pinata' }) // need to configure pinata (method not supported?? see minty!)
+      metadata = await {name:name, description:description, image:`https://ipfs.io/ipfs/${results[0]}`}
+      createNFT(metadata);
+      }
+  }
+
+  async function addFile(){ // preparation of the file (front-end exclusive)
+    const selectedFile = document.getElementById('imageInput').files[0];
+    setFile(selectedFile)
+    let reader = new FileReader(); // read it
+    reader.readAsDataURL(selectedFile); //
     reader.onloadend = function () {
         setImageData(reader.result)
         var image = new Image(); // for sizing info
         image.src = reader.result;
         image.onload = function() {
           setImageSize(this.width, this.height)
-          }};
+          }
+      }
   }
 
   const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width} // for sizes adjustments
@@ -133,7 +193,7 @@ export default function MintNFTView() {
             DESCRIPTION (OPTIONAL)
           </div>
           <input className={styles.input} id="descriptionIn"   onChange={(e)=>setDescription(e.target.value)}/>
-          <Button disabled={!imageData || !name} style={{ display: "block", marginTop: "40px" }} onClick={()=>createNFT()}>
+          <Button disabled={!imageData || !name} style={{ display: "block", marginTop: "40px" }} onClick={()=>prepareNftData()}>
             Create NFT
           </Button>
         </div>

@@ -1,0 +1,7 @@
+export const config = {
+  pinningService: {
+        name: 'pinata',
+        endpoint: 'https://api.pinata.cloud/psa',
+        key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIzNjk4ZDMxOS1hMTM2LTRjZTQtOWU1NC0zNWMwZjBkMjFkMDQiLCJlbWFpbCI6Imx1Y2FzemllZ2VuZnVoc0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJpZCI6Ik5ZQzEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlfSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiYjE0MWJlODFlZTVjYzYyYmYzNjgiLCJzY29wZWRLZXlTZWNyZXQiOiI3MjMyYWRjYzAyYzA3ZTVkMTgyNWZjZDc1MWY5MmIxNDdiMmFjN2U2OThiOTg2ZWQ2NjVkMGM3YWZhNzU4NmNkIiwiaWF0IjoxNjI0Mzk3MDk1fQ.a5sF34V6yBnq-gqi8qTi0HbJUeiEF6e9kSKaztwcf9s'
+    }
+}
