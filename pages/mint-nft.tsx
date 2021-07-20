@@ -8,17 +8,16 @@ import { Image as ImageComponent }  from "@chakra-ui/image";
 import { Contract } from "@ethersproject/contracts";
 import { useWeb3Context } from "/contexts/Web3Context";
 import {utils} from "ethers";
-import {pinByHash} from '../utils/pinataPinner';
+import {pinByHash} from '../utils/pinataPinner'; // Since we upload to IPFS, simply call pin services to pin the hash
 
-const { create, globSource } = require('ipfs-http-client')
-
-
+const { create, globSource } = require('ipfs-http-client');
 const ethers = require('ethers');
 
-const contracts = [{providerChainId:1, address:'0x0000000000000000000000000000000000000000'},{providerChainId:5, address:'0x1941a9207c0145693b66ec2a67bc6cfecced794a'}]
+// Contracts to expose mint function
+const contracts = [{providerChainId:1, address:'0x0000000000000000000000000000000000000000'},{providerChainId:5, address:'0xF9680c2e645531AbFcD80DAC0A34D42c08b60B78'}]
 // only ABI funct needed to mint
 const mintAbi = [
-  "function mint(address _to, string tokenURI)"
+  "function mint(string tokenURI)"
   ];
 
   // { Json Version
@@ -34,7 +33,6 @@ const mintAbi = [
   //   type: "function",
   // }
 
-
 export default function MintNFTView() {
   const { providerChainId, provider, account } = useWeb3Context();
   const [ipfsNode, setIpfsNode] = useState();
@@ -46,7 +44,7 @@ export default function MintNFTView() {
   const [file, setFile] = useState();
   const transactionOptions = { // hardcoded forced for error on automatic gas estimation (Goerli stuff??)
       gasLimit: 600000,
-      gasPrice: ethers.utils.parseUnits('100.0', 'gwei')
+      gasPrice: ethers.utils.parseUnits('5.0', 'gwei')
   }
 
   // show tx hash
@@ -95,14 +93,14 @@ export default function MintNFTView() {
       await pinByHash(formatted) //Pinata
       let receipt;
 
-      // let tx = await contract.mint(account, formatted, transactionOptions) // fails on cannot estimate gas. with pre-settings passes.
-      // try{
-      //   receipt = await tx.wait();
-      // }catch(e){
-      //   receipt = 'Error: ',e.toString() //test this
-      // }
-      // console.log('Transaction receipt');
-      // console.log(receipt);
+      let tx = await contract.mint(formatted) // fails on cannot estimate gas. with pre-settings passes.
+      try{
+        receipt = await tx.wait();
+      }catch(e){
+        receipt = 'Error: ',e.toString() //test this
+      }
+      console.log('Transaction receipt');
+      console.log(receipt);
 
   }
 
