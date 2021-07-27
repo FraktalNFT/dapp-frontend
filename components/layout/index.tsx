@@ -8,7 +8,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { providerChainId } = useWeb3Context();
 
   const isValid = useMemo(
-    () => [1, 5].includes(providerChainId),
+    () => [null, 1, 5].includes(providerChainId),
     [providerChainId]
   );
 
