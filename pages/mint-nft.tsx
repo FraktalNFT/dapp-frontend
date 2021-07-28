@@ -10,11 +10,11 @@ import { useWeb3Context } from "/contexts/Web3Context";
 import {utils} from "ethers";
 import {pinByHash} from '../utils/pinataPinner'; // Since we upload to IPFS, simply call pin services to pin the hash
 
-const { create, globSource } = require('ipfs-http-client');
+const { create } = require('ipfs-http-client');
 const ethers = require('ethers');
 
 // Contracts to expose mint function
-const contracts = [{providerChainId:1, address:'0x0000000000000000000000000000000000000000'},{providerChainId:5, address:'0xF9680c2e645531AbFcD80DAC0A34D42c08b60B78'}]
+const contracts = [{providerChainId:1, address:'0x0000000000000000000000000000000000000000'},{providerChainId:5, address:'0xA916BbdB90bA3BA7DCca09F2D3B249180f7fE0D2'}]
 // only ABI funct needed to mint
 const mintAbi = [
   "function mint(string tokenURI)"
@@ -142,7 +142,7 @@ export default function MintNFTView() {
     let imageCid
     let metadata
     let results = await uploadImageToIpfs()
-    metadata = await {name:name, description:description, image:`https://ipfs.io/ipfs/${results}`}
+    metadata = await {name:name, description:description, image:results}
     createNFT(metadata);
   }
 

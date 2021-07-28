@@ -1,3 +1,4 @@
+import { gql, useQuery } from "@apollo/client";
 import { Grid, HStack, VStack } from "@chakra-ui/layout";
 import Head from "next/head";
 import React from "react";
@@ -9,6 +10,24 @@ import styles from "../styles/my-nfts.module.css";
 import FrakButton from "../components/button";
 
 export default function MyNFTsView() {
+  // filter only by my account
+  const QUERY_GRAPHQL = `
+  query {
+    users{
+      id
+      fraktals
+    }
+    fraktionsBalances(first: 25){
+      id
+      amount
+    }
+    }
+  `;
+  const QUERY_GQL = gql(QUERY_GRAPHQL);
+  const { loading, data } = useQuery(QUERY_GQL, { pollInterval: 18000 });
+  console.log('data fetched: ', data);
+  // query the tokens data.. 
+
   const demoNFTItemsFull: FrakCard[] = Array.from({ length: 3 }).map(
     (_, index) => ({
       id: index + 1,

@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@apollo/client": "^3.3.21",
     "@chakra-ui/react": "^1.6.1",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
@@ -15,6 +16,7 @@
     "axios": "^0.21.1",
     "ethers": "^5.1.4",
     "framer-motion": "^4",
+    "graphql": "^15.5.1",
     "ipfs-http-client": "^50.1.2",
     "moment": "^2.29.1",
     "next": "10.2.0",
