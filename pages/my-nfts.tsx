@@ -18,13 +18,18 @@ export default function MyNFTsView() {
 
   useEffect(async()=>{
     let objects = await getAccountFraktalNFTs('account_fraktals',account)
+    console.log('-')
     Promise.all(objects.fraktalNFTs.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
-  },[account])
+  },[account]);
   useEffect(async()=>{
-    let objects = await getAccountFraktalNFTs('account_fraktions','^'.concat(account))
-    console.log('fraktions',objects)
+    let objects = await getAccountFraktalNFTs('account_fraktions',account)
     if(objects){
-      setFraktionItems(objects)
+      let objectsInner = objects.fraktionsBalances.filter(x=>{return x.id.startsWith(account.slice(0,6))})
+      let ownerTokenId = objectsInner.map(x=>({owner:x.id.split('-')[0],tokenId:x.id.split('-')[1]}))
+      let fraktalsOwned = ownerTokenId.map(x=>{return x.tokenId})
+      // console.log('fraktions',objectsInner)
+
+      setFraktionItems(ownerTokenId)
     }
   },[account])
 

@@ -38,7 +38,7 @@ export default function AuctionNFTView() {
           <div className={styles.goBack}>← back to all NFTS</div>
         </Link>
 
-        <div className={styles.header}>{exampleNFT.name}</div>
+        <div className={styles.header}>{nftObject?nftObject.name:''}</div>
         <HStack spacing="32px" marginTop="40px" align="flex-start">
           <div>
               <Image

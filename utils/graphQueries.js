@@ -82,13 +82,26 @@ const users = gql`
   }
 `
 const account_fraktions_query = gql`
-  query($id:String!){
-    fraktionsBalances(first:10, where:{id:{regex:$id}}){
+  query{
+    fraktionsBalances(first:10){
       id
       amount
     }
   }
 `
+const fraktal_fraktions_query = gql`
+query($id:ID!){
+  fraktalNFTs(where:{fraktions:$id}) {
+    id
+    marketId
+    hash
+    creator
+    fraktions{
+      amount
+    }
+  }
+  }
+`;
 const calls = [
   {name: 'account_fraktals', call: account_query},
   {name: 'account_fraktions', call: account_fraktions_query},
@@ -98,6 +111,7 @@ const calls = [
   {name: 'artists', call: users},
   {name: 'all', call: all_nfts},
   {name: 'creator', call: creator_query},
+  {name: 'id_fraktions', call: fraktal_fraktions_query},
 ]
 
 export const getAccountFraktalNFTs = async (call, id) => {
