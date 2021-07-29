@@ -1,32 +1,37 @@
 import { gql, useQuery } from "@apollo/client";
 import { Grid, HStack, VStack } from "@chakra-ui/layout";
 import Head from "next/head";
-import React from "react";
+import React, {useEffect, useState, useCallback} from "react";
 import { BigNumber } from "ethers";
 import { FrakCard } from "../types";
 import NFTItem from "../components/nft-item";
 import NextLink from "next/link";
 import styles from "../styles/my-nfts.module.css";
 import FrakButton from "../components/button";
-
+import { useWeb3Context } from '../contexts/Web3Context';
+import { getAccountFraktalNFTs, createObject } from '../utils/graphQueries';
+const { create, CID } = require('ipfs-http-client');
 export default function MyNFTsView() {
+  const { account } = useWeb3Context();
+  const [nftItems, setNftItems] = useState();
   // filter only by my account
-  const QUERY_GRAPHQL = `
-  query {
-    users{
-      id
-      fraktals
+
+  async function getFraktals(account){
+    let data
+    // setInterval(async function(){
+    data = await getAccountFraktalNFTs('account_fraktals',account)
+    console.log('data fetched: ', data,' - account: ', account);
+    // }, 180)
+    if(data){
+      console.log('--')
+      Promise.all(data.fraktalNFTs.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
+    }else{
+      setNftItems([])
     }
-    fraktionsBalances(first: 25){
-      id
-      amount
-    }
-    }
-  `;
-  const QUERY_GQL = gql(QUERY_GRAPHQL);
-  const { loading, data } = useQuery(QUERY_GQL, { pollInterval: 18000 });
-  console.log('data fetched: ', data);
-  // query the tokens data.. 
+  }
+  useEffect(()=>{
+    getFraktals(account)
+  },[account])
 
   const demoNFTItemsFull: FrakCard[] = Array.from({ length: 3 }).map(
     (_, index) => ({
@@ -54,7 +59,8 @@ export default function MyNFTsView() {
         <title>Fraktal - My NFTs</title>
       </Head>
       <div className={styles.header}>My NFTs</div>
-      {demoNFTItemsFull.length ? (
+      <button onClick={()=>console.log(nftItems)}>test</button>
+      {nftItems?.length ? (
         <Grid
           mt='40px !important'
           ml='0'
@@ -64,7 +70,7 @@ export default function MyNFTsView() {
           templateColumns='repeat(3, 1fr)'
           gap='3.2rem'
         >
-          {demoNFTItemsFull.map(item => (
+          {nftItems.map(item => (
             <NFTItem key={item.id} item={item} CTAText={"List on Market"} />
           ))}
         </Grid>
@@ -81,7 +87,7 @@ export default function MyNFTsView() {
         </div>
       )}
       <div className={styles.header2}>My Fraktions</div>
-      {demoNFTFraktionsFull.length ? (
+      {nftItems?.length ? (
         <div style={{ marginTop: "16px" }}>
           <div className={styles.subText}>You have earned</div>
           <div

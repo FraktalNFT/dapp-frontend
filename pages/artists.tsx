@@ -1,5 +1,5 @@
 import { Box, Grid, HStack, VStack, Text } from "@chakra-ui/layout";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { FrakCard } from "../types";
 import { BigNumber } from "ethers";
@@ -10,16 +10,51 @@ import FrakButton from "../components/button";
 import Pagination from "../components/pagination";
 import styles from "../styles/artists.module.css";
 import { Image } from "@chakra-ui/image";
+import { shortenHash } from "../utils/helpers";
+import { getAccountFraktalNFTs, createObject, getNFTobject } from '../utils/graphQueries';
 
 export default function ArtistsView() {
   const SORT_TYPES = ["Popular", "New"];
   const [selectionMode, setSelectionMode] = useState(false);
   const [sortType, setSortType] = useState("Popular");
+  const [artists, setArtists] = useState([]);
+  const [fraktalItems, setFraktalItems] = useState();
+  const [nftItems, setNftItems] = useState([]);
+  const [artistsItems, setArtistsItems] = useState([]);
+
 
   const handleSortSelect = (item: string) => {
     setSortType(item);
     setSelectionMode(false);
   };
+
+  useEffect(()=>{
+    if(!fraktalItems){
+      const data = getAccountFraktalNFTs('artists','')
+      let fraktalsSamples
+      data.then((d)=>{
+        setArtists(d.users)
+        fraktalsSamples = d.users.map(x=>{return x.fraktals[0]})
+        console.log('-*--',fraktalsSamples)
+        Promise.all(fraktalsSamples.map(x=>{return getAccountFraktalNFTs('id_fraktal', x)})).then((results)=>setFraktalItems(results.map(x=>{return x.fraktalNFTs[0]})))
+      })
+    }else{
+      console.log('--*-')
+      Promise.all(fraktalItems.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
+    }
+  },[fraktalItems])
+  useEffect(()=>{
+      if(nftItems.length){
+        console.log('hey')
+        let artistsObj = artists.map((x,i)=>({
+          id: x.id,
+          name: shortenHash(x.id),
+          imageURL: nftItems[i].imageURL,
+          totalGallery:x.fraktals.length,
+        }))
+        setArtistsItems(artistsObj)
+      }
+  },[nftItems])
 
   // TODO: hardcoded stuff as of now
   const demoArtistItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
@@ -66,6 +101,7 @@ export default function ArtistsView() {
           <Image src='/search.svg' />
         </div>
       </HStack>
+      {/*artists[i].fraktals.length*/}
       <Grid
         margin='0 !important'
         mb='5.6rem !important'
@@ -73,9 +109,10 @@ export default function ArtistsView() {
         templateColumns='repeat(3, 1fr)'
         gap='3.2rem'
       >
-        {demoArtistItemsFull.map(item => (
+        <button onClick={()=>console.log(artistsObj)}>test</button>
+        {artistsItems.map((item, i) => (
           <NextLink href={`/artist/${item.id}`}>
-            <NFTItem key={item.id} item={item} CTAText='View 3 NFTs' />
+            <NFTItem key={artists[i].id} item={item} CTAText={item.totalGallery} />
           </NextLink>
         ))}
       </Grid>

@@ -27,21 +27,6 @@ const customTheme = extendTheme({
 const APIURL = 'https://api.studio.thegraph.com/query/101/fraktalgoerli/v0.0.1';
 const client = new ApolloClient({  uri: APIURL,  cache: new InMemoryCache()});
 
-// const httpLink = createHttpLink({
-//   uri: 'https://api.thegraph.com/studio/subgraph/fraktalgoerli/',
-// });
-//
-// const authLink = setContext((_, { headers }) => {
-//   // get the authentication token from local storage if it exists
-//   const token = localStorage.getItem('token');
-//   // return the headers to the context so httpLink can read them
-//   return {
-//     headers: {
-//       ...headers,
-//       authorization: token ? `Bearer ${token}` : "",
-//     }
-//   }
-// });
 function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider theme={customTheme}>

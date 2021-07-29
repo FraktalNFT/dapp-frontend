@@ -17,6 +17,7 @@
     "ethers": "^5.1.4",
     "framer-motion": "^4",
     "graphql": "^15.5.1",
+    "graphql-request": "^3.5.0",
     "ipfs-http-client": "^50.1.2",
     "moment": "^2.29.1",
     "next": "10.2.0",
