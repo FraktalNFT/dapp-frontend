@@ -1,38 +1,50 @@
+import { gql, useQuery } from "@apollo/client";
 import { Box, Grid, HStack, Text, VStack } from "@chakra-ui/layout";
 import { BigNumber } from "ethers";
 import Head from "next/head";
 import NextLink from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FrakButton from "../components/button";
 import Dropdown from "../components/dropdown";
 import NFTItem from "../components/nft-item";
 import Pagination from "../components/pagination";
 import { FrakCard } from "../types";
-
+import {getAccountFraktalNFTs, createObject} from '../utils/graphQueries';
+const { create, CID } = require('ipfs-http-client');
 const SORT_TYPES = ["Popular", "Ending Soonest", "Newly Listed"];
-
-// TODO: hardcoded stuff as of now
-const demoNFTItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
-  (_, index) => ({
-    id: index + 1,
-    name: "Golden Fries Cascade",
-    imageURL: "/filler-image-1.png",
-    contributions: BigNumber.from(5).div(100),
-    createdAt: new Date().toISOString(),
-    countdown: new Date("06-25-2021"),
-  })
-);
 
 const demoNFTItemsEmpty = [];
 
 const Home: React.FC = () => {
   const [selectionMode, setSelectionMode] = useState(false);
   const [sortType, setSortType] = useState("Popular");
-
+  const [nftItems, setNftItems] = useState([]);
   const handleSortSelect = (item: string) => {
     setSortType(item);
     setSelectionMode(false);
   };
+
+  useEffect(async ()=>{
+    let data = await getAccountFraktalNFTs('all','')
+    if(data){
+      console.log('-')
+      Promise.all(data.fraktalNFTs.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
+    }
+  },[])
+
+
+
+  // TODO: hardcoded stuff as of now
+  const demoNFTItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
+    (_, index) => ({
+      id: index + 1,
+      name: "Golden Fries Cascade",
+      imageURL: "/filler-image-1.png",
+      contributions: BigNumber.from(5).div(100),
+      createdAt: new Date().toISOString(),
+      countdown: new Date("06-25-2021"),
+    })
+  );
 
   return (
     <VStack spacing='0' mb='12.8rem'>
@@ -64,7 +76,8 @@ const Home: React.FC = () => {
           <FrakButton>List NFT</FrakButton>
         </NextLink>
       </HStack>
-      {demoNFTItemsFull.length ? (
+
+      {nftItems.length ? (
         <>
           <Grid
             margin='0 !important'
@@ -73,7 +86,7 @@ const Home: React.FC = () => {
             templateColumns='repeat(3, 1fr)'
             gap='3.2rem'
           >
-            {demoNFTItemsFull.map(item => (
+            {nftItems.map(item => (
               <NextLink key={item.id} href={`/nft/${item.id}/auction`}>
                 <NFTItem item={item} />
               </NextLink>

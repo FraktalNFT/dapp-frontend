@@ -35,9 +35,6 @@ const Header = () => {
             <NextLink href='/dao'>
               <Link className='semi-16'>DAO</Link>
             </NextLink>
-            <NextLink href='/learn-more'>
-              <Link className='semi-16'>Learn More</Link>
-            </NextLink>
           </HStack>
           {!account ? (
             <FrakButton onClick={connectWeb3}>Connect Wallet</FrakButton>
