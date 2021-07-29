@@ -14,23 +14,18 @@ const { create, CID } = require('ipfs-http-client');
 export default function MyNFTsView() {
   const { account } = useWeb3Context();
   const [nftItems, setNftItems] = useState();
-  // filter only by my account
+  const [fraktionItems, setFraktionItems] = useState();
 
-  async function getFraktals(account){
-    let data
-    // setInterval(async function(){
-    data = await getAccountFraktalNFTs('account_fraktals',account)
-    console.log('data fetched: ', data,' - account: ', account);
-    // }, 180)
-    if(data){
-      console.log('--')
-      Promise.all(data.fraktalNFTs.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
-    }else{
-      setNftItems([])
+  useEffect(async()=>{
+    let objects = await getAccountFraktalNFTs('account_fraktals',account)
+    Promise.all(objects.fraktalNFTs.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
+  },[account])
+  useEffect(async()=>{
+    let objects = await getAccountFraktalNFTs('account_fraktions','^'.concat(account))
+    console.log('fraktions',objects)
+    if(objects){
+      setFraktionItems(objects)
     }
-  }
-  useEffect(()=>{
-    getFraktals(account)
   },[account])
 
   const demoNFTItemsFull: FrakCard[] = Array.from({ length: 3 }).map(
@@ -59,7 +54,6 @@ export default function MyNFTsView() {
         <title>Fraktal - My NFTs</title>
       </Head>
       <div className={styles.header}>My NFTs</div>
-      <button onClick={()=>console.log(nftItems)}>test</button>
       {nftItems?.length ? (
         <Grid
           mt='40px !important'

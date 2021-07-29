@@ -6,6 +6,7 @@ import {
 } from "./constants";
 import { utils } from "ethers";
 
+export const timezone = (timestamp) => {return new Date(timestamp*1000).toLocaleDateString("en-US")}
 export const getNetworkName = (chainId: number) => networkNames[chainId || 1];
 export const getNetworkLabel = (chainId: number) => networkLabels[chainId || 1];
 export const getRPCUrl = (chainId: number) => chainUrls[chainId || 1].rpc;

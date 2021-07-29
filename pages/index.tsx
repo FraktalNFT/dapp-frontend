@@ -1,4 +1,3 @@
-import { gql, useQuery } from "@apollo/client";
 import { Box, Grid, HStack, Text, VStack } from "@chakra-ui/layout";
 import { BigNumber } from "ethers";
 import Head from "next/head";

@@ -22,7 +22,6 @@ export default function ArtistsView() {
   const [nftItems, setNftItems] = useState([]);
   const [artistsItems, setArtistsItems] = useState([]);
 
-
   const handleSortSelect = (item: string) => {
     setSortType(item);
     setSelectionMode(false);
@@ -35,25 +34,24 @@ export default function ArtistsView() {
       data.then((d)=>{
         setArtists(d.users)
         fraktalsSamples = d.users.map(x=>{return x.fraktals[0]})
-        console.log('-*--',fraktalsSamples)
-        Promise.all(fraktalsSamples.map(x=>{return getAccountFraktalNFTs('id_fraktal', x)})).then((results)=>setFraktalItems(results.map(x=>{return x.fraktalNFTs[0]})))
+        Promise.all(fraktalsSamples.map(x=>{return getAccountFraktalNFTs('id_fraktal', x)}))
+          .then((results)=>setFraktalItems(results.map(y=>{return y.fraktalNFTs[0]})))//
       })
     }else{
-      console.log('--*-')
       Promise.all(fraktalItems.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
     }
   },[fraktalItems])
+
   useEffect(()=>{
-      if(nftItems.length){
-        console.log('hey')
-        let artistsObj = artists.map((x,i)=>({
-          id: x.id,
-          name: shortenHash(x.id),
-          imageURL: nftItems[i].imageURL,
-          totalGallery:x.fraktals.length,
-        }))
-        setArtistsItems(artistsObj)
-      }
+    if(nftItems.length){
+      let artistsObj = artists.map((x,i)=>({
+        id: x.id,
+        name: shortenHash(x.id),
+        imageURL: nftItems[i].imageURL,
+        totalGallery:x.fraktals.length,
+      }))
+      setArtistsItems(artistsObj)
+    }
   },[nftItems])
 
   // TODO: hardcoded stuff as of now
@@ -109,7 +107,6 @@ export default function ArtistsView() {
         templateColumns='repeat(3, 1fr)'
         gap='3.2rem'
       >
-        <button onClick={()=>console.log(artistsObj)}>test</button>
         {artistsItems.map((item, i) => (
           <NextLink href={`/artist/${item.id}`}>
             <NFTItem key={artists[i].id} item={item} CTAText={item.totalGallery} />

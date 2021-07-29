@@ -1,14 +1,26 @@
 import { VStack } from "@chakra-ui/layout";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { BigNumber } from "ethers";
 import { Image } from "@chakra-ui/image";
 import styles from "./manage.module.css";
 import Button from "../../../components/button";
-
+import {getAccountFraktalNFTs, createObject, getNFTobject} from '../../../utils/graphQueries';
+import {shortenHash, timezone} from '../../../utils/helpers';
 export default function ManageNFTView() {
+  const address = window.location.href.split('http://localhost:3000/nft/');
+  const index = parseFloat(address[1].split('/manage')[0])
+  const [nftObject, setNftObject] = useState();
   const [view, setView] = useState("accepted");
+
+  useEffect(async ()=>{
+      let obj = await getAccountFraktalNFTs('marketid_fraktal',index)
+      let nftObjects = await createObject(obj.fraktalNFTs[0])
+      if(nftObjects){
+        setNftObject(nftObjects)
+      }
+  },[index])
 
   const exampleNFT = {
     id: 0,
@@ -28,7 +40,7 @@ export default function ManageNFTView() {
         <Link href="/">
           <div className={styles.goBack}>← back to all NFTS</div>
         </Link>
-        <div className={styles.header}>{exampleNFT.name}</div>
+        <div className={styles.header}>{nftObject?nftObject.name:''}</div>
 
         <div
           style={{
@@ -132,7 +144,7 @@ export default function ManageNFTView() {
             </div>
           )}
           <Image
-            src={exampleNFT.imageURL}
+            src={nftObject?nftObject.imageURL:exampleNFT.imageURL}
             w={"320px"}
             h={"320px"}
             borderRadius="4px"

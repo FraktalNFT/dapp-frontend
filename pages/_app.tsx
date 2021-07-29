@@ -1,5 +1,4 @@
 import { Box, ChakraProvider, extendTheme, VStack } from "@chakra-ui/react";
-import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import Header from "../components/header";
 import Footer from "../components/footer";
 
@@ -24,22 +23,18 @@ const customTheme = extendTheme({
     },
   },
 });
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktalgoerli/v0.0.1';
-const client = new ApolloClient({  uri: APIURL,  cache: new InMemoryCache()});
 
 function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider theme={customTheme}>
-      <ApolloProvider client={client}>
-        <Web3ContextProvider>
-          <Layout>
-            <VStack maxW='96.4rem' mx='auto' pt='6.4rem' flex={1} id='app'>
-              <Component {...pageProps} />
-            </VStack>
-            <Footer />
-          </Layout>
-        </Web3ContextProvider>
-      </ApolloProvider>
+      <Web3ContextProvider>
+        <Layout>
+          <VStack maxW='96.4rem' mx='auto' pt='6.4rem' flex={1} id='app'>
+            <Component {...pageProps} />
+          </VStack>
+          <Footer />
+        </Layout>
+      </Web3ContextProvider>
     </ChakraProvider>
   );
 }

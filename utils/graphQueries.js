@@ -21,7 +21,33 @@ query($id:ID!){
   }
   }
 `;
+const creator_query = gql`
+query($id:ID!){
+  fraktalNFTs(where:{creator:$id}) {
+    id
+    marketId
+    hash
+    createdAt
+    creator {
+      id
+    }
+  }
+  }
+`;
 const marketid_query = gql`
+query($id:ID!){
+  fraktalNFTs(where:{marketId:$id}) {
+    id
+    marketId
+    hash
+    createdAt
+    creator {
+      id
+    }
+  }
+  }
+`;
+const id_query = gql`
 query($id:ID!){
   fraktalNFTs(where:{id:$id}) {
     id
@@ -36,7 +62,7 @@ query($id:ID!){
 `;
 const all_nfts = gql`
 query {
-  fraktalNFTs(first: 20) {
+  fraktalNFTs(first: 20, orderBy: "createdAt",  orderDirection: "desc") {
     id
     marketId
     hash
@@ -49,20 +75,29 @@ query {
 `;
 const users = gql`
   query{
-    users(first: 10) {
+    users(first: 20) {
       id
       fraktals
     }
   }
 `
+const account_fraktions_query = gql`
+  query($id:String!){
+    fraktionsBalances(first:10, where:{id:{regex:$id}}){
+      id
+      amount
+    }
+  }
+`
 const calls = [
   {name: 'account_fraktals', call: account_query},
-  {name: 'account_fraktions', call: account_query},
-  {name: 'id_fraktal', call: marketid_query},
+  {name: 'account_fraktions', call: account_fraktions_query},
+  {name: 'marketid_fraktal', call: marketid_query},
+  {name: 'id_fraktal', call: id_query},
   {name: 'listed_items', call: account_query},
   {name: 'artists', call: users},
   {name: 'all', call: all_nfts},
-
+  {name: 'creator', call: creator_query},
 ]
 
 export const getAccountFraktalNFTs = async (call, id) => {
@@ -83,6 +118,7 @@ export async function createObject(data){
   if(nftMetadata){
     // console.log('meta',nftMetadata)
     return {
+      creator:data.creator.id,
       id: data.marketId,
       name: nftMetadata.name,
       imageURL: checkImageCID(nftMetadata.image),

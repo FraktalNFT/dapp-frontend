@@ -1,13 +1,24 @@
 import { HStack, VStack } from "@chakra-ui/layout";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { BigNumber } from "ethers";
 import { Image } from "@chakra-ui/image";
-import moment from "moment";
 import styles from "./auction.module.css";
-
+import {shortenHash, timezone} from '../../../utils/helpers';
+import {getAccountFraktalNFTs, createObject, getNFTobject} from '../../../utils/graphQueries';
 export default function AuctionNFTView() {
+  const address = window.location.href.split('http://localhost:3000/nft/');
+  const index = parseFloat(address[1].split('/auction')[0])
+  const [nftObject, setNftObject] = useState();
+
+  useEffect(async ()=>{
+      let obj = await getAccountFraktalNFTs('marketid_fraktal',index)
+      let nftObjects = await createObject(obj.fraktalNFTs[0])
+      if(nftObjects){
+        setNftObject(nftObjects)
+      }
+  },[index])
   const exampleNFT = {
     id: 0,
     name: "Golden Fries Cascade",
@@ -26,25 +37,26 @@ export default function AuctionNFTView() {
         <Link href="/">
           <div className={styles.goBack}>← back to all NFTS</div>
         </Link>
+
         <div className={styles.header}>{exampleNFT.name}</div>
         <HStack spacing="32px" marginTop="40px" align="flex-start">
           <div>
-            <Image
-              src={exampleNFT.imageURL}
+              <Image
+              src={nftObject?nftObject.imageURL:exampleNFT.imageURL}
               w="300px"
               h="300px"
               style={{ borderRadius: "4px 4px 0px 0px" }}
-            />
+              />
             <div className={styles.NFTCard}>
               <div className={styles.cardHeader}>ARTIST</div>
               <div className={styles.cardText} style={{ color: "#985cff" }}>
-                {exampleNFT.artistAddress}
+                {nftObject? shortenHash(nftObject.creator) : 'loading'}
               </div>
               <div style={{ marginTop: "8px" }} className={styles.cardHeader}>
                 DATE OF CREATION
               </div>
               <div className={styles.cardText}>
-                {moment(exampleNFT.createdAt).format("HH:mm DD MMM YYYY")}
+                {nftObject?timezone(nftObject.createdAt):'loading'}
               </div>
             </div>
           </div>
@@ -93,6 +105,7 @@ export default function AuctionNFTView() {
             </div>
           </div>
         </HStack>
+
       </div>
     </VStack>
   );

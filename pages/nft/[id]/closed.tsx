@@ -1,14 +1,26 @@
 import { HStack, VStack } from "@chakra-ui/layout";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { BigNumber } from "ethers";
 import { Image } from "@chakra-ui/image";
-import moment from "moment";
 import styles from "./closed.module.css";
 import FrakButton from "../../../components/button";
-
+import {shortenHash, timezone} from '../../../utils/helpers';
+import {getAccountFraktalNFTs, createObject, getNFTobject} from '../../../utils/graphQueries';
 export default function ClosedNFTView() {
+  const address = window.location.href.split('http://localhost:3000/nft/');
+  const index = parseFloat(address[1].split('/closed')[0])
+  const [nftObject, setNftObject] = useState();
+
+  useEffect(async ()=>{
+      let obj = await getAccountFraktalNFTs('marketid_fraktal',index)
+      let nftObjects = await createObject(obj.fraktalNFTs[0])
+      if(nftObjects){
+        setNftObject(nftObjects)
+      }
+  },[index])
+
   const [makeOffer, setMakeOffer] = useState(false);
   const exampleNFT = {
     id: 0,
@@ -32,11 +44,11 @@ export default function ClosedNFTView() {
         <Link href="/">
           <div className={styles.goBack}>← back to all NFTS</div>
         </Link>
-        <div className={styles.header}>{exampleNFT.name}</div>
+        <div className={styles.header}>{nftObject?nftObject.name:'loading'}</div>
         <HStack spacing="32px" marginTop="40px" align="flex-start">
           <div>
             <Image
-              src={exampleNFT.imageURL}
+              src={nftObject?nftObject.imageURL:exampleNFT.imageURL}
               w="300px"
               h="300px"
               style={{ borderRadius: "4px 4px 0px 0px" }}
@@ -44,13 +56,13 @@ export default function ClosedNFTView() {
             <div className={styles.NFTCard}>
               <div className={styles.cardHeader}>ARTIST</div>
               <div className={styles.cardText} style={{ color: "#985cff" }}>
-                {exampleNFT.artistAddress}
+                {nftObject?shortenHash(nftObject.creator):exampleNFT.artistAddress}
               </div>
               <div style={{ marginTop: "8px" }} className={styles.cardHeader}>
                 DATE OF CREATION
               </div>
               <div className={styles.cardText}>
-                {moment(exampleNFT.createdAt).format("HH:mm DD MMM YYYY")}
+                {nftObject?timezone(nftObject.createdAt):''}
               </div>
             </div>
           </div>

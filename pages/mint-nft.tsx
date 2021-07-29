@@ -20,19 +20,6 @@ const mintAbi = [
   "function mint(string tokenURI)"
   ];
 
-  // { Json Version
-  //   constant: false,
-  //   inputs: [
-  //     { internalType: "address", name: "_to", type: "address" },
-  //     { internalType: "bytes32", name: "tokenURI", type: "bytes32" },
-  //   ],
-  //   name: "mint",
-  //   outputs: [],
-  //   payable: false,
-  //   stateMutability: "nonpayable",
-  //   type: "function",
-  // }
-
 export default function MintNFTView() {
   const { providerChainId, provider, account } = useWeb3Context();
   const [ipfsNode, setIpfsNode] = useState();
@@ -85,7 +72,6 @@ export default function MintNFTView() {
     }
     loadContract();
   },[provider, optionalBytecode])
-
 
   async function createNFT(metadata){
       let metadataCid = await upload(JSON.stringify(metadata)) // it does not upload the object!!
