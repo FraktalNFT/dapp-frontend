@@ -9,30 +9,19 @@ import { Contract } from "@ethersproject/contracts";
 import { useWeb3Context } from "/contexts/Web3Context";
 import {utils} from "ethers";
 import {pinByHash} from '../utils/pinataPinner'; // Since we upload to IPFS, simply call pin services to pin the hash
-
+import {contracts, createNFT} from '../utils/contractCalls';
 const { create } = require('ipfs-http-client');
 const ethers = require('ethers');
 
-// Contracts to expose mint function
-const contracts = [{providerChainId:1, address:'0x0000000000000000000000000000000000000000'},{providerChainId:5, address:'0xA916BbdB90bA3BA7DCca09F2D3B249180f7fE0D2'}]
-// only ABI funct needed to mint
-const mintAbi = [
-  "function mint(string tokenURI)"
-  ];
-
 export default function MintNFTView() {
-  const { providerChainId, provider, account } = useWeb3Context();
+  const { providerChainId, provider, account, contractAddress } = useWeb3Context();
   const [ipfsNode, setIpfsNode] = useState();
   const [imageData, setImageData] = useState(null); // used?
   const [imageSize, setImageSize] = useState([]);
-  const [contract, setContract] = useState(null);
+  const [signer, setSigner] = useState();
   const [name, setName] = useState();
   const [description, setDescription] = useState();
   const [file, setFile] = useState();
-  const transactionOptions = { // hardcoded forced for error on automatic gas estimation (Goerli stuff??)
-      gasLimit: 600000,
-      gasPrice: ethers.utils.parseUnits('5.0', 'gwei')
-  }
 
   // show tx hash
   // add to metamask tokens received
@@ -49,9 +38,8 @@ export default function MintNFTView() {
 
   let optionalBytecode;
   useEffect(()=>{
-    let address = contracts.find(x=>x.providerChainId === providerChainId).address; // contract specific providerChainId
-    async function loadContract() { //Load contract instance
-      if (typeof provider !== "undefined" && address && mintAbi) {
+    async function loadSigner() { //Load contract instance
+      if (typeof provider !== "undefined") {
         try {
           let signer;
           const accounts = await provider.listAccounts();
@@ -60,35 +48,15 @@ export default function MintNFTView() {
           } else {
             signer = provider; // or use RPC (cannot sign tx's. should call a connect warning)
           }
-
-          const customContract = new Contract(address, mintAbi, signer);
-          if (optionalBytecode) customContract.bytecode = optionalBytecode; // for overwriting contract instance
-
-          setContract(customContract);
+          setSigner(signer);
         } catch (e) {
-          console.log("ERROR LOADING EXTERNAL CONTRACT AT " + address + " (check provider, address, and ABI)!!", e);
+          console.log("ERROR LOADING SIGNER", e);
         }
       }
     }
-    loadContract();
+    loadSigner();
   },[provider, optionalBytecode])
 
-  async function createNFT(metadata){
-      let metadataCid = await upload(JSON.stringify(metadata)) // it does not upload the object!!
-      let formatted = metadataCid.cid.toString()
-      await pinByHash(formatted) //Pinata
-      let receipt;
-
-      let tx = await contract.mint(formatted) // fails on cannot estimate gas. with pre-settings passes.
-      try{
-        receipt = await tx.wait();
-      }catch(e){
-        receipt = 'Error: ',e.toString() //test this
-      }
-      console.log('Transaction receipt');
-      console.log(receipt);
-
-  }
 
   function openLocal(){ // Opens the file browser.. implement tests of the file here or include into front
     document.getElementById('imageInput').files = null;
@@ -123,13 +91,24 @@ export default function MintNFTView() {
     return imageUpload.path;
   }
 
+  // Contracts to expose mint function
+  // const transactionOptions = { // hardcoded forced for error on automatic gas estimation (Goerli stuff??)
+  //     gasLimit: 600000,
+  //     gasPrice: ethers.utils.parseUnits('5.0', 'gwei')
+  // }
 
   async function prepareNftData(){
     let imageCid
     let metadata
     let results = await uploadImageToIpfs()
     metadata = await {name:name, description:description, image:results}
-    createNFT(metadata);
+    minter(metadata)
+  }
+  async function minter(metadata) {
+    let metadataCid = await upload(JSON.stringify(metadata)) // it does not upload the object!!
+    let formatted = metadataCid.cid.toString()
+    await pinByHash(formatted) //Pinata
+    createNFT(formatted, signer, contractAddress);
   }
 
   async function addFile(){ // preparation of the file (front-end exclusive)

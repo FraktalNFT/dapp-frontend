@@ -16,6 +16,7 @@ type Web3ContextType = {
   account: null | string;
   provider: null | ethers.providers.Web3Provider;
   providerChainId: null | number;
+  contractAddress: null | string;
 };
 
 const Web3Context = createContext<
@@ -24,6 +25,7 @@ const Web3Context = createContext<
   account: null,
   provider: null,
   providerChainId: null,
+  contractAddress: null,
   loading: false,
   connectWeb3: () => {},
 });
@@ -52,12 +54,19 @@ const web3Modal =
     providerOptions,
   });
 
+const contracts = [
+  {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+  {providerChainId:5, address:'0xA916BbdB90bA3BA7DCca09F2D3B249180f7fE0D2'}
+]
+
+
 const Web3ContextProvider: React.FC = ({ children }) => {
-  const [{ account, providerChainId, provider }, setWeb3State] =
+  const [{ account, providerChainId, provider, contractAddress }, setWeb3State] =
     useState<Web3ContextType>({
       account: null,
       provider: null,
       providerChainId: null,
+      contractAddress: null,
     });
 
   const [loading, setLoading] = useState(true);
@@ -74,15 +83,18 @@ const Web3ContextProvider: React.FC = ({ children }) => {
             new Web3(prov).currentProvider as ethers.providers.ExternalProvider
           );
           const chainId = parseInt(prov.chainId, 16);
+          const contractAddress = contracts.find(x=>x.providerChainId === chainId).address; // contract specific providerChainId
           const account = initialCall
             ? await provider.getSigner().getAddress()
             : null;
+
 
           setWeb3State(webState => ({
             ...webState,
             providerChainId: chainId,
             provider,
             account: account || webState.account,
+            contractAddress: contractAddress,
           }));
         }
       } catch (err) {
@@ -93,6 +105,7 @@ const Web3ContextProvider: React.FC = ({ children }) => {
     },
     []
   );
+
 
   const connectWeb3 = useCallback(async () => {
     const modalProvider = await web3Modal.connect();
@@ -110,11 +123,11 @@ const Web3ContextProvider: React.FC = ({ children }) => {
 
   return (
     <Web3Context.Provider
-      value={{ account, providerChainId, provider, loading, connectWeb3 }}
+      value={{ account, providerChainId, provider, loading, connectWeb3, contractAddress }}
     >
       {children}
     </Web3Context.Provider>
   );
 };
-
+//
 export default Web3ContextProvider;

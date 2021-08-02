@@ -3,62 +3,109 @@ import { Grid, HStack, VStack } from "@chakra-ui/layout";
 import Head from "next/head";
 import React, {useEffect, useState, useCallback} from "react";
 import { BigNumber } from "ethers";
-import { FrakCard } from "../types";
+import { FrakCard, NFTItemType } from "../types";
 import NFTItem from "../components/nft-item";
 import NextLink from "next/link";
 import styles from "../styles/my-nfts.module.css";
 import FrakButton from "../components/button";
 import { useWeb3Context } from '../contexts/Web3Context';
 import { getAccountFraktalNFTs, createObject } from '../utils/graphQueries';
-const { create, CID } = require('ipfs-http-client');
+import ListItemOptions from '../components/listItem';
+
 export default function MyNFTsView() {
-  const { account } = useWeb3Context();
+  const { account, provider, contractAddress } = useWeb3Context();
   const [nftItems, setNftItems] = useState();
+  const [accountAddress, setAccountAddress] = useState(); // to test the effects not fetching..
+  const [userBalance, setUserBalance] = useState(0);
   const [fraktionItems, setFraktionItems] = useState();
+  const [listModal, setListModal] = useState(false);
+  const [signer, setSigner] = useState();
 
-  useEffect(async()=>{
-    let objects = await getAccountFraktalNFTs('account_fraktals',account)
-    console.log('-')
-    Promise.all(objects.fraktalNFTs.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
-  },[account]);
-  useEffect(async()=>{
-    let objects = await getAccountFraktalNFTs('account_fraktions',account)
-    if(objects){
-      let objectsInner = objects.fraktionsBalances.filter(x=>{return x.id.startsWith(account.slice(0,6))})
-      let ownerTokenId = objectsInner.map(x=>({owner:x.id.split('-')[0],tokenId:x.id.split('-')[1]}))
-      let fraktalsOwned = ownerTokenId.map(x=>{return x.tokenId})
-      // console.log('fraktions',objectsInner)
 
-      setFraktionItems(ownerTokenId)
+  async function getAccountFraktions(account){
+    console.log('searching for ',account,' fraktals')
+    let objects = await getAccountFraktalNFTs('account_fraktions',account)///
+    console.log('retrieved', objects)
+    return objects;
+  };
+
+  async function getFraktionsFraktals(list) {
+    console.log('searching for ',list,' fraktions')
+    let res = await Promise.all(list.map(x=>{return getAccountFraktalNFTs('id_fraktal', x.nft.id)}))
+    let fraks = [];
+    if(res.length){
+      fraks = await Promise.all(res.map(x=>{return createObject(x.fraktalNFTs[0])}))
+    }
+    console.log('res', fraks)
+    return fraks;
+  }
+
+  // let fraktionObjects = async () => {return await getAccountFraktions(account)};
+  // console.log('fraktionObjects', fraktionObjects())
+  useEffect(async()=>{
+    let objects;
+    let fraktals;
+    if (account) {
+      // let userObject = await getAccountFraktalNFTs('userAddress', account)
+      // console.log('userObject',userObject)
+      // objects.fraktionsBalances.map(x=>console.log(x.nft.id.toString()))
+      objects = await getAccountFraktions(account);
+      if(objects && objects.fraktionsBalances.length > 0) {
+        fraktals = await getFraktionsFraktals(objects.fraktionsBalances)
+        // console.log('setting objects ',fraktals)
+        setFraktionItems(fraktals);
+      }
+    } else {
+      // objects = await getAccountFraktalNFTs('account_fraktions',account)
+      setFraktionItems([]);
     }
   },[account])
+  useEffect(()=>{
+    async function loadSigner() { //Load contract instance
+      if (typeof provider !== "undefined") {
+        try {
+          let signer;
+          const accounts = await provider.listAccounts();
+          if (accounts && accounts.length > 0) {
+            signer = provider.getSigner();// get signer
+          } else {
+            signer = provider; // or use RPC (cannot sign tx's. should call a connect warning)
+          }
+          setSigner(signer);
+        } catch (e) {
+          console.log("ERROR LOADING SIGNER", e);
+        }
+      }
+    }
+    loadSigner();
+  },[provider, account]);
 
-  const demoNFTItemsFull: FrakCard[] = Array.from({ length: 3 }).map(
-    (_, index) => ({
-      id: index + 1,
-      name: "Golden Fries Cascade",
-      imageURL: "/filler-image-1.png",
-      //contributions: BigNumber.from(5).div(100),
-      createdAt: new Date().toISOString(),
-      //countdown: new Date("06-25-2021"),
-    })
-  );
-  const demoNFTFraktionsFull: FrakCard[] = Array.from({ length: 2 }).map(
-    (_, index) => ({
-      id: index + 1,
-      name: "Golden Fries Cascade",
-      imageURL: "/filler-image-2.png",
-      //contributions: BigNumber.from(5).div(100),
-      createdAt: new Date().toISOString(),
-      //countdown: new Date("06-25-2021"),
-    })
-  );
+  // useEffect(async()=>{
+  //   setUserBalance(125.99)
+  // },[account])
+
+  useEffect(async()=>{
+    if(account) {
+      let fobjects = await getAccountFraktalNFTs('account_fraktals',account)
+      if(fobjects && fobjects.fraktalNFTs.length){
+        Promise.all(fobjects.fraktalNFTs.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
+      }
+    }
+  },[account]);
+
+
+  async function listItem() {
+    console.log('list it!')
+  }
+
   return (
     <VStack spacing='0' mb='12.8rem'>
       <Head>
         <title>Fraktal - My NFTs</title>
       </Head>
-      <div className={styles.header}>My NFTs</div>
+      <div className={styles.header}>
+        My NFTs
+      </div>
       {nftItems?.length ? (
         <Grid
           mt='40px !important'
@@ -70,7 +117,16 @@ export default function MyNFTsView() {
           gap='3.2rem'
         >
           {nftItems.map(item => (
-            <NFTItem key={item.id} item={item} CTAText={"List on Market"} />
+            <div key={item.id}>
+            <NextLink href={`/nft/${item.id}/list-item`}>
+              <NFTItem item={item} CTAText={"List on Market"} />
+            </NextLink>
+            <ListItemOptions
+              item={item}
+              signer={signer}
+              contract={contractAddress}
+            />
+            </div>
           ))}
         </Grid>
       ) : (
@@ -86,7 +142,7 @@ export default function MyNFTsView() {
         </div>
       )}
       <div className={styles.header2}>My Fraktions</div>
-      {nftItems?.length ? (
+      {fraktionItems?.length ? (
         <div style={{ marginTop: "16px" }}>
           <div className={styles.subText}>You have earned</div>
           <div
@@ -99,7 +155,8 @@ export default function MyNFTsView() {
             <div className={styles.claimContainer}>
               <div style={{ marginLeft: "24px" }}>
                 <div className={styles.claimHeader}>ETH</div>
-                <div className={styles.claimAmount}>125.99</div>
+                {/* add user balance fetched from the contract*/}
+                <div className={styles.claimAmount}>{userBalance}</div>
               </div>
               <div className={styles.claimCTA}>Claim</div>
             </div>
@@ -113,10 +170,17 @@ export default function MyNFTsView() {
             templateColumns='repeat(3, 1fr)'
             gap='3.2rem'
           >
-            {demoNFTFraktionsFull.map(item => (
+            {fraktionItems && fraktionItems.map(item => (
+              <div>
               <NextLink href={`/nft/${item.id}/manage`} key={item.id}>
                 <NFTItem item={item} CTAText={"Manage"} />
               </NextLink>
+              <ListItemOptions
+                item={item}
+                signer={signer}
+                contract={contractAddress}
+              />
+              </div>
             ))}
           </Grid>
         </div>

@@ -8,3 +8,11 @@ export interface FrakCard {
   countdown?: Date;
   contributions?: BigNumberish | BigNumber;
 }
+
+export interface NFTItemType {
+  creator:string,
+  id:number,
+  name:string,
+  imageURL:string,
+  createdAt:number
+};

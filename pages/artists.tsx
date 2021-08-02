@@ -26,15 +26,31 @@ export default function ArtistsView() {
     setSortType(item);
     setSelectionMode(false);
   };
+  useEffect(()=>{
+    if(nftItems.length){
+      let artistsObj = artists.map((x,i)=>({
+        id: x.id,
+        name: shortenHash(x.id),
+        imageURL: nftItems[i]?nftItems[i].imageURL:"/filler-image-1.png",
+        totalGallery:x.created.length,
+      }))
+      setArtistsItems(artistsObj)
+    }
+  },[nftItems])
 
   useEffect(()=>{
     if(!fraktalItems){
       const data = getAccountFraktalNFTs('artists','')
       let fraktalsSamples
+      let fraktalsSamplesWith
       data.then((d)=>{
-        setArtists(d.users)
-        fraktalsSamples = d.users.map(x=>{return x.fraktals[0]})
-        Promise.all(fraktalsSamples.map(x=>{return getAccountFraktalNFTs('id_fraktal', x)}))
+        // console.log('data', d)
+        let onlyCreators = d.users.filter(x=>{return x.created.length > 0 })
+        console.log('creators filtered', onlyCreators)
+        setArtists(onlyCreators)
+        fraktalsSamplesWith = onlyCreators.map(x=>{return x.created[0]})
+        console.log('fraktalSamplesWith', fraktalsSamplesWith)
+        Promise.all(fraktalsSamplesWith.map(x=>{return getAccountFraktalNFTs('id_fraktal', x)}))
           .then((results)=>setFraktalItems(results.map(y=>{return y.fraktalNFTs[0]})))//
       })
     }else{
@@ -42,17 +58,6 @@ export default function ArtistsView() {
     }
   },[fraktalItems])
 
-  useEffect(()=>{
-    if(nftItems.length){
-      let artistsObj = artists.map((x,i)=>({
-        id: x.id,
-        name: shortenHash(x.id),
-        imageURL: nftItems[i].imageURL,
-        totalGallery:x.fraktals.length,
-      }))
-      setArtistsItems(artistsObj)
-    }
-  },[nftItems])
 
   // TODO: hardcoded stuff as of now
   const demoArtistItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
@@ -108,7 +113,7 @@ export default function ArtistsView() {
         gap='3.2rem'
       >
         {artistsItems.map((item, i) => (
-          <NextLink href={`/artist/${item.id}`}>
+          <NextLink href={`/artist/${item.id}`} key={i}>
             <NFTItem key={artists[i].id} item={item} CTAText={item.totalGallery} />
           </NextLink>
         ))}

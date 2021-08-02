@@ -11,12 +11,11 @@ import {shortenHash} from '../../utils/helpers';
 import {getAccountFraktalNFTs, createObject, getNFTobject} from '../../utils/graphQueries';
 
 export default function ArtistView() {
-  //
-  const address = window.location.href.split('http://localhost:3000/artist/');
-  // console.log('address: ', address[1])
+  const [artistAddress, setArtistAddres] = useState('');
   const [nftItems, setNftItems] = useState([]);
-  // const nftItems2 = []
   useEffect(async()=>{
+    let address = window.location.href.split('http://localhost:3000/artist/');
+    setArtistAddres(address[1])
     let objects = await getAccountFraktalNFTs('creator',address[1])
     Promise.all(objects.fraktalNFTs.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
   },[])
@@ -31,13 +30,13 @@ export default function ArtistView() {
       countdown: new Date("06-25-2021"),
     })
   );
-  const minAddress = shortenHash(address[1]);
+  const minAddress = (artistAddress) => shortenHash(artistAddress);
   return (
     <VStack spacing="0" mb="12.8rem">
       <Head>
         <title>Fraktal - Artist</title>
       </Head>
-      <div className={styles.header}>{minAddress}</div>
+      <div className={styles.header}>{minAddress(artistAddress)}</div>
       {nftItems.length ? (
         <>
           <Grid

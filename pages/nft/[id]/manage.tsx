@@ -9,17 +9,20 @@ import Button from "../../../components/button";
 import {getAccountFraktalNFTs, createObject, getNFTobject} from '../../../utils/graphQueries';
 import {shortenHash, timezone} from '../../../utils/helpers';
 export default function ManageNFTView() {
-  const address = window.location.href.split('http://localhost:3000/nft/');
-  const index = parseFloat(address[1].split('/manage')[0])
   const [nftObject, setNftObject] = useState();
   const [view, setView] = useState("accepted");
-
+  const [index, setIndex] = useState();
   useEffect(async ()=>{
-      let obj = await getAccountFraktalNFTs('marketid_fraktal',index)
-      let nftObjects = await createObject(obj.fraktalNFTs[0])
-      if(nftObjects){
-        setNftObject(nftObjects)
-      }
+    const address = window.location.href.split('http://localhost:3000/nft/');
+    const index = parseFloat(address[1].split('/manage')[0])
+    if(index){
+      setIndex(index)
+    }
+    let obj = await getAccountFraktalNFTs('marketid_fraktal',index)
+    let nftObjects = await createObject(obj.fraktalNFTs[0])
+    if(nftObjects){
+      setNftObject(nftObjects)
+    }
   },[index])
 
   const exampleNFT = {

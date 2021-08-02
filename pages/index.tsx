@@ -18,17 +18,20 @@ const Home: React.FC = () => {
   const [selectionMode, setSelectionMode] = useState(false);
   const [sortType, setSortType] = useState("Popular");
   const [nftItems, setNftItems] = useState([]);
+  const [loading, setLoading] = useState(false);
   const handleSortSelect = (item: string) => {
     setSortType(item);
     setSelectionMode(false);
   };
 
   useEffect(async ()=>{
+    setLoading(true);
     let data = await getAccountFraktalNFTs('all','')
     if(data){
       console.log('-')
       Promise.all(data.fraktalNFTs.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
     }
+    setLoading(false);
   },[])
 
 
@@ -75,33 +78,36 @@ const Home: React.FC = () => {
           <FrakButton>List NFT</FrakButton>
         </NextLink>
       </HStack>
-
-      {nftItems.length ? (
-        <>
-          <Grid
-            margin='0 !important'
-            mb='5.6rem !important'
-            w='100%'
-            templateColumns='repeat(3, 1fr)'
-            gap='3.2rem'
-          >
-            {nftItems.map(item => (
-              <NextLink key={item.id} href={`/nft/${item.id}/auction`}>
-                <NFTItem item={item} />
-              </NextLink>
-            ))}
-          </Grid>
-          <Pagination pageCount={21} handlePageClick={() => {}} />
-        </>
-      ) : (
-        <VStack>
-          <Text className='medium-16'>Whoops, no NFTs are for sale.</Text>
-          <Text className='medium-16'>Check back later or list your own!</Text>
-          <NextLink href='/mint-nft'>
-            <FrakButton mt='1.6rem !important'>Mint NFT</FrakButton>
-          </NextLink>
-        </VStack>
-      )}
+        {loading ? 'loading..' :
+        <div>
+        {nftItems.length ? (
+          <>
+            <Grid
+              margin='0 !important'
+              mb='5.6rem !important'
+              w='100%'
+              templateColumns='repeat(3, 1fr)'
+              gap='3.2rem'
+            >
+              {nftItems.map(item => (
+                <NextLink key={item.id} href={`/nft/${item.id}/auction`}>
+                  <NFTItem item={item} />
+                </NextLink>
+              ))}
+            </Grid>
+            <Pagination pageCount={21} handlePageClick={() => {}} />
+          </>
+        ) : (
+          <VStack>
+            <Text className='medium-16'>Whoops, no NFTs are for sale.</Text>
+            <Text className='medium-16'>Check back later or list your own!</Text>
+            <NextLink href='/mint-nft'>
+              <FrakButton mt='1.6rem !important'>Mint NFT</FrakButton>
+            </NextLink>
+          </VStack>
+        )}
+      </div>
+      }
     </VStack>
   );
 };
