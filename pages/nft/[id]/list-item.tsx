@@ -2,15 +2,28 @@ import { HStack, VStack } from "@chakra-ui/layout";
 import React, {useEffect, useState} from "react";
 import Head from "next/head";
 import Link from "next/link";
-import { BigNumber } from "ethers";
+import { BigNumber, utils } from "ethers";
 import { Image } from "@chakra-ui/image";
 import styles from "./auction.module.css";
 import FrakButton from '../../../components/button';
 import {shortenHash, timezone} from '../../../utils/helpers';
 import {getAccountFraktalNFTs, createObject, getNFTobject} from '../../../utils/graphQueries';
+import { useWeb3Context } from '../../../contexts/Web3Context';
+import { listItem } from '../../../utils/contractCalls';
+const exampleNFT = {
+  id: 0,
+  name: "Golden Fries Cascade",
+  imageURL: "/filler-image-1.png",
+  artistAddress: "0x1234...5678",
+  contributions: BigNumber.from(5).div(100),
+  createdAt: new Date().toISOString(),
+  countdown: new Date("06-25-2021"),
+};
 export default function ListNFTView() {
+  const {account, provider, contractAddress} = useWeb3Context();
   const [nftObject, setNftObject] = useState();
   const [index, setIndex] = useState();
+  const [signer, setSigner] = useState();
   const [totalAmount, setTotalAmount] = useState(0.);
   const [totalPrice, setTotalPrice] = useState(0.);
   useEffect(async ()=>{
@@ -25,15 +38,41 @@ export default function ListNFTView() {
         setNftObject(nftObjects)
       }
   },[index])
-  const exampleNFT = {
-    id: 0,
-    name: "Golden Fries Cascade",
-    imageURL: "/filler-image-1.png",
-    artistAddress: "0x1234...5678",
-    contributions: BigNumber.from(5).div(100),
-    createdAt: new Date().toISOString(),
-    countdown: new Date("06-25-2021"),
-  };
+  useEffect(()=>{
+    async function loadSigner() { //Load contract instance
+      if (typeof provider !== "undefined") {
+        try {
+          let signer;
+          const accounts = await provider.listAccounts();
+          if (accounts && accounts.length > 0) {
+            signer = provider.getSigner();// get signer
+          } else {
+            signer = provider; // or use RPC (cannot sign tx's. should call a connect warning)
+          }
+          setSigner(signer);
+        } catch (e) {
+          console.log("ERROR LOADING SIGNER", e);
+        }
+      }
+    }
+    loadSigner();
+  },[provider])
+  async function listNewItem(){
+    let confirmation = window.confirm('Do you want to list this item?');
+    if (confirmation){
+      let tx = await listItem(
+        index,
+        totalAmount,
+        utils.parseUnits(totalPrice)/10000,
+        'fixed',
+        signer,
+        contractAddress)
+    } else{
+      console.log('event cancelled')
+    }
+
+  }
+
   return (
     <VStack spacing="0" mb="12.8rem">
       <Head>
@@ -46,14 +85,15 @@ export default function ListNFTView() {
 
         <div className={styles.header}>{nftObject?nftObject.name:''}</div>
         <div className={styles.subheader}>{nftObject?nftObject.description:''}</div>
-
-        <div>
-          do you have fraktions?<br />
-          is the nft in the market yet?<br />
-          else.. lock the shares to the market,<br />
-          transfer nft to the market<br />
-          and unlock the shares to list<br />
-        </div>
+        {account && contractAddress &&
+          <div>
+            do you have fraktions? {nftObject?.balances[0].owner.id.toLocaleLowerCase() === account.toLocaleLowerCase() ? 'yes' : 'no'}<br />
+            is the nft in the market yet? {nftObject?.owner.toLocaleLowerCase() === contractAddress.toLocaleLowerCase()? 'yes' : 'no'}<br />
+            else.. lock the shares to the market,<br />
+            transfer nft to the market<br />
+            and unlock the shares to list<br />
+          </div>
+        }
 
         <HStack spacing="32px" marginTop="40px" align="flex-start">
           <div>
@@ -122,7 +162,11 @@ export default function ListNFTView() {
               </div>
             </div>
             </div>
-          <FrakButton disabled={!totalPrice || !totalAmount} style={{marginTop: '32px'}}>
+          <FrakButton
+            disabled={!totalPrice || !totalAmount}
+            style={{marginTop: '32px'}}
+            onClick={listNewItem}
+          >
           List fraktals
           </FrakButton>
           </div>

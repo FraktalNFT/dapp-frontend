@@ -1,7 +1,7 @@
 import { gql, request } from 'graphql-request';
 const { create, CID } = require('ipfs-http-client');
 
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktalgoerli/v0.0.4';
+const APIURL = 'https://api.studio.thegraph.com/query/101/fraktalgoerli/v0.0.5';
 
 const ipfsClient = create({
   host: "ipfs.infura.io",
@@ -14,6 +14,9 @@ query($id:ID!){
     id
     marketId
     hash
+    owner {
+      id
+    }
     createdAt
     creator {
       id
@@ -25,9 +28,15 @@ const account_query = gql`
   query($id:ID!){
     fraktalNFTs(where:{owner:$id}) {
       id
-      owner
+      owner {
+        id
+      }
       marketId
       hash
+      fraktions {
+        id
+        amount
+      }
       createdAt
       creator {
         id
@@ -39,6 +48,25 @@ const id_query = gql`
 query($id:ID!){
   fraktalNFTs(where:{id:$id}) {
     id
+    marketId
+    hash
+    owner {
+      id
+    }
+    createdAt
+    creator {
+      id
+    }
+  }
+  }
+`;
+const fraktalsContains = gql`
+query($id:[ID!]){
+  fraktalNFTs(where:{id_in:$id}) {
+    id
+    owner {
+      id
+    }
     marketId
     hash
     createdAt
@@ -55,6 +83,15 @@ query($id:ID!){
     marketId
     hash
     createdAt
+    owner {
+      id
+    }
+    fraktions {
+      owner {
+        id
+      }
+      amount
+    }
     creator {
       id
     }
@@ -67,6 +104,9 @@ query {
     id
     marketId
     hash
+    owner {
+      id
+    }
     createdAt
     creator {
       id
@@ -83,13 +123,20 @@ const users = gql`
     }
   }
 `
-//, where:{created_ > 0}
+//, where:{created_gt: 0} is actually created.length!
 const creators_review = gql`
   query{
     users(first: 20) {
       id
       fraktals
-      created
+      created {
+        id
+        marketId
+        hash
+        creator
+        owner
+        createdAt
+      }
     }
   }
 `
@@ -118,26 +165,75 @@ const account_fraktions_query = gql`
     }
   }
 `
+const account_fraktions_query2 = gql`
+  query($id:ID!){
+    fraktalNFTs(first:10, where:{owner:$id}){
+      id
+      fraktions {
+        id
+        owner {
+          id
+        }
+        amount
+      }
+      marketId
+    }
+  }
+`
 const fraktal_fraktions_query = gql`
 query($id:ID!){
   fraktalNFTs(where:{fraktions:$id}) {
     id
     marketId
     hash
-    creator
+    owner {
+      id
+    }
+    creator {
+      id
+    }
     fraktions{
       amount
     }
   }
   }
 `;
+
+const listedItems = gql`
+  query{
+    listItems(first: 10){
+      id
+      seller {
+        id
+      }
+      fraktal {
+        id
+        hash
+        owner{
+          id
+        }
+        marketId
+        creator {
+          id
+        }
+        createdAt
+        transactionHash
+      }
+      price
+      amount
+      type
+    }
+  }
+`;
+
 const calls = [
   {name: 'account_fraktals', call: account_query},
   {name: 'account_fraktions', call: account_fraktions_query},
   {name: 'marketid_fraktal', call: marketid_query},
   {name: 'id_fraktal', call: id_query},
+  {name: 'id_fraktals', call: fraktalsContains},
   {name: 'userAddress', call: userAddress},
-  // {name: 'listed_items', call: account_query},
+  {name: 'listed_items', call: listedItems},
   {name: 'artists', call: creators_review},
   {name: 'all', call: all_nfts},
   {name: 'creator', call: creator_query},
@@ -163,11 +259,13 @@ export async function createObject(data){
     // console.log('meta',nftMetadata)
     return {
       creator:data.creator.id,
+      owner: data.owner.id,
       id: data.marketId,
+      balances: data.fraktions,
+      createdAt: data.createdAt,
       name: nftMetadata.name,
       description: nftMetadata.description,
       imageURL: checkImageCID(nftMetadata.image),
-      createdAt: data.createdAt,
     }
   }
 };

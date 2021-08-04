@@ -41,6 +41,7 @@ export default function ArtistsView() {
   useEffect(()=>{
     if(!fraktalItems){
       const data = getAccountFraktalNFTs('artists','')
+      console.log('data', data)
       let fraktalsSamples
       let fraktalsSamplesWith
       data.then((d)=>{
@@ -50,8 +51,7 @@ export default function ArtistsView() {
         setArtists(onlyCreators)
         fraktalsSamplesWith = onlyCreators.map(x=>{return x.created[0]})
         console.log('fraktalSamplesWith', fraktalsSamplesWith)
-        Promise.all(fraktalsSamplesWith.map(x=>{return getAccountFraktalNFTs('id_fraktal', x)}))
-          .then((results)=>setFraktalItems(results.map(y=>{return y.fraktalNFTs[0]})))//
+        Promise.all(fraktalsSamplesWith.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
       })
     }else{
       Promise.all(fraktalItems.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))

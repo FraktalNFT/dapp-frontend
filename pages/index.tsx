@@ -26,10 +26,11 @@ const Home: React.FC = () => {
 
   useEffect(async ()=>{
     setLoading(true);
-    let data = await getAccountFraktalNFTs('all','')
+    let data = await getAccountFraktalNFTs('listed_items','')
     if(data){
-      console.log('-')
-      Promise.all(data.fraktalNFTs.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
+      let listedItems = data.listItems.map(x => {return x.fraktal})
+      // console.log('listed items', listedItems)
+      Promise.all(listedItems.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
     }
     setLoading(false);
   },[])

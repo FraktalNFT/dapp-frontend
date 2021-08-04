@@ -24,7 +24,7 @@ export default function MyNFTsView() {
 
   async function getAccountFraktions(account){
     console.log('searching for ',account,' fraktals')
-    let objects = await getAccountFraktalNFTs('account_fraktions',account)///
+    let objects = await getAccountFraktalNFTs('account_fraktions',account.toLocaleLowerCase())///
     console.log('retrieved', objects)
     return objects;
   };
@@ -36,7 +36,6 @@ export default function MyNFTsView() {
     if(res.length){
       fraks = await Promise.all(res.map(x=>{return createObject(x.fraktalNFTs[0])}))
     }
-    console.log('res', fraks)
     return fraks;
   }
 
@@ -86,7 +85,7 @@ export default function MyNFTsView() {
 
   useEffect(async()=>{
     if(account) {
-      let fobjects = await getAccountFraktalNFTs('account_fraktals',account)
+      let fobjects = await getAccountFraktalNFTs('account_fraktals',account.toLocaleLowerCase())
       if(fobjects && fobjects.fraktalNFTs.length){
         Promise.all(fobjects.fraktalNFTs.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
       }
@@ -171,8 +170,8 @@ export default function MyNFTsView() {
             gap='3.2rem'
           >
             {fraktionItems && fraktionItems.map(item => (
-              <div>
-              <NextLink href={`/nft/${item.id}/manage`} key={item.id}>
+              <div key={item.id}>
+              <NextLink href={`/nft/${item.id}/list-item`} key={item.id}>
                 <NFTItem item={item} CTAText={"Manage"} />
               </NextLink>
               <ListItemOptions
