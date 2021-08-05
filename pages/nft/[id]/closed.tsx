@@ -9,15 +9,22 @@ import FrakButton from "../../../components/button";
 import {shortenHash, timezone} from '../../../utils/helpers';
 import {getAccountFraktalNFTs, createObject, getNFTobject} from '../../../utils/graphQueries';
 export default function ClosedNFTView() {
-  const address = window.location.href.split('http://localhost:3000/nft/');
-  const index = parseFloat(address[1].split('/closed')[0])
+  const [index, setIndex] = useState();
   const [nftObject, setNftObject] = useState();
+
+  useEffect(()=>{
+    const address = window.location.href.split('http://localhost:3000/nft/');
+    const index = parseFloat(address[1].split('/closed')[0])
+    if(index) setIndex(index)
+  })
 
   useEffect(async ()=>{
       let obj = await getAccountFraktalNFTs('marketid_fraktal',index)
-      let nftObjects = await createObject(obj.fraktalNFTs[0])
-      if(nftObjects){
-        setNftObject(nftObjects)
+      if(obj && obj.fraktalNFTs){
+        let nftObjects = await createObject(obj.fraktalNFTs[0])
+        if(nftObjects){
+          setNftObject(nftObjects)
+        }
       }
   },[index])
 
@@ -45,6 +52,7 @@ export default function ClosedNFTView() {
           <div className={styles.goBack}>← back to all NFTS</div>
         </Link>
         <div className={styles.header}>{nftObject?nftObject.name:'loading'}</div>
+        <div style={{textAlign: 'center', color: 'grey', fontSize:'21px', fontWeight:'bold'}}>{nftObject?nftObject.description:'loading'}</div>
         <HStack spacing="32px" marginTop="40px" align="flex-start">
           <div>
             <Image

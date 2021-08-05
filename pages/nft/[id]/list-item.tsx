@@ -9,7 +9,7 @@ import FrakButton from '../../../components/button';
 import {shortenHash, timezone} from '../../../utils/helpers';
 import {getAccountFraktalNFTs, createObject, getNFTobject} from '../../../utils/graphQueries';
 import { useWeb3Context } from '../../../contexts/Web3Context';
-import { listItem } from '../../../utils/contractCalls';
+import { listItem, lockShares, transferToken, unlockShares } from '../../../utils/contractCalls';
 const exampleNFT = {
   id: 0,
   name: "Golden Fries Cascade",
@@ -26,18 +26,12 @@ export default function ListNFTView() {
   const [signer, setSigner] = useState();
   const [totalAmount, setTotalAmount] = useState(0.);
   const [totalPrice, setTotalPrice] = useState(0.);
-  useEffect(async ()=>{
-    const address = window.location.href.split('http://localhost:3000/nft/');
-    const index = parseFloat(address[1].split('/auction')[0])
-    if(index){
-      setIndex(index)
-    }
-      let obj = await getAccountFraktalNFTs('marketid_fraktal',index)
-      let nftObjects = await createObject(obj.fraktalNFTs[0])
-      if(nftObjects){
-        setNftObject(nftObjects)
-      }
-  },[index])
+  const [fraktions, setFraktions] = useState(0);
+  const [locked, setLocked] = useState(false);
+  const [transferred, setTransferred] = useState(false);
+  const [unlocked, setUnlocked] = useState(false);
+  const [updating, setUpdating] = useState(false);
+
   useEffect(()=>{
     async function loadSigner() { //Load contract instance
       if (typeof provider !== "undefined") {
@@ -57,6 +51,51 @@ export default function ListNFTView() {
     }
     loadSigner();
   },[provider])
+
+  const fraktalReady = fraktions > 0 && totalAmount >= fraktions && totalPrice > 0 && nftObject.owner === contractAddress.toLocaleLowerCase();
+
+  useEffect(async ()=>{
+    const address = window.location.href.split('http://localhost:3000/nft/');
+    const index = parseFloat(address[1].split('/auction')[0])
+    if(index){
+      setIndex(index)
+    }
+    //first check that is not listed yet
+    if(account){
+      let listing = await getAccountFraktalNFTs('listed_itemsId', `${account.toLocaleLowerCase()}-0x${index+1}`)
+      if(listing && listing.listItems.length > 0){
+        setUpdating(true)
+        let nftObject = await createObject(listing.listItems[0].fraktal)
+        if(nftObject && account){
+          setNftObject(nftObject)
+          let userAmount = nftObject.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
+          if(userAmount){
+            let parsedPrice = utils.formatEther(listing.listItems[0].price)
+            let settedPrice = parsedPrice*listing.listItems[0].amount
+            setTotalPrice(Math.round(settedPrice, 1))
+            setTotalAmount(listing.listItems[0].amount)
+            setFraktions(nftObject.balances[0].amount)
+          }else {
+            setFraktions(0)
+          }
+        }
+      }else{
+        let obj = await getAccountFraktalNFTs('marketid_fraktal',index)
+        if(obj && obj.fraktalNFTs){
+          let nftObjects = await createObject(obj.fraktalNFTs[0]) // its an array (?)
+          if(nftObjects && account ){
+            setNftObject(nftObjects)
+            let userAmount = nftObjects.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
+            if(userAmount){
+              setFraktions(nftObjects.balances[0].amount)
+            }else {
+              setFraktions(0)
+            }
+        }
+      }
+    }
+      }
+  },[index, account])
   async function listNewItem(){
     let confirmation = window.confirm('Do you want to list this item?');
     if (confirmation){
@@ -67,10 +106,41 @@ export default function ListNFTView() {
         'fixed',
         signer,
         contractAddress)
+      if(tx) {
+        console.log('go to marketplace! (where is navigation??)')
+        window.location('http://localhost:3000/')
+      }
     } else{
       console.log('event cancelled')
     }
+  }
 
+  async function lockingShares(id, amount, to){
+      try {
+        let tx = await lockShares(id, amount, to, signer, contractAddress);
+        if (tx) {setLocked(true)}
+      }catch(e){
+        console.log('There has been an error: ',e)
+      }
+  }
+  async function unlockingShares(id, amount, to){
+      try {
+        let tx = await unlockShares(id, amount, to, signer, contractAddress);
+        if(tx){setUnlocked(true)}
+      }catch(e){
+        console.log('There has been an error: ',e)
+      }
+  }
+  async function transferingToken(id, subId,amount,to){
+    try {
+      let tx = await transferToken(id, subId, amount, to, signer, contractAddress);
+      if(tx){
+        setTransferred(true)
+        await unlockingShares(nftObject.id, 10000, contractAddress)
+      }
+    }catch(e){
+      console.log('There has been an error: ',e)
+    }
   }
 
   return (
@@ -85,15 +155,6 @@ export default function ListNFTView() {
 
         <div className={styles.header}>{nftObject?nftObject.name:''}</div>
         <div className={styles.subheader}>{nftObject?nftObject.description:''}</div>
-        {account && contractAddress &&
-          <div>
-            do you have fraktions? {nftObject?.balances[0].owner.id.toLocaleLowerCase() === account.toLocaleLowerCase() ? 'yes' : 'no'}<br />
-            is the nft in the market yet? {nftObject?.owner.toLocaleLowerCase() === contractAddress.toLocaleLowerCase()? 'yes' : 'no'}<br />
-            else.. lock the shares to the market,<br />
-            transfer nft to the market<br />
-            and unlock the shares to list<br />
-          </div>
-        }
 
         <HStack spacing="32px" marginTop="40px" align="flex-start">
           <div>
@@ -129,20 +190,21 @@ export default function ListNFTView() {
                     <input
                       className={styles.contributeInput}
                       type="number"
-                      placeholder={"0.01"}
+                      placeholder={totalPrice}
                       onChange={(e)=>{setTotalPrice(e.target.value)}}
                     />
                   </div>
                 </div>
                 <div >
                   <div style={{ marginLeft: "24px" }}>
-                    <div className={styles.contributeHeader}>Fraktals</div>
+                    <div className={styles.contributeHeader}>Fraktions</div>
                     <input
                       className={styles.contributeInput}
                       type="number"
                       placeholder={totalAmount}
                       onChange={(e)=>{setTotalAmount(e.target.value)}}
                     />
+                    <div className={styles.contributeHeader}>Max: {fraktions}</div>
                   </div>
                 </div>
               </div>
@@ -162,12 +224,30 @@ export default function ListNFTView() {
               </div>
             </div>
             </div>
+          {nftObject?.owner !== contractAddress?.toLocaleLowerCase() ?
+            <div style={{marginTop: '16px'}}>
+              You need to lock the nft in the market to list the fraktions!
+              <br />
+              <div style={{marginTop: '8px', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
+              <FrakButton
+              disabled={locked}
+              onClick={()=>lockingShares(nftObject.id, 10000, contractAddress)}
+                >
+              Lock</FrakButton>
+              <FrakButton
+              disabled={transferred || !locked}
+              onClick={()=>transferingToken(nftObject.id, 0,1,contractAddress)}>Transfer</FrakButton>
+              {transferred?'Accept the tx for unlocking your fraktions':null}
+              </div>
+            </div>
+            :null}
+
           <FrakButton
-            disabled={!totalPrice || !totalAmount}
+            disabled={!fraktalReady}
             style={{marginTop: '32px'}}
             onClick={listNewItem}
           >
-          List fraktals
+          {updating? 'Update data':'List fraktals'}
           </FrakButton>
           </div>
           </div>

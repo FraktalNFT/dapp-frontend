@@ -212,6 +212,12 @@ const listedItems = gql`
         owner{
           id
         }
+        fraktions {
+          owner{
+            id
+          }
+          amount
+        }
         marketId
         creator {
           id
@@ -225,20 +231,38 @@ const listedItems = gql`
     }
   }
 `;
-
-const calls = [
-  {name: 'account_fraktals', call: account_query},
-  {name: 'account_fraktions', call: account_fraktions_query},
-  {name: 'marketid_fraktal', call: marketid_query},
-  {name: 'id_fraktal', call: id_query},
-  {name: 'id_fraktals', call: fraktalsContains},
-  {name: 'userAddress', call: userAddress},
-  {name: 'listed_items', call: listedItems},
-  {name: 'artists', call: creators_review},
-  {name: 'all', call: all_nfts},
-  {name: 'creator', call: creator_query},
-  {name: 'id_fraktions', call: fraktal_fraktions_query},
-]
+const listedItemsId = gql`
+  query($id:ID!){
+    listItems(where:{id:$id}){
+      id
+      seller {
+        id
+      }
+      fraktal {
+        id
+        hash
+        owner{
+          id
+        }
+        fraktions {
+          owner{
+            id
+          }
+          amount
+        }
+        marketId
+        creator {
+          id
+        }
+        createdAt
+        transactionHash
+      }
+      price
+      amount
+      type
+    }
+  }
+`;
 
 export const getAccountFraktalNFTs = async (call, id) => {
   let callGql = calls.find(x=> {return x.name == call})
@@ -269,6 +293,21 @@ export async function createObject(data){
     }
   }
 };
+const calls = [
+  {name: 'account_fraktals', call: account_query},
+  {name: 'account_fraktions', call: account_fraktions_query},
+  {name: 'marketid_fraktal', call: marketid_query},
+  {name: 'id_fraktal', call: id_query},
+  {name: 'id_fraktals', call: fraktalsContains},
+  {name: 'userAddress', call: userAddress},
+  {name: 'listed_items', call: listedItems},
+  {name: 'listed_itemsId', call: listedItemsId},
+  {name: 'artists', call: creators_review},
+  {name: 'all', call: all_nfts},
+  {name: 'creator', call: creator_query},
+  {name: 'id_fraktions', call: fraktal_fraktions_query},
+];
+
 
 function toBase32(value) { // to transform V0 to V1 and use as `https://${cidV1}.ipfs.dweb.link`
   var cid = new CID(value)

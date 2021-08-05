@@ -5,12 +5,12 @@ import React, {useEffect, useState, useCallback} from "react";
 import { BigNumber } from "ethers";
 import { FrakCard, NFTItemType } from "../types";
 import NFTItem from "../components/nft-item";
+import NFTItemManager from "../components/nft-item-manager";
 import NextLink from "next/link";
 import styles from "../styles/my-nfts.module.css";
 import FrakButton from "../components/button";
 import { useWeb3Context } from '../contexts/Web3Context';
 import { getAccountFraktalNFTs, createObject } from '../utils/graphQueries';
-import ListItemOptions from '../components/listItem';
 
 export default function MyNFTsView() {
   const { account, provider, contractAddress } = useWeb3Context();
@@ -118,13 +118,8 @@ export default function MyNFTsView() {
           {nftItems.map(item => (
             <div key={item.id}>
             <NextLink href={`/nft/${item.id}/list-item`}>
-              <NFTItem item={item} CTAText={"List on Market"} />
+              <NFTItemManager item={item} CTAText={"List on Market"} />
             </NextLink>
-            <ListItemOptions
-              item={item}
-              signer={signer}
-              contract={contractAddress}
-            />
             </div>
           ))}
         </Grid>
@@ -134,9 +129,11 @@ export default function MyNFTsView() {
             Transfer NFT to your wallet or Mint a new NFT.
           </div>
           <div style={{ display: "flex", justifyContent: "center" }}>
-            <FrakButton style={{ width: "240px", marginTop: "24px" }}>
+            <NextLink href={`/mint-nft`}>
+              <FrakButton style={{ width: "240px", marginTop: "24px" }}>
               Mint NFT
-            </FrakButton>
+              </FrakButton>
+            </NextLink>
           </div>
         </div>
       )}
@@ -154,7 +151,6 @@ export default function MyNFTsView() {
             <div className={styles.claimContainer}>
               <div style={{ marginLeft: "24px" }}>
                 <div className={styles.claimHeader}>ETH</div>
-                {/* add user balance fetched from the contract*/}
                 <div className={styles.claimAmount}>{userBalance}</div>
               </div>
               <div className={styles.claimCTA}>Claim</div>
@@ -171,14 +167,7 @@ export default function MyNFTsView() {
           >
             {fraktionItems && fraktionItems.map(item => (
               <div key={item.id}>
-              <NextLink href={`/nft/${item.id}/list-item`} key={item.id}>
-                <NFTItem item={item} CTAText={"Manage"} />
-              </NextLink>
-              <ListItemOptions
-                item={item}
-                signer={signer}
-                contract={contractAddress}
-              />
+                <NFTItemManager item={item} />
               </div>
             ))}
           </Grid>

@@ -28,6 +28,7 @@ const Home: React.FC = () => {
     setLoading(true);
     let data = await getAccountFraktalNFTs('listed_items','')
     if(data){
+      console.log('data',data)
       let listedItems = data.listItems.map(x => {return x.fraktal})
       // console.log('listed items', listedItems)
       Promise.all(listedItems.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
@@ -75,7 +76,7 @@ const Home: React.FC = () => {
           )}
         </Box>
         <Text className='semi-48'>Marketplace</Text>
-        <NextLink href='/list-nft'>
+        <NextLink href='/my-nfts'>
           <FrakButton>List NFT</FrakButton>
         </NextLink>
       </HStack>

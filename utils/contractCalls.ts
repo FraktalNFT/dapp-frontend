@@ -15,6 +15,7 @@ export async function transferToken(tokenId, subId, amount, to, signer, contract
   }
   console.log('Transaction receipt');
   console.log(receipt);
+  return receipt;
 }
 
 export async function unlockShares(id, amount,to, signer, contract) {
@@ -31,6 +32,7 @@ export async function unlockShares(id, amount,to, signer, contract) {
   }
   console.log('Transaction receipt');
   console.log(receipt);
+  return receipt;
 }
 
 export async function lockShares(id, amount,to, signer, contract) {
@@ -48,6 +50,7 @@ export async function lockShares(id, amount,to, signer, contract) {
   }
   console.log('Transaction receipt');
   console.log(receipt);
+  return receipt;
 }
 
 export async function createNFT(hash, signer, contractAddress,optionalBytecode){
