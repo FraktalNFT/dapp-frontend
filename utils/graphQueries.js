@@ -201,7 +201,7 @@ query($id:ID!){
 
 const listedItems = gql`
   query{
-    listItems(first: 10){
+    listItems(first: 10, where:{amount_gt: 0}){
       id
       seller {
         id

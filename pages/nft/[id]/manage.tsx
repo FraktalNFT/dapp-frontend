@@ -7,23 +7,66 @@ import { Image } from "@chakra-ui/image";
 import styles from "./manage.module.css";
 import Button from "../../../components/button";
 import {getAccountFraktalNFTs, createObject, getNFTobject} from '../../../utils/graphQueries';
-import {shortenHash, timezone} from '../../../utils/helpers';
+import {shortenHash, timezone, loadSigner} from '../../../utils/helpers';
+import { useWeb3Context } from '../../../contexts/Web3Context';
+import { sellerClaim } from '../../../utils/contractCalls';
+
 export default function ManageNFTView() {
+  const {account, provider, contractAddress} = useWeb3Context();
   const [nftObject, setNftObject] = useState();
-  const [view, setView] = useState("accepted");
+  const [signer, setSigner] = useState();
+  const [view, setView] = useState("manage");
   const [index, setIndex] = useState();
+
+  function getOwnershipPercenteage() {
+    let obj = nftObject.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
+    let amount = obj.amount
+    let perc = amount/100
+    console.log('calculated percenteage', perc)
+    return perc;
+  }
+
   useEffect(async ()=>{
     const address = window.location.href.split('http://localhost:3000/nft/');
     const index = parseFloat(address[1].split('/manage')[0])
     if(index){
       setIndex(index)
     }
-    let obj = await getAccountFraktalNFTs('marketid_fraktal',index)
-    let nftObjects = await createObject(obj.fraktalNFTs[0])
-    if(nftObjects){
-      setNftObject(nftObjects)
+    //look if it is listed at name of the account, so to display functions of claiming
+    if(account){
+      let listing = await getAccountFraktalNFTs('listed_itemsId', `${account.toLocaleLowerCase()}-0x${index+1}`)
+      let nftObjects;
+      if(listing && listing.listItems.length > 0){
+        nftObjects = await createObject(listing.listItems[0].fraktal)
+      }else{
+        let obj = await getAccountFraktalNFTs('marketid_fraktal',index)
+        nftObjects = await createObject(obj.fraktalNFTs[0])
+      }
+      if(nftObjects){
+        setNftObject(nftObjects)
+      }
     }
+
+
   },[index])
+
+  useEffect(async ()=>{
+    let signer = await loadSigner(provider);
+    console.log('signer', signer)
+    if(signer){
+      setSigner(signer)
+    }
+  },[provider])
+
+  async function claimGains(){
+    let confirm = window.confirm('Are you sure you want to claim your gains?')
+    if(confirm){
+      let tx = await sellerClaim(index, signer, contractAddress);
+    }
+  }
+
+  const isOwned = nftObject?.owner === account?.toLocaleLowerCase();
+  const listItemUrl = '/nft/'+index+'/list-item'
 
   const exampleNFT = {
     id: 0,
@@ -44,7 +87,20 @@ export default function ManageNFTView() {
           <div className={styles.goBack}>← back to all NFTS</div>
         </Link>
         <div className={styles.header}>{nftObject?nftObject.name:''}</div>
-
+        <div style={{textAlign:'center', fontWeight:'bold',fontSize:'21px',color:"grey"}}>
+          {nftObject?nftObject.description:''}
+        </div>
+        {isOwned?
+          <Link href={listItemUrl}>
+            <Button style={{color: 'white', background:'black', alignItems: 'center'}} >
+              List item
+            </Button>
+          </Link>
+          :
+          <div style={{textAlign: 'center', fontWeight:'bold', fontSize: '21px'}}>
+            You can manage your listed item here
+          </div>
+        }
         <div
           style={{
             display: "flex",
@@ -95,7 +151,9 @@ export default function ManageNFTView() {
                 <div className={styles.redeemContainer}>
                   <div style={{ marginLeft: "24px" }}>
                     <div className={styles.redeemHeader}>OWNERSHIP</div>
-                    <div className={styles.redeemAmount}>50%</div>
+                    <div className={styles.redeemAmount}>
+                    {nftObject? getOwnershipPercenteage()+'%' : null}
+                    </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <Image src={"/info.svg"} style={{ marginRight: "8px" }} />

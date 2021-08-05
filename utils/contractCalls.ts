@@ -69,6 +69,7 @@ export async function createNFT(hash, signer, contractAddress,optionalBytecode){
     }
     console.log('Transaction receipt');
     console.log(receipt);
+    return receipt;
 }
 
 export async function listItem(tokenId,amount,price,type,signer,contractAddress){
@@ -86,6 +87,40 @@ export async function listItem(tokenId,amount,price,type,signer,contractAddress)
   }
   console.log('Transaction receipt');
   console.log(receipt);
+  return receipt;
+}
+
+export async function unlistItem(tokenId, signer, contractAddress){
+  const unlistItemAbi = [
+    "function unlistItem(uint256 _tokenId)"
+  ];
+  const customContract = new Contract(contractAddress, unlistItemAbi, signer);
+  let receipt;
+  let tx = await customContract.unlistItem(tokenId)
+  try{
+    receipt = await tx.wait();
+  }catch(e){
+    receipt = 'Error: ',e.toString() //test this
+  }
+  console.log('Transaction receipt');
+  console.log(receipt);
+  return receipt;
+}
+export async function sellerClaim(tokenId, signer, contractAddress){
+  const rescueEthAbi = [
+    "function rescueEth(uint256 _tokenId)"
+  ];
+  const customContract = new Contract(contractAddress, rescueEthAbi, signer);
+  let receipt;
+  let tx = await customContract.rescueEth(tokenId)
+  try{
+    receipt = await tx.wait();
+  }catch(e){
+    receipt = 'Error: ',e.toString() 
+  }
+  console.log('Transaction receipt');
+  console.log(receipt);
+  return receipt;
 }
 
 export async function buyFraktions(seller, tokenId,amount,signer,contractAddress){
@@ -103,4 +138,5 @@ export async function buyFraktions(seller, tokenId,amount,signer,contractAddress
   }
   console.log('Transaction receipt');
   console.log(receipt);
+  return receipt;
 }

@@ -49,3 +49,20 @@ export const addChainToMetaMask = async (
         ],
       });
 };
+
+export async function loadSigner(provider) { //Load contract instance
+  if (typeof provider !== "undefined") {
+    try {
+      let signer;
+      const accounts = await provider.listAccounts();
+      if (accounts && accounts.length > 0) {
+        signer = provider.getSigner();// get signer
+      } else {
+        signer = provider; // or use RPC (cannot sign tx's. should call a connect warning)
+      }
+      return signer;
+    } catch (e) {
+      console.log("ERROR LOADING SIGNER", e);
+    }
+  }
+}
