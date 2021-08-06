@@ -34,27 +34,28 @@ export default function ManageNFTView() {
     }
     //look if it is listed at name of the account, so to display functions of claiming
     if(account){
-      let listing = await getAccountFraktalNFTs('listed_itemsId', `${account.toLocaleLowerCase()}-0x${index+1}`)
+      let listing = await getAccountFraktalNFTs('listed_itemsId', `${account.toLocaleLowerCase()}-0x${(index+1).toString(16)}`)
       let nftObjects;
       if(listing && listing.listItems.length > 0){
         nftObjects = await createObject(listing.listItems[0].fraktal)
       }else{
         let obj = await getAccountFraktalNFTs('marketid_fraktal',index)
+        console.log('obj',obj)
         nftObjects = await createObject(obj.fraktalNFTs[0])
       }
       if(nftObjects){
         setNftObject(nftObjects)
       }
     }
-
-
-  },[index])
+  },[])
 
   useEffect(async ()=>{
-    let signer = await loadSigner(provider);
-    console.log('signer', signer)
-    if(signer){
-      setSigner(signer)
+    if(provider){
+      let signer = await loadSigner(provider);
+      console.log('signer', signer)
+      if(signer){
+        setSigner(signer)
+      }
     }
   },[provider])
 

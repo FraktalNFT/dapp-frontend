@@ -8,7 +8,7 @@ import Dropdown from "../components/dropdown";
 import NFTItem from "../components/nft-item";
 import Pagination from "../components/pagination";
 import { FrakCard } from "../types";
-import {getAccountFraktalNFTs, createObject} from '../utils/graphQueries';
+import {getAccountFraktalNFTs, createObject, createListed} from '../utils/graphQueries';
 const { create, CID } = require('ipfs-http-client');
 const SORT_TYPES = ["Popular", "Ending Soonest", "Newly Listed"];
 
@@ -28,10 +28,7 @@ const Home: React.FC = () => {
     setLoading(true);
     let data = await getAccountFraktalNFTs('listed_items','')
     if(data){
-      console.log('data',data)
-      let listedItems = data.listItems.map(x => {return x.fraktal})
-      // console.log('listed items', listedItems)
-      Promise.all(listedItems.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
+      Promise.all(data.listItems.map(x=>{return createListed(x)})).then((results)=>setNftItems(results))
     }
     setLoading(false);
   },[])
@@ -92,7 +89,7 @@ const Home: React.FC = () => {
               gap='3.2rem'
             >
               {nftItems.map(item => (
-                <NextLink key={item.id} href={`/nft/${item.id}/auction`}>
+                <NextLink key={item.id} href={`/nft/${item.id}/fix-price-sale`}>
                   <NFTItem item={item} />
                 </NextLink>
               ))}

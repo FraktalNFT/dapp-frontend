@@ -7,7 +7,7 @@ export async function transferToken(tokenId, subId, amount, to, signer, contract
   console.log('inputs',tokenId,subId,amount,to,signer,contractAddress)
   const customContract = new Contract(contractAddress, transferAbi, signer);
   let receipt;
-  let tx = await customContract.makeSafeTransfer(to, tokenId, subId,amount) // fails on cannot estimate gas. with pre-settings passes.
+  let tx = await customContract.makeSafeTransfer(to, tokenId, subId,amount)
   try{
     receipt = await tx.wait();
   }catch(e){
@@ -116,21 +116,22 @@ export async function sellerClaim(tokenId, signer, contractAddress){
   try{
     receipt = await tx.wait();
   }catch(e){
-    receipt = 'Error: ',e.toString() 
+    receipt = 'Error: ',e.toString()
   }
   console.log('Transaction receipt');
   console.log(receipt);
   return receipt;
 }
 
-export async function buyFraktions(seller, tokenId,amount,signer,contractAddress){
+export async function buyFraktions(seller, tokenId,amount,value,signer,contractAddress){
   const buyAbi = [
-    "function buy(address from,uint256 _tokenId,uint256 _numberOfShares)"
+    "function buy(address from,uint256 _tokenId,uint256 _numberOfShares) payable"
   ];
-  console.log('inputs',tokenId,amount,seller)
+  console.log('inputs',tokenId,amount,seller, value)
+  const override = {value:value, gasLimit:160000}
   const customContract = new Contract(contractAddress, buyAbi, signer);
   let receipt;
-  let tx = await customContract.buy(seller, tokenId, amount)
+  let tx = await customContract.buy(seller, tokenId, amount, override)
   try{
     receipt = await tx.wait();
   }catch(e){

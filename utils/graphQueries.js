@@ -1,5 +1,6 @@
 import { gql, request } from 'graphql-request';
 const { create, CID } = require('ipfs-http-client');
+import { utils } from "ethers";
 
 const APIURL = 'https://api.studio.thegraph.com/query/101/fraktalgoerli/v0.0.5';
 
@@ -154,6 +155,7 @@ const account_fraktions_query = gql`
   query($id:ID!){
     fraktionsBalances(first:10, where:{owner:$id}){
       id
+      amount
       owner {
         id
       }
@@ -161,7 +163,6 @@ const account_fraktions_query = gql`
         id
         marketId
       }
-      amount
     }
   }
 `
@@ -203,15 +204,14 @@ const listedItems = gql`
   query{
     listItems(first: 10, where:{amount_gt: 0}){
       id
+      price
+      amount
+      type
       seller {
         id
       }
       fraktal {
-        id
         hash
-        owner{
-          id
-        }
         fraktions {
           owner{
             id
@@ -223,11 +223,7 @@ const listedItems = gql`
           id
         }
         createdAt
-        transactionHash
       }
-      price
-      amount
-      type
     }
   }
 `;
@@ -287,6 +283,23 @@ export async function createObject(data){
       id: data.marketId,
       balances: data.fraktions,
       createdAt: data.createdAt,
+      name: nftMetadata.name,
+      description: nftMetadata.description,
+      imageURL: checkImageCID(nftMetadata.image),
+    }
+  }
+};
+export async function createListed(data){
+  let nftMetadata = await fetchNftMetadata(data.fraktal.hash)
+  if(nftMetadata){
+    return {
+      creator:data.fraktal.creator.id,
+      marketId: data.fraktal.marketId,
+      createdAt: data.fraktal.createdAt,
+      id: data.id,
+      price:utils.formatEther(data.price),
+      amount: data.amount,
+      seller: data.seller.id,
       name: nftMetadata.name,
       description: nftMetadata.description,
       imageURL: checkImageCID(nftMetadata.image),

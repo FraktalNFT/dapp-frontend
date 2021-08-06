@@ -7,7 +7,7 @@ import { Image } from "@chakra-ui/image";
 import styles from "./auction.module.css";
 import FrakButton from '../../../components/button';
 import {shortenHash, timezone, loadSigner} from '../../../utils/helpers';
-import {getAccountFraktalNFTs, createObject, getNFTobject} from '../../../utils/graphQueries';
+import {getAccountFraktalNFTs, createObject, getNFTobject, createListed} from '../../../utils/graphQueries';
 import { useWeb3Context } from '../../../contexts/Web3Context';
 import { listItem, lockShares, transferToken, unlockShares, unlistItem } from '../../../utils/contractCalls';
 const exampleNFT = {
@@ -53,24 +53,21 @@ export default function ListNFTView() {
       let listing = await getAccountFraktalNFTs('listed_itemsId', `${account.toLocaleLowerCase()}-0x${(index+1).toString(16)}`)
       if(listing && listing.listItems.length > 0){
         setUpdating(true)
-        let nftObject = await createObject(listing.listItems[0].fraktal)
+        let nftObject = await createListed(listing.listItems[0])
         if(nftObject && account){
           setNftObject(nftObject)
-          let userAmount = nftObject.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
-          if(userAmount){
-            let parsedPrice = utils.formatEther(listing.listItems[0].price)
-            let settedPrice = parsedPrice*listing.listItems[0].amount
-            setTotalPrice(Math.round(settedPrice, 1))
-            setTotalAmount(listing.listItems[0].amount)
-            setFraktions(nftObject.balances[0].amount)
+          let parsedPrice = nftObject.price
+          let settedPrice = parseFloat(parsedPrice)*parseFloat(nftObject.amount)
+          setTotalPrice(settedPrice)
+          setTotalAmount(listing.amount)
+          setFraktions(nftObject.amount)
           }else {
             setFraktions(0)
           }
-        }
       }else{
         let obj = await getAccountFraktalNFTs('marketid_fraktal',index)
         if(obj && obj.fraktalNFTs){
-          let nftObjects = await createObject(obj.fraktalNFTs[0]) // its an array (?)
+          let nftObjects = await createObject(obj.fraktalNFTs[0])
           if(nftObjects && account ){
             setNftObject(nftObjects)
             let userAmount = nftObjects.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
