@@ -15,14 +15,18 @@ export default function FixPriceNFTView() {
   const {account, provider, contractAddress} = useWeb3Context();
   const [signer, setSigner] = useState();
   const [index, setIndex] = useState();
+  const [raised, setRaised] = useState(0);
+  const [fraktalOwners, setFraktalOwners] = useState(1);
   const [nftObject, setNftObject] = useState();
   const [fraktionsToBuy, setFraktionsToBuy] = useState();
 
   useEffect(async ()=>{
-    let signer = await loadSigner(provider);
-    console.log('signer', signer)
-    if(signer){
-      setSigner(signer)
+    if(provider){
+      let signer = await loadSigner(provider);
+      console.log('signer', signer)
+      if(signer){
+        setSigner(signer)
+      }
     }
   },[provider])
 
@@ -35,8 +39,15 @@ export default function FixPriceNFTView() {
       let obj = await getAccountFraktalNFTs('listed_itemsId',index)
       if(obj){
         let nftObjects = await createListed(obj.listItems[0])
-        if(nftObjects){
+        if(nftObjects && contractAddress){
           setNftObject(nftObjects)
+          let newObj = await getAccountFraktalNFTs('marketid_fraktal', nftObjects.marketId)
+          console.log(newObj)
+          if(newObj && newObj.fraktalNFTs){
+            setFraktalOwners(newObj.fraktalNFTs[0].fraktions.length)
+            // let owners =
+          }
+          // let fraktionsOwners = query for fraktionBalances where nft:id and then .length
         }
       }else{
         setNftObject()
@@ -120,11 +131,11 @@ export default function FixPriceNFTView() {
               <div className={styles.auctionCardHeader}>Contributed</div>
               <div className={styles.auctionCardDetailsContainer}>
                 <div style={{ marginRight: "60px" }}>
-                  <div className={styles.auctionCardDetailsNumber}>Raised</div>
-                  <div className={styles.auctionCardDetailsText}>ETH</div>
+                  <div className={styles.auctionCardDetailsNumber}>{raised}ETH</div>
+                  <div className={styles.auctionCardDetailsText}>Raised</div>
                 </div>
                 <div>
-                  <div className={styles.auctionCardDetailsNumber}>x</div>
+                  <div className={styles.auctionCardDetailsNumber}>{fraktalOwners}</div>
                   <div className={styles.auctionCardDetailsText}>People</div>
                 </div>
               </div>
