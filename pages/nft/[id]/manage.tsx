@@ -92,9 +92,11 @@ export default function ManageNFTView() {
         </div>
         {isOwned?
           <Link href={listItemUrl}>
-            <Button style={{color: 'white', background:'black', alignItems: 'center'}} >
-              List item
-            </Button>
+            <div style={{display: 'flex', justifyContent: 'center'}}>
+              <Button style={{color: 'white', background:'black', alignItems: 'center'}} >
+                List item
+              </Button>
+            </div>
           </Link>
           :
           <div style={{textAlign: 'center', fontWeight:'bold', fontSize: '21px'}}>

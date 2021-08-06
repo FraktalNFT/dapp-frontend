@@ -25,7 +25,6 @@ export default function ListNFTView() {
   const [index, setIndex] = useState();
   const [signer, setSigner] = useState();
   const [totalAmount, setTotalAmount] = useState(0);
-  // const [ownedAmount, setOwnedAmount] = useState(0)
   const [totalPrice, setTotalPrice] = useState(0.);
   const [fraktions, setFraktions] = useState(0);
   const [locked, setLocked] = useState(false);
@@ -41,7 +40,7 @@ export default function ListNFTView() {
     }
   },[provider])
 
-  const fraktalReady = fraktions > 0 && totalAmount >= fraktions && totalPrice > 0 && nftObject.owner === contractAddress.toLocaleLowerCase();
+  const fraktalReady = fraktions > 0 && totalAmount <= fraktions && totalPrice > 0 && nftObject.owner === contractAddress.toLocaleLowerCase();
 
   useEffect(async ()=>{
     const address = window.location.href.split('http://localhost:3000/nft/');
@@ -111,7 +110,7 @@ export default function ListNFTView() {
         signer,
         contractAddress)
       if(tx) {
-        console.log('go to marketplace! (where is navigation??)')
+        console.log('go to marketplace!')
       }
     } else{
       console.log('event cancelled')
@@ -130,7 +129,7 @@ export default function ListNFTView() {
       try {
         let tx = await unlockShares(id, amount, to, signer, contractAddress);
         if(tx){
-          let objectOverriden = {...nftObject, owner: contractAddress};
+          let objectOverriden = {...nftObject, owner: contractAddress.toLocaleLowerCase()};
           setNftObject(objectOverriden)
           setUnlocked(true)
         }
@@ -196,6 +195,7 @@ export default function ListNFTView() {
                     <div className={styles.contributeHeader}>Total price (ETH)</div>
                     <input
                       className={styles.contributeInput}
+                      disabled={!nftObject || (contractAddress.toLocaleLowerCase() !== nftObject.owner)}
                       type="number"
                       placeholder={totalPrice}
                       onChange={(e)=>{setTotalPrice(e.target.value)}}
@@ -207,6 +207,7 @@ export default function ListNFTView() {
                     <div className={styles.contributeHeader}>Fraktions</div>
                     <input
                       className={styles.contributeInput}
+                      disabled={!nftObject || (contractAddress.toLocaleLowerCase() !== nftObject.owner)}
                       type="number"
                       placeholder={fraktions}
                       onChange={(e)=>{setTotalAmount(e.target.value)}}
@@ -236,15 +237,17 @@ export default function ListNFTView() {
               You need to lock the nft in the market to list the fraktions!
               <br />
               <div style={{marginTop: '8px', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-              <FrakButton
-              disabled={locked || fraktions === 0}
-              onClick={()=>lockingShares(nftObject.id, 10000, contractAddress)}
-                >
-              Lock</FrakButton>
-              <FrakButton
-              disabled={!locked}
-              onClick={()=>transferingToken(nftObject.id, 0,1,contractAddress)}>Transfer</FrakButton>
-              {transferred?'Accept the tx for unlocking your fraktions':null}
+                <FrakButton
+                disabled={locked || fraktions === 0}
+                onClick={()=>lockingShares(nftObject.id, 10000, contractAddress)}
+                  >
+                Lock</FrakButton>
+                <FrakButton
+                disabled={!locked || transferred}
+                onClick={()=>transferingToken(nftObject.id, 0,1,contractAddress)}>Transfer</FrakButton>
+              </div>
+              <div style={{textAlign: 'center', fontWeight: 'bold', fontSize: '18px', marginTop: '12px'}}>
+                {transferred && !unlocked ?'Accept the tx for unlocking your fraktions':null}
               </div>
             </div>
             :null}
