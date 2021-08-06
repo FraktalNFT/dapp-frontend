@@ -2,7 +2,7 @@ import { gql, request } from 'graphql-request';
 const { create, CID } = require('ipfs-http-client');
 import { utils } from "ethers";
 
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktalgoerli/v0.0.5';
+const APIURL = 'https://api.studio.thegraph.com/query/101/fraktalgoerli/v0.0.6';
 
 const ipfsClient = create({
   host: "ipfs.infura.io",
@@ -206,6 +206,7 @@ const listedItems = gql`
       id
       price
       amount
+      balance
       type
       seller {
         id
@@ -256,6 +257,7 @@ const listedItemsId = gql`
       price
       amount
       type
+      balance
     }
   }
 `;
@@ -296,6 +298,7 @@ export async function createListed(data){
       creator:data.fraktal.creator.id,
       marketId: data.fraktal.marketId,
       createdAt: data.fraktal.createdAt,
+      raised: data.balance,
       id: data.id,
       price:utils.formatEther(data.price),
       amount: data.amount,

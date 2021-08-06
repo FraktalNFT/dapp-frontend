@@ -41,6 +41,7 @@ export default function FixPriceNFTView() {
         let nftObjects = await createListed(obj.listItems[0])
         if(nftObjects && contractAddress){
           setNftObject(nftObjects)
+          setRaised(parseFloat(nftObjects.raised)/10**18)
           let newObj = await getAccountFraktalNFTs('marketid_fraktal', nftObjects.marketId)
           console.log(newObj)
           if(newObj && newObj.fraktalNFTs){
