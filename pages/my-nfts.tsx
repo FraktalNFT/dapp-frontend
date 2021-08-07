@@ -4,7 +4,6 @@ import Head from "next/head";
 import React, {useEffect, useState, useCallback} from "react";
 import { BigNumber } from "ethers";
 import { FrakCard, NFTItemType } from "../types";
-import NFTItem from "../components/nft-item";
 import NFTItemManager from "../components/nft-item-manager";
 import NextLink from "next/link";
 import styles from "../styles/my-nfts.module.css";
@@ -15,18 +14,19 @@ import { getSubgraphData, createObject } from '../utils/graphQueries';
 export default function MyNFTsView() {
   const { account, provider, contractAddress } = useWeb3Context();
   const [nftItems, setNftItems] = useState();
+  const [totalBalance, setTotalBalance] = useState(0);
   const [fraktionItems, setFraktionItems] = useState();
-  const [userBalance, setUserBalance] = useState(0);
 
   async function getAccountFraktions(){
     let objects = await getSubgraphData('account_fraktions',account.toLocaleLowerCase())
     return objects;
   };
-
   useEffect(async()=>{
     if(account) {
       let fobjects = await getAccountFraktions()
       if(fobjects && fobjects.fraktionsBalances.length){
+        let userBalance = fobjects.fraktionsBalances[0].owner.balance
+        setTotalBalance(parseFloat(userBalance)/10**18)
         let nftObjects = await Promise.all(fobjects.fraktionsBalances.map(x=>{return createObject(x.nft)}))
         if(nftObjects){
           setFraktionItems(nftObjects)
@@ -98,9 +98,9 @@ export default function MyNFTsView() {
             <div className={styles.claimContainer}>
               <div style={{ marginLeft: "24px" }}>
                 <div className={styles.claimHeader}>ETH</div>
-                <div className={styles.claimAmount}>{userBalance}</div>
+                <div className={styles.claimAmount}>{totalBalance}</div>
               </div>
-              <div className={styles.claimCTA}>Claim</div>
+              <div className={styles.claimCTA}>Claim from manage</div>
             </div>
           </div>
           <Grid

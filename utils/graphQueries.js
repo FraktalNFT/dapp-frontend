@@ -2,7 +2,7 @@ import { gql, request } from 'graphql-request';
 const { create, CID } = require('ipfs-http-client');
 import { utils } from "ethers";
 
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktalgoerli/v0.0.6';
+const APIURL = 'https://api.studio.thegraph.com/query/101/fraktalgoerli/v0.0.7';
 
 const ipfsClient = create({
   host: "ipfs.infura.io",
@@ -86,6 +86,7 @@ const account_fraktions_query = gql`
       amount
       owner {
         id
+        balance
       }
       nft {
         id

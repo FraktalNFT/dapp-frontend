@@ -2,15 +2,14 @@ import { VStack } from "@chakra-ui/layout";
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
-import { BigNumber } from "ethers";
+import { BigNumber,utils } from "ethers";
 import { Image } from "@chakra-ui/image";
 import styles from "./manage.module.css";
 import Button from "../../../components/button";
-import {getSubgraphData, createObject} from '../../../utils/graphQueries';
+import {getSubgraphData, createObject, createListed} from '../../../utils/graphQueries';
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
 import { sellerClaim } from '../../../utils/contractCalls';
-
 export default function ManageNFTView() {
   const {account, provider, contractAddress} = useWeb3Context();
   const [nftObject, setNftObject] = useState();
@@ -18,10 +17,25 @@ export default function ManageNFTView() {
   const [index, setIndex] = useState();
 
   function getOwnershipPercenteage() {
+    let perc;
     let obj = nftObject.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
-    let perc = obj.amount/100
+    if(obj && obj.amount > 0){
+      perc = obj.amount/100
+    }else{
+      perc = 0
+    }
     return perc;
   }
+  async function sellerClaiming(){
+    try {
+      let tx = await sellerClaim(
+        index,
+        provider,
+        contractAddress);
+      }catch(e){
+        console.log('There has been an error: ',e)
+      }
+    }
 
   useEffect(async ()=>{
     const address = getParams('nft');
@@ -33,17 +47,24 @@ export default function ManageNFTView() {
       let listing = await getSubgraphData('listed_itemsId', `${account.toLocaleLowerCase()}-0x${(index+1).toString(16)}`)
       let nftObjects;
       if(listing && listing.listItems.length > 0){
-        nftObjects = await createObject(listing.listItems[0].fraktal)
+        nftObjects = await createListed(listing.listItems[0])
+        let objectOverriden = {...nftObjects, balances: listing.listItems[0].fraktal.fraktions};
+        setNftObject(objectOverriden)
       }else{
         let obj = await getSubgraphData('marketid_fraktal',index)
         nftObjects = await createObject(obj.fraktalNFTs[0])
-      }
-      if(nftObjects){
         setNftObject(nftObjects)
       }
     }
   },[account])
-
+  function raised(){
+    let value = parseFloat(nftObject.raised)/10**18
+    if(value){
+      return value
+    }else{
+      return 0
+    }
+  }
   const isOwned = nftObject?.owner === account?.toLocaleLowerCase();
   const listItemUrl = '/nft/'+index+'/list-item'
 
@@ -130,10 +151,17 @@ export default function ManageNFTView() {
               )}
               <div style={{ display: "flex", justifyContent: "center" }}>
                 <div className={styles.redeemContainer}>
-                  <div style={{ marginLeft: "24px" }}>
+                  <div style={{ marginLeft: "16px" }}>
                     <div className={styles.redeemHeader}>OWNERSHIP</div>
                     <div className={styles.redeemAmount}>
-                    {nftObject? getOwnershipPercenteage()+'%' : null}
+                    {nftObject? getOwnershipPercenteage() +'%' : null}
+                    </div>
+                  </div>
+                  <div style={{ marginLeft: "12px" }}>
+
+                    <div className={styles.redeemHeader}>Gains</div>
+                    <div className={styles.redeemAmount}>
+                      {nftObject? raised() +'ETH' : 0}
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center" }}>
@@ -180,8 +208,9 @@ export default function ManageNFTView() {
               <Button
                 isOutlined
                 style={{ backgroundColor: "white", width: "192px" }}
+                onClick={()=>sellerClaiming()}
               >
-                Claim Revenue
+                Claim Gains
               </Button>
             </div>
           )}
