@@ -31,9 +31,9 @@ const Header = () => {
             <NextLink href='/artists'>
               <Link className='semi-16'>Artists</Link>
             </NextLink>
-            <NextLink href='/dao'>
+            <a href='https://app.daohaus.club/dao/0x4/0x721c1016044a7bd95332601bcbcf889f958be5b2' target='_blank' rel='noopener noreferrer'>
               <Link className='semi-16'>DAO</Link>
-            </NextLink>
+            </a>
           </HStack>
           {!account ? (
             <FrakButton onClick={connectWeb3}>Connect Wallet</FrakButton>
