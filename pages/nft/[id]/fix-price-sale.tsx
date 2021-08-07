@@ -17,7 +17,7 @@ export default function FixPriceNFTView() {
   const [raised, setRaised] = useState(0);
   const [fraktalOwners, setFraktalOwners] = useState(1);
   const [nftObject, setNftObject] = useState();
-  const [fraktionsToBuy, setFraktionsToBuy] = useState();
+  const [fraktionsToBuy, setFraktionsToBuy] = useState(0);
 
   useEffect(async ()=>{
       const address = getParams('nft');
@@ -105,7 +105,7 @@ export default function FixPriceNFTView() {
             <div style={{ marginRight: "52px" }}>
               <div className={styles.auctionCardDetailsContainer}>
                 <div style={{ marginRight: "48px" }}>
-                  <div className={styles.auctionCardDetailsNumber}>{nftObject?nftObject.price:''}</div>
+                  <div className={styles.auctionCardDetailsNumber}>{nftObject?Math.round(nftObject.price*10000)/10000:''}</div>
                   <div className={styles.auctionCardDetailsText}>Price of Fraktion</div>
                 </div>
                 <div style={{ marginRight: "28px" }}>
@@ -119,7 +119,7 @@ export default function FixPriceNFTView() {
               <div className={styles.auctionCardHeader}>Contributed</div>
               <div className={styles.auctionCardDetailsContainer}>
                 <div style={{ marginRight: "60px" }}>
-                  <div className={styles.auctionCardDetailsNumber}>{raised}ETH</div>
+                  <div className={styles.auctionCardDetailsNumber}>{Math.round(raised*1000)/1000}ETH</div>
                   <div className={styles.auctionCardDetailsText}>Raised</div>
                 </div>
                 <div>

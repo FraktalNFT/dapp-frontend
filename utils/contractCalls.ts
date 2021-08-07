@@ -115,7 +115,8 @@ export async function sellerClaim(tokenId, provider, contractAddress){
   const signer = await loadSigner(provider);
   const customContract = new Contract(contractAddress, rescueEthAbi, signer);
   let receipt;
-  let tx = await customContract.rescueEth(tokenId)
+  const override = {gasLimit:60000}
+  let tx = await customContract.rescueEth(tokenId,override)
   try{
     receipt = await tx.wait();
   }catch(e){
@@ -138,7 +139,7 @@ export async function buyFraktions(seller, tokenId,amount,value,provider,contrac
   try{
     receipt = await tx.wait();
   }catch(e){
-    receipt = 'Error: ',e.toString() 
+    receipt = 'Error: ',e.toString()
   }
   console.log('Transaction receipt');
   console.log(receipt);

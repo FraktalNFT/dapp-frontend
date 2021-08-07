@@ -98,7 +98,7 @@ export default function MyNFTsView() {
             <div className={styles.claimContainer}>
               <div style={{ marginLeft: "24px" }}>
                 <div className={styles.claimHeader}>ETH</div>
-                <div className={styles.claimAmount}>{totalBalance}</div>
+                <div className={styles.claimAmount}>{Math.round(totalBalance*1000)/1000}</div>
               </div>
               <div className={styles.claimCTA}>Claim from manage</div>
             </div>

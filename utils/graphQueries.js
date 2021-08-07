@@ -150,6 +150,7 @@ const listedItemsId = gql`
         fraktions {
           owner{
             id
+            balance
           }
           amount
         }

@@ -50,8 +50,8 @@ export default function ListNFTView() {
         setLocked(true)
         setTransferred(true)
         setUnlocked(true)
-        console.log('listing',listing)
         let ownedFraktions = listing.listItems[0].fraktal.fraktions.find(x=> x.owner.id === account.toLocaleLowerCase())
+        console.log('account has ',ownedFraktions)
         setFraktions(ownedFraktions.amount)
         let nftObject = await createListed(listing.listItems[0])
         if(nftObject && account){
@@ -69,9 +69,10 @@ export default function ListNFTView() {
           let nftObjects = await createObject(obj.fraktalNFTs[0])
           if(nftObjects && account ){
             setNftObject(nftObjects)
+            console.log('nftObjects',nftObjects)
             let userAmount = nftObjects.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
             if(userAmount){
-              setFraktions(nftObjects.balances[0].amount)
+              setFraktions(userAmount.amount)
             }else {
               setFraktions(0)
             }

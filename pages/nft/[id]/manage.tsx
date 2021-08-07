@@ -13,6 +13,7 @@ import { sellerClaim } from '../../../utils/contractCalls';
 export default function ManageNFTView() {
   const {account, provider, contractAddress} = useWeb3Context();
   const [nftObject, setNftObject] = useState();
+  const [raised, setRaised] = useState(0);
   const [view, setView] = useState("manage");
   const [index, setIndex] = useState();
 
@@ -48,6 +49,12 @@ export default function ManageNFTView() {
       let nftObjects;
       if(listing && listing.listItems.length > 0){
         nftObjects = await createListed(listing.listItems[0])
+        let ownerGains = listing.listItems[0].fraktal.fraktions.find(x=>x.owner.id === account.toLocaleLowerCase())
+        if(ownerGains){
+          setRaised(parseFloat(ownerGains.owner.balance)/10**18)
+        }else{
+          setRaised(0)
+        }
         let objectOverriden = {...nftObjects, balances: listing.listItems[0].fraktal.fraktions};
         setNftObject(objectOverriden)
       }else{
@@ -57,14 +64,6 @@ export default function ManageNFTView() {
       }
     }
   },[account])
-  function raised(){
-    let value = parseFloat(nftObject.raised)/10**18
-    if(value){
-      return value
-    }else{
-      return 0
-    }
-  }
   const isOwned = nftObject?.owner === account?.toLocaleLowerCase();
   const listItemUrl = '/nft/'+index+'/list-item'
 
@@ -161,7 +160,7 @@ export default function ManageNFTView() {
 
                     <div className={styles.redeemHeader}>Gains</div>
                     <div className={styles.redeemAmount}>
-                      {nftObject? raised() +'ETH' : 0}
+                      {nftObject? Math.round(raised*1000)/1000 +'ETH' : 0}
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center" }}>
