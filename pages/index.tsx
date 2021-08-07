@@ -8,7 +8,7 @@ import Dropdown from "../components/dropdown";
 import NFTItem from "../components/nft-item";
 import Pagination from "../components/pagination";
 import { FrakCard } from "../types";
-import {getAccountFraktalNFTs, createObject, createListed} from '../utils/graphQueries';
+import {getSubgraphData, createListed} from '../utils/graphQueries';
 const { create, CID } = require('ipfs-http-client');
 const SORT_TYPES = ["Popular", "Ending Soonest", "Newly Listed"];
 
@@ -26,16 +26,13 @@ const Home: React.FC = () => {
 
   useEffect(async ()=>{
     setLoading(true);
-    let data = await getAccountFraktalNFTs('listed_items','')
+    let data = await getSubgraphData('listed_items','')
     if(data){
       Promise.all(data.listItems.map(x=>{return createListed(x)})).then((results)=>setNftItems(results))
     }
     setLoading(false);
   },[])
 
-
-
-  // TODO: hardcoded stuff as of now
   const demoNFTItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
     (_, index) => ({
       id: index + 1,

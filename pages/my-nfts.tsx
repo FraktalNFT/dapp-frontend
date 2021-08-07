@@ -10,92 +10,39 @@ import NextLink from "next/link";
 import styles from "../styles/my-nfts.module.css";
 import FrakButton from "../components/button";
 import { useWeb3Context } from '../contexts/Web3Context';
-import { getAccountFraktalNFTs, createObject } from '../utils/graphQueries';
+import { getSubgraphData, createObject } from '../utils/graphQueries';
 
 export default function MyNFTsView() {
   const { account, provider, contractAddress } = useWeb3Context();
   const [nftItems, setNftItems] = useState();
-  const [accountAddress, setAccountAddress] = useState(); // to test the effects not fetching..
-  const [userBalance, setUserBalance] = useState(0);
   const [fraktionItems, setFraktionItems] = useState();
-  const [listModal, setListModal] = useState(false);
-  const [signer, setSigner] = useState();
+  const [userBalance, setUserBalance] = useState(0);
 
-
-  async function getAccountFraktions(account){
-    console.log('searching for ',account,' fraktals')
-    let objects = await getAccountFraktalNFTs('account_fraktions',account.toLocaleLowerCase())///
-    console.log('retrieved', objects)
+  async function getAccountFraktions(){
+    let objects = await getSubgraphData('account_fraktions',account.toLocaleLowerCase())
     return objects;
   };
 
-  async function getFraktionsFraktals(list) {
-    console.log('searching for ',list,' fraktions')
-    let res = await Promise.all(list.map(x=>{return getAccountFraktalNFTs('id_fraktal', x.nft.id)}))
-    let fraks = [];
-    if(res.length){
-      fraks = await Promise.all(res.map(x=>{return createObject(x.fraktalNFTs[0])}))
-    }
-    return fraks;
-  }
-
-  // let fraktionObjects = async () => {return await getAccountFraktions(account)};
-  // console.log('fraktionObjects', fraktionObjects())
   useEffect(async()=>{
-    let objects;
-    let fraktals;
-    if (account) {
-      // let userObject = await getAccountFraktalNFTs('userAddress', account)
-      // console.log('userObject',userObject)
-      // objects.fraktionsBalances.map(x=>console.log(x.nft.id.toString()))
-      objects = await getAccountFraktions(account);
-      if(objects && objects.fraktionsBalances.length > 0) {
-        fraktals = await getFraktionsFraktals(objects.fraktionsBalances)
-        // console.log('setting objects ',fraktals)
-        setFraktionItems(fraktals);
-      }
-    } else {
-      // objects = await getAccountFraktalNFTs('account_fraktions',account)
-      setFraktionItems([]);
-    }
-  },[account])
-  useEffect(()=>{
-    async function loadSigner() { //Load contract instance
-      if (typeof provider !== "undefined") {
-        try {
-          let signer;
-          const accounts = await provider.listAccounts();
-          if (accounts && accounts.length > 0) {
-            signer = provider.getSigner();// get signer
-          } else {
-            signer = provider; // or use RPC (cannot sign tx's. should call a connect warning)
+    if(account) {
+      let fobjects = await getAccountFraktions()
+      if(fobjects && fobjects.fraktionsBalances.length){
+        let nftObjects = await Promise.all(fobjects.fraktionsBalances.map(x=>{return createObject(x.nft)}))
+        if(nftObjects){
+          setFraktionItems(nftObjects)
+          const ownedNfts = nftObjects.filter(x=>x.owner === account.toLocaleLowerCase())
+          if (ownedNfts.length){
+            setNftItems(ownedNfts)
+          }else{
+            setNftItems([])
           }
-          setSigner(signer);
-        } catch (e) {
-          console.log("ERROR LOADING SIGNER", e);
+        }else{
+          setNftItems([])
+          setFraktionItems([])
         }
       }
     }
-    loadSigner();
-  },[provider, account]);
-
-  // useEffect(async()=>{
-  //   setUserBalance(125.99)
-  // },[account])
-
-  useEffect(async()=>{
-    if(account) {
-      let fobjects = await getAccountFraktalNFTs('account_fraktals',account.toLocaleLowerCase())
-      if(fobjects && fobjects.fraktalNFTs.length){
-        Promise.all(fobjects.fraktalNFTs.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
-      }
-    }
   },[account]);
-
-
-  async function listItem() {
-    console.log('list it!')
-  }
 
   return (
     <VStack spacing='0' mb='12.8rem'>

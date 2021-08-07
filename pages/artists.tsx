@@ -11,14 +11,13 @@ import Pagination from "../components/pagination";
 import styles from "../styles/artists.module.css";
 import { Image } from "@chakra-ui/image";
 import { shortenHash } from "../utils/helpers";
-import { getAccountFraktalNFTs, createObject, getNFTobject } from '../utils/graphQueries';
+import { getSubgraphData, createObject } from '../utils/graphQueries';
 
 export default function ArtistsView() {
   const SORT_TYPES = ["Popular", "New"];
   const [selectionMode, setSelectionMode] = useState(false);
   const [sortType, setSortType] = useState("Popular");
   const [artists, setArtists] = useState([]);
-  const [fraktalItems, setFraktalItems] = useState();
   const [nftItems, setNftItems] = useState([]);
   const [artistsItems, setArtistsItems] = useState([]);
 
@@ -38,26 +37,32 @@ export default function ArtistsView() {
     }
   },[nftItems])
 
-  useEffect(()=>{
-    if(!fraktalItems){
-      const data = getAccountFraktalNFTs('artists','')
-      console.log('data', data)
-      let fraktalsSamples
-      let fraktalsSamplesWith
-      data.then((d)=>{
-        // console.log('data', d)
-        let onlyCreators = d.users.filter(x=>{return x.created.length > 0 })
-        console.log('creators filtered', onlyCreators)
-        setArtists(onlyCreators)
-        fraktalsSamplesWith = onlyCreators.map(x=>{return x.created[0]})
-        console.log('fraktalSamplesWith', fraktalsSamplesWith)
-        Promise.all(fraktalsSamplesWith.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
-      })
-    }else{
-      Promise.all(fraktalItems.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
-    }
-  },[fraktalItems])
+  function getArtistsObjects(artists, nftItems){
+    let artistsObj = artists.map((x,i)=>({
+      id: x.id,
+      name: shortenHash(x.id),
+      imageURL: nftItems[i]?nftItems[i].imageURL:"/filler-image-1.png",
+      totalGallery:x.created.length,
+    }))
+    return artistsObj;
+  }
 
+  useEffect(async()=>{
+    const data = await getSubgraphData('artists','')
+    let fraktalSamples
+    if (data) {
+      let onlyCreators = data.users.filter(x=>{return x.created.length > 0 })
+      setArtists(onlyCreators)
+      fraktalSamples = onlyCreators.map(x=>{return x.created[0]})
+      let fraktalsSamplesObjects = await Promise.all(fraktalSamples.map(x=>{return createObject(x)}))//.then((results)=>setNftItems(results))
+      let artistsObj = getArtistsObjects(onlyCreators, fraktalsSamplesObjects)
+      if(artistsObj){
+        setArtistsItems(artistsObj)
+      }else{
+        setArtistsItems([])
+      }
+    }
+  },[])
 
   // TODO: hardcoded stuff as of now
   const demoArtistItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
@@ -104,7 +109,6 @@ export default function ArtistsView() {
           <Image src='/search.svg' />
         </div>
       </HStack>
-      {/*artists[i].fraktals.length*/}
       <Grid
         margin='0 !important'
         mb='5.6rem !important'

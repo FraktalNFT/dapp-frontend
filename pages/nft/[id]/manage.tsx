@@ -6,65 +6,43 @@ import { BigNumber } from "ethers";
 import { Image } from "@chakra-ui/image";
 import styles from "./manage.module.css";
 import Button from "../../../components/button";
-import {getAccountFraktalNFTs, createObject, getNFTobject} from '../../../utils/graphQueries';
-import {shortenHash, timezone, loadSigner} from '../../../utils/helpers';
+import {getSubgraphData, createObject} from '../../../utils/graphQueries';
+import {shortenHash, timezone, getParams} from '../../../utils/helpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
 import { sellerClaim } from '../../../utils/contractCalls';
 
 export default function ManageNFTView() {
   const {account, provider, contractAddress} = useWeb3Context();
   const [nftObject, setNftObject] = useState();
-  const [signer, setSigner] = useState();
   const [view, setView] = useState("manage");
   const [index, setIndex] = useState();
 
   function getOwnershipPercenteage() {
     let obj = nftObject.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
-    let amount = obj.amount
-    let perc = amount/100
-    console.log('calculated percenteage', perc)
+    let perc = obj.amount/100
     return perc;
   }
 
   useEffect(async ()=>{
-    const address = window.location.href.split('http://localhost:3000/nft/');
-    const index = parseFloat(address[1].split('/manage')[0])
+    const address = getParams('nft');
+    const index = parseFloat(address.split('/manage')[0])
     if(index){
       setIndex(index)
     }
-    //look if it is listed at name of the account, so to display functions of claiming
     if(account){
-      let listing = await getAccountFraktalNFTs('listed_itemsId', `${account.toLocaleLowerCase()}-0x${(index+1).toString(16)}`)
+      let listing = await getSubgraphData('listed_itemsId', `${account.toLocaleLowerCase()}-0x${(index+1).toString(16)}`)
       let nftObjects;
       if(listing && listing.listItems.length > 0){
         nftObjects = await createObject(listing.listItems[0].fraktal)
       }else{
-        let obj = await getAccountFraktalNFTs('marketid_fraktal',index)
-        console.log('obj',obj)
+        let obj = await getSubgraphData('marketid_fraktal',index)
         nftObjects = await createObject(obj.fraktalNFTs[0])
       }
       if(nftObjects){
         setNftObject(nftObjects)
       }
     }
-  },[])
-
-  useEffect(async ()=>{
-    if(provider){
-      let signer = await loadSigner(provider);
-      console.log('signer', signer)
-      if(signer){
-        setSigner(signer)
-      }
-    }
-  },[provider])
-
-  async function claimGains(){
-    let confirm = window.confirm('Are you sure you want to claim your gains?')
-    if(confirm){
-      let tx = await sellerClaim(index, signer, contractAddress);
-    }
-  }
+  },[account])
 
   const isOwned = nftObject?.owner === account?.toLocaleLowerCase();
   const listItemUrl = '/nft/'+index+'/list-item'

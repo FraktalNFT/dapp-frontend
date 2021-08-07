@@ -23,11 +23,6 @@ export default function MintNFTView() {
   const [description, setDescription] = useState();
   const [file, setFile] = useState();
 
-  // show tx hash
-  // add to metamask tokens received
-  // get events
-  // navigate to market?
-
   useEffect(()=>{
     const ipfsClient = create({
       host: "ipfs.infura.io",
@@ -91,12 +86,6 @@ export default function MintNFTView() {
     return imageUpload.path;
   }
 
-  // Contracts to expose mint function
-  // const transactionOptions = { // hardcoded forced for error on automatic gas estimation (Goerli stuff??)
-  //     gasLimit: 600000,
-  //     gasPrice: ethers.utils.parseUnits('5.0', 'gwei')
-  // }
-
   async function prepareNftData(){
     let imageCid
     let metadata
@@ -105,30 +94,27 @@ export default function MintNFTView() {
     minter(metadata)
   }
   async function minter(metadata) {
-    let metadataCid = await upload(JSON.stringify(metadata)) // it does not upload the object!!
+    let metadataCid = await upload(JSON.stringify(metadata))
     let formatted = metadataCid.cid.toString()
     await pinByHash(formatted) //Pinata
-    createNFT(formatted, signer, contractAddress);
+    createNFT(formatted, provider, contractAddress);
   }
 
   async function addFile(){ // preparation of the file (front-end exclusive)
     const selectedFile = document.getElementById('imageInput').files[0];
     setFile(selectedFile)
-    // All this is to manage image issues
-    let reader = new FileReader(); // read it
-    reader.readAsDataURL(selectedFile); //
+    let reader = new FileReader();
+    reader.readAsDataURL(selectedFile);
     reader.onloadend = function () {
         setImageData(reader.result)
-        var image = new Image(); // for sizing info
+        var image = new Image();
         image.src = reader.result;
         image.onload = function() {
           setImageSize(this.width, this.height)
           }
       }
   }
-
-  const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width} // for sizes adjustments
-
+  const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width} 
   return (
     <VStack spacing='0' mb='12.8rem'>
       <Head>

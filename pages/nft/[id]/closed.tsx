@@ -6,27 +6,23 @@ import { BigNumber } from "ethers";
 import { Image } from "@chakra-ui/image";
 import styles from "./closed.module.css";
 import FrakButton from "../../../components/button";
-import {shortenHash, timezone} from '../../../utils/helpers';
-import {getAccountFraktalNFTs, createObject, getNFTobject} from '../../../utils/graphQueries';
+import {shortenHash, timezone, getParams} from '../../../utils/helpers';
+import {getSubgraphData, createObject} from '../../../utils/graphQueries';
 export default function ClosedNFTView() {
   const [index, setIndex] = useState();
   const [nftObject, setNftObject] = useState();
 
-  useEffect(()=>{
-    const address = window.location.href.split('http://localhost:3000/nft/');
-    const index = parseFloat(address[1].split('/closed')[0])
-    if(index) setIndex(index)
-  })
-
   useEffect(async ()=>{
-      let obj = await getAccountFraktalNFTs('marketid_fraktal',index)
-      if(obj && obj.fraktalNFTs){
-        let nftObjects = await createObject(obj.fraktalNFTs[0])
-        if(nftObjects){
-          setNftObject(nftObjects)
-        }
+    const address = getParams('nft');
+    const index = parseFloat(address.split('/closed')[0])
+    let obj = await getSubgraphData('marketid_fraktal',index)
+    if(obj && obj.fraktalNFTs){
+      let nftObjects = await createObject(obj.fraktalNFTs[0])
+      if(nftObjects){
+        setNftObject(nftObjects)
       }
-  },[index])
+    }
+  },[])
 
   const [makeOffer, setMakeOffer] = useState(false);
   const exampleNFT = {

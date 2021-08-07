@@ -7,17 +7,21 @@ import { BigNumber } from "ethers";
 import NFTItem from "../../components/nft-item";
 import FrakButton from "../../components/button";
 import NextLink from "next/link";
-import {shortenHash} from '../../utils/helpers';
-import {getAccountFraktalNFTs, createObject, getNFTobject} from '../../utils/graphQueries';
+import {shortenHash, getParams} from '../../utils/helpers';
+import {getSubgraphData, createObject, getNFTobject} from '../../utils/graphQueries';
 
 export default function ArtistView() {
   const [artistAddress, setArtistAddres] = useState('');
   const [nftItems, setNftItems] = useState([]);
+
   useEffect(async()=>{
-    let address = window.location.href.split('http://localhost:3000/artist/');
-    setArtistAddres(address[1])
-    let objects = await getAccountFraktalNFTs('creator',address[1])
-    Promise.all(objects.fraktalNFTs.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
+    let address = getParams('artist');
+    console.log('address',address)
+      if(address){
+      setArtistAddres(address)
+      let objects = await getSubgraphData('creator',address)
+      Promise.all(objects.fraktalNFTs.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
+    }
   },[])
 
   const demoNFTItemsFull: FrakCard[] = Array.from({ length: 3 }).map(

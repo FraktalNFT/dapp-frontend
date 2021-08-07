@@ -25,58 +25,6 @@ query($id:ID!){
   }
   }
 `;
-const account_query = gql`
-  query($id:ID!){
-    fraktalNFTs(where:{owner:$id}) {
-      id
-      owner {
-        id
-      }
-      marketId
-      hash
-      fraktions {
-        id
-        amount
-      }
-      createdAt
-      creator {
-        id
-      }
-    }
-    }
-`;
-const id_query = gql`
-query($id:ID!){
-  fraktalNFTs(where:{id:$id}) {
-    id
-    marketId
-    hash
-    owner {
-      id
-    }
-    createdAt
-    creator {
-      id
-    }
-  }
-  }
-`;
-const fraktalsContains = gql`
-query($id:[ID!]){
-  fraktalNFTs(where:{id_in:$id}) {
-    id
-    owner {
-      id
-    }
-    marketId
-    hash
-    createdAt
-    creator {
-      id
-    }
-  }
-  }
-`;
 const marketid_query = gql`
 query($id:ID!){
   fraktalNFTs(where:{marketId:$id}) {
@@ -115,16 +63,6 @@ query {
   }
 }
 `;
-const users = gql`
-  query{
-    users(first: 20) {
-      id
-      fraktals
-      created
-    }
-  }
-`
-//, where:{created_gt: 0} is actually created.length!
 const creators_review = gql`
   query{
     users(first: 20) {
@@ -141,16 +79,6 @@ const creators_review = gql`
     }
   }
 `
-const userAddress = gql`
-query($id:ID!){
-  users(where:{id:$id}) {
-    id
-    created
-    fraktals
-  }
-  }
-`;
-
 const account_fraktions_query = gql`
   query($id:ID!){
     fraktionsBalances(first:10, where:{owner:$id}){
@@ -162,44 +90,18 @@ const account_fraktions_query = gql`
       nft {
         id
         marketId
-      }
-    }
-  }
-`
-const account_fraktions_query2 = gql`
-  query($id:ID!){
-    fraktalNFTs(first:10, where:{owner:$id}){
-      id
-      fraktions {
-        id
-        owner {
+        hash
+        creator{
           id
         }
-        amount
+        owner{
+          id
+        }
+        createdAt
       }
-      marketId
     }
   }
 `
-const fraktal_fraktions_query = gql`
-query($id:ID!){
-  fraktalNFTs(where:{fraktions:$id}) {
-    id
-    marketId
-    hash
-    owner {
-      id
-    }
-    creator {
-      id
-    }
-    fraktions{
-      amount
-    }
-  }
-  }
-`;
-
 const listedItems = gql`
   query{
     listItems(first: 10, where:{amount_gt: 0}){
@@ -213,6 +115,9 @@ const listedItems = gql`
       }
       fraktal {
         hash
+        owner {
+          id
+        }
         fraktions {
           owner{
             id
@@ -262,11 +167,11 @@ const listedItemsId = gql`
   }
 `;
 
-export const getAccountFraktalNFTs = async (call, id) => {
+export const getSubgraphData = async (call, id) => {
   let callGql = calls.find(x=> {return x.name == call})
   try {
     const data = await request(APIURL , callGql.call, {id});
-    console.log('data for:',id,' found',data)
+    // console.log('data for:',id,' found',data)
     return data;
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -298,6 +203,7 @@ export async function createListed(data){
       creator:data.fraktal.creator.id,
       marketId: data.fraktal.marketId,
       createdAt: data.fraktal.createdAt,
+      owner: data.fraktal.owner.id,
       raised: data.balance,
       id: data.id,
       price:utils.formatEther(data.price),
@@ -310,18 +216,13 @@ export async function createListed(data){
   }
 };
 const calls = [
-  {name: 'account_fraktals', call: account_query},
-  {name: 'account_fraktions', call: account_fraktions_query},
-  {name: 'marketid_fraktal', call: marketid_query},
-  {name: 'id_fraktal', call: id_query},
-  {name: 'id_fraktals', call: fraktalsContains},
-  {name: 'userAddress', call: userAddress},
-  {name: 'listed_items', call: listedItems},
-  {name: 'listed_itemsId', call: listedItemsId},
-  {name: 'artists', call: creators_review},
+  {name: 'account_fraktions', call: account_fraktions_query},//
+  {name: 'marketid_fraktal', call: marketid_query},//
+  {name: 'listed_items', call: listedItems},//
+  {name: 'listed_itemsId', call: listedItemsId},//
+  {name: 'artists', call: creators_review},//
   {name: 'all', call: all_nfts},
-  {name: 'creator', call: creator_query},
-  {name: 'id_fraktions', call: fraktal_fraktions_query},
+  {name: 'creator', call: creator_query},//
 ];
 
 
@@ -358,11 +259,4 @@ async function fetchNftMetadata(hash){
   }
   // console.log('NFT metadata: ',chunks)
   return chunks;
-};
-export async function getNFTobject(id){
-  let fraktalNft = await getAccountFraktalNFTs('id_fraktal', id);
-  let obj = Promise(createObject(fraktalNft.fraktalNFTs))
-  obj.then((data)=>console.log('encontrado:',data))
-
-  return obj
 };

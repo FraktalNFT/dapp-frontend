@@ -5,24 +5,24 @@ import Link from "next/link";
 import { BigNumber } from "ethers";
 import { Image } from "@chakra-ui/image";
 import styles from "./auction.module.css";
-import {shortenHash, timezone} from '../../../utils/helpers';
-import {getAccountFraktalNFTs, createObject, getNFTobject} from '../../../utils/graphQueries';
+import {shortenHash, timezone, getParams} from '../../../utils/helpers';
+import {getSubgraphData, createObject} from '../../../utils/graphQueries';
 export default function AuctionNFTView() {
   const [index, setIndex] = useState();
   const [nftObject, setNftObject] = useState();
 
   useEffect(async ()=>{
-      const address = window.location.href.split('http://localhost:3000/nft/');
-      const index = parseFloat(address[1].split('/auction')[0])
+      const address = getParams('nft');
+      const index = parseFloat(address.split('/auction')[0])
       if(index){
         setIndex(index)
       }
-      let obj = await getAccountFraktalNFTs('marketid_fraktal',index)
+      let obj = await getSubgraphData('marketid_fraktal',index)
       let nftObjects = await createObject(obj.fraktalNFTs[0])
       if(nftObjects){
         setNftObject(nftObjects)
       }
-  },[index])
+  },[])
   const exampleNFT = {
     id: 0,
     name: "Golden Fries Cascade",

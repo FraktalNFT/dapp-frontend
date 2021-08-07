@@ -6,14 +6,13 @@ import { BigNumber, utils } from "ethers";
 import FrakButton from '../../../components/button';
 import { Image } from "@chakra-ui/image";
 import styles from "./auction.module.css";
-import {shortenHash, timezone, loadSigner} from '../../../utils/helpers';
-import {getAccountFraktalNFTs, createListed, getNFTobject} from '../../../utils/graphQueries';
+import {shortenHash, timezone, getParams} from '../../../utils/helpers';
+import {getSubgraphData, createListed} from '../../../utils/graphQueries';
 import { useWeb3Context } from '../../../contexts/Web3Context';
 import { buyFraktions } from '../../../utils/contractCalls';
 
 export default function FixPriceNFTView() {
   const {account, provider, contractAddress} = useWeb3Context();
-  const [signer, setSigner] = useState();
   const [index, setIndex] = useState();
   const [raised, setRaised] = useState(0);
   const [fraktalOwners, setFraktalOwners] = useState(1);
@@ -21,39 +20,27 @@ export default function FixPriceNFTView() {
   const [fraktionsToBuy, setFraktionsToBuy] = useState();
 
   useEffect(async ()=>{
-    if(provider){
-      let signer = await loadSigner(provider);
-      console.log('signer', signer)
-      if(signer){
-        setSigner(signer)
-      }
-    }
-  },[provider])
-
-  useEffect(async ()=>{
-      const address = window.location.href.split('http://localhost:3000/nft/');
-      const index = address[1].split('/fix-price-sale')[0]
+      const address = getParams('nft');
+      const index = address.split('/fix-price-sale')[0]
       if(index){
         setIndex(index)
       }
-      let obj = await getAccountFraktalNFTs('listed_itemsId',index)
+      let obj = await getSubgraphData('listed_itemsId',index)
       if(obj){
         let nftObjects = await createListed(obj.listItems[0])
         if(nftObjects && contractAddress){
           setNftObject(nftObjects)
           setRaised(parseFloat(nftObjects.raised)/10**18)
-          let newObj = await getAccountFraktalNFTs('marketid_fraktal', nftObjects.marketId)
+          let newObj = await getSubgraphData('marketid_fraktal', nftObjects.marketId)
           console.log(newObj)
           if(newObj && newObj.fraktalNFTs){
             setFraktalOwners(newObj.fraktalNFTs[0].fraktions.length)
-            // let owners =
           }
-          // let fraktionsOwners = query for fraktionBalances where nft:id and then .length
         }
       }else{
         setNftObject()
       }
-  },[])
+  },[account])
 
   const toPay = () => utils.parseEther(((fraktionsToBuy * nftObject.price)+0.000000001).toString()) //utils.parseEther(
 
@@ -64,7 +51,7 @@ export default function FixPriceNFTView() {
           nftObject.marketId,
           fraktionsToBuy,
           toPay(),
-          signer,
+          provider,
           contractAddress);
       }catch(e){
         console.log('There has been an error: ',e)
@@ -119,7 +106,7 @@ export default function FixPriceNFTView() {
               <div className={styles.auctionCardDetailsContainer}>
                 <div style={{ marginRight: "48px" }}>
                   <div className={styles.auctionCardDetailsNumber}>{nftObject?nftObject.price:''}</div>
-                  <div className={styles.auctionCardDetailsText}>Price of fraktion</div>
+                  <div className={styles.auctionCardDetailsText}>Price of Fraktion</div>
                 </div>
                 <div style={{ marginRight: "28px" }}>
                 <div className={styles.auctionCardDetailsNumber}>{nftObject?nftObject.amount:''}</div>
