@@ -12,6 +12,7 @@ import styles from "../styles/artists.module.css";
 import { Image } from "@chakra-ui/image";
 import { shortenHash } from "../utils/helpers";
 import { getSubgraphData, createObject } from '../utils/graphQueries';
+import { useWeb3Context } from '../contexts/Web3Context';
 
 export default function ArtistsView() {
   const SORT_TYPES = ["Popular", "New"];
@@ -20,7 +21,7 @@ export default function ArtistsView() {
   const [artists, setArtists] = useState([]);
   const [nftItems, setNftItems] = useState([]);
   const [artistsItems, setArtistsItems] = useState([]);
-
+  const {contractAddress} = useWeb3Context();
   const handleSortSelect = (item: string) => {
     setSortType(item);
     setSelectionMode(false);
@@ -52,17 +53,18 @@ export default function ArtistsView() {
     let fraktalSamples
     if (data) {
       let onlyCreators = data.users.filter(x=>{return x.created.length > 0 })
-      setArtists(onlyCreators)
-      fraktalSamples = onlyCreators.map(x=>{return x.created[0]})
+      let withoutMarket = onlyCreators.filter(x=>{return x.id != contractAddress.toLocaleLowerCase()})
+      setArtists(withoutMarket)
+      fraktalSamples = withoutMarket.map(x=>{return x.created[0]})
       let fraktalsSamplesObjects = await Promise.all(fraktalSamples.map(x=>{return createObject(x)}))//.then((results)=>setNftItems(results))
-      let artistsObj = getArtistsObjects(onlyCreators, fraktalsSamplesObjects)
+      let artistsObj = getArtistsObjects(withoutMarket, fraktalsSamplesObjects)
       if(artistsObj){
         setArtistsItems(artistsObj)
       }else{
         setArtistsItems([])
       }
     }
-  },[])
+  },[contractAddress])
 
   // TODO: hardcoded stuff as of now
   const demoArtistItemsFull: FrakCard[] = Array.from({ length: 9 }).map(

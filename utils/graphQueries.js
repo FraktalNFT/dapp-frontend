@@ -78,7 +78,7 @@ query {
 `;
 const creators_review = gql`
   query{
-    users(first: 20) {
+    users(first: 5) {
       id
       fraktals
       created {
