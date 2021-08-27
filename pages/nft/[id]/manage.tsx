@@ -9,17 +9,28 @@ import Button from "../../../components/button";
 import {getSubgraphData, createObject, createListed} from '../../../utils/graphQueries';
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
-import { sellerClaim } from '../../../utils/contractCalls';
+import { release, createRevenuePayment, lockShares, unlockShares, claimFraktalSold } from '../../../utils/contractCalls';
+
+
 export default function ManageNFTView() {
   const {account, provider, contractAddress} = useWeb3Context();
   const [nftObject, setNftObject] = useState();
   const [raised, setRaised] = useState(0);
+  const [revenues, setRevenues] = useState();
+  const [offers, setOffers] = useState();
+  const [revenueValue, setRevenueValue] = useState(0)
+  const [valueSetter, setValueSetter] = useState(false)
   const [view, setView] = useState("manage");
   const [index, setIndex] = useState();
+  const [lockedFraktions, setLockedFraktions] = useState(false);
+  const [buyer, setBuyer] = useState(false);
+
+  const userBalance = () => nftObject.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
 
   function getOwnershipPercenteage() {
     let perc;
-    let obj = nftObject.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
+    let obj = userBalance()
+    // nftObject.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
     if(obj && obj.amount > 0){
       perc = obj.amount/100
     }else{
@@ -27,12 +38,9 @@ export default function ManageNFTView() {
     }
     return perc;
   }
-  async function sellerClaiming(){
+  async function revenueClaiming(){
     try {
-      let tx = await sellerClaim(
-        index,
-        provider,
-        contractAddress);
+      let tx = await release(account, provider, revenues[0].address)// only one here! change UI for a list of revenues
       }catch(e){
         console.log('There has been an error: ',e)
       }
@@ -44,28 +52,60 @@ export default function ManageNFTView() {
     if(index){
       setIndex(index)
     }
+    let nftObjects;
+    let obj = await getSubgraphData('marketid_fraktal',index)
+    console.log('retrieved ',obj)
+    if(obj.fraktalNfts[0].revenues.length){
+      setRevenues(obj.fraktalNfts[0].revenues)
+    }
+    nftObjects = await createObject(obj.fraktalNfts[0])
+    setNftObject(nftObjects)
     if(account){
-      let listing = await getSubgraphData('listed_itemsId', `${account.toLocaleLowerCase()}-0x${(index+1).toString(16)}`)
-      let nftObjects;
-      if(listing && listing.listItems.length > 0){
-        nftObjects = await createListed(listing.listItems[0])
-        let ownerGains = listing.listItems[0].fraktal.fraktions.find(x=>x.owner.id === account.toLocaleLowerCase())
-        if(ownerGains){
-          setRaised(parseFloat(ownerGains.owner.balance)/10**18)
-        }else{
-          setRaised(0)
+      const bal = nftObjects.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
+      let userHasLocked = bal.locked > 0
+      setLockedFraktions(userHasLocked)
+    }
+    if(nftObjects){
+      setRaised(nftObjects.raised)
+      if(obj.fraktalNfts[0].offers.length){
+        setOffers(obj.fraktalNfts[0].offers)
+        if(obj.fraktalNfts[0].offers[0].value > 0){
+          setView('offer')
         }
-        let objectOverriden = {...nftObjects, balances: listing.listItems[0].fraktal.fraktions};
-        setNftObject(objectOverriden)
-      }else{
-        let obj = await getSubgraphData('marketid_fraktal',index)
-        nftObjects = await createObject(obj.fraktalNFTs[0])
-        setNftObject(nftObjects)
+        if(obj.fraktalNfts[0].status.startsWith('sold')){
+          setView('accepted')
+          let winner = obj.fraktalNfts[0].offers[0].offerer.id // careful here!
+          setBuyer(winner == account.toLocaleLowerCase())
+        }
       }
     }
-  },[account])
+  },[account, index])
   const isOwned = nftObject?.owner === account?.toLocaleLowerCase();
   const listItemUrl = '/nft/'+index+'/list-item'
+
+  async function launchRevenuePayment() {
+    let offChainData = await getSubgraphData('manage', nftObject.id);
+    let holders = offChainData.fraktionsBalances.map(x=>{return x.owner.id});
+    let fraktions = offChainData.fraktionsBalances.map(x=>{return parseInt(x.amount)});
+    let valueIn = utils.parseEther((parseFloat(revenueValue)+0.000000001).toString())
+    createRevenuePayment(holders, fraktions, account, valueIn, provider, nftObject.id);
+  }
+
+  async function cancelVote(index){
+    unlockShares(offers[index].offerer.id, provider, nftObject.id)
+  }
+
+  async function voteOffer(index){
+    let balance = userBalance()
+    lockShares(balance.amount,offers[index].offerer.id, provider, nftObject.id)
+  }
+
+  async function claimFraktal(){
+    let offChainData = await getSubgraphData('manage', nftObject.id);
+    let holders = offChainData.fraktionsBalances.map(x=>{return x.owner.id});
+    let fraktions = offChainData.fraktionsBalances.map(x=>{return parseInt(x.amount)});
+    claimFraktalSold(holders, fraktions, nftObject.marketId, provider, contractAddress)
+  }
 
   const exampleNFT = {
     id: 0,
@@ -112,7 +152,10 @@ export default function ManageNFTView() {
           {view === "manage" || view === "offer" ? (
             <div>
               {view === "offer" && (
+                <div>
+                {offers.map((x,i)=>{return(
                 <div
+                  key = {i}
                   className={styles.offerContainer}
                   style={{ marginBottom: "16px" }}
                 >
@@ -121,22 +164,26 @@ export default function ManageNFTView() {
                     determines if the offer is accepted
                   </div>
                   <div className={styles.offerText}>
-                    A buyer has offered 10 ETH for this NFT
+                    A buyer has offered {x.value/10**18} ETH for this NFT
                   </div>
                   <div className={styles.offerCTAContainer}>
                     <Button
                       isOutlined
+                      disabled={lockedFraktions}
                       style={{
                         color: "#00C4B8",
                         borderColor: "#00C4B8",
                         width: "192px",
                         marginRight: "16px",
                       }}
+                      onClick={()=>voteOffer(i)}
                     >
                       Accept
                     </Button>
                     <Button
                       isOutlined
+                      disabled={!lockedFraktions}
+                      onClick={()=>cancelVote(i)}
                       style={{
                         color: "#FF0000",
                         borderColor: "#FF0000",
@@ -147,6 +194,8 @@ export default function ManageNFTView() {
                     </Button>
                   </div>
                 </div>
+              )})}
+              </div>
               )}
               <div style={{ display: "flex", justifyContent: "center" }}>
                 <div className={styles.redeemContainer}>
@@ -160,7 +209,7 @@ export default function ManageNFTView() {
 
                     <div className={styles.redeemHeader}>Gains</div>
                     <div className={styles.redeemAmount}>
-                      {nftObject? Math.round(raised*1000)/1000 +'ETH' : 0}
+                      {nftObject && revenues?.length? Math.round((revenues[0].value/10**18)*1000)/1000 +'ETH' : 0}
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center" }}>
@@ -172,7 +221,7 @@ export default function ManageNFTView() {
             </div>
           ) : (
             <div style={{ fontWeight: 500 }}>
-              The offer for 10 ETH has been accepted. Your share is 50%
+              The offer for {offers[0].value/10**18} ETH has been accepted. Your share is {getOwnershipPercenteage()}%
             </div>
           )}
         </div>
@@ -182,15 +231,25 @@ export default function ManageNFTView() {
             <div className={styles.claimContainer}>
               <div style={{ marginLeft: "24px" }}>
                 <div className={styles.redeemHeader}>ETH</div>
-                <div className={styles.redeemAmount}>5.00</div>
+                <div className={styles.redeemAmount}>{offers[0].value*getOwnershipPercenteage()/10**20}</div>
               </div>
-
-              <div
+              {buyer?
+                <div
                 className={styles.redeemCTA}
                 style={{ backgroundColor: "#000" }}
-              >
+                onClick={()=>claimFraktal()}
+                >
                 Claim
-              </div>
+                </div>
+              :
+                <div
+                className={styles.redeemCTA}
+                style={{ backgroundColor: "#000" }}
+                onClick={()=>revenueClaiming()}
+                >
+                Claim
+                </div>
+              }
             </div>
           ) : (
             <div className={styles.CTAsContainer}>
@@ -201,16 +260,42 @@ export default function ManageNFTView() {
                   marginRight: "16px",
                   width: "192px",
                 }}
+                onClick={()=>setValueSetter(!valueSetter)}
               >
-                Deposit Revenue
+                {valueSetter? 'Cancel' : 'Deposit Revenue'}
               </Button>
-              <Button
+              {valueSetter &&
+                <input
+                  className={styles.contributeInput}
+                  disabled={!nftObject}
+                  type="number"
+                  placeholder="Revenue to split"
+                  onChange={(e)=>{setRevenueValue(e.target.value)}}
+                />
+              }
+              {valueSetter && revenueValue != 0 &&
+                <Button
+                  isOutlined
+                  style={{
+                    backgroundColor: "white",
+                    marginRight: "16px",
+                    width: "192px",
+                  }}
+                  onClick={()=>launchRevenuePayment()}
+                >
+                  {'Deposit'}
+                </Button>
+              }
+              {!valueSetter &&
+                <Button
                 isOutlined
+                disabled={!revenues}
                 style={{ backgroundColor: "white", width: "192px" }}
-                onClick={()=>sellerClaiming()}
-              >
+                onClick={()=>revenueClaiming()}
+                >
                 Claim Gains
-              </Button>
+                </Button>
+              }
             </div>
           )}
           <Image

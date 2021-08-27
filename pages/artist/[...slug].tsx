@@ -20,7 +20,7 @@ export default function ArtistView() {
       if(address){
       setArtistAddres(address)
       let objects = await getSubgraphData('creator',address)
-      Promise.all(objects.fraktalNFTs.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
+      Promise.all(objects.fraktalNfts.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
     }
   },[])
 

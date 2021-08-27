@@ -10,7 +10,7 @@ import styles from "../styles/my-nfts.module.css";
 import FrakButton from "../components/button";
 import { useWeb3Context } from '../contexts/Web3Context';
 import { getSubgraphData, createObject } from '../utils/graphQueries';
-
+import { rescueEth } from '../utils/contractCalls';
 export default function MyNFTsView() {
   const { account, provider, contractAddress } = useWeb3Context();
   const [nftItems, setNftItems] = useState();
@@ -25,8 +25,9 @@ export default function MyNFTsView() {
     if(account) {
       let fobjects = await getAccountFraktions()
       if(fobjects && fobjects.fraktionsBalances.length){
-        let userBalance = fobjects.fraktionsBalances[0].owner.balance
+        let userBalance = fobjects.fraktionsBalances[0].owner.balance // only one!
         setTotalBalance(parseFloat(userBalance)/10**18)
+        console.log('nft Objects', fobjects.fraktionsBalances)
         let nftObjects = await Promise.all(fobjects.fraktionsBalances.map(x=>{return createObject(x.nft)}))
         if(nftObjects){
           setFraktionItems(nftObjects)
@@ -63,8 +64,8 @@ export default function MyNFTsView() {
           gap='3.2rem'
         >
           {nftItems.map(item => (
-            <div key={item.id}>
-            <NextLink href={`/nft/${item.id}/list-item`}>
+            <div key={item.marketId}>
+            <NextLink href={`/nft/${item.marketId}/list-item`}>
               <NFTItemManager item={item} CTAText={"List on Market"} />
             </NextLink>
             </div>
@@ -100,7 +101,7 @@ export default function MyNFTsView() {
                 <div className={styles.claimHeader}>ETH</div>
                 <div className={styles.claimAmount}>{Math.round(totalBalance*1000)/1000}</div>
               </div>
-              <div className={styles.claimCTA}>Claim from manage</div>
+              <div className={styles.claimCTA} onClick={()=>rescueEth(provider, contractAddress)}>Claim</div>
             </div>
           </div>
           <Grid
@@ -113,7 +114,7 @@ export default function MyNFTsView() {
             gap='3.2rem'
           >
             {fraktionItems && fraktionItems.map(item => (
-              <div key={item.id}>
+              <div key={item.marketId}>
                 <NFTItemManager item={item} />
               </div>
             ))}

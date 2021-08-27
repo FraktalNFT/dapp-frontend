@@ -26,15 +26,16 @@ export default function FixPriceNFTView() {
         setIndex(index)
       }
       let obj = await getSubgraphData('listed_itemsId',index)
+      // console.log('obj',obj)
       if(obj){
+        if(obj && obj.listItems){
+          setFraktalOwners(obj.listItems[0].fraktal.fraktions.length)
+        }
         let nftObjects = await createListed(obj.listItems[0])
         if(nftObjects && contractAddress){
           setNftObject(nftObjects)
-          setRaised(parseFloat(nftObjects.raised)/10**18)
-          let newObj = await getSubgraphData('marketid_fraktal', nftObjects.marketId)
-          console.log(newObj)
-          if(newObj && newObj.fraktalNFTs){
-            setFraktalOwners(newObj.fraktalNFTs[0].fraktions.length)
+          if(nftObject?.raised){
+            setRaised(parseFloat(nftObjects.raised)/10**18)
           }
         }
       }else{
@@ -119,12 +120,12 @@ export default function FixPriceNFTView() {
               <div className={styles.auctionCardHeader}>Contributed</div>
               <div className={styles.auctionCardDetailsContainer}>
                 <div style={{ marginRight: "60px" }}>
-                  <div className={styles.auctionCardDetailsNumber}>{Math.round(raised*1000)/1000}ETH</div>
+                  <div className={styles.auctionCardDetailsNumber}>{raised !== 0 ?Math.round(raised*1000)/1000 : 0}ETH</div>
                   <div className={styles.auctionCardDetailsText}>Raised</div>
                 </div>
                 <div>
                   <div className={styles.auctionCardDetailsNumber}>{fraktalOwners}</div>
-                  <div className={styles.auctionCardDetailsText}>People</div>
+                  <div className={styles.auctionCardDetailsText}>Investors</div>
                 </div>
               </div>
             </div>

@@ -27,6 +27,7 @@ const Home: React.FC = () => {
   useEffect(async ()=>{
     setLoading(true);
     let data = await getSubgraphData('listed_items','')
+    console.log('fetched ',data)
     if(data){
       Promise.all(data.listItems.map(x=>{return createListed(x)})).then((results)=>setNftItems(results))
     }

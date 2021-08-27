@@ -2,7 +2,7 @@ import { gql, request } from 'graphql-request';
 const { create, CID } = require('ipfs-http-client');
 import { utils } from "ethers";
 
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktalgoerli/v0.0.7';
+const APIURL = 'https://api.studio.thegraph.com/query/101/fraktalrinkeby/v0.0.23';
 
 const ipfsClient = create({
   host: "ipfs.infura.io",
@@ -11,7 +11,7 @@ const ipfsClient = create({
 
 const creator_query = gql`
 query($id:ID!){
-  fraktalNFTs(where:{creator:$id}) {
+  fraktalNfts(where:{creator:$id}) {
     id
     marketId
     hash
@@ -27,11 +27,23 @@ query($id:ID!){
 `;
 const marketid_query = gql`
 query($id:ID!){
-  fraktalNFTs(where:{marketId:$id}) {
+  fraktalNfts(where:{marketId:$id}) {
     id
     marketId
     hash
     createdAt
+    status
+    offers {
+      offerer {
+        id
+      }
+      value
+      votes
+    }
+    revenues {
+      address
+      value
+    }
     owner {
       id
     }
@@ -40,6 +52,7 @@ query($id:ID!){
         id
       }
       amount
+      locked
     }
     creator {
       id
@@ -49,7 +62,7 @@ query($id:ID!){
 `;
 const all_nfts = gql`
 query {
-  fraktalNFTs(first: 20, orderBy: "createdAt",  orderDirection: "desc") {
+  fraktalNfts(first: 20, orderBy: "createdAt",  orderDirection: "desc") {
     id
     marketId
     hash
@@ -81,7 +94,7 @@ const creators_review = gql`
 `
 const account_fraktions_query = gql`
   query($id:ID!){
-    fraktionsBalances(first:10, where:{owner:$id}){
+    fraktionsBalances(first:10, where:{owner:$id, amount_gt:0}){
       id
       amount
       owner {
@@ -92,13 +105,37 @@ const account_fraktions_query = gql`
         id
         marketId
         hash
+        createdAt
         creator{
           id
         }
         owner{
           id
         }
+      }
+    }
+  }
+`
+const fraktal_fraktions_query = gql`
+  query($id:ID!){
+    fraktionsBalances(first:10, where:{nft:$id, amount_gt:0}){
+      id
+      amount
+      owner {
+        id
+        balance
+      }
+      nft {
+        id
+        marketId
+        hash
         createdAt
+        creator{
+          id
+        }
+        owner{
+          id
+        }
       }
     }
   }
@@ -109,13 +146,14 @@ const listedItems = gql`
       id
       price
       amount
-      balance
-      type
+      gains
       seller {
         id
       }
       fraktal {
         hash
+        marketId
+        createdAt
         owner {
           id
         }
@@ -125,25 +163,29 @@ const listedItems = gql`
           }
           amount
         }
-        marketId
         creator {
           id
         }
-        createdAt
       }
     }
   }
 `;
 const listedItemsId = gql`
   query($id:ID!){
-    listItems(where:{id:$id}){
+    listItems(where:{id:$id, amount_gt: 0}){
       id
+      price
+      amount
+      gains
       seller {
         id
       }
       fraktal {
         id
         hash
+        marketId
+        createdAt
+        transactionHash
         owner{
           id
         }
@@ -154,17 +196,10 @@ const listedItemsId = gql`
           }
           amount
         }
-        marketId
         creator {
           id
         }
-        createdAt
-        transactionHash
       }
-      price
-      amount
-      type
-      balance
     }
   }
 `;
@@ -183,37 +218,78 @@ export const getSubgraphData = async (call, id) => {
 };
 
 export async function createObject(data){
-  let nftMetadata = await fetchNftMetadata(data.hash)
-  if(nftMetadata){
-    // console.log('meta',nftMetadata)
-    return {
-      creator:data.creator.id,
-      owner: data.owner.id,
-      id: data.marketId,
-      balances: data.fraktions,
-      createdAt: data.createdAt,
-      name: nftMetadata.name,
-      description: nftMetadata.description,
-      imageURL: checkImageCID(nftMetadata.image),
+  try{
+    let nftMetadata = await fetchNftMetadata(data.hash)
+    if(nftMetadata){
+      // console.log('meta',nftMetadata)
+      return {
+        id: data.id,
+        creator:data.creator.id,
+        owner: data.owner.id,
+        marketId: data.marketId,
+        balances: data.fraktions,
+        createdAt: data.createdAt,
+        name: nftMetadata.name,
+        description: nftMetadata.description,
+        imageURL: checkImageCID(nftMetadata.image),
+      }
+    }
+  }catch{
+    let hashHacked = data.hash.substring(0, data.hash.length - 1)
+    let nftMetadata = await fetchNftMetadata(hashHacked)
+    if(nftMetadata){
+      // console.log('meta',nftMetadata)
+      return {
+        id: data.id,
+        creator:data.creator.id,
+        owner: data.owner.id,
+        marketId: data.marketId,
+        balances: data.fraktions,
+        createdAt: data.createdAt,
+        name: nftMetadata.name,
+        description: nftMetadata.description,
+        imageURL: checkImageCID(nftMetadata.image),
+      }
     }
   }
 };
 export async function createListed(data){
-  let nftMetadata = await fetchNftMetadata(data.fraktal.hash)
-  if(nftMetadata){
-    return {
-      creator:data.fraktal.creator.id,
-      marketId: data.fraktal.marketId,
-      createdAt: data.fraktal.createdAt,
-      owner: data.fraktal.owner.id,
-      raised: data.balance,
-      id: data.id,
-      price:utils.formatEther(data.price),
-      amount: data.amount,
-      seller: data.seller.id,
-      name: nftMetadata.name,
-      description: nftMetadata.description,
-      imageURL: checkImageCID(nftMetadata.image),
+  try{
+    let nftMetadata = await fetchNftMetadata(data.fraktal.hash)
+    if(nftMetadata){
+      return {
+        creator:data.fraktal.creator.id,
+        marketId: data.fraktal.marketId,
+        createdAt: data.fraktal.createdAt,
+        owner: data.fraktal.owner.id,
+        raised: data.gains,
+        id: data.id,
+        price:utils.formatEther(data.price),
+        amount: data.amount,
+        seller: data.seller.id,
+        name: nftMetadata.name,
+        description: nftMetadata.description,
+        imageURL: checkImageCID(nftMetadata.image),
+      }
+    }
+  }catch{
+    let hashHacked = data.fraktal.hash.substring(0, data.fraktal.hash.length - 1)
+    let nftMetadata = await fetchNftMetadata(hashHacked)
+    if(nftMetadata){
+      return {
+        creator:data.fraktal.creator.id,
+        marketId: data.fraktal.marketId,
+        createdAt: data.fraktal.createdAt,
+        owner: data.fraktal.owner.id,
+        raised: data.gains,
+        id: data.id,
+        price:utils.formatEther(data.price),
+        amount: data.amount,
+        seller: data.seller.id,
+        name: nftMetadata.name,
+        description: nftMetadata.description,
+        imageURL: checkImageCID(nftMetadata.image),
+      }
     }
   }
 };
@@ -225,6 +301,7 @@ const calls = [
   {name: 'artists', call: creators_review},//
   {name: 'all', call: all_nfts},
   {name: 'creator', call: creator_query},//
+  {name: 'manage', call: fraktal_fraktions_query},
 ];
 
 
@@ -235,14 +312,18 @@ function toBase32(value) { // to transform V0 to V1 and use as `https://${cidV1}
 
 function checkImageCID(cid){
   let correctedCid
-  if(cid.startsWith('https://ipfs.io/ipfs/')){
+  if(cid.startsWith('https://ipfs.io/')){
     let splitted = cid.split('https://ipfs.io/ipfs/')
     correctedCid = splitted[1]
+    let cidv1 = toBase32(correctedCid)
+    return `https://${cidv1}.ipfs.dweb.link`
+  }else if (cid.startsWith('Qm')){
+      correctedCid = cid
+      let cidv1 = toBase32(correctedCid)
+      return `https://${cidv1}.ipfs.dweb.link`
   }else{
-    correctedCid = cid
+    return cid;
   }
-  let cidv1 = toBase32(correctedCid)
-  return `https://${cidv1}.ipfs.dweb.link`
 };
 
 // Convert Binary Into JSON
