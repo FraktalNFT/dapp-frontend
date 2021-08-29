@@ -11,6 +11,8 @@ import FrakButton from "../components/button";
 import { useWeb3Context } from '../contexts/Web3Context';
 import { getSubgraphData, createObject } from '../utils/graphQueries';
 import { rescueEth } from '../utils/contractCalls';
+import { assetsInWallet } from '../utils/openSeaAPI';
+
 export default function MyNFTsView() {
   const { account, provider, contractAddress } = useWeb3Context();
   const [nftItems, setNftItems] = useState();
@@ -23,6 +25,7 @@ export default function MyNFTsView() {
   };
   useEffect(async()=>{
     if(account) {
+      assetsInWallet(account);
       let fobjects = await getAccountFraktions()
       if(fobjects && fobjects.fraktionsBalances.length){
         let userBalance = fobjects.fraktionsBalances[0].owner.balance // only one!
