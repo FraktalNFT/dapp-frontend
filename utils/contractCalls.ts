@@ -169,7 +169,7 @@ export async function rescueEth(provider, contractAddress){
   const signer = await loadSigner(provider);
   const customContract = new Contract(contractAddress, rescueEthAbi, signer);
   let receipt;
-  const override = {gasLimit:60000}
+  const override = {gasLimit:100000}
   let tx = await customContract.rescueEth(override)
   try{
     receipt = await tx.wait();
