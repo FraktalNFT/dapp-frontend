@@ -26,6 +26,12 @@ export default function MyNFTsView() {
   useEffect(async()=>{
     if(account) {
       assetsInWallet(account);
+      // Array<Objects>
+      //[attr: address=contract, token_metadata=ipfs url for the meta (name, description, image)]
+
+      // find the addresses that are not in the subgraph (are not fraktions) to import them.
+      
+
       let fobjects = await getAccountFraktions()
       if(fobjects && fobjects.fraktionsBalances.length){
         let userBalance = fobjects.fraktionsBalances[0].owner.balance // only one!
