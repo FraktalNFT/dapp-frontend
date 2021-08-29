@@ -68,7 +68,7 @@ export async function loadSigner(provider) { //Load contract instance
 }
 
 export function getParams(type){
-  const url = `https://fraktal-dapp-recent.vercel.app/${type}/`;
+  const url = `https://fraktal-dapp.vercel.app/${type}/`;
   let address;
   if(window.location.href.startsWith('http://localhost')){
     address = window.location.href.split(`http://localhost:3000/${type}/`);
