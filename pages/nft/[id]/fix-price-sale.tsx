@@ -103,25 +103,27 @@ export default function FixPriceNFTView() {
             </div>
           </div>
           <div className={styles.auctionCard}>
-            <div style={{ marginRight: "52px" }}>
+            <div style={{ marginRight: "22px" }}>
               <div className={styles.auctionCardDetailsContainer}>
+
+
                 <div style={{ marginRight: "48px" }}>
+                  <div className={styles.auctionCardDetailsNumber}>{nftObject?nftObject.amount:''}</div>
+                  <div className={styles.auctionCardDetailsText}>Fraktions on sale</div>
+                </div>
+                <div style={{ marginRight: "28px" }}>
                   <div className={styles.auctionCardDetailsNumber}>{nftObject?Math.round(nftObject.price*10000)/10000:''}</div>
                   <div className={styles.auctionCardDetailsText}>Price of Fraktion</div>
                 </div>
-                <div style={{ marginRight: "28px" }}>
-                <div className={styles.auctionCardDetailsNumber}>{nftObject?nftObject.amount:''}</div>
-                  <div className={styles.auctionCardDetailsText}>Fraktions on sale</div>
-                </div>
+
               </div>
             </div>
             <div className={styles.auctionCardDivider} />
             <div style={{ marginRight: "24px" }}>
-              <div className={styles.auctionCardHeader}>Contributed</div>
+              <div className={styles.auctionCardHeader}>Full NFT value</div>
               <div className={styles.auctionCardDetailsContainer}>
-                <div style={{ marginRight: "60px" }}>
-                  <div className={styles.auctionCardDetailsNumber}>{raised !== 0 ?Math.round(raised*1000)/1000 : 0}ETH</div>
-                  <div className={styles.auctionCardDetailsText}>Raised</div>
+                <div style={{ marginRight: "48px" }}>
+                  <div className={styles.auctionCardDetailsNumber}>{Math.round(nftObject.price*10**6)/100}ETH</div>
                 </div>
                 <div>
                   <div className={styles.auctionCardDetailsNumber}>{fraktalOwners}</div>
