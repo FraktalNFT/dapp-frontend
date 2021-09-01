@@ -51,7 +51,7 @@ export default function ArtistsView() {
   useEffect(async()=>{
     const data = await getSubgraphData('artists','')
     let fraktalSamples
-    if (data) {
+    if (data, contractAddress) {
       let onlyCreators = data.users.filter(x=>{return x.created.length > 0 })
       let withoutMarket = onlyCreators.filter(x=>{return x.id != contractAddress.toLocaleLowerCase()})
       setArtists(withoutMarket)

@@ -36,8 +36,9 @@ export default function ListNFTView() {
   const fraktalReady = fraktions > 0
     && totalAmount > 0
     && totalAmount <= parseFloat(fraktions)
-    && totalPrice > 0;
-    // && nftObject.owner === contractAddress.toLocaleLowerCase();
+    && totalPrice > 0
+    && isApproved
+    && nftObject.owner === contractAddress.toLocaleLowerCase();
 
   useEffect(async ()=>{
     const address = getParams('nft');
@@ -112,7 +113,7 @@ export default function ListNFTView() {
         console.log('There has been an error: ',e)
       }
   }
-  async function predefraktionalize(id){
+  async function predefraktionalize(id){ // leave it for after, will handle 'defraktionalized' nfts
       try {
         let tx = await defraktionalize(id, provider, contractAddress);
         if(tx){
@@ -213,11 +214,12 @@ export default function ListNFTView() {
               </div>
             </div>
             </div>
+
           {nftObject?.owner !== contractAddress?.toLocaleLowerCase() ?
             <div style={{marginTop: '16px'}}>
               You need to lock the nft in the market to list the Fraktions!
               <br />
-              {prepare && fraktions == 10000?
+              {prepare && fraktions == "10000"?
                 <div style={{marginTop: '8px', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                   {!isApproved ?
                     <FrakButton
@@ -231,9 +233,21 @@ export default function ListNFTView() {
                     Fraktionalize</FrakButton>
                   }
                   </div>
-                :null}
+                :
+                null
+                }
             </div>
-            :null}
+            :
+            <div style={{marginTop: '8px', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
+              {!isApproved ?
+                <FrakButton
+                disabled={fraktions === 0}
+                onClick={()=>approveContract()}>Approve</FrakButton>
+                :
+                'null (delete)'
+              }
+            </div>
+          }
 
           {updating?
             <FrakButton
