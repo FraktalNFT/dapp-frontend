@@ -244,7 +244,7 @@ export default function ListNFTView() {
                 disabled={fraktions === 0}
                 onClick={()=>approveContract()}>Approve</FrakButton>
                 :
-                'null (delete)'
+                null
               }
             </div>
           }
