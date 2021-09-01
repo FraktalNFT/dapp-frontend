@@ -129,12 +129,13 @@ export async function createNFT(hash, provider, contractAddress,optionalBytecode
 
 export async function listItem(tokenId,amount,price,provider,contractAddress){
   const listItemAbi = [
-    "function listItem(uint256 _tokenId,uint256 _price,uint256 _numberOfShares)"
+    "function listItem(uint256 _tokenId,uint256 _price,uint16 _numberOfShares)"
   ];
+  const override = {gasLimit:300000}
   const signer = await loadSigner(provider);
   const customContract = new Contract(contractAddress, listItemAbi, signer);
   let receipt;
-  let tx = await customContract.listItem(tokenId, price, amount)
+  let tx = await customContract.listItem(tokenId, price, amount, override)
   try{
     receipt = await tx.wait();
   }catch(e){
@@ -183,10 +184,10 @@ export async function rescueEth(provider, contractAddress){
 
 export async function buyFraktions(seller, tokenId,amount,value,provider,contractAddress){
   const buyAbi = [
-    "function buyFraktions(address from, uint256 _tokenId, uint256 _numberOfShares) payable"
+    "function buyFraktions(address from, uint256 _tokenId, uint16 _numberOfShares) payable"
   ];
   const signer = await loadSigner(provider);
-  const override = {value:value, gasLimit:160000}
+  const override = {value:value, gasLimit:300000}
   const customContract = new Contract(contractAddress, buyAbi, signer);
   let receipt;
   let tx = await customContract.buyFraktions(seller, tokenId, amount, override)
@@ -200,15 +201,15 @@ export async function buyFraktions(seller, tokenId,amount,value,provider,contrac
   return receipt;
 }
 
-export async function createRevenuePayment(addresses, fraktions, offerer, value, provider, fraktalAddress){
+export async function createRevenuePayment(value, provider, fraktalAddress){
   const revenueAbi = [
-    "function createRevenuePayment(address[] memory _addresses, uint256[] memory _fraktions, address buyer) payable"
+    "function createRevenuePayment() payable"
   ];
   const signer = await loadSigner(provider);
   const override = {value: value, gasLimit:700000}
   const customContract = new Contract(fraktalAddress, revenueAbi, signer);
   let receipt;
-  let tx = await customContract.createRevenuePayment(addresses, fraktions, offerer, override)
+  let tx = await customContract.createRevenuePayment(override)
   try{
     receipt = await tx.wait();
   }catch(e){
@@ -218,15 +219,15 @@ export async function createRevenuePayment(addresses, fraktions, offerer, value,
   console.log(receipt);
   return receipt;
 }
-export async function release(address, provider, revenueAddress){
+export async function release(provider, revenueAddress){
   const releaseAbi = [
-    "function release(address payable account)"
+    "function release()"
   ];
   const signer = await loadSigner(provider);
   const override = {gasLimit:160000}
   const customContract = new Contract(revenueAddress, releaseAbi, signer);
   let receipt;
-  let tx = await customContract.release(address,override)
+  let tx = await customContract.release(override)
   try{
     receipt = await tx.wait();
   }catch(e){
@@ -236,15 +237,34 @@ export async function release(address, provider, revenueAddress){
   console.log(receipt);
   return receipt;
 }
-export async function claimFraktalSold(addresses, fraktions, tokenId, provider, marketAddress){
+export async function claimFraktalSold(tokenId, provider, marketAddress){
   const claimAbi = [
-    "function claimFraktal(address[] memory _addresses, uint256[] memory _fraktions, uint _tokenId)"
+    "function claimFraktal(uint _tokenId)"
   ];
   const signer = await loadSigner(provider);
   const override = {gasLimit:700000}
   const customContract = new Contract(marketAddress, claimAbi, signer);
   let receipt;
-  let tx = await customContract.claimFraktal(addresses, fraktions, tokenId, override)
+  let tx = await customContract.claimFraktal(tokenId, override)
+  try{
+    receipt = await tx.wait();
+  }catch(e){
+    receipt = 'Error: ',e.toString()
+  }
+  console.log('Transaction receipt');
+  console.log(receipt);
+  return receipt;
+}
+
+export async function voteOffer(offerer, tokenAddress, provider, marketAddress){
+  const voteAbi = [
+    "function voteOffer(address offerer, address tokenAddress)"
+  ];
+  const signer = await loadSigner(provider);
+  const override = {gasLimit:2000000}
+  const customContract = new Contract(marketAddress, voteAbi, signer);
+  let receipt;
+  let tx = await customContract.voteOffer(offerer, tokenAddress, override)
   try{
     receipt = await tx.wait();
   }catch(e){

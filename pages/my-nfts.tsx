@@ -26,7 +26,25 @@ export default function MyNFTsView() {
   useEffect(async()=>{
     if(account) {
       assetsInWallet(account);
+      // Array<Objects>
+      //[attr: address=contract, token_metadata=ipfs url for the meta (name, description, image)]
+
+      // find the addresses that are not in the subgraph (are not fraktions) to import them.
+      // find the NFTs (fraktals) in the subgraph
+      // filter non fraktals
+      let nftOwned = await getSubgraphData('owned',account.toLocaleLowerCase());
+
+      if(nftOwned && nftOwned.fraktalNfts.length > 0){
+        console.log('nftOwned',nftOwned)
+        let nftOwnedObjects = await Promise.all(nftOwned.fraktalNfts.map(x=>{return createObject(x)}))
+        if(nftOwnedObjects){
+          setNftItems(nftOwnedObjects)
+        }else{
+          setNftItems([])
+        }
+      }
       let fobjects = await getAccountFraktions()
+      // console.log('fobjects',fobjects)
       if(fobjects && fobjects.fraktionsBalances.length){
         let userBalance = fobjects.fraktionsBalances[0].owner.balance // only one!
         setTotalBalance(parseFloat(userBalance)/10**18)
@@ -34,14 +52,7 @@ export default function MyNFTsView() {
         let nftObjects = await Promise.all(fobjects.fraktionsBalances.map(x=>{return createObject(x.nft)}))
         if(nftObjects){
           setFraktionItems(nftObjects)
-          const ownedNfts = nftObjects.filter(x=>x.owner === account.toLocaleLowerCase())
-          if (ownedNfts.length){
-            setNftItems(ownedNfts)
-          }else{
-            setNftItems([])
-          }
         }else{
-          setNftItems([])
           setFraktionItems([])
         }
       }

@@ -34,7 +34,7 @@ export default function FixPriceNFTView() {
         let nftObjects = await createListed(obj.listItems[0])
         if(nftObjects && contractAddress){
           setNftObject(nftObjects)
-          if(nftObject?.raised){
+          if(nftObjects?.raised){
             setRaised(parseFloat(nftObjects.raised)/10**18)
           }
         }

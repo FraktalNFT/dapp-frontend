@@ -2,7 +2,7 @@ import { gql, request } from 'graphql-request';
 const { create, CID } = require('ipfs-http-client');
 import { utils } from "ethers";
 
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktalrinkeby/v0.0.23';
+const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.0.13';
 
 const ipfsClient = create({
   host: "ipfs.infura.io",
@@ -19,6 +19,41 @@ query($id:ID!){
       id
     }
     createdAt
+    creator {
+      id
+    }
+  }
+  }
+`;
+const owner_query = gql`
+query($id:ID!){
+  fraktalNfts(where:{owner:$id}) {
+    id
+    marketId
+    hash
+    createdAt
+    status
+    offers {
+      offerer {
+        id
+      }
+      value
+      votes
+    }
+    revenues {
+      address
+      value
+    }
+    owner {
+      id
+    }
+    fraktions {
+      owner {
+        id
+      }
+      amount
+      locked
+    }
     creator {
       id
     }
@@ -302,6 +337,7 @@ const calls = [
   {name: 'all', call: all_nfts},
   {name: 'creator', call: creator_query},//
   {name: 'manage', call: fraktal_fraktions_query},
+  {name: 'owned', call: owner_query},
 ];
 
 
