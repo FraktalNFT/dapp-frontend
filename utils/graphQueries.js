@@ -9,6 +9,8 @@ const ipfsClient = create({
   port: "5001",
   protocol: "https",});
 
+// for importedERC721 is importedERC721S(first:5){}
+
 const creator_query = gql`
 query($id:ID!){
   fraktalNfts(where:{creator:$id}) {

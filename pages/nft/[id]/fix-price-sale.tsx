@@ -122,9 +122,12 @@ export default function FixPriceNFTView() {
             <div style={{ marginRight: "24px" }}>
               <div className={styles.auctionCardHeader}>Full NFT value</div>
               <div className={styles.auctionCardDetailsContainer}>
-                <div style={{ marginRight: "48px" }}>
+                {nftObject &&
+                  <div style={{ marginRight: "48px" }}>
                   <div className={styles.auctionCardDetailsNumber}>{Math.round(nftObject.price*10**6)/100}ETH</div>
-                </div>
+                  </div>
+                }
+
                 <div>
                   <div className={styles.auctionCardDetailsNumber}>{fraktalOwners}</div>
                   <div className={styles.auctionCardDetailsText}>Investors</div>
