@@ -2,14 +2,12 @@ import { gql, request } from 'graphql-request';
 const { create, CID } = require('ipfs-http-client');
 import { utils } from "ethers";
 
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.0.13';
+const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.0.16';
 
 const ipfsClient = create({
   host: "ipfs.infura.io",
   port: "5001",
   protocol: "https",});
-
-// for importedERC721 is importedERC721S(first:5){}
 
 const creator_query = gql`
 query($id:ID!){
@@ -240,7 +238,32 @@ const listedItemsId = gql`
     }
   }
 `;
-
+const user_wallet_query = gql`
+  query($id:ID!){
+    users(where:{id:$id}){
+      id
+      balance
+      fraktals {
+        id
+      }
+      fraktions (where:{amount_gt: 0}){
+        amount
+        nft {
+          id
+          marketId
+          hash
+          createdAt
+          creator{
+            id
+          }
+          owner{
+            id
+          }
+        }
+      }
+    }
+  }
+`
 export const getSubgraphData = async (call, id) => {
   let callGql = calls.find(x=> {return x.name == call})
   try {
@@ -254,7 +277,37 @@ export const getSubgraphData = async (call, id) => {
   }
 };
 
+export async function createOpenSeaObject(data){
+  // console.log('checking ', data);
+  try{
+    return {
+      id: data.asset_contract.address,
+      creator:data.creator.address,
+      token_schema: data.asset_contract.schema_name,
+      tokenId: data.token_id,
+      createdAt: data.asset_contract.created_date,
+      name: data.name,
+      imageURL: data.image_original_url,
+      // owner: data.owner.address,
+      // marketId: data.marketId,
+      // balances: data.fraktions,
+      // description: nftMetadata.description,
+    }
+
+  }catch{
+    return null;
+  }
+}
+
 export async function createObject(data){
+  // handle token_schema
+
+  // ERC721 + ipfs(?)
+  // let hashHacked = data.hash.substring(0, data.hash.length - 1)
+  // this should be handled as isERC721? then split tokenId from the end of hash...continue
+
+  // and possibly tokenId
+
   try{
     let nftMetadata = await fetchNftMetadata(data.hash)
     if(nftMetadata){
@@ -272,22 +325,8 @@ export async function createObject(data){
       }
     }
   }catch{
-    let hashHacked = data.hash.substring(0, data.hash.length - 1)
-    let nftMetadata = await fetchNftMetadata(hashHacked)
-    if(nftMetadata){
-      // console.log('meta',nftMetadata)
-      return {
-        id: data.id,
-        creator:data.creator.id,
-        owner: data.owner.id,
-        marketId: data.marketId,
-        balances: data.fraktions,
-        createdAt: data.createdAt,
-        name: nftMetadata.name,
-        description: nftMetadata.description,
-        imageURL: checkImageCID(nftMetadata.image),
-      }
-    }
+    console.log('Error fetching ',data.id);
+    return null;
   }
 };
 export async function createListed(data){
@@ -298,6 +337,7 @@ export async function createListed(data){
         creator:data.fraktal.creator.id,
         marketId: data.fraktal.marketId,
         createdAt: data.fraktal.createdAt,
+        tokenAddress: data.fraktal.id,
         owner: data.fraktal.owner.id,
         raised: data.gains,
         id: data.id,
@@ -310,6 +350,8 @@ export async function createListed(data){
       }
     }
   }catch{
+    // this is to handle ERC721 with the tokenId (which is added to tokenURL last digit (careful with double digits!!!))
+    // handle it filtering 32bytes???
     let hashHacked = data.fraktal.hash.substring(0, data.fraktal.hash.length - 1)
     let nftMetadata = await fetchNftMetadata(hashHacked)
     if(nftMetadata){
@@ -340,6 +382,7 @@ const calls = [
   {name: 'creator', call: creator_query},//
   {name: 'manage', call: fraktal_fraktions_query},
   {name: 'owned', call: owner_query},
+  {name: 'wallet', call: user_wallet_query},
 ];
 
 
@@ -348,7 +391,7 @@ function toBase32(value) { // to transform V0 to V1 and use as `https://${cidV1}
   return cid.toV1().toBaseEncodedString('base32')
 };
 
-function checkImageCID(cid){
+function checkImageCID(cid){ // this does not handle others than IPFS... correct THAT!
   let correctedCid
   if(cid.startsWith('https://ipfs.io/')){
     let splitted = cid.split('https://ipfs.io/ipfs/')

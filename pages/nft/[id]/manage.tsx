@@ -17,7 +17,7 @@ import {
   claimFraktalSold,
   voteOffer,
   defraktionalize,
-  approve
+  approveERC1155
 } from '../../../utils/contractCalls';
 
 
@@ -58,7 +58,7 @@ export default function ManageNFTView() {
 
   async function defraktionalization() {
     // if owner == contractAddress.toLocaleLowerCase()
-    let done = await approve(contractAddress, provider, nftObject.id)
+    let done = await approveERC1155(contractAddress, provider, nftObject.id)
     if(done){
       defraktionalize(nftObject.marketId, provider, contractAddress);
     }

@@ -4,12 +4,13 @@ import Head from "next/head";
 import Link from "next/link";
 import { BigNumber, utils } from "ethers";
 import FrakButton from '../../../components/button';
+import Button from "../../../components/button";
 import { Image } from "@chakra-ui/image";
 import styles from "./auction.module.css";
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
 import {getSubgraphData, createListed} from '../../../utils/graphQueries';
 import { useWeb3Context } from '../../../contexts/Web3Context';
-import { buyFraktions } from '../../../utils/contractCalls';
+import { buyFraktions, makeOffer } from '../../../utils/contractCalls';
 
 export default function FixPriceNFTView() {
   const {account, provider, contractAddress} = useWeb3Context();
@@ -18,7 +19,8 @@ export default function FixPriceNFTView() {
   const [fraktalOwners, setFraktalOwners] = useState(1);
   const [nftObject, setNftObject] = useState();
   const [fraktionsToBuy, setFraktionsToBuy] = useState(0);
-
+  const [valueSetter, setValueSetter] = useState(false);
+  const [offerValue, setOfferValue] = useState(false);
   useEffect(async ()=>{
       const address = getParams('nft');
       const index = address.split('/fix-price-sale')[0]
@@ -59,6 +61,17 @@ export default function FixPriceNFTView() {
       }
   }
 
+  async function launchOffer() {
+    try {
+      let tx = await makeOffer(
+        utils.parseEther(offerValue),
+        nftObject.tokenAddress,
+        provider,
+        contractAddress);
+    }catch(e){
+      console.log('There has been an error: ',e)
+    }
+  }
 
   const exampleNFT = {
     id: 0,
@@ -120,11 +133,11 @@ export default function FixPriceNFTView() {
             </div>
             <div className={styles.auctionCardDivider} />
             <div style={{ marginRight: "24px" }}>
-              <div className={styles.auctionCardHeader}>Full NFT value</div>
               <div className={styles.auctionCardDetailsContainer}>
                 {nftObject &&
                   <div style={{ marginRight: "48px" }}>
                   <div className={styles.auctionCardDetailsNumber}>{Math.round(nftObject.price*10**6)/100}ETH</div>
+                  <div className={styles.auctionCardDetailsText}>Full NFT value</div>
                   </div>
                 }
 
@@ -152,6 +165,41 @@ export default function FixPriceNFTView() {
               <FrakButton className={styles.contributeCTA} onClick={()=>buyingFraktions()}>
               BUY
               </FrakButton>
+            </div>
+            <div className={styles.CTAsContainer}>
+              <Button
+                isOutlined
+                style={{
+                  backgroundColor: "white",
+                  marginRight: "16px",
+                  width: "192px",
+                }}
+                onClick={()=>setValueSetter(!valueSetter)}
+              >
+                {valueSetter? 'Cancel' : 'Make an Offer'}
+              </Button>
+              {valueSetter &&
+                <input
+                  className={styles.contributeInput}
+                  disabled={!nftObject}
+                  type="number"
+                  placeholder="Offer in ETH"
+                  onChange={(e)=>{setOfferValue(e.target.value)}}
+                />
+              }
+              {valueSetter && offerValue != 0 &&
+                <Button
+                  isOutlined
+                  style={{
+                    backgroundColor: "white",
+                    marginRight: "16px",
+                    width: "192px",
+                  }}
+                  onClick={()=>launchOffer()}
+                >
+                  {'Offer'}
+                </Button>
+              }
             </div>
           </div>
         </HStack>
