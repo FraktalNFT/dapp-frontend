@@ -1,3 +1,7 @@
+// TODO:
+// Take a good look to importERC1155 vs Fraktionalize..
+//  test, test and more test
+
 import { gql, useQuery } from "@apollo/client";
 import { Grid, HStack, VStack } from "@chakra-ui/layout";
 import Head from "next/head";
@@ -45,11 +49,13 @@ export default function MyNFTsView() {
         let nftsERC1155_wallet;
         let totalNFTs = [];
         if(nftObjects){
-          nftsERC721_wallet = nftObjects.filter(x=>{return x.token_schema == 'ERC721'})
+          console.log('nftObjects',nftObjects)
+          let nftObjectsClean = nftObjects.filter(x=>{return x != null});
+          nftsERC721_wallet = nftObjectsClean.filter(x=>{return x.token_schema == 'ERC721'})
           if(nftsERC721_wallet && nftsERC721_wallet.length){
             totalNFTs = totalNFTs.concat(nftsERC721_wallet);
           }
-          nftsERC1155_wallet = nftObjects.filter(x=>{return x.token_schema == 'ERC1155' && x.tokenId == '0' && x.imageURL})
+          nftsERC1155_wallet = nftObjectsClean.filter(x=>{return x.token_schema == 'ERC1155' && x.tokenId == '0' && x.imageURL})
           if(nftsERC1155_wallet && nftsERC1155_wallet.length && fobjects && fobjects.users.length){
             //list of fraktions addresses to clean up opensea assets
             let fobjectsAddresses = fobjects.users[0].fraktals.map(x=> {return x.id});
@@ -57,18 +63,17 @@ export default function MyNFTsView() {
             // console.log('to check: ',nftsERC1155_wallet);
             // filter openSea assets
             let fraktals = nftsERC1155_wallet.filter(x=> fobjectsAddresses.includes(x.id))
-            console.log('possibly fraktals ',fraktals)
-
+            // console.log('possibly fraktals ',fraktals)
             // let fraktalsObjects = await Promise.all(fobjects.users[0].fraktalss.map(x=>{return createObject(x.nft)}))
 
             totalNFTs = nftsERC721_wallet.concat(nftsERC1155_wallet);
 
           }
           setNftItems(totalNFTs)
+          let fraktionsERC1155_wallet = nftObjectsClean.filter(x=>{return x.token_schema == 'ERC1155' && x.tokenId == '1' && x.imageURL})
         }else{
           setNftItems([])
         }
-        let fraktionsERC1155_wallet = nftObjects.filter(x=>{return x.token_schema == 'ERC1155' && x.tokenId == '1' && x.imageURL})
 
         console.log('fobjects',fobjects)
         if(fobjects && fobjects.users.length){

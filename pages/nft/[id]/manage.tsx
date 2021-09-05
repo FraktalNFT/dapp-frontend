@@ -92,8 +92,8 @@ export default function ManageNFTView() {
       setRaised(nftObjects.raised)
       if(obj.fraktalNfts[0].offers.length){
         let offersValid = obj.fraktalNfts[0].offers.filter(x=>{return x.value > 0 })
-        setOffers(offersValid)
-        if(offersValid[0].value > 0){
+        if(offersValid[0] && offersValid[0].value > 0){
+          setOffers(offersValid)
           setView('offer')
         }
         if(obj.fraktalNfts[0].status.startsWith('sold')){

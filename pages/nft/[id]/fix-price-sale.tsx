@@ -1,3 +1,7 @@
+// TODO:
+//  correct position of make offer
+// detect account offers, display possibility of increase of retreat
+
 import { HStack, VStack } from "@chakra-ui/layout";
 import React, {useEffect, useState} from "react";
 import Head from "next/head";
@@ -10,7 +14,7 @@ import styles from "./auction.module.css";
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
 import {getSubgraphData, createListed} from '../../../utils/graphQueries';
 import { useWeb3Context } from '../../../contexts/Web3Context';
-import { buyFraktions, makeOffer } from '../../../utils/contractCalls';
+import { buyFraktions, makeOffer, claimFraktalSold } from '../../../utils/contractCalls';
 
 export default function FixPriceNFTView() {
   const {account, provider, contractAddress} = useWeb3Context();
@@ -20,7 +24,10 @@ export default function FixPriceNFTView() {
   const [nftObject, setNftObject] = useState();
   const [fraktionsToBuy, setFraktionsToBuy] = useState(0);
   const [valueSetter, setValueSetter] = useState(false);
-  const [offerValue, setOfferValue] = useState(false);
+  const [offerValue, setOfferValue] = useState('0');
+  const [isOfferer, setIsOfferer] = useState(false);
+  const [itemSold, setItemSold] = useState(false);
+
   useEffect(async ()=>{
       const address = getParams('nft');
       const index = address.split('/fix-price-sale')[0]
@@ -29,9 +36,21 @@ export default function FixPriceNFTView() {
       }
       let obj = await getSubgraphData('listed_itemsId',index)
       // console.log('obj',obj)
-      if(obj){
+      if(obj && account){
         if(obj && obj.listItems){
           setFraktalOwners(obj.listItems[0].fraktal.fraktions.length)
+          if(obj.listItems[0].fraktal.offers.length){
+            let findSold = obj.listItems[0].fraktal.status == 'sold'
+            if(findSold){
+              setItemSold(true);
+              console.log('NFT sold', obj.listItems[0].fraktal.id)
+            }
+            let findOffer = obj.listItems[0].fraktal.offers.find(x => x.offerer.id == account.toLocaleLowerCase());
+            console.log('offer made', findOffer)
+            if(findOffer){
+              setIsOfferer(true);
+            }
+          }
         }
         let nftObjects = await createListed(obj.listItems[0])
         if(nftObjects && contractAddress){
@@ -68,6 +87,14 @@ export default function FixPriceNFTView() {
         nftObject.tokenAddress,
         provider,
         contractAddress);
+    }catch(e){
+      console.log('There has been an error: ',e)
+    }
+  }
+
+  async function claimNFT() {
+    try {
+      let tx = await claimFraktalSold(nftObject.marketId, provider, contractAddress);
     }catch(e){
       console.log('There has been an error: ',e)
     }
@@ -147,26 +174,84 @@ export default function FixPriceNFTView() {
                 </div>
               </div>
             </div>
-            <div className={styles.contributeContainer}>
-              <div style={{ marginLeft: "24px" }}>
-                <div className={styles.contributeHeader}>Buy fraktions</div>
-                <input
-                  className={styles.contributeInput}
-                  type="number"
-                  onChange={(e)=>setFraktionsToBuy(e.target.value)}
-                />
-              </div>
-              <div style={{ marginLeft: "24px" }}>
-                <div className={styles.contributeHeader}>Total</div>
-                <div className={styles.contributeHeader}>
-                  {nftObject?parseFloat(fraktionsToBuy*nftObject.price).toFixed(4): 0} ETH
+
+            {!itemSold ?
+            <div>
+              <div className={styles.contributeContainer1}>
+                <div style={{ marginLeft: "24px" }}>
+                  <div className={styles.contributeHeader}>Buy fraktions</div>
+                  <input
+                    className={styles.contributeInput}
+                    type="number"
+                    onChange={(e)=>setFraktionsToBuy(e.target.value)}
+                  />
                 </div>
+                <div style={{ marginLeft: "24px" }}>
+                  <div className={styles.contributeHeader}>Total</div>
+                  <div className={styles.contributeHeader}>
+                    {nftObject?parseFloat(fraktionsToBuy*nftObject.price).toFixed(4): 0} ETH
+                  </div>
+                </div>
+                <FrakButton className={styles.contributeCTA} onClick={()=>buyingFraktions()}>
+                BUY
+                </FrakButton>
               </div>
-              <FrakButton className={styles.contributeCTA} onClick={()=>buyingFraktions()}>
-              BUY
-              </FrakButton>
+
+              {!isOfferer ?
+                <div className={styles.contributeContainer2}>
+                  <Button
+                    isOutlined
+                    style={{
+                      backgroundColor: "white",
+                      marginRight: "16px",
+                      width: "192px",
+                    }}
+                    onClick={()=>setValueSetter(!valueSetter)}
+                  >
+                    {valueSetter? 'Cancel' : 'Make an Offer'}
+                  </Button>
+                  {valueSetter &&
+                    <input
+                      className={styles.contributeInput}
+                      disabled={!nftObject}
+                      type="number"
+                      placeholder="Offer in ETH"
+                      onChange={(e)=>{setOfferValue(e.target.value)}}
+                    />
+                  }
+                  {valueSetter && offerValue > 0. &&
+                    <Button
+                      isOutlined
+                      style={{
+                        backgroundColor: "white",
+                        marginRight: "16px",
+                        width: "192px",
+                      }}
+                      onClick={()=>launchOffer()}
+                    >
+                      {'Offer'}
+                    </Button>
+                  }
+                </div>
+              :
+                <div className={styles.contributeContainer2}>
+                  <Button
+                    isOutlined
+                    style={{
+                      backgroundColor: "white",
+                      marginRight: "16px",
+                      width: "192px",
+                    }}
+                    onClick={()=>launchOffer()}
+                  >
+                    {'Take out offer'}
+                  </Button>
+                </div>
+              }
             </div>
-            <div className={styles.CTAsContainer}>
+            :
+            <div>
+            <div className={styles.contributeContainer2}>
               <Button
                 isOutlined
                 style={{
@@ -174,34 +259,16 @@ export default function FixPriceNFTView() {
                   marginRight: "16px",
                   width: "192px",
                 }}
-                onClick={()=>setValueSetter(!valueSetter)}
+                onClick={()=>claimNFT()}
               >
-                {valueSetter? 'Cancel' : 'Make an Offer'}
+                {'Claim NFT'}
               </Button>
-              {valueSetter &&
-                <input
-                  className={styles.contributeInput}
-                  disabled={!nftObject}
-                  type="number"
-                  placeholder="Offer in ETH"
-                  onChange={(e)=>{setOfferValue(e.target.value)}}
-                />
-              }
-              {valueSetter && offerValue != 0 &&
-                <Button
-                  isOutlined
-                  style={{
-                    backgroundColor: "white",
-                    marginRight: "16px",
-                    width: "192px",
-                  }}
-                  onClick={()=>launchOffer()}
-                >
-                  {'Offer'}
-                </Button>
-              }
             </div>
+            </div>
+          }
           </div>
+
+
         </HStack>
 
       </div>

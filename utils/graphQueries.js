@@ -216,6 +216,7 @@ const listedItemsId = gql`
         id
       }
       fraktal {
+        status
         id
         hash
         marketId
@@ -230,6 +231,14 @@ const listedItemsId = gql`
             balance
           }
           amount
+        }
+        offers (where: {value_gt: 0}) {
+          id
+          offerer {
+            id
+          }
+          value
+          votes
         }
         creator {
           id

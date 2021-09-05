@@ -97,6 +97,34 @@
   border-radius: 32px;
   background-color: #fff;
 }
+.contributeContainer1 {
+  position: absolute;
+  bottom: -32px;
+  left: calc(50% - 320px);
+  width: 320px;
+  height: 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 32px;
+  background-color: #fff;
+}
+.contributeContainer2 {
+  position: absolute;
+  bottom: -32px;
+  left: calc(100% - 320px);
+  width: 280px;
+  height: 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 32px;
+  background-color: #fff;
+}
 
 .contributeHeader {
   letter-spacing: 1px;
