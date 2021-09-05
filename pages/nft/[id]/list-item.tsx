@@ -9,7 +9,7 @@ import FrakButton from '../../../components/button';
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
 import {getSubgraphData, createObject, createListed} from '../../../utils/graphQueries';
 import { useWeb3Context } from '../../../contexts/Web3Context';
-import { listItem, lockShares, transferToken, unlockShares, unlistItem, fraktionalize, defraktionalize, approve } from '../../../utils/contractCalls';
+import { listItem, lockShares, transferToken, unlockShares, unlistItem, fraktionalize, defraktionalize, approveERC1155 } from '../../../utils/contractCalls';
 const exampleNFT = {
   id: 0,
   name: "Golden Fries Cascade",
@@ -126,7 +126,7 @@ export default function ListNFTView() {
       }
   }
   async function approveContract(){
-    let done = await approve(contractAddress, provider, nftObject.id)
+    let done = await approveERC1155(contractAddress, provider, nftObject.id)
     if(done){
       setIsApproved(true)
     }
@@ -238,15 +238,7 @@ export default function ListNFTView() {
                 }
             </div>
             :
-            <div style={{marginTop: '8px', display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-              {!isApproved ?
-                <FrakButton
-                disabled={fraktions === 0}
-                onClick={()=>approveContract()}>Approve</FrakButton>
-                :
-                null
-              }
-            </div>
+            null
           }
 
           {updating?
@@ -257,13 +249,23 @@ export default function ListNFTView() {
             Unlist
             </FrakButton>
             :
-            <FrakButton
-            disabled={!fraktalReady}
-            style={{marginTop: '32px'}}
-            onClick={listNewItem}
-            >
-            List Item
-            </FrakButton>
+            <div style={{margin: '24px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+              {!isApproved ?
+                <FrakButton
+                disabled={fraktions === 0}
+                onClick={()=>approveContract()}>Approve</FrakButton>
+                :
+                null
+              }
+              <br />
+              <FrakButton
+              disabled={!fraktalReady}
+              style={{marginTop: '32px'}}
+              onClick={listNewItem}
+              >
+              List Item
+              </FrakButton>
+            </div>
           }
           </div>
           </div>

@@ -54,7 +54,7 @@ export async function defraktionalize(id, provider, contract){
   return receipt;
 }
 
-export async function approve(to, provider, contract) {
+export async function approveERC1155(to, provider, contract) {
   const approveAbi = [
     "function setApprovalForAll(address operator, bool approved)"
   ]
@@ -265,6 +265,63 @@ export async function voteOffer(offerer, tokenAddress, provider, marketAddress){
   const customContract = new Contract(marketAddress, voteAbi, signer);
   let receipt;
   let tx = await customContract.voteOffer(offerer, tokenAddress, override)
+  try{
+    receipt = await tx.wait();
+  }catch(e){
+    receipt = 'Error: ',e.toString()
+  }
+  console.log('Transaction receipt');
+  console.log(receipt);
+  return receipt;
+}
+export async function importERC721(tokenId, tokenAddress, provider, marketAddress){
+  const importERC721Abi = [
+    "function importERC721(address _tokenAddress, uint256 _tokenId)"
+  ];
+  const signer = await loadSigner(provider);
+  const override = {gasLimit:2000000}
+  console.log(tokenId)
+  console.log(tokenAddress)
+  const customContract = new Contract(marketAddress, importERC721Abi, signer);
+  let receipt;
+  let tx = await customContract.importERC721(tokenAddress,tokenId, override)
+  try{
+    receipt = await tx.wait();
+  }catch(e){
+    receipt = 'Error: ',e.toString()
+  }
+  console.log('Transaction receipt');
+  console.log(receipt);
+  return receipt;
+}
+export async function importERC1155(tokenId, tokenAddress, provider, marketAddress){
+  const importERC1155Abi = [
+    "function importERC1155(address _tokenAddress, uint256 _tokenId)"
+  ];
+  const signer = await loadSigner(provider);
+  const override = {gasLimit:2000000}
+  const customContract = new Contract(marketAddress, importERC1155Abi, signer);
+  let receipt;
+  let tx = await customContract.importERC1155(tokenAddress,tokenId, override)
+  try{
+    receipt = await tx.wait();
+  }catch(e){
+    receipt = 'Error: ',e.toString()
+  }
+  console.log('Transaction receipt');
+  console.log(receipt);
+  return receipt;
+}
+//     function makeOffer(address tokenAddress, uint256 _value) public payable
+export async function makeOffer(value, tokenAddress, provider, marketAddress){
+  const makeOfferAbi = [
+    "function makeOffer(address tokenAddress, uint256 _value) payable"
+  ];
+  const signer = await loadSigner(provider);
+  const override = {gasLimit:2000000, value: value}
+  const customContract = new Contract(marketAddress, makeOfferAbi, signer);
+  let receipt;
+  let tx = await customContract.makeOffer(tokenAddress,value, override)
   try{
     receipt = await tx.wait();
   }catch(e){
