@@ -4,12 +4,13 @@ TODO:
 BUGS:
   CONTRACTS:
   ------------------------------------------------------------------------------------------------
+  - IMPLEMENT CLONE PROXY!
+
   - Once an item is sold ANYONE can claim it
     -send it in the sellItem process to the buyer (functions is already hiper heavy)
     -or assign the buyer with the right (modify contracts)
   - Multiple votes from the same user are allowed (and summed!)
   - Revenue for fraktions in market property at sold time will be locked (belong to the market and do not have a call to retrieve it)
-
 
   UI
   ------------------------------------------------------------------------------------------------
@@ -22,3 +23,4 @@ BUGS:
   SUBGRAPH
 ------------------------------------------------------------------------------------------------
   - Does not detect releases from payment channels (doesnt detect fraktions burned on sell)
+  - Does not detect ERC1155 transfers so ownership is not followed.
