@@ -8,7 +8,7 @@ import FrakButton from "../button";
 import NextLink from "next/link";
 import {useState} from 'react';
 import { useWeb3Context } from '../../contexts/Web3Context';
-import {approveERC1155, importERC721, importERC1155} from '../../utils/contractCalls';
+import {approveMarket, importERC721, importERC1155} from '../../utils/contractCalls';
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
@@ -25,7 +25,7 @@ const NFTItemOS = forwardRef<HTMLDivElement, NFTItemProps>(
     async function importNFT(item){
       setApproving(true)
       console.log('importing',item.id);
-      let done = await approveERC1155(contractAddress, provider, item.id)
+      let done = await approveMarket(contractAddress, provider, item.id)
       if(done){
         setApproving(false)
         setImporting(true)

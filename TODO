@@ -4,21 +4,26 @@ TODO:
 BUGS:
   CONTRACTS:
   ------------------------------------------------------------------------------------------------
-  - Once an item is sold ANYONE can claim it
-    -send it in the sellItem process to the buyer (functions is already hiper heavy)
-    -or assign the buyer with the right (modify contracts)
-  - Multiple votes from the same user are allowed (and summed!)
-  - Revenue for fraktions in market property at sold time will be locked (belong to the market and do not have a call to retrieve it)
-
+  - IMPLEMENT CLONE PROXY!
+  - User can unlock and keep voting, but result is taken from total locked attribute
 
   UI
   ------------------------------------------------------------------------------------------------
+
+  - My NFTs reads and handle arbitrarely some NFTs (ERC1155 subId 1 are considered fraktions by 'default')
+  - Some opensea assets has overflow problems on importing.. handle it (?)
   - Handle imported NFT's multiple hashes (ipfs or whatever).. currently failing items are not displayed!!
-  - There is no tx handler (besides metamask) nor redirecting in the dapp.
-  - Claims are a list, we are only handling 1 in the UI (first one with value, which makes it "recursive")
+  - Read account shares (minus total released) in revenues contracts.. display if only.
+  
+  - There is no tx handler (besides metamask)
+  - Complete redirectings in the dapp.
   - Items should be listed to have the UI that allows making offers (if no listed fraktions, page fails)
   - Incorrect networks does not work very well, does not detect network change (add listener)
+  - Does detect account change.. but is buggy..
+  - Claims are a list, we are only handling 1 in the UI (first one with value, which makes it "recursive")
 
   SUBGRAPH
 ------------------------------------------------------------------------------------------------
-  - Does not detect releases from payment channels (doesnt detect fraktions burned on sell)
+  - Handle fraktions burn (or payment releases)
+  - Handle users list and shares of each
+  - Does not detect ERC1155 transfers so ownership is not followed.

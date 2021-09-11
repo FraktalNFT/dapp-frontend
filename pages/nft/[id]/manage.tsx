@@ -6,6 +6,7 @@ import { BigNumber,utils } from "ethers";
 import { Image } from "@chakra-ui/image";
 import styles from "./manage.module.css";
 import Button from "../../../components/button";
+import FrakButton from '../../../components/button';
 import {getSubgraphData, createObject, createListed} from '../../../utils/graphQueries';
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
@@ -17,7 +18,9 @@ import {
   claimFraktalSold,
   voteOffer,
   defraktionalize,
-  approveERC1155
+  approveMarket,
+  getApproved,
+  getLocked
 } from '../../../utils/contractCalls';
 
 
@@ -32,8 +35,9 @@ export default function ManageNFTView() {
   const [valueSetter, setValueSetter] = useState(false)
   const [view, setView] = useState("manage");
   const [index, setIndex] = useState();
-  const [lockedFraktions, setLockedFraktions] = useState(false);
+  const [lockedFraktions, setLockedFraktions] = useState(0);
   const [buyer, setBuyer] = useState(false);
+  const [approved, setApproved] = useState(false);
 
   const userBalance = () => nftObject.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
 
@@ -58,12 +62,37 @@ export default function ManageNFTView() {
 
   async function defraktionalization() {
     // if owner == contractAddress.toLocaleLowerCase()
-    let done = await approveERC1155(contractAddress, provider, nftObject.id)
+    let done = await approveMarket(contractAddress, provider, nftObject.id)
     if(done){
       defraktionalize(nftObject.marketId, provider, contractAddress);
     }
   }
 
+  async function getIsApprovedForAll() {
+    let approved = await getApproved(account, contractAddress, provider, nftObject.id);
+    return approved;
+  }
+
+  useEffect(async () => {
+    if(account && nftObject && contractAddress) {
+      try {
+        const approvedTokens = await getIsApprovedForAll();
+        setApproved(approvedTokens);
+        console.log('approved',approvedTokens);
+      }catch(e){
+        console.log('Error: ',e);
+      }
+
+    }
+  },[account, nftObject, contractAddress])
+
+  useEffect(async () => {
+    if(account && nftObject){
+      let locked = await getLocked(account, nftObject.id, provider);
+      // console.log('locked ',locked);
+      setLockedFraktions(locked)
+    }
+  },[account, nftObject])
 
   useEffect(async ()=>{
     const address = getParams('nft');
@@ -80,14 +109,14 @@ export default function ManageNFTView() {
     }
     nftObjects = await createObject(obj.fraktalNfts[0])
     setNftObject(nftObjects)
-    if(account){
-      const bal = nftObjects.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
-      if(bal){
-        setFraktions(bal.amount)
-        let userHasLocked = bal.locked > 0
-        setLockedFraktions(userHasLocked)
-      }
-    }
+    // if(account){
+    //   const bal = nftObjects.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
+    //   if(bal){
+    //     setFraktions(bal.amount)
+    //     let userHasLocked = bal.locked > 0
+    //     setLockedFraktions(userHasLocked)
+    //   }
+    // }
     if(account && nftObjects){
       setRaised(nftObjects.raised)
       if(obj.fraktalNfts[0].offers.length){
@@ -112,9 +141,9 @@ export default function ManageNFTView() {
     createRevenuePayment(valueIn, provider, nftObject.id);
   }
 
-  // async function cancelVote(index){
-  //   unlockShares(offers[index].offerer.id, provider, nftObject.id)
-  // }
+  async function cancelVote(index){
+    unlockShares(offers[index].offerer.id, provider, nftObject.id)
+  }
 
   async function voteOnOffer(index){
     voteOffer(offers[index].offerer.id, nftObject.id, provider, contractAddress)
@@ -122,6 +151,13 @@ export default function ManageNFTView() {
 
   async function claimFraktal(){
     claimFraktalSold(nftObject.marketId, provider, contractAddress)
+  }
+
+  async function approveContract(){
+    let done = await approveMarket(contractAddress, provider, nftObject.id)
+    if(done){
+      setApproved(true)
+    }
   }
 
   const exampleNFT = {
@@ -171,48 +207,59 @@ export default function ManageNFTView() {
               {view === "offer" && (
                 <div>
                 {offers.map((x,i)=>{return(
-                <div
-                  key = {i}
-                  className={styles.offerContainer}
-                  style={{ marginBottom: "16px" }}
-                >
-                  <div className={styles.offerInfo}>
-                    Every holder votes and the majority decision (&gt;50%)
-                    determines if the offer is accepted
+                  <div
+                    key = {i}
+                    className={styles.offerContainer}
+                    style={{ marginBottom: "16px" }}
+                  >
+                    <div className={styles.offerInfo}>
+                      Every holder votes and the majority decision (&gt;80%)
+                      determines if the offer is accepted
+                    </div>
+                    <div className={styles.offerText}>
+                      A buyer has offered {x.value/10**18} ETH for this NFT
+                    </div>
+
+                    {!approved ?
+                      <div style={{textAlign:'center', marginTop:'30px'}}>
+                        <FrakButton
+                          disabled={fraktions === 0}
+                          onClick={()=>approveContract()}>
+                          Approve the market to vote!
+                        </FrakButton>
+                      </div>
+                      :
+                      <div className={styles.offerCTAContainer}>
+                        <Button
+                          isOutlined
+                          disabled={lockedFraktions}
+                          style={{
+                            color: "#00C4B8",
+                            borderColor: "#00C4B8",
+                            width: "192px",
+                            marginRight: "16px",
+                          }}
+                          onClick={()=>voteOnOffer(i)}
+                        >
+                          Accept
+                        </Button>
+                        <Button
+                          isOutlined
+                          disabled={!lockedFraktions}
+                          onClick={()=>cancelVote(i)}
+                          style={{
+                            color: "#FF0000",
+                            borderColor: "#FF0000",
+                            width: "192px",
+                          }}
+                        >
+                          Reject
+                        </Button>
+                      </div>
+                    }
                   </div>
-                  <div className={styles.offerText}>
-                    A buyer has offered {x.value/10**18} ETH for this NFT
-                  </div>
-                  <div className={styles.offerCTAContainer}>
-                    <Button
-                      isOutlined
-                      disabled={lockedFraktions}
-                      style={{
-                        color: "#00C4B8",
-                        borderColor: "#00C4B8",
-                        width: "192px",
-                        marginRight: "16px",
-                      }}
-                      onClick={()=>voteOnOffer(i)}
-                    >
-                      Accept
-                    </Button>
-                    <Button
-                      isOutlined
-                      disabled={!lockedFraktions}
-                      onClick={()=>cancelVote(i)}
-                      style={{
-                        color: "#FF0000",
-                        borderColor: "#FF0000",
-                        width: "192px",
-                      }}
-                    >
-                      Reject
-                    </Button>
-                  </div>
+                )})}
                 </div>
-              )})}
-              </div>
               )}
               <div style={{ display: "flex", justifyContent: "center" }}>
                 <div className={styles.redeemContainer}>
@@ -226,7 +273,7 @@ export default function ManageNFTView() {
 
                     <div className={styles.redeemHeader}>Gains</div>
                     <div className={styles.redeemAmount}>
-                      {nftObject && revenues?.length? Math.round((revenues[0].value/10**18)*1000)/1000 +'ETH' : 0}
+                      {nftObject && revenues?.length? Math.round((revenues[0].value*getOwnershipPercenteage()/10**20)*1000)/1000 +'ETH' : 0}
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center" }}>
@@ -264,7 +311,7 @@ export default function ManageNFTView() {
                 style={{ backgroundColor: "#000" }}
                 onClick={()=>claimFraktal()}
                 >
-                Claim
+                Claim Fraktal
                 </div>
               :
                 <div
@@ -291,10 +338,20 @@ export default function ManageNFTView() {
               </Button>
               {valueSetter &&
                 <input
-                  className={styles.contributeInput}
+                  style={{
+                    fontSize:'64px',
+                    color: 'blue',
+                    fontWeight:'bold',
+                    textAlign:'center',
+                    maxWidth:'130px',
+                    marginRight:'10px',
+                    marginLeft:'10px',
+                    borderRadius: '8px',
+                    background:'transparent'
+                  }}
                   disabled={!nftObject}
                   type="number"
-                  placeholder="Revenue to split"
+                  placeholder="ETH"
                   onChange={(e)=>{setRevenueValue(e.target.value)}}
                 />
               }
@@ -311,6 +368,7 @@ export default function ManageNFTView() {
                   {'Deposit'}
                 </Button>
               }
+{/*              // handle claims to do it for sold items and revenues*/}
               {!valueSetter &&
                 <Button
                 isOutlined

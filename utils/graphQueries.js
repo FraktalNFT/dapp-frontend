@@ -2,7 +2,7 @@ import { gql, request } from 'graphql-request';
 const { create, CID } = require('ipfs-http-client');
 import { utils } from "ethers";
 
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.0.16';
+const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.0.34';
 
 const ipfsClient = create({
   host: "ipfs.infura.io",
@@ -296,7 +296,7 @@ export async function createOpenSeaObject(data){
       tokenId: data.token_id,
       createdAt: data.asset_contract.created_date,
       name: data.name,
-      imageURL: data.image_original_url,
+      imageURL: data.image_url,
       // owner: data.owner.address,
       // marketId: data.marketId,
       // balances: data.fraktions,
@@ -314,6 +314,8 @@ export async function createObject(data){
   // ERC721 + ipfs(?)
   // let hashHacked = data.hash.substring(0, data.hash.length - 1)
   // this should be handled as isERC721? then split tokenId from the end of hash...continue
+  // OR..
+  // read the contract and get the URI, we have the token address and token index
 
   // and possibly tokenId
 

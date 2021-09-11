@@ -1,6 +1,8 @@
 import { Contract } from "@ethersproject/contracts";
 import { loadSigner } from './helpers';
 
+
+
 export async function transferToken(tokenId, subId, amount, to, provider, contractAddress) {
   const transferAbi = [
     "function makeSafeTransfer(address _to,uint256 _tokenId,uint256 _subId,uint256 _amount)"
@@ -54,7 +56,36 @@ export async function defraktionalize(id, provider, contract){
   return receipt;
 }
 
-export async function approveERC1155(to, provider, contract) {
+export async function getApproved(account, marketContract, provider, tokenContract) {
+  const getApprovedAbi = [
+    "function isApprovedForAll(address account,address operator) external view returns (bool)"
+  ];
+  const customContract = new Contract(tokenContract, getApprovedAbi, provider);
+  let approved = await customContract.isApprovedForAll(account, marketContract)
+  return approved;
+}
+
+export async function getMinimumOffer(tokenAddress, provider, marketContract) {
+  const getMaxPriceAbi = [
+    "function maxPriceRegistered(address) view returns (uint256)"
+  ];
+  const customContract = new Contract(marketContract, getMaxPriceAbi, provider);
+  let maxPrice = await customContract.maxPriceRegistered(tokenAddress)
+  return maxPrice;
+}
+
+export async function getLocked(account, tokenAddress, provider) {
+  const getLockedSharesAbi = [
+    "function lockedShares(address) public view returns (uint256)"
+  ];
+  const customContract = new Contract(tokenAddress, getLockedSharesAbi, provider);
+  let lockedShares = await customContract.lockedShares(account)
+  // console.log('res ',lockedShares.toNumber())
+  return lockedShares.toNumber();
+}
+
+
+export async function approveMarket(to, provider, contract) {
   const approveAbi = [
     "function setApprovalForAll(address operator, bool approved)"
   ]
@@ -300,10 +331,12 @@ export async function importERC1155(tokenId, tokenAddress, provider, marketAddre
   ];
   const signer = await loadSigner(provider);
   const override = {gasLimit:2000000}
+  console.log('importing ERC1155 address:',tokenAddress, ' and id: ',tokenId)
   const customContract = new Contract(marketAddress, importERC1155Abi, signer);
   let receipt;
-  let tx = await customContract.importERC1155(tokenAddress,tokenId, override)
+  // get max tokenId (uin256) and override it..
   try{
+    let tx = await customContract.importERC1155(tokenAddress,tokenId, override)
     receipt = await tx.wait();
   }catch(e){
     receipt = 'Error: ',e.toString()
