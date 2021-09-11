@@ -9,7 +9,18 @@ import FrakButton from '../../../components/button';
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
 import {getSubgraphData, createObject, createListed} from '../../../utils/graphQueries';
 import { useWeb3Context } from '../../../contexts/Web3Context';
-import { listItem, lockShares, transferToken, unlockShares, unlistItem, fraktionalize, defraktionalize, approveERC1155 } from '../../../utils/contractCalls';
+import {
+  listItem,
+  lockShares,
+  transferToken,
+  unlockShares,
+  unlistItem,
+  fraktionalize,
+  defraktionalize,
+  approveMarket,
+  getApproved
+} from '../../../utils/contractCalls';
+import { useRouter } from 'next/router';
 const exampleNFT = {
   id: 0,
   name: "Golden Fries Cascade",
@@ -20,6 +31,7 @@ const exampleNFT = {
   countdown: new Date("06-25-2021"),
 };
 export default function ListNFTView() {
+  const router = useRouter();
   const {account, provider, contractAddress} = useWeb3Context();
   const [nftObject, setNftObject] = useState();
   const [index, setIndex] = useState();
@@ -39,6 +51,26 @@ export default function ListNFTView() {
     && totalPrice > 0
     && isApproved
     && nftObject.owner === contractAddress.toLocaleLowerCase();
+
+  async function getIsApprovedForAll(tokenAddress) {
+    let approved = await getApproved(account, contractAddress, provider, tokenAddress);
+    return approved;
+  }
+
+  useEffect(async () => {
+    if(account && nftObject && contractAddress) {
+      let approvedTokens;
+      try {
+        approvedTokens = await getIsApprovedForAll(nftObject.id);        
+        setIsApproved(approvedTokens);
+        console.log('approved',approvedTokens);
+      }catch(e){
+        console.log('Error: ',e);
+      }
+
+    }
+  },[account, nftObject, contractAddress, updating])
+
 
   useEffect(async ()=>{
     const address = getParams('nft');
@@ -90,7 +122,7 @@ export default function ListNFTView() {
       provider,
       contractAddress)
     if(tx) {
-      console.log('go to marketplace!')
+      router.push('/my-nfts');
     }
   }
   async function listNewItem(){
@@ -101,7 +133,7 @@ export default function ListNFTView() {
       provider,
       contractAddress)
     if(tx) {
-      console.log('go to marketplace!')
+      router.push('/');
     }
   }
 
@@ -126,7 +158,7 @@ export default function ListNFTView() {
       }
   }
   async function approveContract(){
-    let done = await approveERC1155(contractAddress, provider, nftObject.id)
+    let done = await approveMarket(contractAddress, provider, nftObject.id)
     if(done){
       setIsApproved(true)
     }
@@ -243,7 +275,7 @@ export default function ListNFTView() {
 
           {updating?
             <FrakButton
-            style={{marginTop: '8px'}}
+            style={{marginTop: '24px'}}
             onClick={callUnlistItem}
             >
             Unlist

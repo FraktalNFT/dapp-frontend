@@ -25,7 +25,6 @@ export default function MyNFTsView() {
   const [totalBalance, setTotalBalance] = useState(0);
 
   async function getAccountFraktions(){
-    // do a user query.. get fraktions and nfts.. use to filter
     let objects = await getSubgraphData('wallet',account.toLocaleLowerCase())
     return objects;
   };
@@ -44,18 +43,19 @@ export default function MyNFTsView() {
       let openseaAssets = await assetsInWallet(account);
       let fobjects = await getAccountFraktions()
       if(openseaAssets && openseaAssets.assets.length && fobjects){
+        console.log(openseaAssets)
         let nftObjects = await Promise.all(openseaAssets.assets.map(x=>{return createOpenSeaObject(x)}))
         let nftsERC721_wallet;
         let nftsERC1155_wallet;
         let totalNFTs = [];
         if(nftObjects){
-          console.log('nftObjects',nftObjects)
+          // console.log('nftObjects',nftObjects)
           let nftObjectsClean = nftObjects.filter(x=>{return x != null});
           nftsERC721_wallet = nftObjectsClean.filter(x=>{return x.token_schema == 'ERC721'})
           if(nftsERC721_wallet && nftsERC721_wallet.length){
             totalNFTs = totalNFTs.concat(nftsERC721_wallet);
           }
-          nftsERC1155_wallet = nftObjectsClean.filter(x=>{return x.token_schema == 'ERC1155' && x.tokenId == '0' && x.imageURL})
+          nftsERC1155_wallet = nftObjectsClean.filter(x=>{return x.token_schema == 'ERC1155' && x.tokenId != '1' && x.imageURL})
           if(nftsERC1155_wallet && nftsERC1155_wallet.length && fobjects && fobjects.users.length){
             //list of fraktions addresses to clean up opensea assets
             let fobjectsAddresses = fobjects.users[0].fraktals.map(x=> {return x.id});

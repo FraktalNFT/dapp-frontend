@@ -12,8 +12,10 @@ import {pinByHash} from '../utils/pinataPinner'; // Since we upload to IPFS, sim
 import {contracts, createNFT} from '../utils/contractCalls';
 const { create } = require('ipfs-http-client');
 const ethers = require('ethers');
+import { useRouter } from 'next/router';
 
 export default function MintNFTView() {
+  const router = useRouter();
   const { providerChainId, provider, account, contractAddress } = useWeb3Context();
   const [ipfsNode, setIpfsNode] = useState();
   const [imageData, setImageData] = useState(null); // used?
@@ -97,7 +99,10 @@ export default function MintNFTView() {
     let metadataCid = await upload(JSON.stringify(metadata))
     let formatted = metadataCid.cid.toString()
     await pinByHash(formatted) //Pinata
-    createNFT(formatted, provider, contractAddress);
+    let receipt = await createNFT(formatted, provider, contractAddress);
+    if(receipt){
+      router.push('my-nfts');
+    }
   }
 
   async function addFile(){ // preparation of the file (front-end exclusive)
@@ -114,7 +119,7 @@ export default function MintNFTView() {
           }
       }
   }
-  const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width} 
+  const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
   return (
     <VStack spacing='0' mb='12.8rem'>
       <Head>
