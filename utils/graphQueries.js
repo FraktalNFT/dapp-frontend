@@ -2,7 +2,7 @@ import { gql, request } from 'graphql-request';
 const { create, CID } = require('ipfs-http-client');
 import { utils } from "ethers";
 
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.0.34';
+const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.0.44';
 
 const ipfsClient = create({
   host: "ipfs.infura.io",
@@ -41,7 +41,7 @@ query($id:ID!){
       votes
     }
     revenues {
-      address
+      tokenAddress
       value
     }
     owner {
@@ -76,7 +76,8 @@ query($id:ID!){
       votes
     }
     revenues {
-      address
+      id
+      tokenAddress
       value
     }
     owner {
@@ -175,6 +176,7 @@ const fraktal_fraktions_query = gql`
     }
   }
 `
+// cannot get to work a fraktal filter (where:{status:"open"})
 const listedItems = gql`
   query{
     listItems(first: 10, where:{amount_gt: 0}){
@@ -185,10 +187,11 @@ const listedItems = gql`
       seller {
         id
       }
-      fraktal {
+      fraktal{
         hash
         marketId
         createdAt
+        status
         owner {
           id
         }
@@ -268,11 +271,67 @@ const user_wallet_query = gql`
           owner{
             id
           }
+          collateral {
+            id
+            type
+          }
         }
       }
     }
   }
 `
+const user_bought_query = gql`
+  query($id:ID!){
+    fraktalNfts(where:{status:"sold"}){
+      id
+      marketId
+      hash
+      createdAt
+      creator{
+        id
+      }
+      owner{
+        id
+      }
+      offers (where:{offerer: $id}){
+        value
+      }
+      collateral {
+        id
+        type
+      }
+    }
+  }
+`
+
+const user_offers_query = gql`
+  query($id:ID!){
+    users(where:{id:$id}){
+      id
+      offersMade(where:{value_gt: 0}){
+        value
+        fraktal{
+          id
+          marketId
+          hash
+          createdAt
+          creator{
+            id
+          }
+          owner{
+            id
+          }
+          collateral {
+            id
+            type
+          }
+          status
+        }
+      }
+    }
+  }
+`
+
 export const getSubgraphData = async (call, id) => {
   let callGql = calls.find(x=> {return x.name == call})
   try {
@@ -297,6 +356,7 @@ export async function createOpenSeaObject(data){
       createdAt: data.asset_contract.created_date,
       name: data.name,
       imageURL: data.image_url,
+      // isFraktal: ,
       // owner: data.owner.address,
       // marketId: data.marketId,
       // balances: data.fraktions,
@@ -321,8 +381,8 @@ export async function createObject(data){
 
   try{
     let nftMetadata = await fetchNftMetadata(data.hash)
+    // console.log('meta',nftMetadata)
     if(nftMetadata){
-      // console.log('meta',nftMetadata)
       return {
         id: data.id,
         creator:data.creator.id,
@@ -330,13 +390,14 @@ export async function createObject(data){
         marketId: data.marketId,
         balances: data.fraktions,
         createdAt: data.createdAt,
+        status: data.status,
         name: nftMetadata.name,
         description: nftMetadata.description,
         imageURL: checkImageCID(nftMetadata.image),
       }
     }
   }catch{
-    console.log('Error fetching ',data.id);
+    console.log('Error fetching ',data);
     return null;
   }
 };
@@ -394,6 +455,8 @@ const calls = [
   {name: 'manage', call: fraktal_fraktions_query},
   {name: 'owned', call: owner_query},
   {name: 'wallet', call: user_wallet_query},
+  {name: 'bought', call: user_bought_query},
+  {name: 'offers', call: user_offers_query},
 ];
 
 
@@ -427,11 +490,19 @@ const binArrayToJson = function(binArray)
     }
     return JSON.parse(str)
 };
+
 async function fetchNftMetadata(hash){
-  let chunks
-  for await (const chunk of ipfsClient.cat(hash)) {
+  if(hash.startsWith('Qm')){
+    let chunks
+    for await (const chunk of ipfsClient.cat(hash)) {
       chunks = binArrayToJson(chunk);
+    }
+    return chunks;
+  } else {
+    let res = await fetch(hash)
+    if(res){
+      let result = res.json()
+      return result
+    }
   }
-  // console.log('NFT metadata: ',chunks)
-  return chunks;
 };

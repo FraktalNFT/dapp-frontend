@@ -22,7 +22,7 @@ import {
   getApproved,
   getLocked
 } from '../../../utils/contractCalls';
-
+import { useRouter } from 'next/router';
 
 export default function ManageNFTView() {
   const {account, provider, contractAddress} = useWeb3Context();
@@ -38,6 +38,7 @@ export default function ManageNFTView() {
   const [lockedFraktions, setLockedFraktions] = useState(0);
   const [buyer, setBuyer] = useState(false);
   const [approved, setApproved] = useState(false);
+  const router = useRouter();
 
   const userBalance = () => nftObject.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
 
@@ -54,7 +55,14 @@ export default function ManageNFTView() {
   }
   async function revenueClaiming(){
     try {
-      let tx = await release(provider, revenues[0].address)// only one here! change UI for a list of revenues
+      //
+      /**       FINISH THIS */
+      //
+
+      let tx = await release(provider, revenues[0].id)// only one here! change UI for a list of revenues
+      if(tx){
+        router.push('/my-nfts');
+      }
       }catch(e){
         console.log('There has been an error: ',e)
       }
@@ -109,14 +117,14 @@ export default function ManageNFTView() {
     }
     nftObjects = await createObject(obj.fraktalNfts[0])
     setNftObject(nftObjects)
-    // if(account){
-    //   const bal = nftObjects.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
-    //   if(bal){
-    //     setFraktions(bal.amount)
-    //     let userHasLocked = bal.locked > 0
-    //     setLockedFraktions(userHasLocked)
-    //   }
-    // }
+    if(account){
+      const bal = nftObjects.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
+      if(bal){
+        setFraktions(bal.amount)
+        let userHasLocked = bal.locked > 0
+        setLockedFraktions(userHasLocked)
+      }
+    }
     if(account && nftObjects){
       setRaised(nftObjects.raised)
       if(obj.fraktalNfts[0].offers.length){
@@ -137,16 +145,24 @@ export default function ManageNFTView() {
   const listItemUrl = '/nft/'+index+'/list-item'
 
   async function launchRevenuePayment() {
-    let valueIn = utils.parseEther((parseFloat(revenueValue)+0.000000001).toString())
+    let valueIn = utils.parseEther((parseFloat(revenueValue)+0.000000000001).toString())
     createRevenuePayment(valueIn, provider, nftObject.id);
+    // then refresh
   }
 
   async function cancelVote(index){
     unlockShares(offers[index].offerer.id, provider, nftObject.id)
+    // then refresh
   }
 
   async function voteOnOffer(index){
-    voteOffer(offers[index].offerer.id, nftObject.id, provider, contractAddress)
+    let tx = await voteOffer(offers[index].offerer.id, nftObject.id, provider, contractAddress)
+    // then refresh
+    if(tx){
+      router.push('/my-nfts');
+    }else{
+      console.log('there was an error');
+    }
   }
 
   async function claimFraktal(){
@@ -223,7 +239,7 @@ export default function ManageNFTView() {
                     {!approved ?
                       <div style={{textAlign:'center', marginTop:'30px'}}>
                         <FrakButton
-                          disabled={fraktions === 0}
+                          disabled={fraktions == 0}
                           onClick={()=>approveContract()}>
                           Approve the market to vote!
                         </FrakButton>
@@ -316,7 +332,7 @@ export default function ManageNFTView() {
               :
                 <div
                 className={styles.redeemCTA}
-                style={{ backgroundColor: "#000" }}
+                style={{ backgroundColor: "#000", cursor: 'pointer' }}
                 onClick={()=>revenueClaiming()}
                 >
                 Claim
