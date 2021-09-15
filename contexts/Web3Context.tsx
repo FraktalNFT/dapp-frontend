@@ -56,7 +56,7 @@ const web3Modal =
 
 const contracts = [
   {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
-  {providerChainId:4, address:'0x139B2A1b1E81214F205e168d0B3fD251c12256b6'},
+  {providerChainId:4, address:'0xFf3532447a93497471279150602B6ec24ae1170f'},
   {providerChainId:5, address:'0xA916BbdB90bA3BA7DCca09F2D3B249180f7fE0D2'}
 ]
 

@@ -88,8 +88,13 @@ export default function FixPriceNFTView() {
 
 useEffect(async () => {
   if(nftObject && contractAddress){
-    let minPrice = await getMinimumOffer(nftObject.tokenAddress, provider, contractAddress)
-    let minPriceParsed = utils.formatEther(minPrice);
+    let minPriceParsed;
+    try{
+      let minPrice = await getMinimumOffer(nftObject.tokenAddress, provider, contractAddress)
+      minPriceParsed = utils.formatEther(minPrice);
+    }catch {
+      minPriceParsed = 0.
+    }
     // console.log('minPrice',minPriceParsed);
     setMinOffer(minPriceParsed);
   }
@@ -102,6 +107,9 @@ useEffect(async () => {
         nftObject.tokenAddress,
         provider,
         contractAddress);
+      if(tx){
+          router.push('/my-nfts');
+      }
     }catch(e){
       console.log('There has been an error: ',e)
     }

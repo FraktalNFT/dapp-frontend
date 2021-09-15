@@ -27,9 +27,10 @@ const Home: React.FC = () => {
   useEffect(async ()=>{
     setLoading(true);
     let data = await getSubgraphData('listed_items','')
-    console.log('fetched ',data)
+    // console.log('fetched ',data)
+    let dataOnSale = data.listItems.filter(x=>{return x.fraktal.status == 'open'});
     if(data){
-      Promise.all(data.listItems.map(x=>{return createListed(x)})).then((results)=>setNftItems(results))
+      Promise.all(dataOnSale.map(x=>{return createListed(x)})).then((results)=>setNftItems(results))
     }
     setLoading(false);
   },[])

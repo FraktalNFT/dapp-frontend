@@ -270,7 +270,7 @@ export async function release(provider, revenueAddress){
 }
 export async function claimFraktalSold(tokenId, provider, marketAddress){
   const claimAbi = [
-    "function claimFraktal(uint _tokenId)"
+    "function claimFraktal(uint256 _tokenId)"
   ];
   const signer = await loadSigner(provider);
   const override = {gasLimit:700000}

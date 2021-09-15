@@ -20,11 +20,12 @@ const NFTItemOS = forwardRef<HTMLDivElement, NFTItemProps>(
     const { account, provider, contractAddress } = useWeb3Context();
     const [approving, setApproving] = useState(false);
     const [importing, setImporting] = useState(false);
-    const [fraktalNft, setFraktalNft] = useState(false);
+
+    // const [fraktalNft, setFraktalNft] = useState(false);
 
     async function importNFT(item){
       setApproving(true)
-      console.log('importing',item.id);
+      // console.log('importing',item.id);
       let done = await approveMarket(contractAddress, provider, item.id)
       if(done){
         setApproving(false)
@@ -32,10 +33,13 @@ const NFTItemOS = forwardRef<HTMLDivElement, NFTItemProps>(
         let res;
         if(item.token_schema == 'ERC721'){
           res = importERC721(parseInt(item.tokenId), item.id, provider, contractAddress)
-        }else if (!fraktalNft){
+        }else {
           res = importERC1155(parseInt(item.tokenId), item.id, provider, contractAddress)
-        } else {
-          res = fraktionalize(parseInt(item.marketId), provider, contractAddress) // tokenId is NOT what it goes!
+//
+//        HERE important to filter fraktals to simply call 'fraktionalize' instead of importing as escrow
+//
+        // } else {
+        //   res = fraktionalize(parseInt(item.marketId), provider, contractAddress) // tokenId is NOT what it goes!
         }
         if(res){
           setImporting(false)
@@ -47,8 +51,8 @@ const NFTItemOS = forwardRef<HTMLDivElement, NFTItemProps>(
         return 'Importing'
       } else if (approving) {
         return 'Approving'
-      } else if(fraktalNft) {
-        return 'Fraktionalize'
+      // } else if(fraktalNft) {
+      //   return 'Fraktionalize'
       }
       else {
         return 'Import'
