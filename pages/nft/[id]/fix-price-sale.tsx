@@ -6,13 +6,14 @@ import { HStack, VStack } from "@chakra-ui/layout";
 import React, {useEffect, useState} from "react";
 import Head from "next/head";
 import Link from "next/link";
-import { BigNumber, utils } from "ethers";
+import { utils } from "ethers";
 import FrakButton from '../../../components/button';
 import Button from "../../../components/button";
 import { Image } from "@chakra-ui/image";
 import styles from "./auction.module.css";
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
-import {getSubgraphData, createListed} from '../../../utils/graphQueries';
+import { getSubgraphData } from '../../../utils/graphQueries';
+import { createListed } from '../../../utils/nftHelpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
 import { buyFraktions, makeOffer, claimFraktalSold, getMinimumOffer } from '../../../utils/contractCalls';
 import { useRouter } from 'next/router';
@@ -20,8 +21,6 @@ import { useRouter } from 'next/router';
 export default function FixPriceNFTView() {
   const router = useRouter();
   const {account, provider, contractAddress} = useWeb3Context();
-  const [index, setIndex] = useState();
-  const [raised, setRaised] = useState(0);
   const [fraktalOwners, setFraktalOwners] = useState(1);
   const [nftObject, setNftObject] = useState();
   const [fraktionsToBuy, setFraktionsToBuy] = useState(0);
@@ -31,12 +30,10 @@ export default function FixPriceNFTView() {
   const [minOffer, setMinOffer] = useState(0.);
   const [itemSold, setItemSold] = useState(false);
 
+// use callbacks
   useEffect(async ()=>{
       const address = getParams('nft');
       const index = address.split('/fix-price-sale')[0]
-      if(index){
-        setIndex(index)
-      }
       let obj = await getSubgraphData('listed_itemsId',index)
       console.log('obj',obj)
       if(obj && account){
@@ -58,58 +55,51 @@ export default function FixPriceNFTView() {
         let nftObjects = await createListed(obj.listItems[0])
         if(nftObjects && contractAddress){
           setNftObject(nftObjects)
-          if(nftObjects?.raised){
-            setRaised(parseFloat(nftObjects.raised)/10**18)
-          }
         }
       }else{
         setNftObject()
       }
   },[account])
 
-  const toPay = () => utils.parseEther(((fraktionsToBuy * nftObject.price)+0.000000001).toString()) //utils.parseEther(
+  const toPay = () => utils.parseEther(((fraktionsToBuy * nftObject.price)+0.000000001).toString());
 
   async function buyingFraktions() {
       try {
-        let tx = await buyFraktions(
+        await buyFraktions(
           nftObject.seller,
           nftObject.marketId,
           fraktionsToBuy,
           toPay(),
           provider,
-          contractAddress);
-        if(tx){
-          router.push('/my-nfts');
-        }
-      }catch(e){
-        console.log('There has been an error: ',e)
+          contractAddress).then(()=>router.reload());
+      }catch(err){
+        console.log('Error',err);
       }
   }
 
-useEffect(async () => {
-  if(nftObject && contractAddress){
-    let minPriceParsed;
-    try{
-      let minPrice = await getMinimumOffer(nftObject.tokenAddress, provider, contractAddress)
-      minPriceParsed = utils.formatEther(minPrice);
-    }catch {
-      minPriceParsed = 0.
+  useEffect(async () => {
+    if(nftObject && contractAddress){
+      let minPriceParsed;
+      try{
+        let minPrice = await getMinimumOffer(nftObject.tokenAddress, provider, contractAddress)
+        minPriceParsed = utils.formatEther(minPrice);
+      }catch {
+        minPriceParsed = 0.
+      }
+      setMinOffer(minPriceParsed);
     }
-    // console.log('minPrice',minPriceParsed);
-    setMinOffer(minPriceParsed);
-  }
-},[nftObject, contractAddress])
+  },[nftObject, contractAddress])
 
   async function launchOffer() {
     try {
-      let tx = await makeOffer(
+      makeOffer(
         utils.parseEther(offerValue),
         nftObject.tokenAddress,
         provider,
-        contractAddress);
-      if(tx){
+        contractAddress).then(()=>{
           router.push('/my-nfts');
-      }
+        })
+
     }catch(e){
       console.log('There has been an error: ',e)
     }
@@ -131,7 +121,6 @@ useEffect(async () => {
     name: "Golden Fries Cascade",
     imageURL: "/filler-image-1.png",
     artistAddress: "0x1234...5678",
-    contributions: BigNumber.from(5).div(100),
     createdAt: new Date().toISOString(),
     countdown: new Date("06-25-2021"),
   };

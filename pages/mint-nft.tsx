@@ -5,22 +5,18 @@ import styles from "../styles/mint-nft.module.css";
 import Button from "../components/button";
 import { HStack } from "@chakra-ui/layout";
 import { Image as ImageComponent }  from "@chakra-ui/image";
-import { Contract } from "@ethersproject/contracts";
-import { useWeb3Context } from "/contexts/Web3Context";
-import {utils} from "ethers";
-import {pinByHash} from '../utils/pinataPinner'; // Since we upload to IPFS, simply call pin services to pin the hash
-import {contracts, createNFT} from '../utils/contractCalls';
-const { create } = require('ipfs-http-client');
-const ethers = require('ethers');
+import { useWeb3Context } from "../contexts/Web3Context";
+import { pinByHash } from '../utils/pinataPinner';
+import { createNFT} from '../utils/contractCalls';
 import { useRouter } from 'next/router';
+const { create } = require('ipfs-http-client');
 
 export default function MintNFTView() {
   const router = useRouter();
-  const { providerChainId, provider, account, contractAddress } = useWeb3Context();
+  const { provider, contractAddress } = useWeb3Context();
   const [ipfsNode, setIpfsNode] = useState();
-  const [imageData, setImageData] = useState(null); // used?
+  const [imageData, setImageData] = useState(null);
   const [imageSize, setImageSize] = useState([]);
-  const [signer, setSigner] = useState();
   const [name, setName] = useState();
   const [description, setDescription] = useState();
   const [file, setFile] = useState();
@@ -33,79 +29,39 @@ export default function MintNFTView() {
     setIpfsNode(ipfsClient)
   },[])
 
-  let optionalBytecode;
-  useEffect(()=>{
-    async function loadSigner() { //Load contract instance
-      if (typeof provider !== "undefined") {
-        try {
-          let signer;
-          const accounts = await provider.listAccounts();
-          if (accounts && accounts.length > 0) {
-            signer = provider.getSigner();// get signer
-          } else {
-            signer = provider; // or use RPC (cannot sign tx's. should call a connect warning)
-          }
-          setSigner(signer);
-        } catch (e) {
-          console.log("ERROR LOADING SIGNER", e);
-        }
-      }
-    }
-    loadSigner();
-  },[provider, optionalBytecode])
-
-
-  function openLocal(){ // Opens the file browser.. implement tests of the file here or include into front
+  function openLocal(){
     document.getElementById('imageInput').files = null;
     document.getElementById('imageInput').click()
-// test type? or add accept attributes in input?
+    // test type? or add accept attributes in input?
   }
 
-  // ipfs.add parameters for more deterministic CIDs
-  const ipfsAddOptions = {
-    cidVersion: 1,
-    hashAlg: 'sha2-256'
-  }
-
-  async function upload(data){
-    let added = await ipfsNode.add(data); // , ipfsAddOptions for V1 CIDs
-    // console.log('ADDED',added)
-    return added;
-  }
-
-
-  async function uploadImageToIpfs(){
-    let url
-    let imageUpload
+  async function uploadAndPin(data){
+    let dataUpload
     try{
-      imageUpload = await upload(file);
+      dataUpload = await ipfsNode.add(data);
     }catch(e){
       console.log('Error: ',e)
       return 'Error uploading the file'
     }
-
-    await pinByHash(imageUpload.cid.toString()) // Pinata
-    return imageUpload.path;
+    await pinByHash(dataUpload.cid.toString()) // Pinata
+    return dataUpload;
   }
 
   async function prepareNftData(){
-    let imageCid
-    let metadata
-    let results = await uploadImageToIpfs()
-    metadata = await {name:name, description:description, image:results}
+    let results = await uploadAndPin(file)
+    let metadata = {name:name, description:description, image:results.path}
     minter(metadata)
   }
   async function minter(metadata) {
-    let metadataCid = await upload(JSON.stringify(metadata))
-    let formatted = metadataCid.cid.toString()
-    await pinByHash(formatted) //Pinata
-    let receipt = await createNFT(formatted, provider, contractAddress);
-    if(receipt){
-      router.push('my-nfts');
+    let metadataCid =  await uploadAndPin(JSON.stringify(metadata))
+    if(metadataCid){
+      createNFT(metadataCid.cid.toString(), provider, contractAddress).then(()=>{
+        router.push('/my-nfts');
+      });
     }
   }
 
-  async function addFile(){ // preparation of the file (front-end exclusive)
+  async function addFile(){
     const selectedFile = document.getElementById('imageInput').files[0];
     setFile(selectedFile)
     let reader = new FileReader();

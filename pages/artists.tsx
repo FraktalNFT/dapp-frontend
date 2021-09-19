@@ -1,8 +1,7 @@
-import { Box, Grid, HStack, VStack, Text } from "@chakra-ui/layout";
 import React, { useState, useEffect } from "react";
+import { Box, Grid, HStack, VStack, Text } from "@chakra-ui/layout";
 import Head from "next/head";
 import { FrakCard } from "../types";
-import { BigNumber } from "ethers";
 import NextLink from "next/link";
 import NFTItem from "../components/nft-item";
 import Dropdown from "../components/dropdown";
@@ -11,7 +10,8 @@ import Pagination from "../components/pagination";
 import styles from "../styles/artists.module.css";
 import { Image } from "@chakra-ui/image";
 import { shortenHash } from "../utils/helpers";
-import { getSubgraphData, createObject } from '../utils/graphQueries';
+import { getSubgraphData } from '../utils/graphQueries';
+import { createObject } from '../utils/nftHelpers';
 import { useWeb3Context } from '../contexts/Web3Context';
 
 export default function ArtistsView() {
@@ -19,7 +19,6 @@ export default function ArtistsView() {
   const [selectionMode, setSelectionMode] = useState(false);
   const [sortType, setSortType] = useState("Popular");
   const [artists, setArtists] = useState([]);
-  const [nftItems, setNftItems] = useState([]);
   const [artistsItems, setArtistsItems] = useState([]);
   const {contractAddress} = useWeb3Context();
   const handleSortSelect = (item: string) => {
@@ -27,22 +26,22 @@ export default function ArtistsView() {
     setSelectionMode(false);
   };
   useEffect(()=>{
-    if(nftItems.length){
+    if(artistsItems.length){
       let artistsObj = artists.map((x,i)=>({
         id: x.id,
         name: shortenHash(x.id),
-        imageURL: nftItems[i]?nftItems[i].imageURL:"/filler-image-1.png",
+        imageURL: artistsItems[i]?artistsItems[i].imageURL:"/filler-image-1.png",
         totalGallery:x.created.length,
       }))
       setArtistsItems(artistsObj)
     }
-  },[nftItems])
+  },[artistsItems])
 
-  function getArtistsObjects(artists, nftItems){
-    let artistsObj = artists.map((x,i)=>({
+  function getArtistsObjects(artists, artistsItems){
+    const artistsObj = artists.map((x,i)=>({
       id: x.id,
       name: shortenHash(x.id),
-      imageURL: nftItems[i]?nftItems[i].imageURL:"/filler-image-1.png",
+      imageURL: artistsItems[i]?artistsItems[i].imageURL:"/filler-image-1.png",
       totalGallery:x.created.length,
     }))
     return artistsObj;
@@ -66,17 +65,6 @@ export default function ArtistsView() {
     }
   },[contractAddress])
 
-  // TODO: hardcoded stuff as of now
-  const demoArtistItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
-    (_, index) => ({
-      id: index + 1,
-      name: "beople.eth",
-      imageURL: "/filler-image-1.png",
-      //contributions: BigNumber.from(5).div(100),
-      createdAt: new Date().toISOString(),
-      //countdown: new Date("06-25-2021"),
-    })
-  );
   return (
     <VStack spacing='0' mb='12.8rem'>
       <Head>

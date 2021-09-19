@@ -1,19 +1,21 @@
-import { VStack } from "@chakra-ui/layout";
+import { VStack, Stack } from "@chakra-ui/layout";
+import { Image } from "@chakra-ui/image";
+import { Radio, RadioGroup } from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
-import { BigNumber,utils } from "ethers";
-import { Image } from "@chakra-ui/image";
+import { utils } from "ethers";
 import styles from "./manage.module.css";
 import Button from "../../../components/button";
 import FrakButton from '../../../components/button';
-import {getSubgraphData, createObject, createListed} from '../../../utils/graphQueries';
-import {shortenHash, timezone, getParams} from '../../../utils/helpers';
+import {getSubgraphData } from '../../../utils/graphQueries';
+import { createObject } from '../../../utils/nftHelpers';
+import { getParams } from '../../../utils/helpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
 import {
   release,
   createRevenuePayment,
-  lockShares,
+  // lockShares,
   unlockShares,
   claimFraktalSold,
   voteOffer,
@@ -27,7 +29,6 @@ import { useRouter } from 'next/router';
 export default function ManageNFTView() {
   const {account, provider, contractAddress} = useWeb3Context();
   const [nftObject, setNftObject] = useState();
-  const [raised, setRaised] = useState(0);
   const [revenues, setRevenues] = useState();
   const [offers, setOffers] = useState();
   const [fraktions, setFraktions] = useState(0);
@@ -36,43 +37,45 @@ export default function ManageNFTView() {
   const [view, setView] = useState("manage");
   const [index, setIndex] = useState();
   const [lockedFraktions, setLockedFraktions] = useState(0);
-  const [buyer, setBuyer] = useState(false);
   const [approved, setApproved] = useState(false);
   const router = useRouter();
-
-  const userBalance = () => nftObject.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
+  const [revenueToClaim, setRevenueToClaim] = useState();
 
   function getOwnershipPercenteage() {
-    let perc;
-    let obj = userBalance()
-    // nftObject.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
-    if(obj && obj.amount > 0){
-      perc = obj.amount/100
+    let ownership:Number;
+    let balance = nftObject.balances.find(x=>x.owner.id == account.toLocaleLowerCase())
+    if(balance && balance.amount > 0){
+      ownership = balance.amount/100
     }else{
-      perc = 0
+      ownership = 0
     }
-    return perc;
+    return ownership;
   }
   async function revenueClaiming(){
     try {
-      //
-      /**       FINISH THIS */
-      //
-
-      let tx = await release(provider, revenues[0].id)// only one here! change UI for a list of revenues
-      if(tx){
-        router.push('/my-nfts');
+      if(revenues.length == 1){
+        release(provider, revenues[0].id).then(()=>{
+          router.push('/my-nfts');
+        })
+      }else{
+        release(provider, revenueToClaim).then(()=>{
+          router.push('/my-nfts');
+        })
       }
-      }catch(e){
-        console.log('There has been an error: ',e)
-      }
+    }catch(e){
+      console.log('There has been an error: ',e)
     }
+  }
 
   async function defraktionalization() {
-    // if owner == contractAddress.toLocaleLowerCase()
-    let done = await approveMarket(contractAddress, provider, nftObject.id)
-    if(done){
-      defraktionalize(nftObject.marketId, provider, contractAddress);
+    let tx;
+    if(!approved){
+      tx = await approveMarket(contractAddress, provider, nftObject.id)
+    }
+    if(tx || approved){
+      await defraktionalize(nftObject.marketId, provider, contractAddress).then(()=>{
+        router.push('/my-nfts')
+      });
     }
   }
 
@@ -86,7 +89,6 @@ export default function ManageNFTView() {
       try {
         const approvedTokens = await getIsApprovedForAll();
         setApproved(approvedTokens);
-        console.log('approved',approvedTokens);
       }catch(e){
         console.log('Error: ',e);
       }
@@ -97,7 +99,6 @@ export default function ManageNFTView() {
   useEffect(async () => {
     if(account && nftObject){
       let locked = await getLocked(account, nftObject.id, provider);
-      // console.log('locked ',locked);
       setLockedFraktions(locked)
     }
   },[account, nftObject])
@@ -110,7 +111,6 @@ export default function ManageNFTView() {
     }
     let nftObjects;
     let obj = await getSubgraphData('marketid_fraktal',index)
-    console.log('retrieved ',obj)
     if(obj.fraktalNfts[0].revenues.length){
       let revenuesValid = obj.fraktalNfts[0].revenues.filter(x=>{return x.value > 0 })
       setRevenues(revenuesValid)
@@ -118,15 +118,15 @@ export default function ManageNFTView() {
     nftObjects = await createObject(obj.fraktalNfts[0])
     setNftObject(nftObjects)
     if(account){
+// get the balance from the contract!
       const bal = nftObjects.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
       if(bal){
         setFraktions(bal.amount)
         let userHasLocked = bal.locked > 0
-        setLockedFraktions(userHasLocked)
+        setLockedFraktions(userHasLocked);
       }
     }
     if(account && nftObjects){
-      setRaised(nftObjects.raised)
       if(obj.fraktalNfts[0].offers.length){
         let offersValid = obj.fraktalNfts[0].offers.filter(x=>{return x.value > 0 })
         if(offersValid[0] && offersValid[0].value > 0){
@@ -135,8 +135,6 @@ export default function ManageNFTView() {
         }
         if(obj.fraktalNfts[0].status.startsWith('sold')){
           setView('accepted')
-          let winner = obj.fraktalNfts[0].status
-          setBuyer(winner == account.toLocaleLowerCase())
         }
       }
     }
@@ -146,27 +144,20 @@ export default function ManageNFTView() {
 
   async function launchRevenuePayment() {
     let valueIn = utils.parseEther((parseFloat(revenueValue)+0.000000000001).toString())
-    createRevenuePayment(valueIn, provider, nftObject.id);
-    // then refresh
+    createRevenuePayment(valueIn, provider, nftObject.id).then(()=> router.reload());
   }
 
   async function cancelVote(index){
-    unlockShares(offers[index].offerer.id, provider, nftObject.id)
-    // then refresh
+    unlockShares(offers[index].offerer.id, provider, nftObject.id).then(()=> router.reload());
   }
 
   async function voteOnOffer(index){
     let tx = await voteOffer(offers[index].offerer.id, nftObject.id, provider, contractAddress)
-    // then refresh
-    if(tx){
-      router.push('/my-nfts');
-    }else{
-      console.log('there was an error');
-    }
+    tx.then(()=> router.reload());
   }
 
   async function claimFraktal(){
-    claimFraktalSold(nftObject.marketId, provider, contractAddress)
+    claimFraktalSold(nftObject.marketId, provider, contractAddress).then(()=>router.reload());
   }
 
   async function approveContract(){
@@ -181,7 +172,6 @@ export default function ManageNFTView() {
     name: "Golden Fries Cascade",
     imageURL: "/filler-image-1.png",
     artistAddress: "0x1234...5678",
-    contributions: BigNumber.from(5).div(100),
     createdAt: new Date().toISOString(),
     countdown: new Date("06-25-2021"),
   };
@@ -288,9 +278,20 @@ export default function ManageNFTView() {
                   <div style={{ marginLeft: "12px" }}>
 
                     <div className={styles.redeemHeader}>Gains</div>
-                    <div className={styles.redeemAmount}>
-                      {nftObject && revenues?.length? Math.round((revenues[0].value*getOwnershipPercenteage()/10**20)*1000)/1000 +'ETH' : 0}
-                    </div>
+                      {revenues?.length?
+                        <div>
+                          <RadioGroup onChange={address => setRevenueToClaim(address)}>
+                            <Stack>
+                              {revenues.map(function(x){
+                                return (
+                                  <Radio value={x.id}>{Math.round(utils.formatEther(x.value)*1000/1000)} ETH</Radio>
+                                  )
+                                })
+                              }
+                            </Stack>
+                          </RadioGroup>
+                        </div>
+                      :null}
                   </div>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <Image src={"/info.svg"} style={{ marginRight: "8px" }} />
@@ -319,25 +320,17 @@ export default function ManageNFTView() {
             <div className={styles.claimContainer}>
               <div style={{ marginLeft: "24px" }}>
                 <div className={styles.redeemHeader}>ETH</div>
+                {/* Correct next line.. does not reflect the winner offer */}
                 <div className={styles.redeemAmount}>{Math.round(((offers[0].value*getOwnershipPercenteage()/10**20))*1000)/1000}</div>
               </div>
-              {buyer?
-                <div
-                className={styles.redeemCTA}
-                style={{ backgroundColor: "#000" }}
-                onClick={()=>claimFraktal()}
-                >
-                Claim Fraktal
-                </div>
-              :
-                <div
-                className={styles.redeemCTA}
-                style={{ backgroundColor: "#000", cursor: 'pointer' }}
-                onClick={()=>revenueClaiming()}
-                >
-                Claim
-                </div>
-              }
+              <Button
+              isOutlined
+              disabled={!revenues}
+              style={{ backgroundColor: "white", width: "192px" }}
+              onClick={()=>revenueClaiming()}
+              >
+              Claim Gains
+              </Button>
             </div>
           ) : (
             <div className={styles.CTAsContainer}>
@@ -384,13 +377,12 @@ export default function ManageNFTView() {
                   {'Deposit'}
                 </Button>
               }
-{/*              // handle claims to do it for sold items and revenues*/}
               {!valueSetter &&
                 <Button
-                isOutlined
-                disabled={!revenues}
-                style={{ backgroundColor: "white", width: "192px" }}
-                onClick={()=>revenueClaiming()}
+                  isOutlined
+                  disabled={!revenueToClaim}
+                  style={{ backgroundColor: "white", width: "192px" }}
+                  onClick={()=>revenueClaiming()}
                 >
                 Claim Gains
                 </Button>

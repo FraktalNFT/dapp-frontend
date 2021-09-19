@@ -1,4 +1,6 @@
 TODO::
+--------------------------------------------------------------------------------
+Re-organize everything.. keep functions in library and improve filtering data.
 
 BUGS:
 
@@ -9,8 +11,6 @@ BUGS:
 
   UI
   ------------------------------------------------------------------------------------------------
-  - How to get collaterals? make that!
-  - My-nfts does not offer the defraktionalize (only import)
   - Before the buyer claims, its not possible to claim the revenues, pospone and check it has been created
   - My NFTs reads and handle arbitrarely some NFTs (ERC1155 subId 1 are considered fraktions by 'default')
   - Opensea API is veery slow to detect transfers
@@ -19,10 +19,11 @@ BUGS:
   - Complete redirectings in the dapp.
   - Incorrect networks does not work very well, does not detect network change (add listener)
   - Does detect account change.. but is buggy..
-  - Claims are a list, we are only handling 1 in the UI (first one with value, which makes it "recursive")
+  - Claims are radio group. What is the best way? (list?)
 
   SUBGRAPH
 ------------------------------------------------------------------------------------------------
   - Does not detect ERC1155 transfers so ownership is not followed.
   - When importing NFTs, subgraph duplicates the fraktions. Minted event its called from the market.
   - claim fraktal does not change ownership
+  - in revenues, add a timedate for reference

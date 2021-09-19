@@ -78,3 +78,15 @@ export function getParams(type){
   // console.log('address',address[1])
   return address[1];
 }
+
+export async function processTx(tx){
+  let receipt;
+  try{
+    receipt = await tx.wait();
+  }catch(e){
+    receipt = 'Error: ',e.toString()
+  }
+  console.log('Transaction receipt');
+  console.log(receipt);
+  return receipt;
+}

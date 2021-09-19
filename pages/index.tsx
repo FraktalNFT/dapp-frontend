@@ -8,11 +8,9 @@ import Dropdown from "../components/dropdown";
 import NFTItem from "../components/nft-item";
 import Pagination from "../components/pagination";
 import { FrakCard } from "../types";
-import {getSubgraphData, createListed} from '../utils/graphQueries';
-const { create, CID } = require('ipfs-http-client');
+import { getSubgraphData } from '../utils/graphQueries';
+import { createListed } from '../utils/nftHelpers';
 const SORT_TYPES = ["Popular", "Ending Soonest", "Newly Listed"];
-
-const demoNFTItemsEmpty = [];
 
 const Home: React.FC = () => {
   const [selectionMode, setSelectionMode] = useState(false);
@@ -26,11 +24,10 @@ const Home: React.FC = () => {
 
   useEffect(async ()=>{
     setLoading(true);
-    let data = await getSubgraphData('listed_items','')
-    // console.log('fetched ',data)
-    let dataOnSale = data.listItems.filter(x=>{return x.fraktal.status == 'open'});
-    if(data){
-      Promise.all(dataOnSale.map(x=>{return createListed(x)})).then((results)=>setNftItems(results))
+    let data = await getSubgraphData('listed_items','');
+    const dataOnSale = data.listItems.filter(x=>{return x.fraktal.status == 'open'});
+    if(dataOnSale){
+      Promise.all(dataOnSale.map(x=>{return createListed(x)})).then((results)=>setNftItems(results));
     }
     setLoading(false);
   },[])
