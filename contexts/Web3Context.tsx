@@ -11,6 +11,7 @@ import { provider } from "web3-core";
 import Web3Modal, { IProviderOptions } from "web3modal";
 import { getRPCUrl } from "../utils/helpers";
 import Web3 from "web3";
+import { contracts } from '../utils/constants';
 
 type Web3ContextType = {
   account: null | string;
@@ -53,13 +54,6 @@ const web3Modal =
     cacheProvider: true,
     providerOptions,
   });
-
-const contracts = [
-  {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
-  {providerChainId:4, address:'0xFf3532447a93497471279150602B6ec24ae1170f'},
-  {providerChainId:5, address:'0xA916BbdB90bA3BA7DCca09F2D3B249180f7fE0D2'}
-]
-
 
 const Web3ContextProvider: React.FC = ({ children }) => {
   const [{ account, providerChainId, provider, contractAddress }, setWeb3State] =

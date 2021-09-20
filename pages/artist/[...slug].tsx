@@ -1,14 +1,13 @@
 import { Grid, Text, VStack } from "@chakra-ui/layout";
 import Head from "next/head";
 import React, {useState, useEffect} from "react";
-import { FrakCard } from "../../types";
 import styles from "./artist.module.css";
-import { BigNumber } from "ethers";
 import NFTItem from "../../components/nft-item";
 import FrakButton from "../../components/button";
 import NextLink from "next/link";
 import {shortenHash, getParams} from '../../utils/helpers';
-import {getSubgraphData, createObject, getNFTobject} from '../../utils/graphQueries';
+import {getSubgraphData } from '../../utils/graphQueries';
+import { createObject } from '../../utils/nftHelpers';
 
 export default function ArtistView() {
   const [artistAddress, setArtistAddres] = useState('');
@@ -16,31 +15,19 @@ export default function ArtistView() {
 
   useEffect(async()=>{
     let address = getParams('artist');
-    console.log('address',address)
-      if(address){
+    if(address){
       setArtistAddres(address)
       let objects = await getSubgraphData('creator',address)
       Promise.all(objects.fraktalNfts.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
     }
   },[])
 
-  const demoNFTItemsFull: FrakCard[] = Array.from({ length: 3 }).map(
-    (_, index) => ({
-      id: index + 1,
-      name: "Golden Fries Cascade",
-      imageURL: "/filler-image-1.png",
-      contributions: BigNumber.from(5).div(100),
-      createdAt: new Date().toISOString(),
-      countdown: new Date("06-25-2021"),
-    })
-  );
-  const minAddress = (artistAddress) => shortenHash(artistAddress);
   return (
     <VStack spacing="0" mb="12.8rem">
       <Head>
         <title>Fraktal - Artist</title>
       </Head>
-      <div className={styles.header}>{minAddress(artistAddress)}</div>
+      <div className={styles.header}>{shortenHash(artistAddress)}</div>
       {nftItems.length ? (
         <>
           <Grid

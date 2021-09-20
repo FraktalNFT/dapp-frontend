@@ -4,6 +4,12 @@ export const LARGEST_UINT256 = BigNumber.from(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 );
 
+export const contracts = [
+  {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+  {providerChainId:4, address:'0xFf3532447a93497471279150602B6ec24ae1170f'},
+  {providerChainId:5, address:'0xA916BbdB90bA3BA7DCca09F2D3B249180f7fE0D2'}
+]
+
 export const networkNames = {
   1: "ETH Mainnet",
   42: "Kovan Testnet",

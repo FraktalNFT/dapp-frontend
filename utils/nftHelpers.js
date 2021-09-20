@@ -1,0 +1,155 @@
+const { create, CID } = require('ipfs-http-client');
+import { utils } from "ethers";
+import { getSubgraphData } from './graphQueries';
+
+const ipfsClient = create({
+  host: "ipfs.infura.io",
+  port: "5001",
+  protocol: "https",});
+
+// Convert Binary Into JSON
+const binArrayToJson = function(binArray)
+{
+    var str = "";
+    for (var i = 0; i < binArray.length; i++) {
+        str += String.fromCharCode(parseInt(binArray[i]));
+    }
+    return JSON.parse(str)
+};
+
+function checkImageCID(cid){ // this does not handle others than IPFS... correct THAT!
+  let correctedCid
+  if(cid.startsWith('https://ipfs.io/')){
+    let splitted = cid.split('https://ipfs.io/ipfs/')
+    correctedCid = splitted[1]
+    let cidv1 = toBase32(correctedCid)
+    return `https://${cidv1}.ipfs.dweb.link`
+  }else if (cid.startsWith('Qm')){
+      correctedCid = cid
+      let cidv1 = toBase32(correctedCid)
+      return `https://${cidv1}.ipfs.dweb.link`
+  }else{
+    return cid;
+  }
+};
+
+function toBase32(value) { // to transform V0 to V1 and use as `https://${cidV1}.ipfs.dweb.link`
+  var cid = new CID(value)
+  return cid.toV1().toBaseEncodedString('base32')
+};
+
+async function fetchNftMetadata(hash){
+  if(hash.startsWith('Qm')){
+    let chunks
+    for await (const chunk of ipfsClient.cat(hash)) {
+      chunks = binArrayToJson(chunk);
+    }
+    return chunks;
+  } else {
+    let res = await fetch(hash)
+    if(res){
+      let result = res.json()
+      return result
+    }
+  }
+};
+
+async function getFraktalData(address){
+  let data = await getSubgraphData('fraktal', address);
+  if(data?.fraktalNfts?.length){
+    return {
+      fraktalId:data.fraktalNfts[0].marketId,
+      collateral:data.fraktalNfts[0].collateral
+    };
+  } else {
+    return {fraktalId:null, collateral:null};
+  }
+}
+
+export async function createOpenSeaObject(data){
+  try{
+    let response = {
+      id: data.asset_contract.address,
+      creator:data.creator.address,
+      token_schema: data.asset_contract.schema_name,
+      tokenId: data.token_id,
+      createdAt: data.asset_contract.created_date,
+      name: data.name,
+      imageURL: data.image_url,
+      marketId: null,
+      collateral: null,
+      collateralType: null,
+    }
+    // console.log('address',data.asset_contract.address)
+    let fraktalData = await getFraktalData(data.asset_contract.address);
+    // console.log('fraktaldata',fraktalData)
+    if(fraktalData?.fraktalId?.length){
+      response.marketId = fraktalData.fraktalId;
+    }
+    if(fraktalData.collateral){
+      response.collateral = fraktalData.collateral.id;
+      response.collateralType = fraktalData.collateral.type;
+    }
+    return response;
+  }catch{
+    return null;
+  }
+}
+
+export async function createObject(data){
+  // handle token_schema
+
+  // ERC721 + ipfs(?)
+  // let hashHacked = data.hash.substring(0, data.hash.length - 1)
+  // this should be handled as isERC721? then split tokenId from the end of hash...continue
+  // OR..
+  // read the contract and get the URI, we have the token address and token index
+
+  // and possibly tokenId
+
+  try{
+    let nftMetadata = await fetchNftMetadata(data.hash)
+    // console.log('meta',nftMetadata)
+    if(nftMetadata){
+      return {
+        id: data.id,
+        creator:data.creator.id,
+        owner: data.owner.id,
+        marketId: data.marketId,
+        balances: data.fraktions,
+        createdAt: data.createdAt,
+        status: data.status,
+        name: nftMetadata.name,
+        description: nftMetadata.description,
+        imageURL: checkImageCID(nftMetadata.image),
+      }
+    }
+  }catch{
+    console.log('Error fetching ',data);
+    return null;
+  }
+};
+export async function createListed(data){
+  try{
+    let nftMetadata = await fetchNftMetadata(data.fraktal.hash)
+    if(nftMetadata){
+      return {
+        creator:data.fraktal.creator.id,
+        marketId: data.fraktal.marketId,
+        createdAt: data.fraktal.createdAt,
+        tokenAddress: data.fraktal.id,
+        owner: data.fraktal.owner.id,
+        raised: data.gains,
+        id: data.id,
+        price:utils.formatEther(data.price),
+        amount: data.amount,
+        seller: data.seller.id,
+        name: nftMetadata.name,
+        description: nftMetadata.description,
+        imageURL: checkImageCID(nftMetadata.image),
+      }
+    }
+  }catch (err){
+    console.log('Error',err);
+  }
+};

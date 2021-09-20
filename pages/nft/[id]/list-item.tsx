@@ -7,13 +7,14 @@ import { Image } from "@chakra-ui/image";
 import styles from "./auction.module.css";
 import FrakButton from '../../../components/button';
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
-import {getSubgraphData, createObject, createListed} from '../../../utils/graphQueries';
+import { getSubgraphData } from '../../../utils/graphQueries';
+import { createObject, createListed } from '../../../utils/nftHelpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
 import {
   listItem,
-  lockShares,
-  transferToken,
-  unlockShares,
+  // lockShares,
+  // transferToken,
+  // unlockShares,
   unlistItem,
   fraktionalize,
   defraktionalize,
@@ -61,9 +62,9 @@ export default function ListNFTView() {
     if(account && nftObject && contractAddress) {
       let approvedTokens;
       try {
-        approvedTokens = await getIsApprovedForAll(nftObject.id);        
+        approvedTokens = await getIsApprovedForAll(nftObject.id);
         setIsApproved(approvedTokens);
-        console.log('approved',approvedTokens);
+        // console.log('approved',approvedTokens);
       }catch(e){
         console.log('Error: ',e);
       }
@@ -126,15 +127,14 @@ export default function ListNFTView() {
     }
   }
   async function listNewItem(){
-    let tx = await listItem(
+    listItem(
       index,
       totalAmount,
       utils.parseUnits(totalPrice).div(totalAmount),
       provider,
-      contractAddress)
-    if(tx) {
-      router.push('/');
-    }
+      contractAddress).then(()=>{
+        router.push('/');
+      })
   }
 
   async function prefraktionalize(id){
@@ -158,10 +158,9 @@ export default function ListNFTView() {
       }
   }
   async function approveContract(){
-    let done = await approveMarket(contractAddress, provider, nftObject.id)
-    if(done){
+    approveMarket(contractAddress, provider, nftObject.id).then(()=>{
       setIsApproved(true)
-    }
+    })
   }
   return (
     <VStack spacing="0" mb="12.8rem">
