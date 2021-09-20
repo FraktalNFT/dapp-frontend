@@ -153,7 +153,9 @@ export default function ManageNFTView() {
 
   async function voteOnOffer(index){
     let tx = await voteOffer(offers[index].offerer.id, nftObject.id, provider, contractAddress)
-    tx.then(()=> router.reload());
+    if(tx){
+      router.reload();
+    }
   }
 
   async function claimFraktal(){

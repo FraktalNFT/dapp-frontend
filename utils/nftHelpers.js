@@ -80,9 +80,9 @@ export async function createOpenSeaObject(data){
       collateral: null,
       collateralType: null,
     }
-    console.log('address',data.asset_contract.address)
+    // console.log('address',data.asset_contract.address)
     let fraktalData = await getFraktalData(data.asset_contract.address);
-    console.log('fraktaldata',fraktalData)
+    // console.log('fraktaldata',fraktalData)
     if(fraktalData?.fraktalId?.length){
       response.marketId = fraktalData.fraktalId;
     }

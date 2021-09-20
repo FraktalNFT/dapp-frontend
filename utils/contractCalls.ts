@@ -10,6 +10,7 @@ const defraktionalizeAbi = ["function defraktionalize(uint256 _tokenId)"];
 const getApprovedAbi = ["function isApprovedForAll(address account,address operator) external view returns (bool)"];
 const getMaxPriceAbi = ["function maxPriceRegistered(address) view returns (uint256)"];
 const getLockedSharesAbi = ["function lockedShares(address) public view returns (uint256)"];
+const getLockedToAbi = ["function lockedToTotal(address) public view returns (uint256)"];
 const approveAbi = ["function setApprovalForAll(address operator, bool approved)"];
 const unlockAbi = ["function unlockSharesTransfer(address _to)"];
 const lockAbi = ["function lockSharesTransfer(uint numShares, address _to)"];
@@ -35,6 +36,7 @@ const calls = [
   {name:'getApproved', abi: getApprovedAbi,contract:'token'},
   {name:'getMaxPrice', abi: getMaxPriceAbi,contract:'token'},
   {name:'getLocked', abi: getLockedSharesAbi,contract:'token'},
+  {name:'getLockedTo', abi: getLockedToAbi,contract:'token'},
   {name:'Approve', abi: approveAbi,contract:'token'},
   {name:'Unlock', abi: unlockAbi,contract:'token'},
   {name:'Lock', abi: lockAbi,contract:'token'},
@@ -67,6 +69,12 @@ export async function getMinimumOffer(tokenAddress, provider, marketContract) {
 }
 
 export async function getLocked(account, tokenAddress, provider) {
+  const customContract = new Contract(tokenAddress, getLockedSharesAbi, provider);
+  let lockedShares = await customContract.lockedShares(account)
+  return lockedShares.toNumber();
+}
+
+export async function getLockedTo(account, tokenAddress, provider) {
   const customContract = new Contract(tokenAddress, getLockedSharesAbi, provider);
   let lockedShares = await customContract.lockedShares(account)
   return lockedShares.toNumber();

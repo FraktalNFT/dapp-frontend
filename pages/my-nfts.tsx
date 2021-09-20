@@ -8,6 +8,7 @@ import NextLink from "next/link";
 import styles from "../styles/my-nfts.module.css";
 import FrakButton from "../components/button";
 import { useWeb3Context } from '../contexts/Web3Context';
+import { utils } from 'ethers';
 import { getSubgraphData } from '../utils/graphQueries';
 import { createObject, createOpenSeaObject } from '../utils/nftHelpers';
 import {
@@ -18,7 +19,10 @@ import {
   claimERC721,
   approveMarket,
   importERC721,
-  importERC1155
+  importERC1155,
+  getApproved,
+  getLockedTo,
+  makeOffer
 } from '../utils/contractCalls';
 import { assetsInWallet } from '../utils/openSeaAPI';
 import { useRouter } from 'next/router';
@@ -40,11 +44,11 @@ export default function MyNFTsView() {
     return objects;
   };
 
-  async function takeOutOffer() {
+  async function takeOutOffer(address) {
     try {
       let tx = await makeOffer(
-        utils.parseEther(0),
-        nftObject.tokenAddress,
+        utils.parseEther('0'),
+        address,
         provider,
         contractAddress);
       if(tx){
@@ -56,11 +60,21 @@ export default function MyNFTsView() {
   }
 
   async function claimNFT(item){
+// check approval
+    let approved = await getApproved(account, contractAddress, provider, item.id);
+    let done:Boolean;
+    if(!approved){
+      done = await approveContract(item.id);
+    } else {
+      done = true;
+    }
     let tx;
-    if(item.collateralType == 'ERC721'){
-      tx = await claimERC721(item.marketId, provider, contractAddress)
-    }else{
-      tx = await claimERC1155(item.marketId, provider, contractAddress)
+    if(done){
+      if(item.collateralType == 'ERC721'){
+        tx = await claimERC721(item.marketId, provider, contractAddress)
+      }else{
+        tx = await claimERC1155(item.marketId, provider, contractAddress)
+      }
     }
     if(tx){
       router.push('/my-nfts');
@@ -79,6 +93,7 @@ export default function MyNFTsView() {
 
   async function approveContract(tokenAddress){
     let done = await approveMarket(contractAddress, provider, tokenAddress)
+    return done;
   }
 
   async function importNFT(item){
@@ -108,7 +123,7 @@ export default function MyNFTsView() {
           totalNFTs = nftsERC721_wallet.concat(nftsERC1155_wallet);
           let nftObjects = await Promise.all(totalNFTs.map(x=>{return createOpenSeaObject(x)}))
           if(nftObjects){
-            let nftObjectsClean = nftObjects.filter(x=>{return x != null});
+            let nftObjectsClean = nftObjects.filter(x=>{return x != null && x.imageURL.length});
             setNftItems(nftObjectsClean)
         }else{
           setNftItems([])
@@ -132,13 +147,26 @@ export default function MyNFTsView() {
 
   useEffect(async () => {
     if(account && nftItems){
-      // bought items
+      let userOffers;
       let fetchOffers = await getUserOffers();
       let openSeaAssetsAddresses = nftItems.map(x=>{return x.id});
       if(fetchOffers){
         let offersMade = fetchOffers.users[0].offersMade.filter(x=> {return !openSeaAssetsAddresses.includes(x.fraktal.id) && (x.fraktal.status == "open" || x.fraktal.status == "sold")})
         if(offersMade && offersMade.length){
-          let userOffers = await Promise.all(offersMade.map(x=>{return createObject(x.fraktal)}))
+          let soldOffers = offersMade.filter(x=> {return x.fraktal.status == 'sold'})
+          let openOffers = offersMade.filter(x=> {return x.fraktal.status != 'sold'})
+          if(soldOffers){
+            soldOffers.map(async x => {
+              getLockedTo(account,x.fraktal.id,provider).then(votes => {
+                if(votes >= 8000){
+                  Object.assign(x.fraktal, { status: 'buyer'});
+                }
+              })
+            })
+            console.log('sold offers ',await soldOffers)
+          }
+          let totalOffers = openOffers.concat(soldOffers)
+          userOffers = await Promise.all(totalOffers.map(x=>{return createObject(x.fraktal)}))
           setOffers(userOffers);
         }
       }
@@ -264,15 +292,7 @@ export default function MyNFTsView() {
           >
           {offers && offers.map(item => (
             <div key={item.id}>
-            {item.status == 'open' ?
-              <div>
-                <NFTItem
-                  item={item}
-                  onClick={()=>takeOutOffer()}
-                  CTAText="Take out offer"
-                />
-              </div>
-              :
+            {item.status == "buyer" ?
               <div>
                 <NFTItem
                   item={item}
@@ -280,7 +300,14 @@ export default function MyNFTsView() {
                   CTAText="Claim Fraktal"
                 />
               </div>
-
+              :
+              <div>
+                <NFTItem
+                  item={item}
+                  onClick={()=>takeOutOffer(item.id)}
+                  CTAText="Take out offer"
+                />
+              </div>
             }
             </div>
           ))}
