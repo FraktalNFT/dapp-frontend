@@ -96,13 +96,26 @@ export default function MyNFTsView() {
 
   async function importNFT(item){
     let res;
-    // overflow problem with opensea assets.. subid toooo big
-    if(item.token_schema == 'ERC721'){
-      res = importERC721(parseInt(item.tokenId), item.id, provider, contractAddress)
-    } else if (item.token_schema = 'ERC1155' && item.marketId == null) {
-      res = importERC1155(parseInt(item.tokenId), item.id, provider, contractAddress)
+    let done;
+    let approved = await getApproved(account, contractAddress, provider, item.id);
+    // console.log('is approved?',approved)
+    if(!approved){
+      done = await approveContract(item.id);
     } else {
-        await approveContract(item.id).then(()=>fraktionalize(parseInt(item.marketId), provider, contractAddress));
+      done = true;
+    }
+    // overflow problem with opensea assets.. subid toooo big
+    if(done){
+      if(item.token_schema == 'ERC721'){
+        res = await importERC721(parseInt(item.tokenId), item.id, provider, contractAddress)
+      } else if (item.token_schema = 'ERC1155' && item.marketId == null) {
+        res = await importERC1155(parseInt(item.tokenId), item.id, provider, contractAddress)
+      } else {
+        res = await approveContract(item.id).then(()=>fraktionalize(parseInt(item.marketId), provider, contractAddress));
+      }
+    }
+    if(res){
+      router.reload();
     }
   }
   useEffect(async()=>{

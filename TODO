@@ -1,6 +1,5 @@
 TODO::
 --------------------------------------------------------------------------------
-Re-organize everything.. keep functions in library and improve filtering data.
 
 BUGS:
 
@@ -9,13 +8,10 @@ BUGS:
   - IMPLEMENT CLONE PROXY! (https://docs.openzeppelin.com/contracts/4.x/api/proxy#TransparentUpgradeableProxy)
   - User can unlock and keep voting, but result is taken from total locked attribute
   - what happens when an item sold is unvoted? it does not lose the 'sold' status!
+  - Opensea assets in rinkeby have id > uint256 !! they fail on import (overflow)
 
   UI
   ------------------------------------------------------------------------------------------------
->>>>    - My-nfts : add getIsBuyer function (reads getLockedTo(account) and if >80% sets claim fraktal vs take out offer)
-  claim collateral must check for approval and do it before..
-
-  - Before the buyer claims, its not possible to claim the revenues, pospone and check it has been created
   - My NFTs reads and handle arbitrarely some NFTs (ERC1155 subId 1 are considered fraktions by 'default')
   - Opensea API is veery slow to detect transfers
   - Read account shares (minus total released) in revenues contracts.. display if only.
