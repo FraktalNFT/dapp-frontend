@@ -46,21 +46,19 @@ export default function MyNFTsView() {
 
   async function takeOutOffer(address) {
     try {
-      let tx = await makeOffer(
+      makeOffer(
         utils.parseEther('0'),
         address,
         provider,
-        contractAddress);
-      if(tx){
+        contractAddress).then(()=>{
           router.push('/my-nfts');
-      }
+        })
     }catch(e){
       console.log('There has been an error: ',e)
     }
   }
 
   async function claimNFT(item){
-// check approval
     let approved = await getApproved(account, contractAddress, provider, item.id);
     let done:Boolean;
     if(!approved){
@@ -83,7 +81,7 @@ export default function MyNFTsView() {
 
   async function claimFraktal(id) {
     try {
-      claimFraktalSold(id, provider, contractAddress).then(()=>{
+      await claimFraktalSold(id, provider, contractAddress).then(()=>{
         router.push('/my-nfts');
       });
     } catch(err){
@@ -163,7 +161,6 @@ export default function MyNFTsView() {
                 }
               })
             })
-            console.log('sold offers ',await soldOffers)
           }
           let totalOffers = openOffers.concat(soldOffers)
           userOffers = await Promise.all(totalOffers.map(x=>{return createObject(x.fraktal)}))

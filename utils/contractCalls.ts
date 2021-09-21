@@ -75,8 +75,8 @@ export async function getLocked(account, tokenAddress, provider) {
 }
 
 export async function getLockedTo(account, tokenAddress, provider) {
-  const customContract = new Contract(tokenAddress, getLockedSharesAbi, provider);
-  let lockedShares = await customContract.lockedShares(account)
+  const customContract = new Contract(tokenAddress, getLockedToAbi, provider);
+  let lockedShares = await customContract.lockedToTotal(account)
   return lockedShares.toNumber();
 }
 
