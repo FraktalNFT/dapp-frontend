@@ -64,7 +64,6 @@ export default function ListNFTView() {
       try {
         approvedTokens = await getIsApprovedForAll(nftObject.id);
         setIsApproved(approvedTokens);
-        // console.log('approved',approvedTokens);
       }catch(e){
         console.log('Error: ',e);
       }
@@ -76,17 +75,18 @@ export default function ListNFTView() {
   useEffect(async ()=>{
     const address = getParams('nft');
     const indexString = address.split('/list-item')
-    setIndex(parseFloat(indexString[0]))
+    const indexNumber = parseFloat(indexString[0]);
+    setIndex(indexNumber);
     if(account){
-      let listing = await getSubgraphData('listed_itemsId', `${account.toLocaleLowerCase()}-0x${indexString[0].toString(16)}`)
+      let hexIndex = indexNumber.toString(16);
+      let fraktionIdString = `${account.toLocaleLowerCase()}-0x${hexIndex}`;
+      let listing = await getSubgraphData('listed_itemsId', fraktionIdString);
       if(listing && listing.listItems.length > 0){
-        console.log('listing item',listing)
         setUpdating(true)
         setLocked(true)
         setTransferred(true)
         setUnlocked(true)
         let ownedFraktions = listing.listItems[0].fraktal.fraktions.find(x=> x.owner.id === account.toLocaleLowerCase())
-        console.log('account has ',ownedFraktions)
         setFraktions(ownedFraktions.amount)
         let nftObject = await createListed(listing.listItems[0])
         if(nftObject && account){
@@ -104,7 +104,6 @@ export default function ListNFTView() {
             let nftObjects = await createObject(obj.fraktalNfts[0])
             if(nftObjects && account ){
               setNftObject(nftObjects)
-              console.log('nftObjects',nftObjects)
               let userAmount = nftObjects.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
               if(userAmount){
                 setFraktions(userAmount.amount)
