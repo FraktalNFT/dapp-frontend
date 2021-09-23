@@ -6,10 +6,10 @@ import { useState, useEffect } from "react";
 import FrakButton from "../components/button";
 import Dropdown from "../components/dropdown";
 import NFTItem from "../components/nft-item";
-import Pagination from "../components/pagination";
 import { FrakCard } from "../types";
 import { getSubgraphData } from '../utils/graphQueries';
 import { createListed } from '../utils/nftHelpers';
+import InfiniteScroll from "react-infinite-scroll-component";
 const SORT_TYPES = ["Popular", "Ending Soonest", "Newly Listed"];
 
 const Home: React.FC = () => {
@@ -24,13 +24,26 @@ const Home: React.FC = () => {
 
   useEffect(async ()=>{
     setLoading(true);
-    let data = await getSubgraphData('listed_items','');
-    const dataOnSale = data.listItems.filter(x=>{return x.fraktal.status == 'open'});
-    if(dataOnSale){
-      Promise.all(dataOnSale.map(x=>{return createListed(x)})).then((results)=>setNftItems(results));
-    }
+    await getMoreListedItems();
+    // let data = await getSubgraphData('listed_items','');
+    // filter on graphQl
+    // const dataOnSale = data.listItems.filter(x=>{return x.fraktal.status == 'open'});
+    // if(dataOnSale){
+    //   Promise.all(dataOnSale.map(x=>{return createListed(x)})).then((results)=>setNftItems(results));
+    // }
     setLoading(false);
   },[])
+
+
+
+  const getMoreListedItems = async () => {
+  // should read where to start (nftItems.length) and add some items continously
+    const data = await getSubgraphData('listed_items','');
+    let dataOnSale = data.listItems.filter(x=>{return x.fraktal.status == 'open'});
+    if(dataOnSale){
+      Promise.all(dataOnSale.map(x=>{return createListed(x)})).then((results)=>setNftItems([...nftItems, ...results]));
+    }
+  };
 
   const demoNFTItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
     (_, index) => ({
@@ -77,20 +90,28 @@ const Home: React.FC = () => {
         <div>
         {nftItems.length ? (
           <>
-            <Grid
-              margin='0 !important'
-              mb='5.6rem !important'
-              w='100%'
-              templateColumns='repeat(3, 1fr)'
-              gap='3.2rem'
+            <InfiniteScroll
+              dataLength={nftItems.length}
+              next={getMoreListedItems}
+              // hasMore={hasMore}
+              style={{display:'ininline'}}
+              loader={<h3> Loading...</h3>}
+              endMessage={<h4>Nothing more to show</h4>}
             >
-              {nftItems.map(item => (
-                <NextLink key={item.id} href={`/nft/${item.id}/fix-price-sale`}>
+              <Grid
+                margin='0 !important'
+                mb='5.6rem !important'
+                w='100%'
+                templateColumns='repeat(3, 1fr)'
+                gap='3.2rem'
+              >
+                {nftItems.map(item => (
+                  <NextLink key={item.id} href={`/nft/${item.id}/fix-price-sale`}>
                   <NFTItem item={item} />
-                </NextLink>
-              ))}
-            </Grid>
-            <Pagination pageCount={21} handlePageClick={() => {}} />
+                  </NextLink>
+                ))}
+              </Grid>
+            </InfiniteScroll>
           </>
         ) : (
           <VStack>

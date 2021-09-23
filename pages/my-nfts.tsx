@@ -175,7 +175,7 @@ export default function MyNFTsView() {
               })
             })
           }
-          let totalOffers = openOffers.concat(soldOffers)
+          let totalOffers = openOffers.concat(await soldOffers)
           userOffers = await Promise.all(totalOffers.map(x=>{return createObject(x.fraktal)}))
           setOffers(userOffers);
         }
