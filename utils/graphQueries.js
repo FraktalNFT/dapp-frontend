@@ -174,7 +174,7 @@ const fraktal_fraktions_query = gql`
 // cannot get to work a fraktal filter (where:{status:"open"})
 const listedItems = gql`
   query{
-    listItems(first: 20, where:{amount_gt: 0}){
+    listItems(first: 100, where:{amount_gt: 0}){
       id
       price
       amount
