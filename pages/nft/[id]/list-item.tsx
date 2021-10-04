@@ -174,12 +174,12 @@ export default function ListNFTView() {
         <div className={styles.header}>{nftObject?nftObject.name:''}</div>
         <div className={styles.subheader}>{nftObject?nftObject.description:''}</div>
 
-        <HStack spacing="32px" marginTop="40px" align="flex-start">
+        <VStack spacing="32px" marginTop="40px" align="flex-center">
           <div>
               <Image
               src={nftObject?nftObject.imageURL:exampleNFT.imageURL}
-              w="300px"
-              h="300px"
+              w="100%"
+              h="100%"
               style={{ borderRadius: "4px 4px 0px 0px" }}
               />
             <div className={styles.NFTCard}>
@@ -299,7 +299,7 @@ export default function ListNFTView() {
           }
           </div>
           </div>
-        </HStack>
+        </VStack>
 
       </div>
     </VStack>

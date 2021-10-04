@@ -136,12 +136,12 @@ export default function FixPriceNFTView() {
         </Link>
 
         <div className={styles.header}>{nftObject?nftObject.name:''}</div>
-        <HStack spacing="32px" marginTop="40px" align="flex-start">
+        <VStack spacing="32px" marginTop="40px" align="flex-center">
           <div>
               <Image
               src={nftObject?nftObject.imageURL:exampleNFT.imageURL}
-              w="300px"
-              h="300px"
+              w="100%"
+              h="100%"
               style={{ borderRadius: "4px 4px 0px 0px" }}
               />
             <div className={styles.NFTCard}>
@@ -300,7 +300,7 @@ export default function FixPriceNFTView() {
           </div>
 
 
-        </HStack>
+        </VStack>
 
       </div>
     </VStack>

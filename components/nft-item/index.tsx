@@ -24,8 +24,8 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
         onClick={onClick}
         ref={ref}
       >
-        <Box minH='30rem' w='100%' position='relative' >
-          <Image src={item.imageURL} width='100%' height='100%' style={{verticalAlign:'auto'}}/>
+        <Box h='35rem' w='100%' position='relative' >
+          <Image src={item.imageURL} width='100%' height='100%' objectFit='cover' margin-left='auto' margin-right='auto' display='flex' maxH='35rem' style={{verticalAlign:'middle'}}/>
           {item.countdown && (
             <VStack
               spacing='0'
