@@ -49,12 +49,12 @@ export default function ClosedNFTView() {
         </Link>
         <div className={styles.header}>{nftObject?nftObject.name:'loading'}</div>
         <div style={{textAlign: 'center', color: 'grey', fontSize:'21px', fontWeight:'bold'}}>{nftObject?nftObject.description:'loading'}</div>
-        <HStack spacing="32px" marginTop="40px" align="flex-start">
+        <VStack spacing="32px" marginTop="40px" align="flex-center">
           <div>
             <Image
               src={nftObject?nftObject.imageURL:exampleNFT.imageURL}
-              w="300px"
-              h="300px"
+              w="100%"
+              h="100%"
               style={{ borderRadius: "4px 4px 0px 0px" }}
             />
             <div className={styles.NFTCard}>
@@ -175,7 +175,7 @@ export default function ClosedNFTView() {
               )}
             </div>
           </div>
-        </HStack>
+        </VStack>
       </div>
     </VStack>
   );
