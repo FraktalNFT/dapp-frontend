@@ -15,7 +15,7 @@ import {shortenHash, timezone, getParams} from '../../../utils/helpers';
 import { getSubgraphData } from '../../../utils/graphQueries';
 import { createListed } from '../../../utils/nftHelpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
-import { buyFraktions, makeOffer, claimFraktalSold, getMinimumOffer } from '../../../utils/contractCalls';
+import { buyFraktions, makeOffer, claimFraktalSold } from '../../../utils/contractCalls';
 import { useRouter } from 'next/router';
 
 export default function FixPriceNFTView() {
@@ -77,18 +77,18 @@ export default function FixPriceNFTView() {
       }
   }
 
-  useEffect(async () => {
-    if(nftObject && contractAddress){
-      let minPriceParsed;
-      try{
-        let minPrice = await getMinimumOffer(nftObject.tokenAddress, provider, contractAddress)
-        minPriceParsed = utils.formatEther(minPrice);
-      }catch {
-        minPriceParsed = 0.
-      }
-      setMinOffer(minPriceParsed);
-    }
-  },[nftObject, contractAddress])
+  // useEffect(async () => {
+  //   if(nftObject && contractAddress){
+  //     let minPriceParsed;
+  //     try{
+  //       let minPrice = await getMinimumOffer(nftObject.tokenAddress, provider, contractAddress)
+  //       minPriceParsed = utils.formatEther(minPrice);
+  //     }catch {
+  //       minPriceParsed = 0.
+  //     }
+  //     setMinOffer(minPriceParsed);
+  //   }
+  // },[nftObject, contractAddress])
 
   async function launchOffer() {
     try {

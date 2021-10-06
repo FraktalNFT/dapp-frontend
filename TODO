@@ -7,12 +7,11 @@ BUGS:
   ------------------------------------------------------------------------------------------------
   - IMPLEMENT CLONE PROXY! (https://docs.openzeppelin.com/contracts/4.x/api/proxy#TransparentUpgradeableProxy)
   - User can unlock and keep voting, but result is taken from total locked attribute
-  - what happens when an item sold is unvoted? it does not lose the 'sold' status!
   - Opensea assets in rinkeby have id > uint256 !! they fail on import (overflow)
 
   UI
   ------------------------------------------------------------------------------------------------
-  - My NFTs reads and handle arbitrarely some NFTs (ERC1155 subId 1 are considered fraktions by 'default')
+  - CONNECT THE CLAIM COLLATERAL FUNCTION!
   - Opensea API is veery slow to detect transfers
   - Read account shares (minus total released) in revenues contracts.. display if only.
   - There is no tx handler (besides metamask)
@@ -23,7 +22,6 @@ BUGS:
 
   SUBGRAPH
 ------------------------------------------------------------------------------------------------
+  - IS NOT GETTING MARKET EVENTS! (check out how to have 2 contracts to follow (factory & market))
   - Does not detect ERC1155 transfers so ownership is not followed.
-  - When importing NFTs, subgraph duplicates the fraktions. Minted event its called from the market.
-  - claim fraktal does not change ownership
   - in revenues, add a timedate for reference

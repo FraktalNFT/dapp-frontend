@@ -3,18 +3,51 @@
 
 import { Contract } from "@ethersproject/contracts";
 import { loadSigner, processTx } from './helpers';
+//tested
+const factoryAbi = [
+  "function mint(string urlIpfs, uint16 majority)",
+  "function importERC721(address _tokenAddress, uint256 _tokenId, uint16 majority)",
+  "function importERC1155(address _tokenAddress, uint256 _tokenId, uint16 majority)",
+  "function claimERC721(uint256 _tokenId)",
+  "function claimERC1155(uint256 _tokenId)",
+]
+const marketAbi = [
+  "function importFraktal(address tokenAddress, uint256 fraktionsIndex)",
+  "function rescueEth()",
+  "function buyFraktions(address from, uint256 _tokenId, uint16 _numberOfShares) payable",
+  "function claimFraktal(uint256 _tokenId)",
+  "function voteOffer(address offerer, address tokenAddress)",
+  "function makeOffer(address tokenAddress, uint256 _value) payable"
+]
+const tokenAbi = [
+  "function isApprovedForAll(address account,address operator) external view returns (bool)",
+  "function makeSafeTransfer(address _to,uint256 _tokenId,uint256 _subId,uint256 _amount)",
+  "function getLockedShares(uint256 index, address who) public view returns(uint)",
+  "function getFraktionsIndex() public view returns (uint256)",
+  "function getLockedToTotal(uint256 index, address who) public view returns(uint)",
+  "function fraktionalize(uint256 _tokenId)",
+  "function defraktionalize(uint256 _tokenId)",
+  "function setApprovalForAll(address operator, bool approved)",
+  "function unlockSharesTransfer(address from, address _to)",
+  "function lockSharesTransfer(address from, uint numShares, address _to)",
+  "function createRevenuePayment() payable",
+]
+const mintAbi = ["function mint(string urlIpfs, uint16 majority)"];
+const importERC721Abi = ["function importERC721(address _tokenAddress, uint256 _tokenId, uint16 majority)"];
+const importERC1155Abi = ["function importERC1155(address _tokenAddress, uint256 _tokenId, uint16 majority)"];
+const claimERC721Abi = ['function claimERC721(uint256 _tokenId)'];
+const claimERC1155Abi = ['function claimERC1155(uint256 _tokenId)'];
+const getApprovedAbi = ["function isApprovedForAll(address account,address operator) external view returns (bool)"];
+const getLockedSharesAbi = ["function getLockedShares(uint256 index, address who) public view returns(uint)"];
+const getLockedToAbi = ["function getLockedToTotal(uint256 index, address who) public view returns(uint)"];
 
+// TODO
 const transferAbi = ["function makeSafeTransfer(address _to,uint256 _tokenId,uint256 _subId,uint256 _amount)"];
 const fraktionalizeAbi = ["function fraktionalize(uint256 _tokenId)"];
 const defraktionalizeAbi = ["function defraktionalize(uint256 _tokenId)"];
-const getApprovedAbi = ["function isApprovedForAll(address account,address operator) external view returns (bool)"];
-const getMaxPriceAbi = ["function maxPriceRegistered(address) view returns (uint256)"];
-const getLockedSharesAbi = ["function lockedShares(address) public view returns (uint256)"];
-const getLockedToAbi = ["function lockedToTotal(address) public view returns (uint256)"];
 const approveAbi = ["function setApprovalForAll(address operator, bool approved)"];
-const unlockAbi = ["function unlockSharesTransfer(address _to)"];
-const lockAbi = ["function lockSharesTransfer(uint numShares, address _to)"];
-const mintAbi = ["function mint(string tokenURI)"];
+const unlockAbi = ["function unlockSharesTransfer(address from, address _to)"];
+const lockAbi = ["function lockSharesTransfer(address from, uint numShares, address _to)"];
 const listItemAbi = ["function listItem(uint256 _tokenId,uint256 _price,uint16 _numberOfShares)"];
 const unlistItemAbi = ["function unlistItem(uint256 _tokenId)"];
 const rescueEthAbi = ["function rescueEth()"];
@@ -23,60 +56,35 @@ const revenueAbi = ["function createRevenuePayment() payable"];
 const releaseAbi = ["function release()"];
 const claimAbi = ["function claimFraktal(uint256 _tokenId)"];
 const voteAbi = ["function voteOffer(address offerer, address tokenAddress)"];
-const importERC721Abi = ["function importERC721(address _tokenAddress, uint256 _tokenId)"];
-const importERC1155Abi = ["function importERC1155(address _tokenAddress, uint256 _tokenId)"];
-const claimERC721Abi = ['function claimERC721(uint256 _tokenId)'];
-const claimERC1155Abi = ['function claimERC1155(uint256 _tokenId)'];
 const makeOfferAbi = ["function makeOffer(address tokenAddress, uint256 _value) payable"];
-
-const calls = [
-  {name:'Transfer', abi: transferAbi, contract:'token'},
-  {name:'Fraktionalize', abi: fraktionalizeAbi, contract:'token'},
-  {name:'Defraktionalize', abi: defraktionalizeAbi,contract:'token'},
-  {name:'getApproved', abi: getApprovedAbi,contract:'token'},
-  {name:'getMaxPrice', abi: getMaxPriceAbi,contract:'token'},
-  {name:'getLocked', abi: getLockedSharesAbi,contract:'token'},
-  {name:'getLockedTo', abi: getLockedToAbi,contract:'token'},
-  {name:'Approve', abi: approveAbi,contract:'token'},
-  {name:'Unlock', abi: unlockAbi,contract:'token'},
-  {name:'Lock', abi: lockAbi,contract:'token'},
-  {name:'Mint', abi: mintAbi,contract:'market'},
-  {name:'ListItem', abi: listItemAbi,contract:'market'},
-  {name:'UnlistItem', abi: unlistItemAbi,contract:'market'},
-  {name:'Rescue', abi: rescueEthAbi,contract:'market'},
-  {name:'Buy', abi: buyAbi,contract:'market'},
-  {name:'Revenue', abi: revenueAbi,contract:'token'},
-  {name:'Release', abi: releaseAbi,contract:'revenue'},
-  {name:'Claim', abi: claimAbi,contract:'market'},
-  {name:'Vote', abi: voteAbi,contract:'market'},
-  {name:'ImportERC721', abi: importERC721Abi,contract:'market'},
-  {name:'ImportERC1155', abi: importERC1155Abi,contract:'market'},
-  {name:'MakeOffer', abi: makeOfferAbi,contract:'market'}
-]
+const importFraktalAbi = ["function importFraktal(tokenAddress, fraktionsIndex)"];
+// const getMaxPriceAbi = ["function maxPriceRegistered(address) view returns (uint256)"];
 
 // View functions
 ///////////////////////////////////////////////////////////
-export async function getApproved(account, marketContract, provider, tokenContract) {
-  const customContract = new Contract(tokenContract, getApprovedAbi, provider);
-  let approved = await customContract.isApprovedForAll(account, marketContract)
+export async function getApproved(account, factoryContract, provider, tokenContract) {
+  const customContract = new Contract(tokenContract, tokenAbi, provider);
+  let approved = await customContract.isApprovedForAll(account, factoryContract)
   return approved;
 }
 
-export async function getMinimumOffer(tokenAddress, provider, marketContract) {
-  const customContract = new Contract(marketContract, getMaxPriceAbi, provider);
-  let maxPrice = await customContract.maxPriceRegistered(tokenAddress)
-  return maxPrice;
-}
+// export async function getMinimumOffer(tokenAddress, provider, marketContract) {
+//   const customContract = new Contract(marketContract, getMaxPriceAbi, provider);
+//   let maxPrice = await customContract.maxPriceRegistered(tokenAddress)
+//   return maxPrice;
+// }
 
 export async function getLocked(account, tokenAddress, provider) {
-  const customContract = new Contract(tokenAddress, getLockedSharesAbi, provider);
-  let lockedShares = await customContract.lockedShares(account)
+  const customContract = new Contract(tokenAddress, tokenAbi, provider);
+  let index = await customContract.getFraktionsIndex();
+  let lockedShares = await customContract.getLockedShares(index, account)
   return lockedShares.toNumber();
 }
 
 export async function getLockedTo(account, tokenAddress, provider) {
-  const customContract = new Contract(tokenAddress, getLockedToAbi, provider);
-  let lockedShares = await customContract.lockedToTotal(account)
+  const customContract = new Contract(tokenAddress, tokenAbi, provider);
+  let index = await customContract.getFraktionsIndex();
+  let lockedShares = await customContract.getLockedToTotal(index, account)
   return lockedShares.toNumber();
 }
 
@@ -135,10 +143,32 @@ export async function lockShares(amount,to, provider, tokenContract) {
   processTx(tx);
 }
 
+const defaultMajority = 8000; //later give this argument to the creator (or owner)
 export async function createNFT(hash, provider, contractAddress){
   const signer = await loadSigner(provider);
-  const customContract = new Contract(contractAddress, mintAbi, signer);
-  let tx = await customContract.mint(hash)
+  const customContract = new Contract(contractAddress, factoryAbi, signer);
+  let tx = await customContract.mint(hash, defaultMajority);
+  processTx(tx);
+}
+export async function importFraktal(tokenAddress, fraktionsIndex, provider, marketAddress){
+  const signer = await loadSigner(provider);
+  const override = {gasLimit:2000000}
+  const customContract = new Contract(marketAddress, marketAbi, signer);
+  let tx = await customContract.importFraktal(tokenAddress, fraktionsIndex, override);
+  processTx(tx);
+}
+export async function importERC721(tokenId, tokenAddress, provider, factoryAddress){
+  const signer = await loadSigner(provider);
+  const override = {gasLimit:2000000}
+  const customContract = new Contract(factoryAddress, importERC721Abi, signer);
+  let tx = await customContract.importERC721(tokenAddress,tokenId, defaultMajority, override)
+  processTx(tx);
+}
+export async function importERC1155(tokenId, tokenAddress, provider, factoryAddress){
+  const signer = await loadSigner(provider);
+  const override = {gasLimit:2000000}
+  const customContract = new Contract(factoryAddress, importERC1155Abi, signer);
+  let tx = await customContract.importERC1155(tokenAddress,tokenId, defaultMajority, override)
   processTx(tx);
 }
 
@@ -199,20 +229,6 @@ export async function voteOffer(offerer, tokenAddress, provider, marketAddress){
   const override = {gasLimit:2000000}
   const customContract = new Contract(marketAddress, voteAbi, signer);
   let tx = await customContract.voteOffer(offerer, tokenAddress, override)
-  processTx(tx);
-}
-export async function importERC721(tokenId, tokenAddress, provider, marketAddress){
-  const signer = await loadSigner(provider);
-  const override = {gasLimit:2000000}
-  const customContract = new Contract(marketAddress, importERC721Abi, signer);
-  let tx = await customContract.importERC721(tokenAddress,tokenId, override)
-  processTx(tx);
-}
-export async function importERC1155(tokenId, tokenAddress, provider, marketAddress){
-  const signer = await loadSigner(provider);
-  const override = {gasLimit:2000000}
-  const customContract = new Contract(marketAddress, importERC1155Abi, signer);
-  let tx = await customContract.importERC1155(tokenAddress,tokenId, override)
   processTx(tx);
 }
 export async function makeOffer(value, tokenAddress, provider, marketAddress){

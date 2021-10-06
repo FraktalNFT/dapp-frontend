@@ -15,6 +15,7 @@ import {
   rescueEth,
   claimFraktalSold,
   fraktionalize,
+  importFraktal,
   claimERC1155,
   claimERC721,
   approveMarket,
@@ -29,7 +30,7 @@ import { useRouter } from 'next/router';
 
 export default function MyNFTsView() {
   const router = useRouter();
-  const { account, provider, contractAddress } = useWeb3Context();
+  const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
   const [nftItems, setNftItems] = useState();
   const [fraktionItems, setFraktionItems] = useState();
   const [totalBalance, setTotalBalance] = useState(0);
@@ -50,7 +51,7 @@ export default function MyNFTsView() {
         utils.parseEther('0'),
         address,
         provider,
-        contractAddress).then(()=>{
+        marketAddress).then(()=>{
           router.push('/my-nfts');
         })
     }catch(e){
@@ -59,19 +60,19 @@ export default function MyNFTsView() {
   }
 
   async function claimNFT(item){
-    let approved = await getApproved(account, contractAddress, provider, item.id);
+    let approved = await getApproved(account, factoryAddress, provider, item.id);
     let done:Boolean;
     if(!approved){
-      done = await approveContract(item.id);
+      done = await approveContract(factoryAddress, item.id);
     } else {
       done = true;
     }
     let tx;
     if(done){
       if(item.collateralType == 'ERC721'){
-        tx = await claimERC721(item.marketId, provider, contractAddress)
+        tx = await claimERC721(item.marketId, provider, factoryAddress)
       }else{
-        tx = await claimERC1155(item.marketId, provider, contractAddress)
+        tx = await claimERC1155(item.marketId, provider, factoryAddress)
       }
     }
     if(tx){
@@ -89,32 +90,48 @@ export default function MyNFTsView() {
     }
   }
 
-  async function approveContract(tokenAddress){
-    let done = await approveMarket(contractAddress, provider, tokenAddress)
+  async function approveContract(contract, tokenAddress){
+    let done = await approveMarket(contract, provider, tokenAddress)
     return done;
   }
 
   async function importNFT(item){
     let res;
     let done;
-    let approved = await getApproved(account, contractAddress, provider, item.id);
+    let approved = await getApproved(account, factoryAddress, provider, item.id);
     // console.log('is approved?',approved)
     if(!approved){
-      done = await approveContract(item.id);
+      done = await approveContract(factoryAddress, item.id);
     } else {
       done = true;
     }
     // overflow problem with opensea assets.. subid toooo big
     if(done){
       if(item.token_schema == 'ERC721'){
-        res = await importERC721(parseInt(item.tokenId), item.id, provider, contractAddress)
-      } else if (item.token_schema = 'ERC1155' && item.marketId == null) {
-        res = await importERC1155(parseInt(item.tokenId), item.id, provider, contractAddress)
+        res = await importERC721(parseInt(item.tokenId), item.id, provider, factoryAddress)
       } else {
-        res = await approveContract(item.id).then(()=>fraktionalize(parseInt(item.marketId), provider, contractAddress));
+        res = await importERC1155(parseInt(item.tokenId), item.id, provider, factoryAddress)
       }
     }
-    if(res){
+    if(done && res){
+      router.reload();
+    }
+  }
+  async function importFraktalToMarket(item){
+    let res;
+    let done;
+    let approved = await getApproved(account, marketAddress, provider, item.id);
+    // console.log('is approved?',approved)
+    if(!approved){
+      done = await approveContract(marketAddress, item.id);
+    } else {
+      done = true;
+    }
+    // overflow problem with opensea assets.. subid toooo big
+    if(done){
+      res = await importFraktal(item.id,1,provider,marketAddress); // change 1 to fraktionsIndex.. should be changeable
+    }
+    if(done && res){
       router.reload();
     }
   }
@@ -161,7 +178,7 @@ export default function MyNFTsView() {
       let userOffers;
       let fetchOffers = await getUserOffers();
       let openSeaAssetsAddresses = nftItems.map(x=>{return x.id});
-      if(fetchOffers){
+      if(fetchOffers && fetchOffers.users.length){
         let offersMade = fetchOffers.users[0].offersMade.filter(x=> {return !openSeaAssetsAddresses.includes(x.fraktal.id) && (x.fraktal.status == "open" || x.fraktal.status == "sold")})
         if(offersMade && offersMade.length){
           let soldOffers = offersMade.filter(x=> {return x.fraktal.status == 'sold'})
@@ -202,13 +219,16 @@ export default function MyNFTsView() {
           gap='3.2rem'
         >
           {nftItems.map(item => (
-            <div key={item.id}>
+            <div key={item.id+'-'+item.tokenId}>
 
-            {item.collateral?
+
+            {item.token_schema == 'ERC1155' && item.tokenId == 0 ?
               <NFTItemOS
                 item={item}
-                CTAText={"Claim collateral"}
-                onClick={()=>claimNFT(item)}
+                CTAText={"Import to market"}
+                onClick={()=>importFraktalToMarket(item)} // No!! should handle import
+                // onCollateralRequest={claimNFT(item)}
+                // make the collateral claim from the component.
               />
                :
               <NFTItemOS

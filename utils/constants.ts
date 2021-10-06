@@ -9,6 +9,14 @@ export const contracts = [
   {providerChainId:4, address:'0xFf3532447a93497471279150602B6ec24ae1170f'},
   {providerChainId:5, address:'0xA916BbdB90bA3BA7DCca09F2D3B249180f7fE0D2'}
 ]
+export const marketContracts = [
+  {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+  {providerChainId:4, address:'0xc992FCC35b943842Ee4d1ab73a35aEc27E5ca851'},
+]
+export const factoryContracts = [
+  {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+  {providerChainId:4, address:'0x21F9e1837975D57b4C8cdB2576aa15dcB7268D34'},
+]
 
 export const networkNames = {
   1: "ETH Mainnet",
