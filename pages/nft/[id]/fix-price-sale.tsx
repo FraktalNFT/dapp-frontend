@@ -1,7 +1,3 @@
-// TODO:
-//  correct position of make offer
-// detect account offers, display possibility of increase of retreat
-
 import { HStack, VStack } from "@chakra-ui/layout";
 import React, {useEffect, useState} from "react";
 import Head from "next/head";
@@ -20,7 +16,7 @@ import { useRouter } from 'next/router';
 
 export default function FixPriceNFTView() {
   const router = useRouter();
-  const {account, provider, contractAddress} = useWeb3Context();
+  const {account, provider, marketAddress} = useWeb3Context();
   const [fraktalOwners, setFraktalOwners] = useState(1);
   const [nftObject, setNftObject] = useState();
   const [fraktionsToBuy, setFraktionsToBuy] = useState(0);
@@ -35,26 +31,23 @@ export default function FixPriceNFTView() {
       const address = getParams('nft');
       const index = address.split('/fix-price-sale')[0]
       let obj = await getSubgraphData('listed_itemsId',index)
-      console.log('obj',obj)
       if(obj && account){
         if(obj && obj.listItems){
           setFraktalOwners(obj.listItems[0].fraktal.fraktions.length)
+          let nftObjects = await createListed(obj.listItems[0])
+          if(nftObjects && marketAddress){
+            setNftObject(nftObjects)
+          }
           if(obj.listItems[0].fraktal.offers.length){
             let findSold = obj.listItems[0].fraktal.status == 'sold'
             if(findSold){
               setItemSold(true);
-              console.log('NFT sold', obj.listItems[0].fraktal.id)
             }
             let findOffer = obj.listItems[0].fraktal.offers.find(x => x.offerer.id == account.toLocaleLowerCase());
-            console.log('offer made', findOffer)
             if(findOffer){
               setIsOfferer(true);
             }
           }
-        }
-        let nftObjects = await createListed(obj.listItems[0])
-        if(nftObjects && contractAddress){
-          setNftObject(nftObjects)
         }
       }else{
         setNftObject()
@@ -67,11 +60,11 @@ export default function FixPriceNFTView() {
       try {
         await buyFraktions(
           nftObject.seller,
-          nftObject.marketId,
+          nftObject.tokenAddress,
           fraktionsToBuy,
           toPay(),
           provider,
-          contractAddress).then(()=>router.reload());
+          marketAddress).then(()=>router.reload());
       }catch(err){
         console.log('Error',err);
       }
@@ -96,7 +89,7 @@ export default function FixPriceNFTView() {
         utils.parseEther(offerValue),
         nftObject.tokenAddress,
         provider,
-        contractAddress).then(()=>{
+        marketAddress).then(()=>{
           router.push('/my-nfts');
         })
 

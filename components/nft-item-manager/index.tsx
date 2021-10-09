@@ -63,7 +63,7 @@ const NFTItemManager = forwardRef<HTMLDivElement, NFTItemProps>(
           <Text className='medium-16' mb='1.6rem'>
             {item.name}
           </Text>
-          <NextLink href={`/nft/${item.marketId}/list-item`}>
+          <NextLink href={`/nft/${item.id}/list-item`}>
             <FrakButton className='semi-16' py='.8rem' px='5.6rem'>
             Sell
             </FrakButton>

@@ -2,7 +2,7 @@ import { gql, request } from 'graphql-request';
 import { utils } from "ethers";
 const { CID } = require('ipfs-http-client');
 
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.1.3';
+const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.1.6';
 
 const creator_query = gql`
 query($id:ID!){
@@ -10,9 +10,6 @@ query($id:ID!){
     id
     marketId
     hash
-    owner {
-      id
-    }
     createdAt
     creator {
       id
@@ -20,6 +17,24 @@ query($id:ID!){
   }
   }
 `;
+
+
+const fraktions_query = gql`
+  query($id:ID!){
+    listItems(first:10, where:{fraktal:$id, amount_gt:0}) {
+      id
+      fraktal {
+        id
+      }
+      price
+  		amount
+      gains
+      seller{
+        id
+      }
+    }
+  }`;
+
 const owner_query = gql`
 query($id:ID!){
   fraktalNfts(where:{owner:$id}) {
@@ -39,13 +54,7 @@ query($id:ID!){
       tokenAddress
       value
     }
-    owner {
-      id
-    }
     fraktions {
-      owner {
-        id
-      }
       amount
       locked
     }
@@ -75,13 +84,7 @@ query($id:ID!){
       tokenAddress
       value
     }
-    owner {
-      id
-    }
     fraktions {
-      owner {
-        id
-      }
       amount
       locked
     }
@@ -97,9 +100,6 @@ query {
     id
     marketId
     hash
-    owner {
-      id
-    }
     createdAt
     creator {
       id
@@ -128,10 +128,6 @@ const account_fraktions_query = gql`
     fraktionsBalances(first:10, where:{owner:$id, amount_gt:0}){
       id
       amount
-      owner {
-        id
-        balance
-      }
       nft {
         id
         marketId
@@ -152,10 +148,6 @@ const fraktal_fraktions_query = gql`
     fraktionsBalances(first:10, where:{nft:$id, amount_gt:0}){
       id
       amount
-      owner {
-        id
-        balance
-      }
       nft {
         id
         marketId
@@ -183,17 +175,12 @@ const listedItems = gql`
         id
       }
       fraktal{
+        id
         hash
         marketId
         createdAt
         status
-        owner {
-          id
-        }
         fraktions {
-          owner{
-            id
-          }
           amount
         }
         creator {
@@ -220,14 +207,7 @@ const listedItemsId = gql`
         marketId
         createdAt
         transactionHash
-        owner{
-          id
-        }
         fraktions {
-          owner{
-            id
-            balance
-          }
           amount
         }
         offers (where: {value_gt: 0}) {
@@ -345,19 +325,14 @@ const fraktalId_query = gql`
         }
         value
         votes
+        timestamp
       }
       revenues {
         id
         tokenAddress
         value
       }
-      owner {
-        id
-      }
       fraktions {
-        owner {
-          id
-        }
         amount
         locked
       }
@@ -382,17 +357,18 @@ export const getSubgraphData = async (call, id) => {
 };
 
 const calls = [
-  {name: 'account_fraktions', call: account_fraktions_query},//
-  {name: 'marketid_fraktal', call: marketid_query},//
-  {name: 'listed_items', call: listedItems},//
-  {name: 'listed_itemsId', call: listedItemsId},//
-  {name: 'artists', call: creators_review},//
+  {name: 'account_fraktions', call: account_fraktions_query},
+  {name: 'marketid_fraktal', call: marketid_query},
+  {name: 'listed_itemsId', call: listedItemsId},
+  {name: 'artists', call: creators_review},
   {name: 'all', call: all_nfts},
-  {name: 'creator', call: creator_query},//
+  {name: 'creator', call: creator_query},
   {name: 'manage', call: fraktal_fraktions_query},
   {name: 'owned', call: owner_query},
   {name: 'wallet', call: user_wallet_query},
   {name: 'bought', call: user_bought_query},
   {name: 'offers', call: user_offers_query},
+  {name: 'listed_items', call: listedItems},
   {name: 'fraktal', call: fraktalId_query},
+  {name: 'fraktions', call: fraktions_query},
 ];

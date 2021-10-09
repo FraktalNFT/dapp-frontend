@@ -38,6 +38,7 @@ export default function MyNFTsView() {
 
   async function getAccountFraktions(){
     let objects = await getSubgraphData('wallet',account.toLocaleLowerCase())
+    console.log('fraktions wallet ',objects)
     return objects;
   };
   async function getUserOffers(){
@@ -271,7 +272,7 @@ export default function MyNFTsView() {
                 <div className={styles.claimHeader}>ETH</div>
                 <div className={styles.claimAmount}>{Math.round(totalBalance*1000)/1000}</div>
               </div>
-              <div className={styles.claimCTA} onClick={()=>rescueEth(provider, contractAddress).then(()=>router.reload())}>Claim</div>
+              <div className={styles.claimCTA} onClick={()=>rescueEth(provider, marketAddress).then(()=>router.reload())}>Claim</div>
             </div>
           </div>
           <Grid

@@ -39,7 +39,7 @@ const Home: React.FC = () => {
   const getMoreListedItems = async () => {
   // should read where to start (nftItems.length) and add some items continously
     const data = await getSubgraphData('listed_items','');
-    let dataOnSale = data.listItems.filter(x=>{return x.fraktal.status == 'open'});
+    let dataOnSale = data.listItems.filter(x=>{return x.fraktal.status == 'open'}); // this goes in the graphql query
     if(dataOnSale){
       Promise.all(dataOnSale.map(x=>{return createListed(x)})).then((results)=>setNftItems([...nftItems, ...results]));
     }
@@ -106,8 +106,8 @@ const Home: React.FC = () => {
                 gap='3.2rem'
               >
                 {nftItems.map(item => (
-                  <NextLink key={item.id} href={`/nft/${item.id}/fix-price-sale`}>
-                  <NFTItem item={item} />
+                  <NextLink key={item.id} href={`/nft/${item.tokenAddress}/details`}>
+                    <NFTItem item={item} />
                   </NextLink>
                 ))}
               </Grid>

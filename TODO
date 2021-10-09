@@ -1,11 +1,18 @@
 TODO::
 --------------------------------------------------------------------------------
+Everything on the nft will be in a /details page
+- Make components for the data displayers and functions
+  - Fraktions listed (and buy options)
+  - Offers (makeOffer & offers history & voting)
+  - Revenues (addRevenue & list of Revenues & claim)
+  
+
 
 BUGS:
 
   CONTRACTS:
   ------------------------------------------------------------------------------------------------
-  - IMPLEMENT CLONE PROXY! (https://docs.openzeppelin.com/contracts/4.x/api/proxy#TransparentUpgradeableProxy)
+  - IMPLEMENT CLONE PROXY to market! (https://docs.openzeppelin.com/contracts/4.x/api/proxy#TransparentUpgradeableProxy)
   - User can unlock and keep voting, but result is taken from total locked attribute
   - Opensea assets in rinkeby have id > uint256 !! they fail on import (overflow)
 
