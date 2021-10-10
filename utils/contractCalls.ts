@@ -29,12 +29,14 @@ const tokenAbi = [
   "function getFraktionsIndex() public view returns (uint256)",
   "function getLockedToTotal(uint256 index, address who) public view returns(uint)",
   "function fraktionalize(uint256 _tokenId)",
-  "function defraktionalize(uint256 _tokenId)",
+  "function defraktionalize() public",
   "function setApprovalForAll(address operator, bool approved)",
   "function unlockSharesTransfer(address from, address _to)",
   "function lockSharesTransfer(address from, uint numShares, address _to)",
   "function createRevenuePayment() payable",
   "function balanceOf(address account, uint256 id) external view returns (uint256)",
+  "function majority() public view returns (uint)",
+  "function fraktionsIndex() public view returns (uint256)"
 ]
 const mintAbi = ["function mint(string urlIpfs, uint16 majority)"];
 const importERC721Abi = ["function importERC721(address _tokenAddress, uint256 _tokenId, uint16 majority)"];
@@ -48,7 +50,7 @@ const getLockedToAbi = ["function getLockedToTotal(uint256 index, address who) p
 // TODO
 const transferAbi = ["function makeSafeTransfer(address _to,uint256 _tokenId,uint256 _subId,uint256 _amount)"];
 const fraktionalizeAbi = ["function fraktionalize(uint256 _tokenId)"];
-const defraktionalizeAbi = ["function defraktionalize(uint256 _tokenId)"];
+// const defraktionalizeAbi = ["function defraktionalize(uint256 _tokenId)"];
 // const approveAbi = ["function setApprovalForAll(address operator, bool approved)"];
 // const unlockAbi = ["function unlockSharesTransfer(address from, address _to)"];
 // const lockAbi = ["function lockSharesTransfer(address from, uint numShares, address _to)"];
@@ -70,6 +72,16 @@ export async function getApproved(account, factoryContract, provider, tokenContr
   const customContract = new Contract(tokenContract, tokenAbi, provider);
   let approved = await customContract.isApprovedForAll(account, factoryContract)
   return approved;
+}
+export async function getMajority(provider, tokenContract) {
+  const customContract = new Contract(tokenContract, tokenAbi, provider);
+  let majority = await customContract.majority();
+  return majority.toNumber();
+}
+export async function getFraktionsIndex(provider, tokenContract) {
+  const customContract = new Contract(tokenContract, tokenAbi, provider);
+  let index = await customContract.fraktionsIndex();
+  return index.toNumber();
 }
 export async function getBalanceFraktions(account, provider, tokenContract) {
   const customContract = new Contract(tokenContract, tokenAbi, provider);
@@ -114,32 +126,32 @@ export async function transferToken(tokenId, subId, amount, to, provider, contra
 
 export async function fraktionalize(id, provider, contract){
   const signer = await loadSigner(provider);
-  const customContract = new Contract(contract, fraktionalizeAbi, signer);
+  const customContract = new Contract(contract, tokenAbi, signer);
   let tx = await customContract.fraktionalize(id)
   processTx(tx);
 }
 export async function claimERC721(marketId, provider, contract){
   const signer = await loadSigner(provider);
-  const customContract = new Contract(contract, claimERC721Abi, signer);
+  const customContract = new Contract(contract, factoryAbi, signer);
   let tx = await customContract.claimERC721(marketId)
   processTx(tx);
 }
 export async function claimERC1155(marketId, provider, contract){
   const signer = await loadSigner(provider);
-  const customContract = new Contract(contract, claimERC1155Abi, signer);
+  const customContract = new Contract(contract, factoryAbi, signer);
   let tx = await customContract.claimERC1155(marketId)
   processTx(tx);
 }
-export async function defraktionalize(id, provider, contract){
+export async function defraktionalize(provider, contract){
   const signer = await loadSigner(provider);
-  const customContract = new Contract(contract, defraktionalizeAbi, signer);
-  let tx = await customContract.defraktionalize(id)
+  const customContract = new Contract(contract, tokenAbi, signer);
+  let tx = await customContract.defraktionalize()
   processTx(tx);
 }
 
 export async function approveMarket(to, provider, contract) {
   const signer = await loadSigner(provider);
-  const customContract = new Contract(contract, approveAbi, signer);
+  const customContract = new Contract(contract, tokenAbi, signer);
   let tx = await customContract.setApprovalForAll(to, true)
   processTx(tx);
 }
@@ -177,7 +189,7 @@ export async function importFraktal(tokenAddress, fraktionsIndex, provider, mark
 export async function importERC721(tokenId, tokenAddress, provider, factoryAddress){
   const signer = await loadSigner(provider);
   const override = {gasLimit:2000000}
-  const customContract = new Contract(factoryAddress, importERC721Abi, signer);
+  const customContract = new Contract(factoryAddress, factoryAbi, signer);
   let tx = await customContract.importERC721(tokenAddress,tokenId, defaultMajority, override)
   processTx(tx);
 }
@@ -185,7 +197,7 @@ export async function importERC721(tokenId, tokenAddress, provider, factoryAddre
 export async function importERC1155(tokenId, tokenAddress, provider, factoryAddress){
   const signer = await loadSigner(provider);
   const override = {gasLimit:2000000}
-  const customContract = new Contract(factoryAddress, importERC1155Abi, signer);
+  const customContract = new Contract(factoryAddress, factoryAbi, signer);
   let tx = await customContract.importERC1155(tokenAddress,tokenId, defaultMajority, override)
   processTx(tx);
 }
@@ -224,7 +236,7 @@ export async function buyFraktions(seller, tokenAddress,amount,value,provider,ma
 export async function createRevenuePayment(value, provider, fraktalAddress){
   const signer = await loadSigner(provider);
   const override = {value: value, gasLimit:700000}
-  const customContract = new Contract(fraktalAddress, revenueAbi, signer);
+  const customContract = new Contract(fraktalAddress, marketAbi, signer);
   let tx = await customContract.createRevenuePayment(override)
   processTx(tx);
 }
@@ -238,7 +250,7 @@ export async function release(provider, revenueAddress){
 export async function claimFraktalSold(tokenId, provider, marketAddress){
   const signer = await loadSigner(provider);
   const override = {gasLimit:700000}
-  const customContract = new Contract(marketAddress, claimAbi, signer);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
   let tx = await customContract.claimFraktal(tokenId, override)
   processTx(tx);
 }
@@ -246,7 +258,7 @@ export async function claimFraktalSold(tokenId, provider, marketAddress){
 export async function voteOffer(offerer, tokenAddress, provider, marketAddress){
   const signer = await loadSigner(provider);
   const override = {gasLimit:2000000}
-  const customContract = new Contract(marketAddress, voteAbi, signer);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
   let tx = await customContract.voteOffer(offerer, tokenAddress, override)
   processTx(tx);
 }

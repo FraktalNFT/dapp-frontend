@@ -2,7 +2,6 @@ import Head from "next/head";
 import Link from "next/link";
 import { utils } from "ethers";
 import FrakButton from '../../../components/button';
-import Button from "../../../components/button";
 import styles from "./auction.module.css";
 import { HStack, VStack } from "@chakra-ui/layout";
 import React, {useEffect, useState} from "react";
@@ -14,52 +13,82 @@ import {shortenHash, timezone, getParams} from '../../../utils/helpers';
 import { getSubgraphData } from '../../../utils/graphQueries';
 import { createObject } from '../../../utils/nftHelpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
-import { getBalanceFraktions, getMinimumOffer } from '../../../utils/contractCalls';
+import {
+  getBalanceFraktions,
+  getMinimumOffer,
+  unlistItem,
+  getApproved,
+  getFraktionsIndex,
+  isFraktalOwner
+} from '../../../utils/contractCalls';
 import { useRouter } from 'next/router';
 
 export default function DetailsView() {
   const router = useRouter();
   const [fraktalOwners, setFraktalOwners] = useState(1);
-  const [fraktionsToBuy, setFraktionsToBuy] = useState(0);
   const [valueSetter, setValueSetter] = useState(false);
   const [isOfferer, setIsOfferer] = useState(false);
   const [itemSold, setItemSold] = useState(false);
 
-  const {account, provider, marketAddress} = useWeb3Context();
+  const {account, provider, marketAddress, factoryAddress} = useWeb3Context();
   const [offers, setOffers] = useState();
   const [minOffer, setMinOffer] = useState(0.);
   const [nftObject, setNftObject] = useState();
   const [tokenAddress, setTokenAddress] = useState();
   const [fraktionsListed, setFraktionsListed] = useState([]);
+  const [userHasListed, setUserHasListed] = useState(false);
+  const [collateralNft, setCollateralNft] = useState();
+  const [fraktionsApproved, setFraktionsApproved] = useState(false);
+  const [factoryApproved, setFactoryApproved] = useState(false);
+  const [fraktionsIndex, setFraktionsIndex] = useState();
   const [userFraktions, setUserFraktions] = useState(0);
-
+  const [isOwner, setIsOwner] = useState(false);
 // use callbacks
   useEffect(async ()=>{
-      const tokenAddress = getParams('nft');
-      const tokenAddressSplitted = tokenAddress.split('/details')[0]
-      setTokenAddress(tokenAddressSplitted);
-      let fraktionsFetch = await getSubgraphData('fraktions',tokenAddressSplitted)
-      if(fraktionsFetch.listItems){
-        setFraktionsListed(fraktionsFetch.listItems)
-      }
+      if(account){
+        const tokenAddress = getParams('nft');
+        const tokenAddressSplitted = tokenAddress.split('/details')[0]
+        setTokenAddress(tokenAddressSplitted);
+        let fraktionsFetch = await getSubgraphData('fraktions',tokenAddressSplitted)
+        if(fraktionsFetch.listItems){
+          setFraktionsListed(fraktionsFetch.listItems)
+          let userFraktionsListed = fraktionsFetch.listItems.find(x=>x.seller.id == account.toLocaleLowerCase());
+          if(userFraktionsListed && userFraktionsListed.amount > 0){
+            setUserHasListed(true)
+          }
+        }
       let fraktalFetch = await getSubgraphData('fraktal',tokenAddressSplitted)
       if(fraktalFetch && fraktalFetch.fraktalNfts){
-        console.log('frak fetch',fraktalFetch)
         let nftObjects = await createObject(fraktalFetch.fraktalNfts[0])
+        // console.log('object',fraktalFetch.fraktalNfts[0])
         if(nftObjects){
           setNftObject(nftObjects)
         }
         if(fraktalFetch.fraktalNfts[0].offers){
           setOffers(fraktalFetch.fraktalNfts[0].offers)
         }
+        if(fraktalFetch.fraktalNfts[0].collateral){
+          setCollateralNft(fraktalFetch.fraktalNfts[0].collateral)
+        }
       }
+    }
   },[account])
 
   useEffect(async ()=>{
     if(tokenAddress && account && provider){
-      let userBalance = await getBalanceFraktions(account, provider, tokenAddress)
-      if(userBalance){
+      try{
+        let userBalance = await getBalanceFraktions(account, provider, tokenAddress)
         setUserFraktions(userBalance);
+        let index = await getFraktionsIndex(provider, tokenAddress)
+        setFraktionsIndex(index);
+        let marketApproved = await getApproved(account, marketAddress, provider, tokenAddress);
+        setFraktionsApproved(marketApproved);
+        let factoryApproved = await getApproved(account, factoryAddress, provider, tokenAddress);
+        setFactoryApproved(factoryApproved);
+        let isOwner = await isFraktalOwner(account, provider, tokenAddress);
+        setIsOwner(isOwner);
+      }catch(e){
+        console.log('Error:',e)
       }
     }
   },[account, provider, tokenAddress]);
@@ -77,7 +106,17 @@ export default function DetailsView() {
     }
   },[nftObject, marketAddress])
 
-  // but add the Claim collateral function here?
+  async function callUnlistItem(){
+    let tx = await unlistItem(
+      tokenAddress,
+      provider,
+      marketAddress)
+    if(tx) {
+      router.push('/my-nfts');
+    }
+  }
+
+
 
   // async function claimNFT() { // this one goes to offersCard
   //   try {
@@ -146,12 +185,32 @@ export default function DetailsView() {
         </HStack>
         <UserOwnership
           fraktions={userFraktions}
+          isFraktalOwner={isOwner}
+          collateral={collateralNft}
+          isApproved={fraktionsApproved}
+          marketAddress={marketAddress}
+          tokenAddress={tokenAddress}
+          marketId={nftObject?nftObject.marketId:null}
+          factoryAddress={factoryAddress}
+          provider={provider}
+          factoryApproved={factoryApproved}
         />
-        <div>
-          List / unList fraktions
-        </div>
-        <div>
-          defraktionalize? / claim collateral?
+
+        <div style={{marginTop: '21px'}}>
+          {userHasListed?
+            <FrakButton
+              onClick={() => callUnlistItem()}
+            >
+              Unlist Fraktions
+            </FrakButton>
+            :
+            <FrakButton
+              disabled={fraktionsIndex != 0 && userFraktions < 1}
+              onClick={() => router.push("/mint-nft")}
+            >
+              List Fraktions
+            </FrakButton>
+          }
         </div>
       </VStack>
       <VStack spacing="0" mb="12.8rem">
@@ -182,6 +241,8 @@ export default function DetailsView() {
           <BuyOutCard
             account={account}
             minPrice={minOffer}
+            fraktionsBalance = {userFraktions}
+            fraktionsApproved={fraktionsApproved}
             investors={nftObject && nftObject.balances ? nftObject.balances.length : 0}
             offers={offers}
             tokenAddress={tokenAddress}

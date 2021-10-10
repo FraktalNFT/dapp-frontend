@@ -5,8 +5,8 @@ Everything on the nft will be in a /details page
   - Fraktions listed (and buy options)
   - Offers (makeOffer & offers history & voting)
   - Revenues (addRevenue & list of Revenues & claim)
-  
 
+- Add a Defraktionalize function in the market to handle the escrow of the fraktal (otherwise is free to claim)
 
 BUGS:
 

@@ -1,10 +1,11 @@
 import { Divider } from "@chakra-ui/react"
 import { VStack, HStack } from "@chakra-ui/layout";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { utils } from "ethers";
+import FrakButton from '../button';
 import FrakButton2 from '../button2';
 import OfferDetail from '../offerDetail';
-import { makeOffer } from '../../utils/contractCalls';
+import { makeOffer, getMajority } from '../../utils/contractCalls';
 import {
   Table,
   Thead,
@@ -13,15 +14,41 @@ import {
   Td,
 } from "@chakra-ui/react"
 
-const BuyOutCard=(({account, tokenAddress, minPrice, investors, offers, provider, marketAddress}) => {
+const BuyOutCard=(({
+  account,
+  tokenAddress,
+  fraktionsBalance,
+  minPrice,
+  investors,
+  offers,
+  provider,
+  marketAddress,
+  fraktionsApproved
+}) => {
   const [isReady, setIsReady] = useState(false);
-  const [valueToOffer, setValueToOffer] = useState(0);
+  const [valueToOffer, setValueToOffer] = useState("0");
   const [offering, setOffering] = useState(false);
+  const [userIsOfferer, setUserIsOfferer] = useState(false);
+  const [majority, setMajority] = useState(0);
 
   // functions for the offers!
-  //vote
-  //unvote
   //claim Fraktal
+
+
+  useEffect(()=>{
+    if(account && offers && offers.length){
+      let userHasOffered = offers.find(x=>x.offerer.id == account.toLocaleLowerCase());
+      if(userHasOffered && userHasOffered.value > 0){
+        setUserIsOfferer(true);
+      }
+    }
+  },[account, offers]);
+  useEffect(async()=>{
+    if(tokenAddress && provider){
+      let tokenMajority=await getMajority(provider, tokenAddress)
+      setMajority(tokenMajority/100)
+    }
+  },[tokenAddress, provider])
 
   async function onOffer(){
     setOffering(true)
@@ -33,7 +60,7 @@ const BuyOutCard=(({account, tokenAddress, minPrice, investors, offers, provider
         marketAddress)
       tx.then(()=>{
         setOffering(false)
-        setValueToOffer(0)
+        setValueToOffer("0")
       });
       }catch(err){
         console.log('Error',err);
@@ -116,10 +143,17 @@ const BuyOutCard=(({account, tokenAddress, minPrice, investors, offers, provider
           {investors}
         </div>
       </VStack>
-      <VStack style={{
-        textAlign:'start',
-        marginLeft:'24px'
-      }}>
+      {userIsOfferer?
+        <FrakButton
+          onClick={onOffer}
+        >
+          Take out offer
+        </FrakButton>
+        :
+        <VStack style={{
+          textAlign:'start',
+          marginLeft:'24px'
+        }}>
         <div style={{
           fontFamily:'Inter',
           fontWeight:600,
@@ -128,16 +162,17 @@ const BuyOutCard=(({account, tokenAddress, minPrice, investors, offers, provider
           letterSpacing:'1px',
           color:'#A7A7A7'
         }}>
-          BUYOUT OFFER IN ETH
+        BUYOUT OFFER IN ETH
         </div>
         <FrakButton2
-          isReady={isReady}
-          onClick={onOffer}
-          onSet={onSetValue}
+        isReady={isReady}
+        onClick={onOffer}
+        onSet={onSetValue}
         >
-          {offering ? "Making offer" : "Offer"}
+        {offering ? "Making offer" : "Offer"}
         </FrakButton2>
-      </VStack>
+        </VStack>
+      }
     </HStack>
     <div style={{
       fontWeight:300,
@@ -146,7 +181,7 @@ const BuyOutCard=(({account, tokenAddress, minPrice, investors, offers, provider
       marginTop:'24px',
       marginBottom:'32px'
     }}>
-    x% (majority) of the investors have to accept your offer for it to go through.
+    {majority}% of the investors have to accept your offer for it to go through.
     </div>
 
     <Divider />
@@ -176,9 +211,11 @@ const BuyOutCard=(({account, tokenAddress, minPrice, investors, offers, provider
                 <OfferDetail
                   account = {account}
                   offerItem = {x}
+                  fraktionsBalance = {fraktionsBalance}
                   tokenAddress = {tokenAddress}
                   marketAddress = {marketAddress}
                   provider = {provider}
+                  fraktionsApproved = {fraktionsApproved}
                 />
               )
           })}
