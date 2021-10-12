@@ -74,14 +74,22 @@ export async function getApproved(account, factoryContract, provider, tokenContr
   return approved;
 }
 export async function getMajority(provider, tokenContract) {
-  const customContract = new Contract(tokenContract, tokenAbi, provider);
-  let majority = await customContract.majority();
-  return majority.toNumber();
+  try{
+    const customContract = new Contract(tokenContract, tokenAbi, provider);
+    let majority = await customContract.majority();
+    return majority.toNumber();
+  }catch{
+    return 'error'
+  }
 }
 export async function getFraktionsIndex(provider, tokenContract) {
-  const customContract = new Contract(tokenContract, tokenAbi, provider);
-  let index = await customContract.fraktionsIndex();
-  return index.toNumber();
+  try{
+    const customContract = new Contract(tokenContract, tokenAbi, provider);
+    let index = await customContract.fraktionsIndex();
+    return index.toNumber();
+  }catch{
+    return 'not Fraktal'
+  }
 }
 export async function getBalanceFraktions(account, provider, tokenContract) {
   const customContract = new Contract(tokenContract, tokenAbi, provider);
@@ -92,7 +100,7 @@ export async function getBalanceFraktions(account, provider, tokenContract) {
 export async function isFraktalOwner(account, provider, tokenContract) {
   const customContract = new Contract(tokenContract, tokenAbi, provider);
   let isOwner = await customContract.balanceOf(account, 0)
-  return isOwner;
+  return isOwner.toNumber();
 }
 
 export async function getMinimumOffer(tokenAddress, provider, marketContract) {

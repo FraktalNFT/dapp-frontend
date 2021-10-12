@@ -108,6 +108,31 @@ export async function createObject(data){
   // and possibly tokenId
 
   try{
+    let nftMetadata = await fetchNftMetadata(data.nft.hash)
+    // console.log('meta',nftMetadata)
+    if(nftMetadata){
+      return {
+        id: data.nft.id,
+        creator:data.nft.creator.id,
+        marketId: data.nft.marketId,
+        // balances: data.nft.fraktions,
+        userBalance: data.amount,
+        // price:,
+        createdAt: data.nft.createdAt,
+        status: data.nft.status,
+        name: nftMetadata.name,
+        description: nftMetadata.description,
+        imageURL: checkImageCID(nftMetadata.image),
+      }
+    }
+  }catch{
+    console.log('Error fetching ',data);
+    return null;
+  }
+};
+
+export async function createObject2(data){
+  try{
     let nftMetadata = await fetchNftMetadata(data.hash)
     // console.log('meta',nftMetadata)
     if(nftMetadata){
@@ -128,6 +153,7 @@ export async function createObject(data){
     return null;
   }
 };
+
 export async function createListed(data){
   try{
     let nftMetadata = await fetchNftMetadata(data.fraktal.hash)

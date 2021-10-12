@@ -11,7 +11,8 @@ export const contracts = [
 ]
 export const marketContracts = [
   {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
-  {providerChainId:4, address:'0xc992FCC35b943842Ee4d1ab73a35aEc27E5ca851'},
+  {providerChainId:4, address:'0x31Ef658a79d156793dC93E4EFE714041B1bd9C60'}, // proxy
+  // {providerChainId:4, address:'0xc992FCC35b943842Ee4d1ab73a35aEc27E5ca851'}, logic
 ]
 export const factoryContracts = [
   {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},

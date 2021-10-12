@@ -45,8 +45,12 @@ const BuyOutCard=(({
   },[account, offers]);
   useEffect(async()=>{
     if(tokenAddress && provider){
-      let tokenMajority=await getMajority(provider, tokenAddress)
-      setMajority(tokenMajority/100)
+      try{
+        let tokenMajority=await getMajority(provider, tokenAddress)
+        setMajority(tokenMajority/100)
+      }catch{
+        console.log('Not yet fraktionalized')
+      }
     }
   },[tokenAddress, provider])
 

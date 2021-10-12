@@ -107,7 +107,12 @@ const Home: React.FC = () => {
               >
                 {nftItems.map(item => (
                   <NextLink key={item.id} href={`/nft/${item.tokenAddress}/details`}>
-                    <NFTItem item={item} />
+                    <NFTItem
+                      name={item.name}
+                      amount={item.amount}
+                      price={item.price}
+                      imageURL={item.imageURL}
+                     />
                   </NextLink>
                 ))}
               </Grid>

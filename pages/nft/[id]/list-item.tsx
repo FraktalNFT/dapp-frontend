@@ -8,7 +8,7 @@ import styles from "./auction.module.css";
 import FrakButton from '../../../components/button';
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
 import { getSubgraphData } from '../../../utils/graphQueries';
-import { createObject, createListed } from '../../../utils/nftHelpers';
+import { createObject2, createListed } from '../../../utils/nftHelpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
 import {
   listItem,
@@ -105,7 +105,7 @@ export default function ListNFTView() {
         } else {
           let obj = await getSubgraphData('marketid_fraktal',index)
           if(obj && obj.fraktalNfts){
-            let nftObjects = await createObject(obj.fraktalNfts[0])
+            let nftObjects = await createObject2(obj.fraktalNfts[0])
             if(nftObjects && account ){
               setNftObject(nftObjects)
               // console.log('nftObjects',nftObjects)

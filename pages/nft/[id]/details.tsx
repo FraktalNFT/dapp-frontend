@@ -1,4 +1,3 @@
-import Head from "next/head";
 import Link from "next/link";
 import { utils } from "ethers";
 import FrakButton from '../../../components/button';
@@ -11,7 +10,7 @@ import BuyOutCard from '../../../components/buyOutCard';
 import { Image } from "@chakra-ui/image";
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
 import { getSubgraphData } from '../../../utils/graphQueries';
-import { createObject } from '../../../utils/nftHelpers';
+import { createObject2 } from '../../../utils/nftHelpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
 import {
   getBalanceFraktions,
@@ -58,9 +57,9 @@ export default function DetailsView() {
           }
         }
       let fraktalFetch = await getSubgraphData('fraktal',tokenAddressSplitted)
-      if(fraktalFetch && fraktalFetch.fraktalNfts){
-        let nftObjects = await createObject(fraktalFetch.fraktalNfts[0])
-        // console.log('object',fraktalFetch.fraktalNfts[0])
+      console.log('object',fraktalFetch)
+      if(fraktalFetch && fraktalFetch.fraktalNfts && fraktalFetch.fraktalNfts[0]){
+        let nftObjects = await createObject2(fraktalFetch.fraktalNfts[0])
         if(nftObjects){
           setNftObject(nftObjects)
         }
@@ -78,14 +77,14 @@ export default function DetailsView() {
     if(tokenAddress && account && provider){
       try{
         let userBalance = await getBalanceFraktions(account, provider, tokenAddress)
-        setUserFraktions(userBalance);
         let index = await getFraktionsIndex(provider, tokenAddress)
-        setFraktionsIndex(index);
         let marketApproved = await getApproved(account, marketAddress, provider, tokenAddress);
-        setFraktionsApproved(marketApproved);
         let factoryApproved = await getApproved(account, factoryAddress, provider, tokenAddress);
-        setFactoryApproved(factoryApproved);
         let isOwner = await isFraktalOwner(account, provider, tokenAddress);
+        setFraktionsIndex(index);
+        setFraktionsApproved(marketApproved);
+        setFactoryApproved(factoryApproved);
+        setUserFraktions(userBalance);
         setIsOwner(isOwner);
       }catch(e){
         console.log('Error:',e)
@@ -206,7 +205,7 @@ export default function DetailsView() {
             :
             <FrakButton
               disabled={fraktionsIndex != 0 && userFraktions < 1}
-              onClick={() => router.push("/mint-nft")}
+              onClick={() => router.push(`/nft/${nftObject.marketId}/list-item`)}
             >
               List Fraktions
             </FrakButton>
