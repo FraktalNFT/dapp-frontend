@@ -1,10 +1,9 @@
-import { Button } from "@chakra-ui/button";
 import { Image } from "@chakra-ui/image";
-import { Box, Center, StackProps, Text, VStack } from "@chakra-ui/layout";
+import { Box, Center, HStack, StackProps, Text, VStack } from "@chakra-ui/layout";
 import { formatEther } from "@ethersproject/units";
+import { Flex, Spacer } from "@chakra-ui/react";
 import React, { forwardRef } from "react";
 import { FrakCard } from "../../types";
-import FrakButton from "../button";
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
@@ -14,8 +13,7 @@ interface NFTItemProps extends StackProps {
 const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
   ({ item, onClick, CTAText }, ref) => {
     return (
-      <VStack
-        cursor='pointer'
+      <Box
         maxW='30rem'
         rounded='md'
         borderWidth='1px'
@@ -24,7 +22,9 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
         _hover={{
           boxShadow: "xl"
         }}
-        ref={ref}
+        ref={ref}>
+      <VStack
+        cursor='pointer'
       >
         <Box 
           h='35rem' 
@@ -63,15 +63,23 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
             </Center>
           )}
         </Box>
-        <Center flexDirection='column' py='1.6rem'>
-          <Text className='medium-16' mb='1.6rem'>
+        </VStack>
+        <Box margin="1rem">
+          <Text className='semi-16' mb='1rem'>
             {item.name}
           </Text>
-          <FrakButton className='semi-16' py='.8rem' px='5.6rem'>
-            {CTAText || "Invest"}
-          </FrakButton>
-        </Center>
-      </VStack>
+          <Flex>
+          <Text className='medium-12'>
+            23.95% Availabile
+          </Text>
+          <Spacer />
+          <Image align="vertical" width="5" height="8" marginEnd="3px" src="https://ethereum.org/static/6b935ac0e6194247347855dc3d328e83/31987/eth-diamond-black.png" />
+          <Text textAlign="end" className='medium-12'>
+            0.325
+          </Text>
+          </Flex>
+        </Box>
+      </Box>
     );
   }
 );
