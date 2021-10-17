@@ -369,7 +369,7 @@ const fraktalId_query = gql`
 `;
 
 export const getSubgraphData = async (call, id) => {
-  let callGql = calls.find(x=> {return x.name == call})
+  let callGql = calls.find(x => {return x.name == call})
   try {
     const data = await request(APIURL , callGql.call, {id});
     // console.log('data for:',id,' found',data)
