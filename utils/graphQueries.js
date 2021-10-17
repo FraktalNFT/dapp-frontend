@@ -109,7 +109,7 @@ query {
 `;
 const creators_review = gql`
   query{
-    users(first: 5) {
+    users {
       id
       fraktals
       created {
@@ -123,6 +123,24 @@ const creators_review = gql`
     }
   }
 `
+const creators_small_review = gql`
+	query{
+		users(first: 10) {
+      		id
+      		fraktals
+      		created {
+        		id
+        		marketId
+        		hash
+        		creator
+        		owner
+        		createdAt
+     	 	}
+    	}
+	}
+`
+
+
 const account_fraktions_query = gql`
   query($id:ID!){
     fraktionsBalances(first:10, where:{owner:$id, amount_gt:0}){
@@ -382,13 +400,14 @@ export const getSubgraphData = async (call, id) => {
 };
 
 const calls = [
-  {name: 'account_fraktions', call: account_fraktions_query},//
-  {name: 'marketid_fraktal', call: marketid_query},//
-  {name: 'listed_items', call: listedItems},//
-  {name: 'listed_itemsId', call: listedItemsId},//
-  {name: 'artists', call: creators_review},//
+  {name: 'account_fraktions', call: account_fraktions_query},
+  {name: 'marketid_fraktal', call: marketid_query},
+  {name: 'listed_items', call: listedItems},
+  {name: 'listed_itemsId', call: listedItemsId},
+  {name: 'artists', call: creators_review},
+  {name: 'first_artists', call: creators_small_review},
   {name: 'all', call: all_nfts},
-  {name: 'creator', call: creator_query},//
+  {name: 'creator', call: creator_query},
   {name: 'manage', call: fraktal_fraktions_query},
   {name: 'owned', call: owner_query},
   {name: 'wallet', call: user_wallet_query},
