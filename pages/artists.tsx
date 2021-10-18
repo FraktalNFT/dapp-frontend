@@ -13,29 +13,34 @@ import { shortenHash } from "../utils/helpers";
 import { getSubgraphData } from '../utils/graphQueries';
 import { createObject } from '../utils/nftHelpers';
 import { useWeb3Context } from '../contexts/Web3Context';
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function ArtistsView() {
-  const SORT_TYPES = ["Popular", "New"];
-  const [selectionMode, setSelectionMode] = useState(false);
-  const [sortType, setSortType] = useState("Popular");
-  const [artists, setArtists] = useState([]);
-  const [artistsItems, setArtistsItems] = useState([]);
-  const {contractAddress} = useWeb3Context();
-  const handleSortSelect = (item: string) => {
-    setSortType(item);
-    setSelectionMode(false);
-  };
-  useEffect(()=>{
-    if(artistsItems.length){
-      let artistsObj = artists.map((x,i)=>({
-        id: x.id,
-        name: shortenHash(x.id),
-        imageURL: artistsItems[i]?artistsItems[i].imageURL:"/filler-image-1.png",
-        totalGallery:x.created.length,
-      }))
-      setArtistsItems(artistsObj)
-    }
-  },[artistsItems])
+  	const SORT_TYPES = ["Popular", "New"];
+  	const [selectionMode, setSelectionMode] = useState(false);
+  	const [sortType, setSortType] = useState("Popular");
+  	const [artists, setArtists] = useState([]);
+  	const [artistsItems, setArtistsItems] = useState([]);
+	const [hasMore, setHasMore] = useState(true);
+  	const {contractAddress} = useWeb3Context();
+  	const handleSortSelect = (item: string) => {
+    	setSortType(item);
+    	setSelectionMode(false);
+	};
+	
+	// why does this exist
+	// it triggers an infinite rerender loop and crashes the app
+	// useEffect(()=>{ 
+	// 	if (artistsItems.length) {
+	// 	let artistsObj = artists.map((x,i)=>({
+	// 		id: x.id,
+	// 		name: shortenHash(x.id),
+	// 		imageURL: artistsItems[i]?artistsItems[i].imageURL:"/filler-image-1.png",
+	// 		totalGallery:x.created.length,
+	// 	}))
+	// 	setArtistsItems(artistsObj)
+	// 	}
+	// },[artistsItems])
 
   function getArtistsObjects(artists, artistsItems){
     const artistsObj = artists.map((x,i)=>({
@@ -45,25 +50,57 @@ export default function ArtistsView() {
       totalGallery:x.created.length,
     }))
     return artistsObj;
-  }
+	}
 
-  useEffect(async()=>{
-    const data = await getSubgraphData('artists','')
-    let fraktalSamples
-    if (data, contractAddress) {
-      let onlyCreators = data.users.filter(x=>{return x.created.length > 0 })
-      let withoutMarket = onlyCreators.filter(x=>{return x.id != contractAddress.toLocaleLowerCase()})
-      setArtists(withoutMarket)
-      fraktalSamples = withoutMarket.map(x=>{return x.created[0]})
-      let fraktalsSamplesObjects = await Promise.all(fraktalSamples.map(x=>{return createObject(x)}))//.then((results)=>setNftItems(results))
-      let artistsObj = getArtistsObjects(withoutMarket, fraktalsSamplesObjects)
-      if(artistsObj){
-        setArtistsItems(artistsObj)
-      }else{
-        setArtistsItems([])
-      }
-    }
-  },[contractAddress])
+
+
+
+	
+	async function fetchNewArtists() {
+		const data = await getSubgraphData('artists', '')
+		console.log('New Artists: ', data);
+		if (data && contractAddress) {
+			let onlyCreators = data.users.filter(x=>{return x.created.length > 0 })
+			let withoutMarket = onlyCreators.filter(x => { return x.id != contractAddress.toLocaleLowerCase() }) // why?
+			setArtists([...artists, ...withoutMarket]);
+			let fraktalSamples = withoutMarket.map(x=>{return x.created[0]}) // list the first NFT in the list of 'nfts this artist made'
+			let fraktalsSamplesObjects = await Promise.all(fraktalSamples.map(x=>{return createObject(x)}))
+			let artistObjects = getArtistsObjects(withoutMarket, fraktalsSamplesObjects)
+			// make sure you're pulling new subgraph data
+			let deduplicatedArtistObjects = artistObjects.filter(item => {
+				const artistMatch = artistsItems.find(artist => artist.id === item.id)
+				if (typeof artistMatch === 'undefined') {
+					return true;
+				} else return false
+			})
+			if (typeof deduplicatedArtistObjects[0] === 'undefined') {
+				setHasMore(false); // no new ArtistObjects, congrats on reaching the end of the internet
+			} else {
+				const newArray = [...artistsItems, ...deduplicatedArtistObjects];
+				setArtistsItems(newArray);
+			}
+		}
+	}
+
+	useEffect(() => {
+		const fetchInitialArtists = async () => {
+			const data = await getSubgraphData('first_artists', '')
+			if (data && contractAddress) {
+				let onlyCreators = data.users.filter(x=>{return x.created.length > 0 })
+				let withoutMarket = onlyCreators.filter(x=>{return x.id != contractAddress.toLocaleLowerCase()}) // why?
+				setArtists(withoutMarket) // why?
+				let fraktalSamples = withoutMarket.map(x=>{return x.created[0]}) // list the first NFT in the list of 'nfts this artist made'
+				let fraktalsSamplesObjects = await Promise.all(fraktalSamples.map(x=>{return createObject(x)}))
+				let artistsObj = getArtistsObjects(withoutMarket, fraktalsSamplesObjects)
+				if (artistsObj) {
+					setArtistsItems(artistsObj)
+				} else {
+					setArtistsItems([])
+				}
+			}
+		};
+		fetchInitialArtists();
+	}, [])
 
   return (
     <VStack spacing='0' mb='12.8rem'>
@@ -99,20 +136,36 @@ export default function ArtistsView() {
           <Image src='/search.svg' />
         </div>
       </HStack>
-      <Grid
-        margin='0 !important'
-        mb='5.6rem !important'
-        w='100%'
-        templateColumns='repeat(3, 1fr)'
-        gap='3.2rem'
-      >
-        {artistsItems.map((item, i) => (
-          <NextLink href={`/artist/${item.id}`} key={i}>
-            <NFTItem key={artists[i].id} item={item} CTAText={item.totalGallery} />
-          </NextLink>
-        ))}
-      </Grid>
-      <Pagination pageCount={21} handlePageClick={() => {}} />
+		{console.log(artistsItems)}
+		{artistsItems.length ? 
+		(
+			<>
+			<InfiniteScroll
+              dataLength={artistsItems.length}
+              next={async () => await fetchNewArtists()}
+              hasMore={hasMore}
+              loader={<h3> Loading...</h3>}
+              endMessage={<h4>Nothing more to show</h4>}
+					  >
+				<Grid
+					margin='0 !important'
+					mb='5.6rem !important'
+					w='100%'
+					templateColumns='repeat(3, 1fr)'
+					gap='3.2rem'
+					>
+					{artistsItems.map((item, i) => (
+						<NextLink href={`/artist/${item.id}`} key={`link--${item.id}-${i}`}>
+							<NFTItem key={`item--${artists[i]?.id}-${i}`} item={item} CTAText={item.totalGallery} />
+						</NextLink>
+					))}
+			  </Grid>
+			</InfiniteScroll>
+			</>
+		)
+		:
+		(null)
+		}
     </VStack>
   );
 }
