@@ -2,7 +2,8 @@ import { gql, request } from 'graphql-request';
 import { utils } from "ethers";
 const { CID } = require('ipfs-http-client');
 
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.1.11';
+const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.1.16';
+
 
 const creator_query = gql`
 query($id:ID!){
@@ -164,6 +165,8 @@ const fraktal_fraktions_query = gql`
   }
 `
 // cannot get to work a fraktal filter (where:{status:"open"})
+
+//, orderBy:createdAt, orderDirection: desc
 const listedItems = gql`
   query{
     listItems(first: 100, where:{amount_gt: 0}){
@@ -324,6 +327,7 @@ const fraktalId_query = gql`
         offerer {
           id
         }
+        winner
         value
         votes
         timestamp
@@ -344,19 +348,6 @@ const fraktalId_query = gql`
   }
 `;
 
-export const getSubgraphData = async (call, id) => {
-  let callGql = calls.find(x=> {return x.name == call})
-  try {
-    const data = await request(APIURL , callGql.call, {id});
-    // console.log('data for:',id,' found',data)
-    return data;
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error('error', err);
-    return err;
-  }
-};
-
 const calls = [
   {name: 'account_fraktions', call: account_fraktions_query},
   {name: 'marketid_fraktal', call: marketid_query},
@@ -373,3 +364,17 @@ const calls = [
   {name: 'fraktal', call: fraktalId_query},
   {name: 'fraktions', call: fraktions_query},
 ];
+
+
+export const getSubgraphData = async (call, id) => {
+  let callGql = calls.find(x=> {return x.name == call})
+  try {
+    const data = await request(APIURL , callGql.call, {id});
+    // console.log('data for:',id,' found',data)
+    return data;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('error', err);
+    return err;
+  }
+};

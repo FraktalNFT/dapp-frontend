@@ -23,7 +23,8 @@ const BuyOutCard=(({
   offers,
   provider,
   marketAddress,
-  fraktionsApproved
+  fraktionsApproved,
+  itemStatus,
 }) => {
   const [isReady, setIsReady] = useState(false);
   const [valueToOffer, setValueToOffer] = useState("0");
@@ -33,7 +34,6 @@ const BuyOutCard=(({
 
   // functions for the offers!
   //claim Fraktal
-
 
   useEffect(()=>{
     if(account && offers && offers.length){
@@ -197,9 +197,9 @@ const BuyOutCard=(({
     }}>
       Offers
     </div>
-    {offers && offers.length ?
+    <div>
+      {offers && offers.length && itemStatus != 'Retrieved' ?
       <Table>
-      {/* all this should have its own component.. to get the functions*/}
         <Thead>
           <Tr>
             <Td>DATE</Td>
@@ -227,12 +227,11 @@ const BuyOutCard=(({
       </Table>
       :
       <div style={{marginTop:'24px'}}>
-      There are no offers for this NFT.
+        There are no offers for this NFT.
       </div>
     }
     </div>
-
+    </div>
   )
-
 })
 export default BuyOutCard;

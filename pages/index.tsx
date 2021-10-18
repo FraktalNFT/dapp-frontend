@@ -39,6 +39,7 @@ const Home: React.FC = () => {
   const getMoreListedItems = async () => {
   // should read where to start (nftItems.length) and add some items continously
     const data = await getSubgraphData('listed_items','');
+    console.log('listed items ',data)
     let dataOnSale = data.listItems.filter(x=>{return x.fraktal.status == 'open'}); // this goes in the graphql query
     if(dataOnSale){
       Promise.all(dataOnSale.map(x=>{return createListed(x)})).then((results)=>setNftItems([...nftItems, ...results]));

@@ -24,6 +24,12 @@ function checkImageCID(cid){ // this does not handle others than IPFS... correct
     correctedCid = splitted[1]
     let cidv1 = toBase32(correctedCid)
     return `https://${cidv1}.ipfs.dweb.link`
+  } else if(cid.startsWith('ipfs://')){
+    let splitted = cid.split('ipfs://')
+    correctedCid = splitted[1]
+    let cidv1 = toBase32(correctedCid)
+    return `https://${cidv1}.ipfs.dweb.link`
+
   }else if (cid.startsWith('Qm')){
       correctedCid = cid
       let cidv1 = toBase32(correctedCid)

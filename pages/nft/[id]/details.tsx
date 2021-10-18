@@ -14,6 +14,7 @@ import { createObject2 } from '../../../utils/nftHelpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
 import {
   getBalanceFraktions,
+  claimFraktalSold,
   getMinimumOffer,
   unlistItem,
   getApproved,
@@ -115,18 +116,13 @@ export default function DetailsView() {
     }
   }
 
-
-
-  // async function claimNFT() { // this one goes to offersCard
-  //   try {
-  //     let tx = await claimFraktalSold(nftObject.marketId, provider, contractAddress);
-  //     if(tx){
-  //       router.push('/my-nfts');
-  //     }
-  //   }catch(e){
-  //     console.log('There has been an error: ',e)
-  //   }
-  // }
+  async function claimNFT() { // this one goes to offersCard
+    try {
+      let tx = await claimFraktalSold(nftObject.id, provider, marketAddress);
+    }catch(e){
+      console.log('There has been an error: ',e)
+    }
+  }
 
   return (
     <HStack>
@@ -230,13 +226,16 @@ export default function DetailsView() {
         }}>
           {nftObject && nftObject.description?nftObject.description:null}
         </div>
-        <FraktionsList
+        {nftObject && nftObject.status == 'open'?
+          <FraktionsList
           fraktionsListed = {fraktionsListed}
           tokenAddress={tokenAddress}
           marketAddress={marketAddress}
           provider={provider}
-        />
+          />
+          :null}
         <div style={{marginTop:'40px'}}>
+          <button onClick={()=>claimNFT()}>Claim</button>
           <BuyOutCard
             account={account}
             minPrice={minOffer}
@@ -247,6 +246,7 @@ export default function DetailsView() {
             tokenAddress={tokenAddress}
             marketAddress={marketAddress}
             provider={provider}
+            itemStatus = {nftObject && nftObject.status ? nftObject.status : null}
           />
         </div>
         <div style={{marginTop:'40px'}}>

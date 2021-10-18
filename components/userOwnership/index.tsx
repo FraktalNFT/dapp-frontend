@@ -53,8 +53,9 @@ const UserOwnership=(({
     if(!isApproved){
       await approveMarket(marketAddress, provider, tokenAddress);
     }
-      // the one below should be changeable for if its already used..
-    await importFraktal(tokenAddress,1,provider,marketAddress);
+    let index = 1;
+    // check indexes in a while loop for indexUsed..
+    await importFraktal(tokenAddress,index,provider,marketAddress);
   }
 
   return(

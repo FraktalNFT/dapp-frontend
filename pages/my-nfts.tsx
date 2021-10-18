@@ -171,7 +171,7 @@ export default function MyNFTsView() {
         let userBalance = fobjects.users[0].balance
         setTotalBalance(parseFloat(userBalance)/10**18)
         let validFraktions = fobjects.users[0].fraktions.filter(x=>{return x.status != 'retrieved'})
-        // console.log('fraktions',validFraktions)
+        console.log('fraktions',validFraktions)
         let fraktionsObjects = await Promise.all(validFraktions.map(x=>{return createObject(x)}))
         if(fraktionsObjects){
           let fraktionsObjectsClean = fraktionsObjects.filter(x=>{return x != null});

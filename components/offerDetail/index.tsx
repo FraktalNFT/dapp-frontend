@@ -6,6 +6,7 @@ import {
   voteOffer,
   getLocked,
   unlockShares,
+  claimFraktalSold,
   // lockShares,
   getApproved,
   approveMarket
@@ -34,10 +35,9 @@ const OfferDetail = forwardRef<HTMLDivElement, offerItemProps>(
     tokenAddress,
     marketAddress,
     provider,
-    fraktionsApproved
+    fraktionsApproved,
   }) => {
     const [fraktionsLocked, setFraktionsLocked] = useState(false);
-
     useEffect(async () => {
       if(account && tokenAddress && offerItem.status != 'sold'){
         let locked = await getLocked(account, tokenAddress, provider);
@@ -59,14 +59,17 @@ const OfferDetail = forwardRef<HTMLDivElement, offerItemProps>(
         setFraktionsApproved(true)
       }
     }
-
-    // async function claimFraktal(){
-    //   claimFraktalSold(nftObject.marketId, provider, contractAddress).then(()=>router.reload());
-    // }
-
+    async function claimFraktal() { // this one goes to offersCard
+      try {
+        await claimFraktalSold(tokenAddress, provider, marketAddress);
+      }catch(e){
+        console.log('There has been an error: ',e)
+      }
+    }
 
     return (
       <HStack style={{marginTop:'24px'}}>
+
         <Tr>
           <Td>
             {timezone(offerItem.timestamp)}
@@ -128,6 +131,22 @@ const OfferDetail = forwardRef<HTMLDivElement, offerItemProps>(
                 <div>buy Fraktions to vote!</div>
              }
              {/*if winner, should claim the fraktal from here*/}
+             {offerItem.winner == true &&
+               <div>
+               <Button
+                 isOutlined
+                 style={{
+                   color: "#000000",
+                   borderColor: "#00C4B8",
+                   width: "192px",
+                   marginRight: "16px",
+                 }}
+                 onClick={()=>claimFraktal()}
+               >
+                 Claim bought Fraktal
+               </Button>
+               </div>
+             }
           </Td>
         </Tr>
       </HStack>

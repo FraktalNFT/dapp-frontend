@@ -14,11 +14,11 @@ const factoryAbi = [
 const marketAbi = [
   "function importFraktal(address tokenAddress, uint256 fraktionsIndex)",
   "function rescueEth()",
-  "function buyFraktions(address from, address tokenAddress, uint16 _numberOfShares) payable",
-  "function claimFraktal(uint256 _tokenId)",
+  "function buyFraktions(address from, address tokenAddress, uint256 _numberOfShares) payable",
+  "function claimFraktal(address tokenAddress)",
   "function voteOffer(address offerer, address tokenAddress)",
   "function makeOffer(address tokenAddress, uint256 _value) payable",
-  "function listItem(address _tokenAddress,uint256 _price,uint16 _numberOfShares) external returns (bool)",
+  "function listItem(address _tokenAddress,uint256 _price,uint256 _numberOfShares) external returns (bool)",
   "function unlistItem(address tokenAddress)",
   "function maxPriceRegistered(address) view returns (uint256)",
 ]
@@ -92,7 +92,7 @@ export async function getFraktionsIndex(provider, tokenContract) {
   }
 }
 export async function getBalanceFraktions(account, provider, tokenContract) {
-  const customContract = new Contract(tokenContract, tokenAbi, provider);
+  const customContract = new Contract(tokenContract, tokenAbi, provider);  
   let index = await customContract.getFraktionsIndex();
   let balanceOfId = await customContract.balanceOf(account, index)
   return balanceOfId.toNumber();
@@ -257,9 +257,8 @@ export async function release(provider, revenueAddress){
 }
 export async function claimFraktalSold(tokenId, provider, marketAddress){
   const signer = await loadSigner(provider);
-  const override = {gasLimit:700000}
   const customContract = new Contract(marketAddress, marketAbi, signer);
-  let tx = await customContract.claimFraktal(tokenId, override)
+  let tx = await customContract.claimFraktal(tokenId)
   processTx(tx);
 }
 
