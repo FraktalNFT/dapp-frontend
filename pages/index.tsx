@@ -1,16 +1,16 @@
-import { Box, Grid, HStack, Text, VStack } from "@chakra-ui/layout";
+import { Flex, Grid, Spacer, Text, VStack } from "@chakra-ui/layout";
+import { MenuButton, Menu, Button, MenuList, MenuItem } from "@chakra-ui/react";
 import { BigNumber } from "ethers";
 import Head from "next/head";
 import NextLink from "next/link";
 import { useState, useEffect } from "react";
 import FrakButton from "../components/button";
-import Dropdown from "../components/dropdown";
 import NFTItem from "../components/nft-item";
 import { FrakCard } from "../types";
 import { getSubgraphData } from '../utils/graphQueries';
 import { createListed } from '../utils/nftHelpers';
+import { FiChevronDown } from 'react-icons/fi';
 import InfiniteScroll from "react-infinite-scroll-component";
-const SORT_TYPES = ["Popular", "Ending Soonest", "Newly Listed"];
 
 const Home: React.FC = () => {
   const [selectionMode, setSelectionMode] = useState(false);
@@ -74,31 +74,25 @@ const Home: React.FC = () => {
 	<title>Fraktal - Marketplace</title>
 	</Head>
     <VStack spacing='0' mb='12.8rem'>
-      <HStack w='96.4rem' spacing='0' justifyContent='space-between' mb='4rem'>
-        <Box position='relative' w={"110px"}>
-          {!selectionMode ? (
-            <FrakButton
-              style={{ minWidth: "200px" }}
-              isOutlined
-              onClick={() => setSelectionMode(true)}
-            >
-              Sort: {sortType}
-            </FrakButton>
-          ) : (
-            <Dropdown
-              items={SORT_TYPES}
-              onItemClick={handleSortSelect}
-              position='absolute'
-              mt='-3rem'
-              zIndex='1'
-            />
-          )}
-        </Box>
-        <Text className='semi-48'>Marketplace</Text>
+      <Flex w='96.4rem'>
+        <Text className='semi-48' marginEnd="2rem">Marketplace</Text>
+        <Menu>
+            <MenuButton
+              as={Button} alignSelf="center" fontSize="12" bg="transparent" height="5rem" width="18rem" rightIcon={<FiChevronDown/>} fontWeight="bold"
+              transition="all 0.2s">
+            Sort: {sortType}
+          </MenuButton>
+            <MenuList>
+              <MenuItem onClick={() => handleSortSelect("Popular")}>Popular</MenuItem>
+              <MenuItem onClick={() => handleSortSelect("Ending Soonest")}>Ending Soonest</MenuItem>
+              <MenuItem onClick={() => handleSortSelect("Newly Listed")}>Newly Listed</MenuItem>
+            </MenuList>
+       </Menu>
+        <Spacer/>
         <NextLink href='/my-nfts'>
           <FrakButton>List NFT</FrakButton>
         </NextLink>
-      </HStack>
+      </Flex>
         {loading ? 'loading..' :
         <div>
         {nftItems.length ? (
