@@ -8,7 +8,7 @@ import styles from "./auction.module.css";
 import FrakButton from '../../../components/button';
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
 import { getSubgraphData } from '../../../utils/graphQueries';
-import { createObject, createListed } from '../../../utils/nftHelpers';
+import { createObject2, createListed } from '../../../utils/nftHelpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
 import {
   listItem,
@@ -19,7 +19,8 @@ import {
   fraktionalize,
   defraktionalize,
   approveMarket,
-  getApproved
+  getApproved,
+  getBalanceFraktions
 } from '../../../utils/contractCalls';
 import { useRouter } from 'next/router';
 const exampleNFT = {
@@ -33,7 +34,7 @@ const exampleNFT = {
 };
 export default function ListNFTView() {
   const router = useRouter();
-  const {account, provider, contractAddress} = useWeb3Context();
+  const {account, provider, marketAddress} = useWeb3Context();
   const [nftObject, setNftObject] = useState();
   const [index, setIndex] = useState();
   const [totalAmount, setTotalAmount] = useState(0);
@@ -50,16 +51,16 @@ export default function ListNFTView() {
     && totalAmount > 0
     && totalAmount <= parseFloat(fraktions)
     && totalPrice > 0
-    && isApproved
-    && nftObject.owner === contractAddress.toLocaleLowerCase();
+    && isApproved;
+    //&& nftObject.owner === contractAddress.toLocaleLowerCase();
 
   async function getIsApprovedForAll(tokenAddress) {
-    let approved = await getApproved(account, contractAddress, provider, tokenAddress);
+    let approved = await getApproved(account, marketAddress, provider, tokenAddress);
     return approved;
   }
 
   useEffect(async () => {
-    if(account && nftObject && contractAddress) {
+    if(account && nftObject && marketAddress) {
       let approvedTokens;
       try {
         approvedTokens = await getIsApprovedForAll(nftObject.id);
@@ -69,25 +70,27 @@ export default function ListNFTView() {
       }
 
     }
-  },[account, nftObject, contractAddress, updating])
+  },[account, nftObject, marketAddress, updating])
 
 
   useEffect(async ()=>{
     const address = getParams('nft');
-    const indexString = address.split('/list-item')
-    const indexNumber = parseFloat(indexString[0]);
-    setIndex(indexNumber);
+    const tokenString = address.split('/list-item')
+    const tokenAddress = tokenString[0];
+    setIndex(tokenAddress);
     if(account){
-      let hexIndex = indexNumber.toString(16);
-      let fraktionIdString = `${account.toLocaleLowerCase()}-0x${hexIndex}`;
-      let listing = await getSubgraphData('listed_itemsId', fraktionIdString);
+      // previously was account-index
+      // let hexIndex = indexNumber.toString(16);
+      let listingString = `${account.toLocaleLowerCase()}-${tokenAddress}`;
+      let listing = await getSubgraphData('listed_itemsId', listingString);
+      // console.log('results ',listing)
       if(listing && listing.listItems.length > 0){
         setUpdating(true)
         setLocked(true)
         setTransferred(true)
         setUnlocked(true)
-        let ownedFraktions = listing.listItems[0].fraktal.fraktions.find(x=> x.owner.id === account.toLocaleLowerCase())
-        setFraktions(ownedFraktions.amount)
+        // let ownedFraktions = listing.listItems[0].fraktal.fraktions.find(x=> x.owner.id === account.toLocaleLowerCase())
+        // setFraktions(ownedFraktions.amount)
         let nftObject = await createListed(listing.listItems[0])
         if(nftObject && account){
           setNftObject(nftObject)
@@ -98,18 +101,16 @@ export default function ListNFTView() {
           }else {
             setFraktions(0)
           }
+        // nftObject gets 2 different inputs (id is different for listed items)
         } else {
           let obj = await getSubgraphData('marketid_fraktal',index)
           if(obj && obj.fraktalNfts){
-            let nftObjects = await createObject(obj.fraktalNfts[0])
+            let nftObjects = await createObject2(obj.fraktalNfts[0])
             if(nftObjects && account ){
               setNftObject(nftObjects)
-              let userAmount = nftObjects.balances.find(x=>x.owner.id === account.toLocaleLowerCase())
-              if(userAmount){
-                setFraktions(userAmount.amount)
-              }else {
-                setFraktions(0)
-              }
+              // console.log('nftObjects',nftObjects)
+              let userBalance = await getBalanceFraktions(account, provider, nftObjects.id)
+              setFraktions(userBalance);
             }
           }
         }
@@ -118,27 +119,27 @@ export default function ListNFTView() {
 
   async function callUnlistItem(){
     let tx = await unlistItem(
-      index,
+      nftObject.tokenAddress,
       provider,
-      contractAddress)
+      marketAddress)
     if(tx) {
       router.push('/my-nfts');
     }
   }
   async function listNewItem(){
     listItem(
-      index,
+      nftObject.id,
       totalAmount,
       utils.parseUnits(totalPrice).div(totalAmount),
       provider,
-      contractAddress).then(()=>{
+      marketAddress).then(()=>{
         router.push('/');
       })
   }
 
   async function prefraktionalize(id){
       try {
-        let tx = await fraktionalize(id, provider, contractAddress);
+        let tx = await fraktionalize(id, provider, marketAddress);
         if (tx) {setPrepare(false)}
       }catch(e){
         console.log('There has been an error: ',e)
@@ -146,10 +147,10 @@ export default function ListNFTView() {
   }
   async function predefraktionalize(id){ // leave it for after, will handle 'defraktionalized' nfts
       try {
-        let tx = await defraktionalize(id, provider, contractAddress);
+        let tx = await defraktionalize(id, provider, marketAddress);
         if(tx){
-          let objectOverriden = {...nftObject, owner: contractAddress.toLocaleLowerCase()};
-          setNftObject(objectOverriden)
+          // let objectOverriden = {...nftObject, owner: contractAddress.toLocaleLowerCase()};
+          // setNftObject(objectOverriden)
           setUnlocked(true)
         }
       }catch(e){
@@ -157,7 +158,7 @@ export default function ListNFTView() {
       }
   }
   async function approveContract(){
-    approveMarket(contractAddress, provider, nftObject.id).then(()=>{
+    approveMarket(marketAddress, provider, nftObject.id).then(()=>{
       setIsApproved(true)
     })
   }
@@ -245,7 +246,7 @@ export default function ListNFTView() {
             </div>
             </div>
 
-          {nftObject?.owner !== contractAddress?.toLocaleLowerCase() ?
+          {/*nftObject?.owner !== contractAddress?.toLocaleLowerCase() ?
             <div style={{marginTop: '16px'}}>
               You need to lock the nft in the market to list the Fraktions!
               <br />
@@ -269,7 +270,7 @@ export default function ListNFTView() {
             </div>
             :
             null
-          }
+          */}
 
           {updating?
             <FrakButton

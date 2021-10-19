@@ -9,14 +9,16 @@ import NextLink from "next/link";
 import {useState} from 'react';
 import { useWeb3Context } from '../../contexts/Web3Context';
 import {approveMarket, importERC721, importERC1155} from '../../utils/contractCalls';
+import { claimNFT } from '../../utils/helpers';
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
   CTAText?: string;
+  onCollateralRequest?: void;
 }
 
 const NFTItemOS = forwardRef<HTMLDivElement, NFTItemProps>(
-  ({ item, onClick, CTAText }, ref) => {
+  ({ item, onClick, CTAText, onCollateralRequest }, ref) => {
 
     return (
       <VStack
@@ -46,6 +48,18 @@ const NFTItemOS = forwardRef<HTMLDivElement, NFTItemProps>(
             >
               {CTAText}
             </FrakButton>
+            {item.collateral &&
+              <div style={{marginTop: '10px'}}>
+                <FrakButton
+                  className='semi-16'
+                  py='.8rem'
+                  px='5.6rem'
+                  // onClick={()=>onCollateralRequest()}
+                >
+                  Claim collateral
+                </FrakButton>
+              </div>
+            }
 
         </Center>
       </VStack>

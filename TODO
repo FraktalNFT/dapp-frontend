@@ -1,18 +1,25 @@
 TODO::
 --------------------------------------------------------------------------------
+Everything on the nft will be in a /details page
+- Make components for the data displayers and functions
+  - Fraktions listed (and buy options)
+  - Offers (makeOffer & offers history & voting)
+  - Revenues (addRevenue & list of Revenues & claim)
+
+- Add a Defraktionalize function in the market to handle the escrow of the fraktal (otherwise is free to claim)
 
 BUGS:
+  - ItemListed event had a uint256 for numberOfShares. was changed to a uint16 but the event called the older type
+   -also in handlebought
 
   CONTRACTS:
   ------------------------------------------------------------------------------------------------
-  - IMPLEMENT CLONE PROXY! (https://docs.openzeppelin.com/contracts/4.x/api/proxy#TransparentUpgradeableProxy)
   - User can unlock and keep voting, but result is taken from total locked attribute
-  - what happens when an item sold is unvoted? it does not lose the 'sold' status!
   - Opensea assets in rinkeby have id > uint256 !! they fail on import (overflow)
 
   UI
   ------------------------------------------------------------------------------------------------
-  - My NFTs reads and handle arbitrarely some NFTs (ERC1155 subId 1 are considered fraktions by 'default')
+  - NFT item component hover (and amount/price location)
   - Opensea API is veery slow to detect transfers
   - Read account shares (minus total released) in revenues contracts.. display if only.
   - There is no tx handler (besides metamask)
@@ -24,6 +31,4 @@ BUGS:
   SUBGRAPH
 ------------------------------------------------------------------------------------------------
   - Does not detect ERC1155 transfers so ownership is not followed.
-  - When importing NFTs, subgraph duplicates the fraktions. Minted event its called from the market.
-  - claim fraktal does not change ownership
   - in revenues, add a timedate for reference
