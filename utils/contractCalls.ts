@@ -251,7 +251,7 @@ export async function buyFraktions(seller, tokenAddress,amount,value,provider,ma
 export async function createRevenuePayment(value, provider, fraktalAddress){
   const signer = await loadSigner(provider);
   const override = {value: value, gasLimit:700000}
-  const customContract = new Contract(fraktalAddress, marketAbi, signer);
+  const customContract = new Contract(fraktalAddress, tokenAbi, signer);
   let tx = await customContract.createRevenuePayment(override)
   processTx(tx);
 }

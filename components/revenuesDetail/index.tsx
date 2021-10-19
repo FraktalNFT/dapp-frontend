@@ -1,8 +1,7 @@
-import { VStack, HStack } from "@chakra-ui/layout";
+import { HStack } from "@chakra-ui/layout";
 import React, { forwardRef, useState, useEffect } from "react";
 import { getReleased, getShares, release, getApproved, approveMarket } from '../../utils/contractCalls';
 import { shortenHash, timezone } from '../../utils/helpers';
-import {utils, BigNumber} from 'ethers';
 
 interface revenueItemProps {
   value: Number;
@@ -32,7 +31,7 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
       }
     }, [account, shares, released, buyout])
 
-    useEffect(async ()=>{
+    useEffect(async () => {
       let userShares = await getShares(account, provider, revenueAddress);
       let userReleased = await getReleased(account, provider, revenueAddress);
       if(userShares){
@@ -42,7 +41,8 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
         setReleased(userReleased/10**18)
       }
     }, [account, revenueAddress, provider])
-    const isClaimable = () => {return shares > 0 && released == 0}; //shares*value/10000 != 
+
+    const isClaimable = () => {return shares > 0 && released == 0}; //shares*value/10000 !=
 
     async function approveFraktions(){
         setIsApproving(true);
@@ -75,7 +75,7 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
         <img src={"/eth.png"} alt={'ETH'} style={{height:'26px', marginRight:'4px'}}/>
         {isClaimable() &&
           <div>
-          {!isApproved ?
+          {buyout && !isApproved ?
             <div
             style={{
               padding: '4px 16px',
