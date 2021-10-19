@@ -109,7 +109,7 @@ query {
 `;
 const creators_review = gql`
   query{
-    users(first: 5) {
+    users {
       id
       fraktals
       created {
@@ -123,6 +123,24 @@ const creators_review = gql`
     }
   }
 `
+const creators_small_review = gql`
+	query{
+		users(first: 10) {
+      		id
+      		fraktals
+      		created {
+        		id
+        		marketId
+        		hash
+        		creator
+        		owner
+        		createdAt
+     	 	}
+    	}
+	}
+`
+
+
 const account_fraktions_query = gql`
   query($id:ID!){
     fraktionsBalances(first:10, where:{owner:$id, amount_gt:0}){
@@ -373,7 +391,7 @@ const calls = [
 
 
 export const getSubgraphData = async (call, id) => {
-  let callGql = calls.find(x=> {return x.name == call})
+  let callGql = calls.find(x => {return x.name == call})
   try {
     const data = await request(APIURL , callGql.call, {id});
     // console.log('data for:',id,' found',data)

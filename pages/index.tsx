@@ -17,23 +17,20 @@ const Home: React.FC = () => {
   const [selectionMode, setSelectionMode] = useState(false);
   const [sortType, setSortType] = useState("Popular");
   const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const handleSortSelect = (item: string) => {
     setSortType(item);
     setSelectionMode(false);
   };
 
-  useEffect(async ()=>{
-    setLoading(true);
-    await getMoreListedItems();
-    // let data = await getSubgraphData('listed_items','');
-    // filter on graphQl
-    // const dataOnSale = data.listItems.filter(x=>{return x.fraktal.status == 'open'});
-    // if(dataOnSale){
-    //   Promise.all(dataOnSale.map(x=>{return createListed(x)})).then((results)=>setNftItems(results));
-    // }
-    setLoading(false);
-  },[])
-
+	useEffect(() => {
+		async function getData() {
+			setLoading(true);
+			await getMoreListedItems();
+			setLoading(false);
+		}
+		getData();
+  	},[])
 
 
   const getMoreListedItems = async () => {
@@ -58,10 +55,11 @@ const Home: React.FC = () => {
   );
 
   return (
+	<> 
+	<Head>
+	<title>Fraktal - Marketplace</title>
+	</Head>
     <VStack spacing='0' mb='12.8rem'>
-      <Head>
-        <title>Fraktal - Marketplace</title>
-      </Head>
       <HStack w='96.4rem' spacing='0' justifyContent='space-between' mb='4rem'>
         <Box position='relative' w={"110px"}>
           {!selectionMode ? (
@@ -94,8 +92,7 @@ const Home: React.FC = () => {
             <InfiniteScroll
               dataLength={nftItems.length}
               next={getMoreListedItems}
-              // hasMore={hasMore}
-              style={{display:'ininline'}}
+              hasMore={hasMore}
               loader={<h3> Loading...</h3>}
               endMessage={<h4>Nothing more to show</h4>}
             >
@@ -131,6 +128,7 @@ const Home: React.FC = () => {
       </div>
       }
     </VStack>
+	</>
   );
 };
 
