@@ -5,6 +5,7 @@ import styles from "./auction.module.css";
 import { HStack, VStack } from "@chakra-ui/layout";
 import React, {useEffect, useState} from "react";
 import FraktionsList from '../../../components/fraktionsList';
+import RevenuesList from '../../../components/revenuesList';
 import UserOwnership from '../../../components/userOwnership';
 import BuyOutCard from '../../../components/buyOutCard';
 import { Image } from "@chakra-ui/image";
@@ -43,6 +44,7 @@ export default function DetailsView() {
   const [fraktionsIndex, setFraktionsIndex] = useState();
   const [userFraktions, setUserFraktions] = useState(0);
   const [isOwner, setIsOwner] = useState(false);
+  const [revenues, setRevenues] = useState();
 // use callbacks
   useEffect(async ()=>{
       if(account){
@@ -59,6 +61,7 @@ export default function DetailsView() {
         }
       let fraktalFetch = await getSubgraphData('fraktal',tokenAddressSplitted)
       console.log('object',fraktalFetch)
+
       if(fraktalFetch && fraktalFetch.fraktalNfts && fraktalFetch.fraktalNfts[0]){
         let nftObjects = await createObject2(fraktalFetch.fraktalNfts[0])
         if(nftObjects){
@@ -69,6 +72,11 @@ export default function DetailsView() {
         }
         if(fraktalFetch.fraktalNfts[0].collateral){
           setCollateralNft(fraktalFetch.fraktalNfts[0].collateral)
+        }
+        let revenuesValid = fraktalFetch.fraktalNfts[0].revenues.filter(x=>{return x.value > 0 })
+        if(revenuesValid){
+          console.log('revenues',revenuesValid)
+          setRevenues(revenuesValid)
         }
       }
     }
@@ -250,7 +258,13 @@ export default function DetailsView() {
           />
         </div>
         <div style={{marginTop:'40px'}}>
-          {/* REVENUES */}
+          <RevenuesList
+            account = {account}
+            revenuesCreated = {revenues}
+            tokenAddress = {tokenAddress}
+            marketAddress = {marketAddress}
+            provider = {provider}
+          />
         </div>
 
 

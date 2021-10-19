@@ -38,39 +38,46 @@ const tokenAbi = [
   "function majority() public view returns (uint)",
   "function fraktionsIndex() public view returns (uint256)"
 ]
-const mintAbi = ["function mint(string urlIpfs, uint16 majority)"];
-const importERC721Abi = ["function importERC721(address _tokenAddress, uint256 _tokenId, uint16 majority)"];
-const importERC1155Abi = ["function importERC1155(address _tokenAddress, uint256 _tokenId, uint16 majority)"];
-const claimERC721Abi = ['function claimERC721(uint256 _tokenId)'];
-const claimERC1155Abi = ['function claimERC1155(uint256 _tokenId)'];
-const getApprovedAbi = ["function isApprovedForAll(address account,address operator) external view returns (bool)"];
-const getLockedSharesAbi = ["function getLockedShares(uint256 index, address who) public view returns(uint)"];
-const getLockedToAbi = ["function getLockedToTotal(uint256 index, address who) public view returns(uint)"];
+const revenuesAbi = [
+    "function shares(address account) external view returns (uint256)",
+    "function released(address account) public view returns (uint256)",
+    "function release() public"
+]
 
 // TODO
 const transferAbi = ["function makeSafeTransfer(address _to,uint256 _tokenId,uint256 _subId,uint256 _amount)"];
-const fraktionalizeAbi = ["function fraktionalize(uint256 _tokenId)"];
-// const defraktionalizeAbi = ["function defraktionalize(uint256 _tokenId)"];
-// const approveAbi = ["function setApprovalForAll(address operator, bool approved)"];
-// const unlockAbi = ["function unlockSharesTransfer(address from, address _to)"];
-// const lockAbi = ["function lockSharesTransfer(address from, uint numShares, address _to)"];
-// const listItemAbi = ["function listItem(address _tokenAddress,uint256 _price,uint16 _numberOfShares) external returns (bool)"];
-// const unlistItemAbi = ["function unlistItem(uint256 _tokenId)"];
-// const rescueEthAbi = ["function rescueEth()"];
-// const buyAbi = ["function buyFraktions(address from, uint256 _tokenId, uint16 _numberOfShares) payable"];
-const revenueAbi = ["function createRevenuePayment() payable"];
-const releaseAbi = ["function release()"];
-const claimAbi = ["function claimFraktal(uint256 _tokenId)"];
-const voteAbi = ["function voteOffer(address offerer, address tokenAddress)"];
-// const makeOfferAbi = ["function makeOffer(address tokenAddress, uint256 _value) payable"];
-const importFraktalAbi = ["function importFraktal(tokenAddress, fraktionsIndex)"];
-// const getMaxPriceAbi = ["function maxPriceRegistered(address) view returns (uint256)"];
+
+export async function getShares(account, provider, revenueContract) {
+  try{
+    const customContract = new Contract(revenueContract, revenuesAbi, provider);
+    let shares = await customContract.shares(account);
+    return shares.toNumber();
+  }catch{
+    return 'error getting shares'
+  }
+}
+export async function getReleased(account, provider, revenueContract) {
+  try{
+    const customContract = new Contract(revenueContract, revenuesAbi, provider);
+    let released = await customContract.released(account);
+    return released;
+  }catch{
+    return 'error getting released'
+  }
+}
+
+export async function release(provider, revenueAddress){
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(revenueAddress, revenuesAbi, signer);
+  let tx = await customContract.release()
+  processTx(tx);
+}
 
 // View functions
 ///////////////////////////////////////////////////////////
-export async function getApproved(account, factoryContract, provider, tokenContract) {
+export async function getApproved(account, checkContract, provider, tokenContract) {
   const customContract = new Contract(tokenContract, tokenAbi, provider);
-  let approved = await customContract.isApprovedForAll(account, factoryContract)
+  let approved = await customContract.isApprovedForAll(account, checkContract)
   return approved;
 }
 export async function getMajority(provider, tokenContract) {
@@ -92,7 +99,7 @@ export async function getFraktionsIndex(provider, tokenContract) {
   }
 }
 export async function getBalanceFraktions(account, provider, tokenContract) {
-  const customContract = new Contract(tokenContract, tokenAbi, provider);  
+  const customContract = new Contract(tokenContract, tokenAbi, provider);
   let index = await customContract.getFraktionsIndex();
   let balanceOfId = await customContract.balanceOf(account, index)
   return balanceOfId.toNumber();
@@ -248,13 +255,7 @@ export async function createRevenuePayment(value, provider, fraktalAddress){
   let tx = await customContract.createRevenuePayment(override)
   processTx(tx);
 }
-export async function release(provider, revenueAddress){
-  const signer = await loadSigner(provider);
-  const override = {gasLimit:160000}
-  const customContract = new Contract(revenueAddress, releaseAbi, signer);
-  let tx = await customContract.release(override)
-  processTx(tx);
-}
+
 export async function claimFraktalSold(tokenId, provider, marketAddress){
   const signer = await loadSigner(provider);
   const customContract = new Contract(marketAddress, marketAbi, signer);
