@@ -48,7 +48,7 @@ const RevenuesList=(({account, revenuesCreated, tokenAddress, marketAddress, pro
         style={{
           backgroundColor: "white",
           marginRight: "16px",
-          width: "192px",
+          width: "125px",
         }}
         onClick={()=>setValueSetter(!valueSetter)}
         >
@@ -57,7 +57,7 @@ const RevenuesList=(({account, revenuesCreated, tokenAddress, marketAddress, pro
         {valueSetter &&
           <input
           style={{
-            fontSize:'64px',
+            fontSize:'48px',
             color: 'blue',
             fontWeight:'bold',
             textAlign:'center',
@@ -79,7 +79,7 @@ const RevenuesList=(({account, revenuesCreated, tokenAddress, marketAddress, pro
           style={{
             backgroundColor: "white",
             marginRight: "16px",
-            width: "192px",
+            width: "92px",
           }}
           onClick={()=>launchRevenuePayment()}
           >

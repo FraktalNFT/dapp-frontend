@@ -15,11 +15,11 @@ import { createObject2 } from '../../../utils/nftHelpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
 import {
   getBalanceFraktions,
-  claimFraktalSold,
   getMinimumOffer,
   unlistItem,
   getApproved,
   getFraktionsIndex,
+  claimFraktalSold,
   isFraktalOwner
 } from '../../../utils/contractCalls';
 import { useRouter } from 'next/router';
@@ -124,13 +124,14 @@ export default function DetailsView() {
     }
   }
 
-  async function claimNFT() { // this one goes to offersCard
+  async function claimFraktal() { // this one goes to offersCard
     try {
-      let tx = await claimFraktalSold(nftObject.id, provider, marketAddress);
+      await claimFraktalSold(tokenAddress, provider, marketAddress);
     }catch(e){
       console.log('There has been an error: ',e)
     }
   }
+
 
   return (
     <HStack>
@@ -186,6 +187,9 @@ export default function DetailsView() {
             </div>
           </VStack>
         </HStack>
+        {/* for the defrak bug, i leave this function to claim the fraktal
+          <button onClick={()=>claimFraktal()}>Claim</button>
+          */}
         <UserOwnership
           fraktions={userFraktions}
           isFraktalOwner={isOwner}
@@ -243,7 +247,6 @@ export default function DetailsView() {
           />
           :null}
         <div style={{marginTop:'40px'}}>
-          <button onClick={()=>claimNFT()}>Claim</button>
           <BuyOutCard
             account={account}
             minPrice={minOffer}

@@ -2,7 +2,7 @@ import { gql, request } from 'graphql-request';
 import { utils } from "ethers";
 const { CID } = require('ipfs-http-client');
 
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.1.21';
+const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.1.24';
 
 const creator_query = gql`
 query($id:ID!){
@@ -361,7 +361,7 @@ const fraktalId_query = gql`
         tokenAddress
         value
         timestamp
-        buyout        
+        buyout
         creator {
           id
         }
