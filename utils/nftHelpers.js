@@ -50,11 +50,13 @@ async function fetchNftMetadata(hash){
     for await (const chunk of ipfsClient.cat(hash)) {
       chunks = binArrayToJson(chunk);
     }
+    // console.log('found qm.., data:',chunks)
     return chunks;
   } else {
     let res = await fetch(hash)
     if(res){
       let result = res.json()
+      // console.log('found other, data:',result)
       return result
     }
   }
@@ -141,21 +143,26 @@ export async function createObject2(data){
   try{
     let nftMetadata = await fetchNftMetadata(data.hash)
     // console.log('meta',nftMetadata)
-    if(nftMetadata){
-      return {
-        id: data.id,
-        creator:data.creator.id,
-        marketId: data.marketId,
-        balances: data.fraktions,
-        createdAt: data.createdAt,
-        status: data.status,
-        name: nftMetadata.name,
-        description: nftMetadata.description,
-        imageURL: checkImageCID(nftMetadata.image),
-      }
+    let object = {
+      id: data.id,
+      creator:data.creator.id,
+      marketId: data.marketId,
+      balances: data.fraktions,
+      createdAt: data.createdAt,
+      status: data.status,
     }
+    if(nftMetadata && nftMetadata.name){
+        object.name = nftMetadata.name
+    }
+    if(nftMetadata && nftMetadata.description){
+        object.description = nftMetadata.description
+    }
+    if(nftMetadata && nftMetadata.image){
+        object.imageURL = checkImageCID(nftMetadata.image)
+    }
+    return object;
   }catch{
-    console.log('Error fetching ',data);
+    console.log('Error fetching 2 ',data.hash);
     return null;
   }
 };

@@ -1,9 +1,8 @@
 import { Image } from "@chakra-ui/image";
-import { Box, Center, StackProps, Text, VStack, HStack } from "@chakra-ui/layout";
-import { formatEther } from "@ethersproject/units";
+import { Box, StackProps, Text, VStack } from "@chakra-ui/layout";
 import React, { forwardRef } from "react";
+import { Flex, Spacer } from "@chakra-ui/react";
 import { FrakCard } from "../../types";
-// import FrakButton from "../button";
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
@@ -17,75 +16,49 @@ interface NFTItemProps extends StackProps {
 const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
   ({ item, amount, price, imageURL, name, onClick, CTAText }, ref) => {
     return (
-      <VStack
-        cursor='pointer'
-        overflow='hidden'
+      <Box
         maxW='30rem'
         rounded='md'
         borderWidth='1px'
-        borderColor='white.100'
+        boxShadow="md"
         onClick={onClick}
-        ref={ref}
         _hover={{
-          h: "40rem",
-          w:'150%'
+          boxShadow: "xl"
         }}
+        ref={ref}>
+      <VStack
+        cursor='pointer'
       >
         <Box
           h='35rem'
           w='100%'
           position='relative' >
           <Image src={imageURL} width='100%' height='100%' objectFit='cover' margin-left='auto' margin-right='auto' display='flex' maxH='35rem' style={{verticalAlign:'middle'}}/>
+
         </Box>
-        <div style={{
-          color:'#000000',
-          fontFamily: 'Inter',
-          alignSelf:'stretch',
-          fontSize:'16px',
-          lineHeight:'19px',
-          fontWeight: 'bold',
-          margin:'16px'
-        }}>
-          {name}
-        </div>
-        <HStack style={{
-          fontSize:'14px',
-          lineHeight:'20px',
-          color:'#654464',
-          justifyContent:'space-beween',
-          marginBottom:'8px'
-        }}>
-          {amount &&
-            <div>
-            {amount/100}% Available
-            </div>
-          }
-          {price &&
-            <HStack>
-            <img src={"/eth.png"} alt={'Eth'} style={{
-              height:'18px',
-              marginRight:'4px',
-              opacity:'0.7'
-            }}/>
-            <div style={{textAlign:'right'}}>
-            {price}
-            </div>
-            </HStack>
-          }
-        </HStack>
-
-
-        {/*
-        <Center flexDirection='column' py='1.6rem'>
-          <Text className='medium-16' mb='1.6rem'>
-            {item.name}
+        </VStack>
+        <Box margin="1rem">
+          <Text className='semi-16' mb='1rem'>
+            {name}
           </Text>
-          <FrakButton className='semi-16' py='.8rem' px='5.6rem'>
-            {CTAText || "Invest"}
-          </FrakButton>
-        </Center>
-        */}
-      </VStack>
+          <Flex>
+          {amount &&
+            <Text className='medium-12'>
+            {amount/100}% Available
+            </Text>
+          }
+
+          <Spacer />
+          <Image align="vertical" width="5" height="8" marginEnd="3px" src="https://ethereum.org/static/6b935ac0e6194247347855dc3d328e83/31987/eth-diamond-black.png" />
+          {price &&
+            <Text textAlign="end" className='medium-12'>
+            {Math.round(price*100000)/100000}
+            </Text>
+          }
+          </Flex>
+        </Box>
+      </Box>
+
     );
   }
 );

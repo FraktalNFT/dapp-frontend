@@ -10,11 +10,10 @@ import FrakButton from "../components/button";
 import { useWeb3Context } from '../contexts/Web3Context';
 import { utils } from 'ethers';
 import { getSubgraphData } from '../utils/graphQueries';
-import { createObject, createOpenSeaObject } from '../utils/nftHelpers';
+import { createObject, createObject2, createOpenSeaObject } from '../utils/nftHelpers';
 import {
   rescueEth,
   claimFraktalSold,
-  fraktionalize,
   importFraktal,
   claimERC1155,
   claimERC721,
@@ -140,25 +139,51 @@ export default function MyNFTsView() {
   useEffect(async()=>{
     if(account) {
       let openseaAssets = await assetsInWallet(account);
+      // let fraktalObjects = ;
       let fobjects = await getAccountFraktions();
       let nftsERC721_wallet;
       let nftsERC1155_wallet;
       let totalNFTs = [];
+      let fraktionsObjects;
+      if(fobjects && fobjects.users.length){
+        let userBalance = fobjects.users[0].balance
+        setTotalBalance(parseFloat(userBalance)/10**18)
+        // console.log('fraktions',fobjects.users[0])
+        let validFraktions = fobjects.users[0].fraktions.filter(x=>{return x.status != 'retrieved'})
+        fraktionsObjects = await Promise.all(validFraktions.map(x=>{return createObject(x)}))
+        if(fraktionsObjects){
+          let fraktionsObjectsClean = fraktionsObjects.filter(x=>{return x != null});
+          setFraktionItems(fraktionsObjectsClean)
+        }else{
+          setFraktionItems([])
+        }
+      }
+
       if(openseaAssets && openseaAssets.assets && openseaAssets.assets.length){
           nftsERC721_wallet = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC721'})
           if(nftsERC721_wallet && nftsERC721_wallet.length){
             totalNFTs = totalNFTs.concat(nftsERC721_wallet);
           }
-          nftsERC1155_wallet = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC1155' && x.token_id != '0'})
+          nftsERC1155_wallet = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC1155'})// && x.token_id != '0'
+
           totalNFTs = nftsERC721_wallet.concat(nftsERC1155_wallet);
-          let userFraktalsSupposed = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC1155' && x.token_id == '0'})
-          let userFraktalObjects = await Promise.all(userFraktalsSupposed.map(x=>{return createOpenSeaObject(x)}))
-          let fraktalsAddressList = userFraktalsSupposed.map(x=>{return x.id})
+          let userFraktalsFetched = fobjects.users[0].fraktals;
+          let userFraktalObjects = await Promise.all(userFraktalsFetched.map(x=>{return createObject2(x)}))
+          let fraktalsClean;
           if(userFraktalObjects){
-            let fraktalsClean = userFraktalObjects.filter(x=>{return x != null && x.imageURL.length});
+            fraktalsClean = userFraktalObjects.filter(x=>{return x != null && x.imageURL.length});
             setUserFraktals(fraktalsClean)
           }
-          let nftObjects = await Promise.all(totalNFTs.map(x=>{return createOpenSeaObject(x)}))
+          let userFraktalAddresses = fraktalsClean.map(x => {return x.id});
+          let userFraktionsAddreses = fraktionsObjects.map(x => {return x.id});
+          let totalAddresses = userFraktalAddresses.concat(userFraktionsAddreses);
+          let nftsFiltered = totalNFTs.map(x=>{
+            if(!totalAddresses.includes(x.asset_contract.address)){
+            return x
+          }
+          })
+          // console.log('listas:', nftsFiltered)
+          let nftObjects = await Promise.all(nftsFiltered.map(x=>{return createOpenSeaObject(x)}))
           if(nftObjects){
             let nftObjectsClean = nftObjects.filter(x=>{return x != null && x.imageURL.length});
             setNftItems(nftObjectsClean)
@@ -167,48 +192,8 @@ export default function MyNFTsView() {
           }
       }
 
-      if(fobjects && fobjects.users.length){
-        let userBalance = fobjects.users[0].balance
-        setTotalBalance(parseFloat(userBalance)/10**18)
-        let validFraktions = fobjects.users[0].fraktions.filter(x=>{return x.status != 'retrieved'})
-        console.log('fraktions',validFraktions)
-        let fraktionsObjects = await Promise.all(validFraktions.map(x=>{return createObject(x)}))
-        if(fraktionsObjects){
-          let fraktionsObjectsClean = fraktionsObjects.filter(x=>{return x != null});
-          setFraktionItems(fraktionsObjectsClean)
-        }else{
-          setFraktionItems([])
-        }
-      }
     }
   },[account]);
-
-  // useEffect(async () => {
-  //   if(account && nftItems){
-  //     let userOffers;
-  //     let fetchOffers = await getUserOffers();
-  //     let openSeaAssetsAddresses = nftItems.map(x=>{return x.id});
-  //     if(fetchOffers && fetchOffers.users.length){
-  //       let offersMade = fetchOffers.users[0].offersMade.filter(x=> {return !openSeaAssetsAddresses.includes(x.fraktal.id) && (x.fraktal.status == "open" || x.fraktal.status == "sold")})
-  //       if(offersMade && offersMade.length){
-  //         let soldOffers = offersMade.filter(x=> {return x.fraktal.status == 'sold'})
-  //         let openOffers = offersMade.filter(x=> {return x.fraktal.status != 'sold'})
-  //         if(soldOffers){
-  //           soldOffers.map(async x => {
-  //             getLockedTo(account,x.fraktal.id,provider).then(votes => {
-  //               if(votes >= 8000){
-  //                 Object.assign(x.fraktal, { status: 'buyer'});
-  //               }
-  //             })
-  //           })
-  //         }
-  //         let totalOffers = openOffers.concat(await soldOffers)
-  //         userOffers = await Promise.all(totalOffers.map(x=>{return createObject(x.fraktal)}))
-  //         setOffers(userOffers);
-  //       }
-  //     }
-  //   }
-  // },[account, nftItems]);
 
   return (
     <VStack spacing='0' mb='12.8rem'>
@@ -359,7 +344,7 @@ export default function MyNFTsView() {
           </div>
         </div>
       )}
-      {offers && offers.length &&
+      {/*offers && offers.length &&
         <div>
           <div className={styles.header2}>OFFERS</div>
           <Grid
@@ -394,7 +379,7 @@ export default function MyNFTsView() {
           ))}
           </Grid>
         </div>
-      }
+      */}
     </VStack>
   )
 };

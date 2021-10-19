@@ -13,9 +13,9 @@ import InfiniteScroll from "react-infinite-scroll-component";
 const SORT_TYPES = ["Popular", "Ending Soonest", "Newly Listed"];
 
 const Home: React.FC = () => {
+  const [nftItems, setNftItems] = useState([]);
   const [selectionMode, setSelectionMode] = useState(false);
   const [sortType, setSortType] = useState("Popular");
-  const [nftItems, setNftItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const handleSortSelect = (item: string) => {
     setSortType(item);
