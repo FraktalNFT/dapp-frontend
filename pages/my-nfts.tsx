@@ -302,7 +302,7 @@ export default function MyNFTsView() {
             <div className={styles.claimHeader}>ETH</div>
             <div className={styles.claimAmount}>{Math.round(totalBalance*1000)/1000}</div>
           </div>
-          <div className={styles.claimCTA} onClick={()=>rescueEth(provider, marketAddress).then(()=>router.reload())}>Claim</div>
+          <div className={styles.claimCTA} onClick={()=>rescueEth(provider, marketAddress)}>Claim</div>
         </div>
       </div>
       {/*///////////////*/}
