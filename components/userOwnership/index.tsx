@@ -50,6 +50,7 @@ const UserOwnership=(({
   }
 
 
+
   async function importFraktalToMarket(){
     if(!isApproved){
       await approveMarket(marketAddress, provider, tokenAddress);

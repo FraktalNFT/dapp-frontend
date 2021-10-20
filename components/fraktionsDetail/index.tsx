@@ -16,6 +16,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
     const [buying, setBuying] = useState(false);
 
     const toPay = () => utils.parseEther(((amountToBuy * price)+0.00000000000000001).toString());
+    const priceParsed = (price) => {return Math.round(utils.formatEther(price)*100000)/100000};
 
     async function onBuy(){
       setBuying(true)
@@ -101,7 +102,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
               lineHeight:'40px',
               color:'#000000'
             }}>
-                {price.toLocaleString()}
+                {priceParsed(price)}
             </div>
           </HStack>
           <div style={{
