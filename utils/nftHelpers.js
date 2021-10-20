@@ -176,6 +176,7 @@ export async function createListed(data){
         marketId: data.fraktal.marketId,
         createdAt: data.fraktal.createdAt,
         tokenAddress: data.fraktal.id,
+        holders: data.fraktal.fraktions.length,
         raised: data.gains,
         id: data.id,
         price: utils.formatEther(data.price),

@@ -15,7 +15,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
     const [ amountToBuy, setAmountToBuy] = useState(0);
     const [buying, setBuying] = useState(false);
 
-    const toPay = () => utils.parseEther(((amountToBuy * price)).toString());
+    const toPay = () => utils.parseEther(((amountToBuy * price)+0.00000000000000001).toString());
 
     async function onBuy(){
       setBuying(true)

@@ -10,18 +10,31 @@ import { FrakCard } from "../types";
 import { getSubgraphData } from '../utils/graphQueries';
 import { createListed } from '../utils/nftHelpers';
 import InfiniteScroll from "react-infinite-scroll-component";
-const SORT_TYPES = ["Popular", "Ending Soonest", "Newly Listed"];
+const SORT_TYPES = ["Availability","Popular", "Newly Listed"];
 
 const Home: React.FC = () => {
   const [nftItems, setNftItems] = useState([]);
   const [selectionMode, setSelectionMode] = useState(false);
-  const [sortType, setSortType] = useState("Popular");
+  const [sortType, setSortType] = useState("Newly Listed");
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const handleSortSelect = (item: string) => {
     setSortType(item);
+    changeOrder(item);
     setSelectionMode(false);
   };
+
+  const changeOrder = (type) => {
+    let sortedItems;
+    if(type == 'Availability'){
+      sortedItems = nftItems.sort((a, b) => (parseInt(a.amount) > parseInt(b.amount)) ? -1 : 1);
+    }else if(type == 'Popular'){
+      sortedItems = nftItems.sort((a, b) => (a.holders > b.holders) ? 1 : -1);
+    }else {
+      sortedItems = nftItems.sort((a, b) => (a.createdAt > b.createdAt) ? 1 : -1);
+    }
+    setNftItems(sortedItems)
+  }
 
 	useEffect(() => {
 		async function getData() {
@@ -32,12 +45,11 @@ const Home: React.FC = () => {
 		getData();
   	},[])
 
-
-
   const getMoreListedItems = async () => {
     const data = await getSubgraphData('listed_items','');
     let dataOnSale = data.listItems.filter(x=>{return x.fraktal.status == 'open'}); // this goes in the graphql query
     if(dataOnSale){
+      // console.log('dataOnSale', dataOnSale)
       let objects = await Promise.all(dataOnSale.map(x=>{return createListed(x)}))//.then((results)=>setNftItems([...nftItems, ...results]));
       let deduplicatedObjects = objects.filter(item => {
 				const objectMatch = nftItems.find(nft => nft.id === item.id)
@@ -52,7 +64,6 @@ const Home: React.FC = () => {
 				setNftItems(newArray);
 			}
     }
-
   };
 
   const demoNFTItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
