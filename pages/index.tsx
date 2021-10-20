@@ -33,14 +33,26 @@ const Home: React.FC = () => {
   	},[])
 
 
+
   const getMoreListedItems = async () => {
-  // should read where to start (nftItems.length) and add some items continously
     const data = await getSubgraphData('listed_items','');
-    console.log('listed items ',data)
     let dataOnSale = data.listItems.filter(x=>{return x.fraktal.status == 'open'}); // this goes in the graphql query
     if(dataOnSale){
-      Promise.all(dataOnSale.map(x=>{return createListed(x)})).then((results)=>setNftItems([...nftItems, ...results]));
+      let objects = await Promise.all(dataOnSale.map(x=>{return createListed(x)}))//.then((results)=>setNftItems([...nftItems, ...results]));
+      let deduplicatedObjects = objects.filter(item => {
+				const objectMatch = nftItems.find(nft => nft.id === item.id)
+				if (typeof objectMatch === 'undefined') {
+					return true;
+				} else return false
+			})
+			if (typeof deduplicatedObjects[0] === 'undefined') {
+				setHasMore(false);
+			} else {
+				const newArray = [...nftItems, ...deduplicatedObjects];
+				setNftItems(newArray);
+			}
     }
+
   };
 
   const demoNFTItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
@@ -55,7 +67,7 @@ const Home: React.FC = () => {
   );
 
   return (
-	<> 
+	<>
 	<Head>
 	<title>Fraktal - Marketplace</title>
 	</Head>

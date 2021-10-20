@@ -78,7 +78,6 @@ export default function ArtistsView() {
 	useEffect(() => {
 		const fetchInitialArtists = async () => {
 			const data = await getSubgraphData('artists', '')
-      // console.log('data',data)
 			if (data && marketAddress) {
 				let onlyCreators = data.users.filter(x=>{return x.created.length > 0 })
 				let withoutFactory = onlyCreators.filter(x=>{return x.id != factoryAddress.toLocaleLowerCase()}) // why?
