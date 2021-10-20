@@ -36,7 +36,8 @@ const tokenAbi = [
   "function createRevenuePayment() payable",
   "function balanceOf(address account, uint256 id) external view returns (uint256)",
   "function majority() public view returns (uint)",
-  "function fraktionsIndex() public view returns (uint256)"
+  "function fraktionsIndex() public view returns (uint256)",
+  "function indexUsed(uint256) view returns (bool)"
 ]
 const revenuesAbi = [
     "function shares(address account) external view returns (uint256)",
@@ -79,6 +80,11 @@ export async function getApproved(account, checkContract, provider, tokenContrac
   const customContract = new Contract(tokenContract, tokenAbi, provider);
   let approved = await customContract.isApprovedForAll(account, checkContract)
   return approved;
+}
+export async function getIndexUsed(index, provider, tokenContract) {
+  const customContract = new Contract(tokenContract, tokenAbi, provider);
+  let isUsed = await customContract.indexUsed(index)
+  return isUsed;
 }
 export async function getMajority(provider, tokenContract) {
   try{
