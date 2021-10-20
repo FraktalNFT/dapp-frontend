@@ -95,7 +95,6 @@ const RevenuesList=(({account, revenuesCreated, tokenAddress, marketAddress, pro
             <HStack>
               <div>Creator</div>
               <div>Date</div>
-              <div>Reason</div>
               <div>Total</div>
               <div>Functions</div>
             </HStack>

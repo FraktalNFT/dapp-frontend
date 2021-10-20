@@ -66,11 +66,6 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
       <HStack style={{marginTop:'24px'}}>
         <div>{shortenHash(creator)}</div>
         <div>{timezone(date)}</div>
-        {buyout &&
-          <div>
-            Item sold!
-          </div>
-        }
         <div>{value/10**18}</div>
         <img src={"/eth.png"} alt={'ETH'} style={{height:'26px', marginRight:'4px'}}/>
         {isClaimable() &&
@@ -116,6 +111,11 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
             >
             {isClaiming? <div>Claiming</div> : <div>Claim</div>}
 
+            </div>
+          }
+          {buyout &&
+            <div>
+              Item sold!
             </div>
           }
           </div>
