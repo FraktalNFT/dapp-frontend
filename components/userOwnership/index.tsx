@@ -6,7 +6,8 @@ import {
   approveMarket,
   claimERC721,
   claimERC1155,
-  defraktionalize
+  defraktionalize,
+  getIndexUsed
 } from '../../utils/contractCalls';
 
 const UserOwnership=(({
@@ -49,13 +50,21 @@ const UserOwnership=(({
   }
 
 
+
   async function importFraktalToMarket(){
     if(!isApproved){
       await approveMarket(marketAddress, provider, tokenAddress);
     }
-    let index = 1;
-    // check indexes in a while loop for indexUsed..
-    await importFraktal(tokenAddress,index,provider,marketAddress);
+    let index = 0;
+    let isUsed = true;
+    while(isUsed == true){
+      index += 1;
+      isUsed = await getIndexUsed(index, provider, tokenAddress);
+      // console.log('testint index = ',index,' and is Used: ',isUsed)
+    }
+    if(isUsed == false){
+      await importFraktal(tokenAddress,index,provider,marketAddress);
+    }
   }
 
   return(

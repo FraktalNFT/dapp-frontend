@@ -7,7 +7,6 @@ import { utils } from "ethers";
 
 const FraktionsList=(({fraktionsListed, tokenAddress, marketAddress, provider}) => {
 
-  const priceParsed = (price) => {return Math.round(utils.formatEther(price)*100000)/100000};
 
   return(
     <div style={{
@@ -32,7 +31,7 @@ const FraktionsList=(({fraktionsListed, tokenAddress, marketAddress, provider}) 
               <FraktionsDetail
                 key={x.id}
                 amount={x.amount}
-                price={priceParsed(x.price)}
+                price={x.price}
                 seller={x.seller.id}
                 tokenAddress={tokenAddress}
                 marketAddress={marketAddress}
