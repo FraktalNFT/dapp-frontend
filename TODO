@@ -1,29 +1,21 @@
 TODO::
 --------------------------------------------------------------------------------
+- Add a Defraktionalize function in the market to handle the escrow of the fraktal (otherwise is free to claim)
 
 BUGS:
+  - DeFrak does not return the Fraktal!!!!
 
   CONTRACTS:
   ------------------------------------------------------------------------------------------------
-  - IMPLEMENT CLONE PROXY! (https://docs.openzeppelin.com/contracts/4.x/api/proxy#TransparentUpgradeableProxy)
   - User can unlock and keep voting, but result is taken from total locked attribute
-  - what happens when an item sold is unvoted? it does not lose the 'sold' status!
   - Opensea assets in rinkeby have id > uint256 !! they fail on import (overflow)
 
   UI
   ------------------------------------------------------------------------------------------------
-  - My NFTs reads and handle arbitrarely some NFTs (ERC1155 subId 1 are considered fraktions by 'default')
   - Opensea API is veery slow to detect transfers
-  - Read account shares (minus total released) in revenues contracts.. display if only.
   - There is no tx handler (besides metamask)
-  - Complete redirectings in the dapp.
   - Incorrect networks does not work very well, does not detect network change (add listener)
   - Does detect account change.. but is buggy..
-  - Claims are radio group. What is the best way? (list?)
 
   SUBGRAPH
 ------------------------------------------------------------------------------------------------
-  - Does not detect ERC1155 transfers so ownership is not followed.
-  - When importing NFTs, subgraph duplicates the fraktions. Minted event its called from the market.
-  - claim fraktal does not change ownership
-  - in revenues, add a timedate for reference

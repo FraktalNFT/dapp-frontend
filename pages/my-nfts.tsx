@@ -10,11 +10,11 @@ import FrakButton from "../components/button";
 import { useWeb3Context } from '../contexts/Web3Context';
 import { utils } from 'ethers';
 import { getSubgraphData } from '../utils/graphQueries';
-import { createObject, createOpenSeaObject } from '../utils/nftHelpers';
+import { createObject, createObject2, createOpenSeaObject } from '../utils/nftHelpers';
 import {
   rescueEth,
   claimFraktalSold,
-  fraktionalize,
+  importFraktal,
   claimERC1155,
   claimERC721,
   approveMarket,
@@ -29,14 +29,16 @@ import { useRouter } from 'next/router';
 
 export default function MyNFTsView() {
   const router = useRouter();
-  const { account, provider, contractAddress } = useWeb3Context();
+  const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
   const [nftItems, setNftItems] = useState();
   const [fraktionItems, setFraktionItems] = useState();
   const [totalBalance, setTotalBalance] = useState(0);
   const [offers, setOffers] = useState();
+  const [userFraktals, setUserFraktals] = useState();
 
   async function getAccountFraktions(){
     let objects = await getSubgraphData('wallet',account.toLocaleLowerCase())
+    // console.log('fraktions wallet ',objects)
     return objects;
   };
   async function getUserOffers(){
@@ -50,7 +52,7 @@ export default function MyNFTsView() {
         utils.parseEther('0'),
         address,
         provider,
-        contractAddress).then(()=>{
+        marketAddress).then(()=>{
           router.push('/my-nfts');
         })
     }catch(e){
@@ -59,19 +61,19 @@ export default function MyNFTsView() {
   }
 
   async function claimNFT(item){
-    let approved = await getApproved(account, contractAddress, provider, item.id);
+    let approved = await getApproved(account, factoryAddress, provider, item.id);
     let done:Boolean;
     if(!approved){
-      done = await approveContract(item.id);
+      done = await approveContract(factoryAddress, item.id);
     } else {
       done = true;
     }
     let tx;
     if(done){
       if(item.collateralType == 'ERC721'){
-        tx = await claimERC721(item.marketId, provider, contractAddress)
+        tx = await claimERC721(item.marketId, provider, factoryAddress)
       }else{
-        tx = await claimERC1155(item.marketId, provider, contractAddress)
+        tx = await claimERC1155(item.marketId, provider, factoryAddress)
       }
     }
     if(tx){
@@ -89,63 +91,66 @@ export default function MyNFTsView() {
     }
   }
 
-  async function approveContract(tokenAddress){
-    let done = await approveMarket(contractAddress, provider, tokenAddress)
+  async function approveContract(contract, tokenAddress){
+    let done = await approveMarket(contract, provider, tokenAddress)
     return done;
   }
 
   async function importNFT(item){
     let res;
     let done;
-    let approved = await getApproved(account, contractAddress, provider, item.id);
+    let approved = await getApproved(account, factoryAddress, provider, item.id);
     // console.log('is approved?',approved)
     if(!approved){
-      done = await approveContract(item.id);
+      done = await approveContract(factoryAddress, item.id);
     } else {
       done = true;
     }
     // overflow problem with opensea assets.. subid toooo big
     if(done){
       if(item.token_schema == 'ERC721'){
-        res = await importERC721(parseInt(item.tokenId), item.id, provider, contractAddress)
-      } else if (item.token_schema = 'ERC1155' && item.marketId == null) {
-        res = await importERC1155(parseInt(item.tokenId), item.id, provider, contractAddress)
+        res = await importERC721(parseInt(item.tokenId), item.id, provider, factoryAddress)
       } else {
-        res = await approveContract(item.id).then(()=>fraktionalize(parseInt(item.marketId), provider, contractAddress));
+        res = await importERC1155(parseInt(item.tokenId), item.id, provider, factoryAddress)
       }
     }
-    if(res){
+    if(done && res){
+      router.reload();
+    }
+  }
+  async function importFraktalToMarket(item){
+    let res;
+    let done;
+    let approved = await getApproved(account, marketAddress, provider, item.id);
+    // console.log('is approved?',approved)
+    if(!approved){
+      done = await approveContract(marketAddress, item.id);
+    } else {
+      done = true;
+    }
+    // overflow problem with opensea assets.. subid toooo big
+    if(done){
+      res = await importFraktal(item.id,1,provider,marketAddress); // change 1 to fraktionsIndex.. should be changeable
+    }
+    if(done && res){
       router.reload();
     }
   }
   useEffect(async()=>{
     if(account) {
       let openseaAssets = await assetsInWallet(account);
+      // let fraktalObjects = ;
       let fobjects = await getAccountFraktions();
       let nftsERC721_wallet;
       let nftsERC1155_wallet;
       let totalNFTs = [];
-      if(openseaAssets && openseaAssets.assets && openseaAssets.assets.length){
-          nftsERC721_wallet = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC721'})
-          if(nftsERC721_wallet && nftsERC721_wallet.length){
-            totalNFTs = totalNFTs.concat(nftsERC721_wallet);
-          }
-          nftsERC1155_wallet = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC1155' && x.token_id != '1'})
-          totalNFTs = nftsERC721_wallet.concat(nftsERC1155_wallet);
-          let nftObjects = await Promise.all(totalNFTs.map(x=>{return createOpenSeaObject(x)}))
-          if(nftObjects){
-            let nftObjectsClean = nftObjects.filter(x=>{return x != null && x.imageURL.length});
-            setNftItems(nftObjectsClean)
-        }else{
-          setNftItems([])
-        }
-      }
-
+      let fraktionsObjects;
       if(fobjects && fobjects.users.length){
         let userBalance = fobjects.users[0].balance
         setTotalBalance(parseFloat(userBalance)/10**18)
-
-        let fraktionsObjects = await Promise.all(fobjects.users[0].fraktions.map(x=>{return createObject(x.nft)}))
+        // console.log('fraktions',fobjects.users[0])
+        let validFraktions = fobjects.users[0].fraktions.filter(x=>{return x.status != 'retrieved'})
+        fraktionsObjects = await Promise.all(validFraktions.map(x=>{return createObject(x)}))
         if(fraktionsObjects){
           let fraktionsObjectsClean = fraktionsObjects.filter(x=>{return x != null});
           setFraktionItems(fraktionsObjectsClean)
@@ -153,35 +158,42 @@ export default function MyNFTsView() {
           setFraktionItems([])
         }
       }
+
+      if(openseaAssets && openseaAssets.assets && openseaAssets.assets.length){
+          nftsERC721_wallet = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC721'})
+          if(nftsERC721_wallet && nftsERC721_wallet.length){
+            totalNFTs = totalNFTs.concat(nftsERC721_wallet);
+          }
+          nftsERC1155_wallet = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC1155'})// && x.token_id != '0'
+
+          totalNFTs = nftsERC721_wallet.concat(nftsERC1155_wallet);
+          let userFraktalsFetched = fobjects.users[0].fraktals;
+          let userFraktalObjects = await Promise.all(userFraktalsFetched.map(x=>{return createObject2(x)}))
+          let fraktalsClean;
+          if(userFraktalObjects){
+            fraktalsClean = userFraktalObjects.filter(x=>{return x != null && x.imageURL.length});
+            setUserFraktals(fraktalsClean)
+          }
+          let userFraktalAddresses = fraktalsClean.map(x => {return x.id});
+          let userFraktionsAddreses = fraktionsObjects.map(x => {return x.id});
+          let totalAddresses = userFraktalAddresses.concat(userFraktionsAddreses);
+          let nftsFiltered = totalNFTs.map(x=>{
+            if(!totalAddresses.includes(x.asset_contract.address)){
+            return x
+          }
+          })
+          // console.log('listas:', nftsFiltered)
+          let nftObjects = await Promise.all(nftsFiltered.map(x=>{return createOpenSeaObject(x)}))
+          if(nftObjects){
+            let nftObjectsClean = nftObjects.filter(x=>{return x != null && x.imageURL.length});
+            setNftItems(nftObjectsClean)
+          }else{
+            setNftItems([])
+          }
+      }
+
     }
   },[account]);
-
-  useEffect(async () => {
-    if(account && nftItems){
-      let userOffers;
-      let fetchOffers = await getUserOffers();
-      let openSeaAssetsAddresses = nftItems.map(x=>{return x.id});
-      if(fetchOffers){
-        let offersMade = fetchOffers.users[0].offersMade.filter(x=> {return !openSeaAssetsAddresses.includes(x.fraktal.id) && (x.fraktal.status == "open" || x.fraktal.status == "sold")})
-        if(offersMade && offersMade.length){
-          let soldOffers = offersMade.filter(x=> {return x.fraktal.status == 'sold'})
-          let openOffers = offersMade.filter(x=> {return x.fraktal.status != 'sold'})
-          if(soldOffers){
-            soldOffers.map(async x => {
-              getLockedTo(account,x.fraktal.id,provider).then(votes => {
-                if(votes >= 8000){
-                  Object.assign(x.fraktal, { status: 'buyer'});
-                }
-              })
-            })
-          }
-          let totalOffers = openOffers.concat(await soldOffers)
-          userOffers = await Promise.all(totalOffers.map(x=>{return createObject(x.fraktal)}))
-          setOffers(userOffers);
-        }
-      }
-    }
-  },[account, nftItems]);
 
   return (
     <VStack spacing='0' mb='12.8rem'>
@@ -189,9 +201,9 @@ export default function MyNFTsView() {
         <title>Fraktal - My NFTs</title>
       </Head>
       <div className={styles.header}>
-        My NFTs
+        Your Fraktal NFTs
       </div>
-      {nftItems?.length ? (
+      {userFraktals?.length ? (
         <Grid
           mt='40px !important'
           ml='0'
@@ -201,59 +213,39 @@ export default function MyNFTsView() {
           templateColumns='repeat(3, 1fr)'
           gap='3.2rem'
         >
-          {nftItems.map(item => (
-            <div key={item.id}>
+          {userFraktals.map(item => (
+            <div key={item.id+'-'+item.tokenId}>
+              <NextLink key={item.id} href={`/nft/${item.id}/details`}>
+                <NFTItem
+                  item={item}
+                  name={item.name}
+                  amount={null}
+                  price={null}
+                  imageURL={item.imageURL}
+                />
+              </NextLink>
 
-            {item.collateral?
-              <NFTItemOS
-                item={item}
-                CTAText={"Claim collateral"}
-                onClick={()=>claimNFT(item)}
-              />
-               :
-              <NFTItemOS
-                item={item}
-                CTAText={"Import"}
-                onClick={()=>importNFT(item)}
-              />
-            }
             </div>
           ))}
         </Grid>
-      ) : (
-        <div style={{ marginTop: "8px" }}>
-          <div className={styles.descText}>
-            Transfer NFT to your wallet or Mint a new NFT.
-          </div>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <NextLink href={`/mint-nft`}>
-              <FrakButton style={{ width: "240px", marginTop: "24px" }}>
-              Mint NFT
-              </FrakButton>
-            </NextLink>
-          </div>
-        </div>
-      )}
-      {/*///////////////////////////////////*/}
-      <div className={styles.header2}>My Fraktions</div>
-      {fraktionItems?.length ? (
-        <div style={{ marginTop: "16px" }}>
-          <div className={styles.subText}>You have earned</div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginTop: "8px",
-            }}
-          >
-            <div className={styles.claimContainer}>
-              <div style={{ marginLeft: "24px" }}>
-                <div className={styles.claimHeader}>ETH</div>
-                <div className={styles.claimAmount}>{Math.round(totalBalance*1000)/1000}</div>
-              </div>
-              <div className={styles.claimCTA} onClick={()=>rescueEth(provider, contractAddress).then(()=>router.reload())}>Claim</div>
+        ) : (
+          <div style={{ marginTop: "8px" }}>
+            <div className={styles.descText}>
+              Transfer NFT to your wallet or Mint a new NFT.
+            </div>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <NextLink href={`/mint-nft`}>
+                <FrakButton style={{ width: "240px", marginTop: "24px" }}>
+                Mint NFT
+                </FrakButton>
+              </NextLink>
             </div>
           </div>
+        )}
+      {/*///////////////////////////////////*/}
+      <div className={styles.header2}>Your Fraktions</div>
+      {fraktionItems?.length ? (
+        <div style={{ marginTop: "16px" }}>
           <Grid
             mt='40px !important'
             ml='0'
@@ -264,11 +256,20 @@ export default function MyNFTsView() {
             gap='3.2rem'
           >
             {fraktionItems && fraktionItems.map(item => (
-              <div key={item.id}>
-                <NFTItemManager item={item} />
-              </div>
+              <NextLink key={item.id} href={`/nft/${item.id}/details`}>
+                <NFTItem
+                  item={item}
+                  name={item.name}
+                  amount={parseInt(item.userBalance)}
+                  price={null}
+                  imageURL={item.imageURL}
+                />
+              </NextLink>
             ))}
           </Grid>
+
+          {/*
+*/}
         </div>
       ) : (
         <div style={{ marginTop: "8px" }}>
@@ -287,8 +288,63 @@ export default function MyNFTsView() {
           </div>
         </div>
       )}
+
+      <div className={styles.subText}>You have earned</div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "8px",
+        }}
+      >
+        <div className={styles.claimContainer}>
+          <div style={{ marginLeft: "24px" }}>
+            <div className={styles.claimHeader}>ETH</div>
+            <div className={styles.claimAmount}>{Math.round(totalBalance*1000)/1000}</div>
+          </div>
+          <div className={styles.claimCTA} onClick={()=>rescueEth(provider, marketAddress)}>Claim</div>
+        </div>
+      </div>
       {/*///////////////*/}
-      {offers && offers.length &&
+      <div className={styles.header}>
+        Your Wallet NFTs
+      </div>
+      {nftItems?.length ? (
+        <Grid
+          mt='40px !important'
+          ml='0'
+          mr='0'
+          mb='5.6rem !important'
+          w='100%'
+          templateColumns='repeat(3, 1fr)'
+          gap='3.2rem'
+        >
+          {nftItems.map(item => (
+            <div key={item.id+'-'+item.tokenId}>
+            {item.token_schema == 'ERC1155' && item.tokenId == 0 ?
+              <NFTItemOS
+                item={item}
+                CTAText={"Import to market"}
+                onClick={()=>importFraktalToMarket(item)}
+              />
+               :
+              <NFTItemOS
+                item={item}
+                CTAText={"Import"}
+                onClick={()=>importNFT(item)}
+              />
+            }
+            </div>
+          ))}
+        </Grid>
+      ) : (
+        <div style={{ marginTop: "8px" }}>
+          <div className={styles.descText}>
+            You dont have NFTs in your wallet.
+          </div>
+        </div>
+      )}
+      {/*offers && offers.length &&
         <div>
           <div className={styles.header2}>OFFERS</div>
           <Grid
@@ -323,7 +379,7 @@ export default function MyNFTsView() {
           ))}
           </Grid>
         </div>
-      }
+      */}
     </VStack>
   )
 };

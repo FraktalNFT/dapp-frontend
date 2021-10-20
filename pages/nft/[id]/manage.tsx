@@ -111,6 +111,7 @@ export default function ManageNFTView() {
     }
     let nftObjects;
     let obj = await getSubgraphData('marketid_fraktal',index)
+    console.log('obj',obj)
     if(obj.fraktalNfts[0].revenues.length){
       let revenuesValid = obj.fraktalNfts[0].revenues.filter(x=>{return x.value > 0 })
       setRevenues(revenuesValid)

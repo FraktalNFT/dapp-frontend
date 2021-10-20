@@ -11,13 +11,14 @@ import { provider } from "web3-core";
 import Web3Modal, { IProviderOptions } from "web3modal";
 import { getRPCUrl } from "../utils/helpers";
 import Web3 from "web3";
-import { contracts } from '../utils/constants';
+import { marketContracts, factoryContracts } from '../utils/constants';
 
 type Web3ContextType = {
   account: null | string;
   provider: null | ethers.providers.Web3Provider;
   providerChainId: null | number;
-  contractAddress: null | string;
+  factoryAddress: null | string;
+  marketAddress: null | string;
 };
 
 const Web3Context = createContext<
@@ -26,7 +27,8 @@ const Web3Context = createContext<
   account: null,
   provider: null,
   providerChainId: null,
-  contractAddress: null,
+  factoryAddress: null,
+  marketAddress: null,
   loading: false,
   connectWeb3: () => {},
 });
@@ -56,12 +58,13 @@ const web3Modal =
   });
 
 const Web3ContextProvider: React.FC = ({ children }) => {
-  const [{ account, providerChainId, provider, contractAddress }, setWeb3State] =
+  const [{ account, providerChainId, provider, marketAddress, factoryAddress }, setWeb3State] =
     useState<Web3ContextType>({
       account: null,
       provider: null,
       providerChainId: null,
-      contractAddress: null,
+      factoryAddress: null,
+      marketAddress: null,
     });
 
   const [loading, setLoading] = useState(true);
@@ -78,7 +81,8 @@ const Web3ContextProvider: React.FC = ({ children }) => {
             new Web3(prov).currentProvider as ethers.providers.ExternalProvider
           );
           const chainId = parseInt(prov.chainId, 16);
-          const contractAddress = contracts.find(x=>x.providerChainId === chainId).address; // contract specific providerChainId
+          const marketChainAddress = marketContracts.find(x=>x.providerChainId === chainId).address; // contract specific providerChainId
+          const factoryChainAddress = factoryContracts.find(x=>x.providerChainId === chainId).address; // contract specific providerChainId
           const account = initialCall
             ? await provider.getSigner().getAddress()
             : null;
@@ -89,7 +93,8 @@ const Web3ContextProvider: React.FC = ({ children }) => {
             providerChainId: chainId,
             provider,
             account: account || webState.account,
-            contractAddress: contractAddress,
+            marketAddress: marketChainAddress,
+            factoryAddress: factoryChainAddress,
           }));
         }
       } catch (err) {
@@ -118,7 +123,7 @@ const Web3ContextProvider: React.FC = ({ children }) => {
 
   return (
     <Web3Context.Provider
-      value={{ account, providerChainId, provider, loading, connectWeb3, contractAddress }}
+      value={{ account, providerChainId, provider, loading, connectWeb3, marketAddress, factoryAddress }}
     >
       {children}
     </Web3Context.Provider>

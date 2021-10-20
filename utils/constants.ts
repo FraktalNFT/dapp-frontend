@@ -4,10 +4,19 @@ export const LARGEST_UINT256 = BigNumber.from(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 );
 
-export const contracts = [
+export const contracts = [ // old ones
   {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
   {providerChainId:4, address:'0xFf3532447a93497471279150602B6ec24ae1170f'},
   {providerChainId:5, address:'0xA916BbdB90bA3BA7DCca09F2D3B249180f7fE0D2'}
+]
+export const marketContracts = [
+  {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+  {providerChainId:4, address:'0xABE7c1cEbA60591f1Bd0deE5453589Dc7E6C83E1'}, // proxy
+  // {providerChainId:4, address:'0xDD301042351A08512b5E728154B1B3E81908A628'}, logic
+]
+export const factoryContracts = [
+  {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+  {providerChainId:4, address:'0x4CD8d476081bE3e7B266EAB82F54Ef7817b51DEB'},
 ]
 
 export const networkNames = {

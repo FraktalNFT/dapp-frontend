@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Box, Grid, HStack, VStack, Text } from "@chakra-ui/layout";
 import Head from "next/head";
-import { FrakCard } from "../types";
 import NextLink from "next/link";
 import NFTItem from "../components/nft-item";
 import Dropdown from "../components/dropdown";
 import FrakButton from "../components/button";
-import Pagination from "../components/pagination";
 import styles from "../styles/artists.module.css";
 import { Image } from "@chakra-ui/image";
 import { shortenHash } from "../utils/helpers";
 import { getSubgraphData } from '../utils/graphQueries';
-import { createObject } from '../utils/nftHelpers';
+import { createObject2 } from '../utils/nftHelpers';
 import { useWeb3Context } from '../contexts/Web3Context';
 import InfiniteScroll from "react-infinite-scroll-component";
 
@@ -21,16 +19,16 @@ export default function ArtistsView() {
   	const [sortType, setSortType] = useState("Popular");
   	const [artists, setArtists] = useState([]);
   	const [artistsItems, setArtistsItems] = useState([]);
-	const [hasMore, setHasMore] = useState(true);
-  	const {contractAddress} = useWeb3Context();
+	  const [hasMore, setHasMore] = useState(true);
+  	const {marketAddress, factoryAddress} = useWeb3Context();
   	const handleSortSelect = (item: string) => {
     	setSortType(item);
     	setSelectionMode(false);
 	};
-	
+
 	// why does this exist
 	// it triggers an infinite rerender loop and crashes the app
-	// useEffect(()=>{ 
+	// useEffect(()=>{
 	// 	if (artistsItems.length) {
 	// 	let artistsObj = artists.map((x,i)=>({
 	// 		id: x.id,
@@ -52,20 +50,15 @@ export default function ArtistsView() {
     return artistsObj;
 	}
 
-
-
-
-	
 	async function fetchNewArtists() {
 		const data = await getSubgraphData('artists', '')
-		console.log('New Artists: ', data);
-		if (data && contractAddress) {
+		if (data && marketAddress) {
 			let onlyCreators = data.users.filter(x=>{return x.created.length > 0 })
-			let withoutMarket = onlyCreators.filter(x => { return x.id != contractAddress.toLocaleLowerCase() }) // why?
-			setArtists([...artists, ...withoutMarket]);
-			let fraktalSamples = withoutMarket.map(x=>{return x.created[0]}) // list the first NFT in the list of 'nfts this artist made'
-			let fraktalsSamplesObjects = await Promise.all(fraktalSamples.map(x=>{return createObject(x)}))
-			let artistObjects = getArtistsObjects(withoutMarket, fraktalsSamplesObjects)
+			let withoutFactory = onlyCreators.filter(x => { return x.id != factoryAddress.toLocaleLowerCase() }) // why?
+			setArtists([...artists, ...withoutFactory]);
+			let fraktalSamples = withoutFactory.map(x=>{return x.created[0]}) // list the first NFT in the list of 'nfts this artist made'
+			let fraktalsSamplesObjects = await Promise.all(fraktalSamples.map(x=>{return createObject2(x)}))
+			let artistObjects = getArtistsObjects(withoutFactory, fraktalsSamplesObjects)
 			// make sure you're pulling new subgraph data
 			let deduplicatedArtistObjects = artistObjects.filter(item => {
 				const artistMatch = artistsItems.find(artist => artist.id === item.id)
@@ -84,14 +77,14 @@ export default function ArtistsView() {
 
 	useEffect(() => {
 		const fetchInitialArtists = async () => {
-			const data = await getSubgraphData('first_artists', '')
-			if (data && contractAddress) {
+			const data = await getSubgraphData('artists', '')
+			if (data && marketAddress) {
 				let onlyCreators = data.users.filter(x=>{return x.created.length > 0 })
-				let withoutMarket = onlyCreators.filter(x=>{return x.id != contractAddress.toLocaleLowerCase()}) // why?
-				setArtists(withoutMarket) // why?
-				let fraktalSamples = withoutMarket.map(x=>{return x.created[0]}) // list the first NFT in the list of 'nfts this artist made'
-				let fraktalsSamplesObjects = await Promise.all(fraktalSamples.map(x=>{return createObject(x)}))
-				let artistsObj = getArtistsObjects(withoutMarket, fraktalsSamplesObjects)
+				let withoutFactory = onlyCreators.filter(x=>{return x.id != factoryAddress.toLocaleLowerCase()}) // why?
+				setArtists(withoutFactory) // why?
+				let fraktalSamples = withoutFactory.map(x=>{return x.created[0]}) // list the first NFT in the list of 'nfts this artist made'
+				let fraktalsSamplesObjects = await Promise.all(fraktalSamples.map(x=>{return createObject2(x)}))
+				let artistsObj = getArtistsObjects(withoutFactory, fraktalsSamplesObjects)
 				if (artistsObj) {
 					setArtistsItems(artistsObj)
 				} else {
@@ -136,8 +129,7 @@ export default function ArtistsView() {
           <Image src='/search.svg' />
         </div>
       </HStack>
-		{console.log(artistsItems)}
-		{artistsItems.length ? 
+		{artistsItems.length ?
 		(
 			<>
 			<InfiniteScroll
@@ -156,9 +148,13 @@ export default function ArtistsView() {
 					>
 					{artistsItems.map((item, i) => (
 						<NextLink href={`/artist/${item.id}`} key={`link--${item.id}-${i}`}>
-							<NFTItem key={`item--${artists[i]?.id}-${i}`} item={item} CTAText={item.totalGallery} />
+							<NFTItem key={`item--${artists[i]?.id}-${i}`}
+              imageURL = {item.imageURL}
+              name={shortenHash(item.name)}
+              price={item.totalGallery}
+             />
 						</NextLink>
-					))}
+  					))}
 			  </Grid>
 			</InfiniteScroll>
 			</>

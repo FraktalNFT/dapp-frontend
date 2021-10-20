@@ -1,72 +1,64 @@
-import { Button } from "@chakra-ui/button";
 import { Image } from "@chakra-ui/image";
-import { Box, Center, StackProps, Text, VStack } from "@chakra-ui/layout";
-import { formatEther } from "@ethersproject/units";
+import { Box, StackProps, Text, VStack } from "@chakra-ui/layout";
 import React, { forwardRef } from "react";
+import { Flex, Spacer } from "@chakra-ui/react";
 import { FrakCard } from "../../types";
-import FrakButton from "../button";
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
+  name: String;
+  amount: Number;
+  price: Number;
+  imageURL: String;
   CTAText?: string;
 }
 
 const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
-  ({ item, onClick, CTAText }, ref) => {
+  ({ item, amount, price, imageURL, name, onClick, CTAText }, ref) => {
     return (
-      <VStack
-        cursor='pointer'
-        overflow='hidden'
+      <Box
         maxW='30rem'
         rounded='md'
         borderWidth='1px'
-        borderColor='white.100'
+        boxShadow="md"
         onClick={onClick}
-        ref={ref}
+        _hover={{
+          boxShadow: "xl"
+        }}
+        ref={ref}>
+      <VStack
+        cursor='pointer'
       >
-        <Box h='35rem' w='100%' position='relative' >
-          <Image src={item.imageURL} width='100%' height='100%' objectFit='cover' margin-left='auto' margin-right='auto' display='flex' maxH='35rem' style={{verticalAlign:'middle'}}/>
-          {item.countdown && (
-            <VStack
-              spacing='0'
-              rounded='lg'
-              background='black.900'
-              position='absolute'
-              alignItems='flex-end'
-              top='.8rem'
-              right='.8rem'
-              py='.6rem'
-              px='.8rem'
-              color='white'
-            >
-              <Text className='medium-upper-12'>Time Remaining</Text>
-              <Text className='medium-16'>11:59:09</Text>
-            </VStack>
-          )}
+        <Box
+          h='35rem'
+          w='100%'
+          position='relative' >
+          <Image src={imageURL} width='100%' height='100%' objectFit='cover' margin-left='auto' margin-right='auto' display='flex' maxH='35rem' style={{verticalAlign:'middle'}}/>
 
-          {item.contributions && (
-            <Center
-              w='100%'
-              position='absolute'
-              bottom='0'
-              background='rgba(0, 0, 0, .8)'
-              py='.6rem'
-            >
-              <Text className='regular-14' color='white'>
-                {formatEther(item.contributions).toString()} Contributed
-              </Text>
-            </Center>
-          )}
         </Box>
-        <Center flexDirection='column' py='1.6rem'>
-          <Text className='medium-16' mb='1.6rem'>
-            {item.name}
+        </VStack>
+        <Box margin="1rem">
+          <Text className='semi-16' mb='1rem'>
+            {name}
           </Text>
-          <FrakButton className='semi-16' py='.8rem' px='5.6rem'>
-            {CTAText || "Invest"}
-          </FrakButton>
-        </Center>
-      </VStack>
+          <Flex>
+          {amount &&
+            <Text className='medium-12'>
+            {amount/100}% Available
+            </Text>
+          }
+
+          <Spacer />
+          <Image align="vertical" width="5" height="8" marginEnd="3px" src="https://ethereum.org/static/6b935ac0e6194247347855dc3d328e83/31987/eth-diamond-black.png" />
+          {price &&
+            <Text textAlign="end" className='medium-12'>
+            {Math.round(price*100000)/100000}
+            </Text>
+          }
+          </Flex>
+        </Box>
+      </Box>
+
     );
   }
 );

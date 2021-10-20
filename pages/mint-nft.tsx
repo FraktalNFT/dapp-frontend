@@ -13,7 +13,7 @@ const { create } = require('ipfs-http-client');
 
 export default function MintNFTView() {
   const router = useRouter();
-  const { provider, contractAddress } = useWeb3Context();
+  const { provider, factoryAddress } = useWeb3Context();
   const [ipfsNode, setIpfsNode] = useState();
   const [imageData, setImageData] = useState(null);
   const [imageSize, setImageSize] = useState([]);
@@ -55,7 +55,7 @@ export default function MintNFTView() {
   async function minter(metadata) {
     let metadataCid =  await uploadAndPin(JSON.stringify(metadata))
     if(metadataCid){
-      createNFT(metadataCid.cid.toString(), provider, contractAddress).then(()=>{
+      createNFT(metadataCid.cid.toString(), provider, factoryAddress).then(()=>{
         router.push('/my-nfts');
       });
     }

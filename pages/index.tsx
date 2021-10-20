@@ -11,17 +11,31 @@ import { getSubgraphData } from '../utils/graphQueries';
 import { createListed } from '../utils/nftHelpers';
 import { FiChevronDown } from 'react-icons/fi';
 import InfiniteScroll from "react-infinite-scroll-component";
+const SORT_TYPES = ["Availability","Popular", "Newly Listed"];
 
 const Home: React.FC = () => {
-  const [selectionMode, setSelectionMode] = useState(false);
-  const [sortType, setSortType] = useState("Popular");
   const [nftItems, setNftItems] = useState([]);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [sortType, setSortType] = useState("Newly Listed");
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const handleSortSelect = (item: string) => {
     setSortType(item);
+    changeOrder(item);
     setSelectionMode(false);
   };
+
+  const changeOrder = (type) => {
+    let sortedItems;
+    if(type == 'Availability'){
+      sortedItems = nftItems.sort((a, b) => (parseInt(a.amount) > parseInt(b.amount)) ? -1 : 1);
+    }else if(type == 'Popular'){
+      sortedItems = nftItems.sort((a, b) => (a.holders > b.holders) ? -1 : 1);
+    }else {
+      sortedItems = nftItems.sort((a, b) => (a.createdAt > b.createdAt) ? -1 : 1);
+    }
+    setNftItems(sortedItems)
+  }
 
 	useEffect(() => {
 		async function getData() {
@@ -32,28 +46,24 @@ const Home: React.FC = () => {
 		getData();
   	},[])
 
-
   const getMoreListedItems = async () => {
-  // should read where to start (nftItems.length) and add some items continously
-	  const data = await getSubgraphData('listed_items', '');
-	  let dataOnSale = data.listItems.filter((item) => {
-		  return item.fraktal.status == 'open'
-	  });
-	  // make sure you're pulling new subgraph data
-	  let deduplicatedData = dataOnSale.filter(item => {
-		  const nftMatch = nftItems.find(nft => nft.id === item.id)
-		  if (typeof nftMatch === 'undefined') {
-			  return true;
-		  } else return false
-	  })
-	// end the array update if there's no new data
-	if (typeof deduplicatedData[0] === 'undefined') {
-		setHasMore(false);
-  	}
-    else {
-		Promise.all(deduplicatedData.map((item) => {
-			return createListed(item)
-		})).then((results) => setNftItems([...nftItems, ...results]));
+    const data = await getSubgraphData('listed_items','');
+    let dataOnSale = data.listItems.filter(x=>{return x.fraktal.status == 'open'}); // this goes in the graphql query
+    if(dataOnSale){
+      // console.log('dataOnSale', dataOnSale)
+      let objects = await Promise.all(dataOnSale.map(x=>{return createListed(x)}))//.then((results)=>setNftItems([...nftItems, ...results]));
+      let deduplicatedObjects = objects.filter(item => {
+				const objectMatch = nftItems.find(nft => nft.id === item.id)
+				if (typeof objectMatch === 'undefined') {
+					return true;
+				} else return false
+			})
+			if (typeof deduplicatedObjects[0] === 'undefined') {
+				setHasMore(false);
+			} else {
+				const newArray = [...nftItems, ...deduplicatedObjects];
+				setNftItems(newArray);
+			}
     }
   };
 
@@ -69,7 +79,7 @@ const Home: React.FC = () => {
   );
 
   return (
-	<> 
+	<>
 	<Head>
 	<title>Fraktal - Marketplace</title>
 	</Head>
@@ -111,9 +121,14 @@ const Home: React.FC = () => {
                 templateColumns='repeat(3, 1fr)'
                 gap='3.2rem'
               >
-                {nftItems.map((item, index) => (
-                  <NextLink key={`nft-link-${item.id}-${index}`} href={`/nft/${item.id}/fix-price-sale`}>
-                  <NFTItem item={item} key={`nft-item-${item.id}-${index}`} />
+                {nftItems.map(item => (
+                  <NextLink key={item.id} href={`/nft/${item.tokenAddress}/details`}>
+                    <NFTItem
+                      name={item.name}
+                      amount={item.amount}
+                      price={item.price}
+                      imageURL={item.imageURL}
+                     />
                   </NextLink>
                 ))}
               </Grid>

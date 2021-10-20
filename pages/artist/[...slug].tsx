@@ -7,7 +7,7 @@ import FrakButton from "../../components/button";
 import NextLink from "next/link";
 import {shortenHash, getParams} from '../../utils/helpers';
 import {getSubgraphData } from '../../utils/graphQueries';
-import { createObject } from '../../utils/nftHelpers';
+import { createObject2 } from '../../utils/nftHelpers';
 
 export default function ArtistView() {
   const [artistAddress, setArtistAddres] = useState('');
@@ -18,7 +18,7 @@ export default function ArtistView() {
     if(address){
       setArtistAddres(address)
       let objects = await getSubgraphData('creator',address)
-      Promise.all(objects.fraktalNfts.map(x=>{return createObject(x)})).then((results)=>setNftItems(results))
+      Promise.all(objects.fraktalNfts.map(x=>{return createObject2(x)})).then((results)=>setNftItems(results))
     }
   },[])
 
@@ -38,8 +38,8 @@ export default function ArtistView() {
             gap="3.2rem"
           >
             {nftItems.map(item => (
-              <NextLink href={`/nft/${item.marketId}/manage`} key={item.marketId}>
-                <NFTItem key={item.id} item={item} CTAText="See More" />
+              <NextLink href={`/nft/${item.id}/details`} key={item.marketId}>
+                <NFTItem key={item.id} name={item.name} imageURL={item.imageURL} />
               </NextLink>
             ))}
           </Grid>
