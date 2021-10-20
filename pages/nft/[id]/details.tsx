@@ -5,6 +5,7 @@ import styles from "./auction.module.css";
 import { HStack, VStack } from "@chakra-ui/layout";
 import React, {useEffect, useState} from "react";
 import FraktionsList from '../../../components/fraktionsList';
+import RevenuesList from '../../../components/revenuesList';
 import UserOwnership from '../../../components/userOwnership';
 import BuyOutCard from '../../../components/buyOutCard';
 import { Image } from "@chakra-ui/image";
@@ -14,11 +15,11 @@ import { createObject2 } from '../../../utils/nftHelpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
 import {
   getBalanceFraktions,
-  claimFraktalSold,
   getMinimumOffer,
   unlistItem,
   getApproved,
   getFraktionsIndex,
+  claimFraktalSold,
   isFraktalOwner
 } from '../../../utils/contractCalls';
 import { useRouter } from 'next/router';
@@ -43,6 +44,7 @@ export default function DetailsView() {
   const [fraktionsIndex, setFraktionsIndex] = useState();
   const [userFraktions, setUserFraktions] = useState(0);
   const [isOwner, setIsOwner] = useState(false);
+  const [revenues, setRevenues] = useState();
 // use callbacks
   useEffect(async ()=>{
       if(account){
@@ -59,6 +61,7 @@ export default function DetailsView() {
         }
       let fraktalFetch = await getSubgraphData('fraktal',tokenAddressSplitted)
       console.log('object',fraktalFetch)
+
       if(fraktalFetch && fraktalFetch.fraktalNfts && fraktalFetch.fraktalNfts[0]){
         let nftObjects = await createObject2(fraktalFetch.fraktalNfts[0])
         if(nftObjects){
@@ -69,6 +72,11 @@ export default function DetailsView() {
         }
         if(fraktalFetch.fraktalNfts[0].collateral){
           setCollateralNft(fraktalFetch.fraktalNfts[0].collateral)
+        }
+        let revenuesValid = fraktalFetch.fraktalNfts[0].revenues.filter(x=>{return x.value > 0 })
+        if(revenuesValid){
+          console.log('revenues',revenuesValid)
+          setRevenues(revenuesValid)
         }
       }
     }
@@ -116,13 +124,14 @@ export default function DetailsView() {
     }
   }
 
-  async function claimNFT() { // this one goes to offersCard
+  async function claimFraktal() { // this one goes to offersCard
     try {
-      let tx = await claimFraktalSold(nftObject.id, provider, marketAddress);
+      await claimFraktalSold(tokenAddress, provider, marketAddress);
     }catch(e){
       console.log('There has been an error: ',e)
     }
   }
+
 
   return (
     <HStack>
@@ -178,6 +187,9 @@ export default function DetailsView() {
             </div>
           </VStack>
         </HStack>
+        {/* for the defrak bug, i leave this function to claim the fraktal
+          <button onClick={()=>claimFraktal()}>Claim</button>
+          */}
         <UserOwnership
           fraktions={userFraktions}
           isFraktalOwner={isOwner}
@@ -235,7 +247,6 @@ export default function DetailsView() {
           />
           :null}
         <div style={{marginTop:'40px'}}>
-          <button onClick={()=>claimNFT()}>Claim</button>
           <BuyOutCard
             account={account}
             minPrice={minOffer}
@@ -250,7 +261,13 @@ export default function DetailsView() {
           />
         </div>
         <div style={{marginTop:'40px'}}>
-          {/* REVENUES */}
+          <RevenuesList
+            account = {account}
+            revenuesCreated = {revenues}
+            tokenAddress = {tokenAddress}
+            marketAddress = {marketAddress}
+            provider = {provider}
+          />
         </div>
 
 
