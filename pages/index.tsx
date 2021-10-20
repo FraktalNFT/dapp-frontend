@@ -29,9 +29,9 @@ const Home: React.FC = () => {
     if(type == 'Availability'){
       sortedItems = nftItems.sort((a, b) => (parseInt(a.amount) > parseInt(b.amount)) ? -1 : 1);
     }else if(type == 'Popular'){
-      sortedItems = nftItems.sort((a, b) => (a.holders > b.holders) ? 1 : -1);
+      sortedItems = nftItems.sort((a, b) => (a.holders > b.holders) ? -1 : 1);
     }else {
-      sortedItems = nftItems.sort((a, b) => (a.createdAt > b.createdAt) ? 1 : -1);
+      sortedItems = nftItems.sort((a, b) => (a.createdAt > b.createdAt) ? -1 : 1);
     }
     setNftItems(sortedItems)
   }
