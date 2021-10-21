@@ -14,7 +14,7 @@ const FrakButton2 = forwardRef<
       display:'inline-block',
     }}>
       <input onChange={(e)=>onSet(event.target.value)} style={{
-        maxWidth:'60%',
+        maxWidth:'40%',
         textAlign:'right',
         color:'#000000',
         margin:'0px 16px',
