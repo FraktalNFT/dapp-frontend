@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Image } from "@chakra-ui/image";
-import { Box, StackProps, Text, VStack } from "@chakra-ui/layout";
+import { Box, StackProps, Text, VStack, BoxProps } from "@chakra-ui/layout";
 import React, { forwardRef } from "react";
-import { Flex, Spacer } from "@chakra-ui/react";
+import { Flex, Spacer, forwardRef as fRef, HTMLChakraProps, chakra } from "@chakra-ui/react";
 import { FrakCard } from "../../types";
+import {motion, isValidMotionProp, HTMLMotionProps} from "framer-motion"
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
@@ -14,12 +15,17 @@ interface NFTItemProps extends StackProps {
   CTAText?: string;
 }
 
+// idk typescript but apparently I have to do this
+type Merge<P, T> = Omit<P, keyof T> & T;
+type ShadowBoxProps = Merge<HTMLChakraProps<"div">, HTMLMotionProps<"div">>;
+const ShadowBox: React.FC<ShadowBoxProps> = motion(chakra.div);
+
 const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
 	({ item, amount, price, imageURL, name, onClick, CTAText }, ref) => {
 		
 		const [isVisible, setIsVisible] = useState(false);
 		
-		const onImageLoad = ms => {
+		const onImageLoad = (ms: number) => {
 			setTimeout(() => {
 				setIsVisible(true);
 			}, ms);
@@ -27,28 +33,40 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
 
 		const visibleStyle = { opacity: `1`};
 		const inVisibleStyle = { opacity: `0` };
+		const visibleAnimRepeat = 1
+		const inVisibleAnimRepeat = Infinity;
 
 		return (
 			<>
-			<Box
+			<ShadowBox
 				w='30rem'
 				rounded='md'
 				borderWidth='1px'
-				boxShadow="md"
 				onClick={onClick}
 				_hover={{
 					boxShadow: "xl"
-				}}
-				
-				ref={ref}>
+				}}	
+					animate={{
+						boxShadow: ['0px 0px 8px #888888', '0px 0px 24px #888888', '0px 0px 8px #888888'],
+					}}
+					transition={{
+						duration: 4,
+						times: [0, 0.5, 0],
+						ease: "linear",
+						repeat: (isVisible) ? visibleAnimRepeat : inVisibleAnimRepeat,
+						repeatType: "loop",
+						repeatDelay: 0,
+					}}
+				// ref={ref}
+				>
 				<VStack
 					cursor='pointer'
 				>
 					<Box
 						h='35rem'
 						w='100%'
-							position='relative'
-							sx={(isVisible) ? visibleStyle : inVisibleStyle /* toggle visibility */} 
+						position='relative'
+						sx={(isVisible) ? visibleStyle : inVisibleStyle /* toggle visibility */} 
 						>
 							<Image
 								src={imageURL}
@@ -62,7 +80,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
 									objectFit: `cover`
 								}}
 								style={{ verticalAlign: 'middle' }}
-								onLoad={() => onImageLoad(2000)}
+								onLoad={() => onImageLoad(4000)}
 							/>
 
 					</Box>
@@ -87,7 +105,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
 						}
 					</Flex>
 				</Box>
-			</Box>
+			</ShadowBox>
 				
 	</>
     );
