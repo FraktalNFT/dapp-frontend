@@ -1,7 +1,7 @@
 import { Grid, VStack } from "@chakra-ui/layout";
 import Head from "next/head";
 import React, {useEffect, useState} from "react";
-import NFTItemManager from "../components/nft-item-manager";
+// import NFTItemManager from "../components/nft-item-manager";
 import NFTItemOS from '../components/nft-item-opensea';
 import NFTItem from '../components/nft-item';
 import NextLink from "next/link";
@@ -21,7 +21,7 @@ import {
   importERC721,
   importERC1155,
   getApproved,
-  getLockedTo,
+  // getLockedTo,
   makeOffer
 } from '../utils/contractCalls';
 import { assetsInWallet } from '../utils/openSeaAPI';
@@ -33,7 +33,7 @@ export default function MyNFTsView() {
   const [nftItems, setNftItems] = useState();
   const [fraktionItems, setFraktionItems] = useState();
   const [totalBalance, setTotalBalance] = useState(0);
-  const [offers, setOffers] = useState();
+  // const [offers, setOffers] = useState();
   const [userFraktals, setUserFraktals] = useState();
 
   async function getAccountFraktions(){
