@@ -148,6 +148,7 @@ export default function ArtistsView() {
 									price={item.totalGallery}
 									item={null}
 									amount={null}
+									wait={250*(i+1)}
 								/>
 							</NextLink>
 						)
