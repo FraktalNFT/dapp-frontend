@@ -20,9 +20,9 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const handleSortSelect = (item: string) => {
+    setSelectionMode(false);
     setSortType(item);
     changeOrder(item);
-    setSelectionMode(false);
   };
 
   const changeOrder = (type) => {
@@ -86,17 +86,25 @@ const Home: React.FC = () => {
     <VStack spacing='0' mb='12.8rem'>
       <Flex w='96.4rem'>
         <Text className='semi-48' marginEnd="2rem">Marketplace</Text>
-        <Menu>
+        <Menu closeOnSelect={true}>
             <MenuButton
-              as={Button} alignSelf="center" fontSize="12" bg="transparent" height="5rem" width="18rem" rightIcon={<FiChevronDown/>} fontWeight="bold"
-              transition="all 0.2s">
+              as={Button}
+              alignSelf="center"
+              fontSize="12"
+              bg="transparent"
+              height="5rem"
+              width="18rem"
+              rightIcon={<FiChevronDown/>}
+              fontWeight="bold"
+              transition="all 0.2s"
+              >
             Sort: {sortType}
           </MenuButton>
-            <MenuList>
-              <MenuItem onClick={() => handleSortSelect("Popular")}>Popular</MenuItem>
-              <MenuItem onClick={() => handleSortSelect("Availability")}>Availability</MenuItem>
-              <MenuItem onClick={() => handleSortSelect("Newly Listed")}>Newly Listed</MenuItem>
-            </MenuList>
+          <MenuList>
+            <MenuItem onClick={() => handleSortSelect("Popular")}>Popular</MenuItem>
+            <MenuItem onClick={() => handleSortSelect("Availability")}>Availability</MenuItem>
+            <MenuItem onClick={() => handleSortSelect("Newly Listed")}>Newly Listed</MenuItem>
+          </MenuList>
        </Menu>
         <Spacer/>
         <NextLink href='/my-nfts'>
