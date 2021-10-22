@@ -94,7 +94,7 @@ const Home: React.FC = () => {
           </MenuButton>
             <MenuList>
               <MenuItem onClick={() => handleSortSelect("Popular")}>Popular</MenuItem>
-              <MenuItem onClick={() => handleSortSelect("Ending Soonest")}>Ending Soonest</MenuItem>
+              <MenuItem onClick={() => handleSortSelect("Availability")}>Availability</MenuItem>
               <MenuItem onClick={() => handleSortSelect("Newly Listed")}>Newly Listed</MenuItem>
             </MenuList>
        </Menu>
