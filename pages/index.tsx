@@ -129,13 +129,15 @@ const Home: React.FC = () => {
                 templateColumns='repeat(3, 1fr)'
                 gap='3.2rem'
               >
-                {nftItems.map(item => (
+                {nftItems.map((item, index) => (
                   <NextLink key={item.id} href={`/nft/${item.tokenAddress}/details`}>
                     <NFTItem
                       name={item.name}
                       amount={item.amount}
                       price={item.price}
-                      imageURL={item.imageURL}
+					  imageURL={item.imageURL}
+					  wait={250 * (index + 1)}
+					  item={null}
                      />
                   </NextLink>
                 ))}

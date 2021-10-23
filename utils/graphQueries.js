@@ -378,10 +378,11 @@ const fraktalId_query = gql`
 `;
 
 const calls = [
-  {name: 'account_fraktions', call: account_fraktions_query},
-  {name: 'marketid_fraktal', call: marketid_query},
-  {name: 'listed_itemsId', call: listedItemsId},
-  {name: 'artists', call: creators_review},
+  { name: 'account_fraktions', call: account_fraktions_query },
+  { name: 'marketid_fraktal', call: marketid_query },
+  { name: 'listed_itemsId', call: listedItemsId },
+  { name: 'artists', call: creators_review },
+  { name: 'firstArtists', call: creators_small_review },
   {name: 'all', call: all_nfts},
   {name: 'creator', call: creator_query},
   {name: 'manage', call: fraktal_fraktions_query},
@@ -392,13 +393,14 @@ const calls = [
   {name: 'listed_items', call: listedItems},
   {name: 'fraktal', call: fraktalId_query},
   {name: 'fraktions', call: fraktions_query},
+  
 ];
 
 
 export const getSubgraphData = async (call, id) => {
   let callGql = calls.find(x => {return x.name == call})
   try {
-    const data = await request(APIURL , callGql.call, {id});
+    const data = await request(APIURL, callGql.call, {id});
     // console.log('data for:',id,' found',data)
     return data;
   } catch (err) {

@@ -26,20 +26,6 @@ export default function ArtistsView() {
     	setSelectionMode(false);
 	};
 
-	// why does this exist
-	// it triggers an infinite rerender loop and crashes the app
-	// useEffect(()=>{
-	// 	if (artistsItems.length) {
-	// 	let artistsObj = artists.map((x,i)=>({
-	// 		id: x.id,
-	// 		name: shortenHash(x.id),
-	// 		imageURL: artistsItems[i]?artistsItems[i].imageURL:"/filler-image-1.png",
-	// 		totalGallery:x.created.length,
-	// 	}))
-	// 	setArtistsItems(artistsObj)
-	// 	}
-	// },[artistsItems])
-
   function getArtistsObjects(artists, artistsItems){
     const artistsObj = artists.map((x,i)=>({
       id: x.id,
@@ -52,13 +38,15 @@ export default function ArtistsView() {
 
 	async function fetchNewArtists() {
 		const data = await getSubgraphData('artists', '')
-		if (data && marketAddress) {
-			let onlyCreators = data.users.filter(x=>{return x.created.length > 0 })
-			let withoutFactory = onlyCreators.filter(x => { return x.id != factoryAddress.toLocaleLowerCase() }) // why?
-			setArtists([...artists, ...withoutFactory]);
-			let fraktalSamples = withoutFactory.map(x=>{return x.created[0]}) // list the first NFT in the list of 'nfts this artist made'
-			let fraktalsSamplesObjects = await Promise.all(fraktalSamples.map(x=>{return createObject2(x)}))
-			let artistObjects = getArtistsObjects(withoutFactory, fraktalsSamplesObjects)
+		console.log('infinite scroll fetching more');
+		if (data && factoryAddress) {
+			console.log('infinite scroll fetching more conditional passed');
+			let onlyCreators = data.users.filter(x => {return x.created.length > 0 })
+			let noImporters = onlyCreators.filter(x => { return x.id != factoryAddress.toLocaleLowerCase() })
+			setArtists([...artists, ...noImporters]);
+			let fraktalSamples = noImporters.map(x => {return x.created[0]}) // list the first NFT in the list of 'nfts this artist made'
+			let fraktalsSamplesObjects = await Promise.all(fraktalSamples.map(x => {return createObject2(x)}))
+			let artistObjects = getArtistsObjects(noImporters, fraktalsSamplesObjects)
 			// make sure you're pulling new subgraph data
 			let deduplicatedArtistObjects = artistObjects.filter(item => {
 				const artistMatch = artistsItems.find(artist => artist.id === item.id)
@@ -77,14 +65,16 @@ export default function ArtistsView() {
 
 	useEffect(() => {
 		const fetchInitialArtists = async () => {
-			const data = await getSubgraphData('artists', '')
-			if (data && marketAddress) {
+			console.log('fetching artists....');
+			const data = await getSubgraphData('firstArtists', '')
+			if (data && factoryAddress) {
+				console.log('fetching artists conditional passed.');
 				let onlyCreators = data.users.filter(x=>{return x.created.length > 0 })
-				let withoutFactory = onlyCreators.filter(x=>{return x.id != factoryAddress.toLocaleLowerCase()}) // why?
-				setArtists(withoutFactory) // why?
-				let fraktalSamples = withoutFactory.map(x=>{return x.created[0]}) // list the first NFT in the list of 'nfts this artist made'
+				let noImporters = onlyCreators.filter(x=>{return x.id != factoryAddress.toLocaleLowerCase()}) // why?
+				setArtists(noImporters) // why?
+				let fraktalSamples = noImporters.map(x=>{return x.created[0]}) // list the first NFT in the list of 'nfts this artist made'
 				let fraktalsSamplesObjects = await Promise.all(fraktalSamples.map(x=>{return createObject2(x)}))
-				let artistsObj = getArtistsObjects(withoutFactory, fraktalsSamplesObjects)
+				let artistsObj = getArtistsObjects(noImporters, fraktalsSamplesObjects)
 				if (artistsObj) {
 					setArtistsItems(artistsObj)
 				} else {
@@ -93,7 +83,8 @@ export default function ArtistsView() {
 			}
 		};
 		fetchInitialArtists();
-	}, [])
+	}, [factoryAddress])
+
 
   return (
     <VStack spacing='0' mb='12.8rem'>
@@ -146,15 +137,22 @@ export default function ArtistsView() {
 					templateColumns='repeat(3, 1fr)'
 					gap='3.2rem'
 					>
-					{artistsItems.map((item, i) => (
-						<NextLink href={`/artist/${item.id}`} key={`link--${item.id}-${i}`}>
-							<NFTItem key={`item--${artists[i]?.id}-${i}`}
-              imageURL = {item.imageURL}
-              name={shortenHash(item.name)}
-              price={item.totalGallery}
-             />
-						</NextLink>
-  					))}
+					{artistsItems.map((item, i) => {
+						
+						return (
+							<NextLink href={`/artist/${item.id}`} key={`link--${item.id}-${i}`}>
+								<NFTItem
+									key={`item--${artists[i]?.id}-${i}`}
+									imageURL={item.imageURL}
+									name={shortenHash(item.name)}
+									price={item.totalGallery}
+									item={null}
+									amount={null}
+									wait={250*(i+1)}
+								/>
+							</NextLink>
+						)
+					})}
 			  </Grid>
 			</InfiniteScroll>
 			</>
