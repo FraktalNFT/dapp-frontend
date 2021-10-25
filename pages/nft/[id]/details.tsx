@@ -8,6 +8,7 @@ import FraktionsList from "../../../components/fraktionsList";
 import RevenuesList from "../../../components/revenuesList";
 import UserOwnership from "../../../components/userOwnership";
 import BuyOutCard from "../../../components/buyOutCard";
+import FraktionOwners from "../../../components/fraktionOwners";
 import { Image } from "@chakra-ui/image";
 import { shortenHash, timezone, getParams } from "../../../utils/helpers";
 import { getSubgraphData } from "../../../utils/graphQueries";
@@ -167,6 +168,8 @@ export default function DetailsView() {
     }
   }
 
+  console.log(nftObject);
+
   return (
     <Box
       sx={{
@@ -324,6 +327,9 @@ export default function DetailsView() {
             marketAddress={marketAddress}
             provider={provider}
           />
+        </div>
+        <div style={{ marginTop: "40px" }}>
+          <FraktionOwners data={[]} nftObject={nftObject} />
         </div>
       </Stack>
     </Box>
