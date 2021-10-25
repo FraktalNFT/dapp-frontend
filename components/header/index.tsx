@@ -18,22 +18,33 @@ const Header = () => {
         </HStack>
         <Flex align='center'>
           <HStack
-            spacing='3.2rem'
+            spacing='1.2rem'
             mr='3.2rem'
             display={{ base: "none", md: "flex" }}
           >
-            <NextLink href='/mint-nft'>
-              <Link className='semi-16'>Mint NFT</Link>
-            </NextLink>
-            <NextLink href='/'>
-              <Link className='semi-16'>Marketplace</Link>
-            </NextLink>
-            <NextLink href='/artists'>
-              <Link className='semi-16'>Artists</Link>
-            </NextLink>
-            <a href='https://app.daohaus.club/dao/0x4/0x721c1016044a7bd95332601bcbcf889f958be5b2' target='_blank' rel='noopener noreferrer'>
-              <Link className='semi-16'>DAO</Link>
-            </a>
+            <Box padding={5} borderRadius={40} _hover={{bg: "#000000", textColor: "#FFFFFF"}}>
+              <NextLink href='/mint-nft'>
+                <Link className='semi-16'>Mint NFT</Link>
+              </NextLink>
+            </Box>
+
+            <Box padding={5} borderRadius={40} _hover={{bg: "#000000", textColor: "#FFFFFF"}}>
+              <NextLink href='/'>
+                <Link className='semi-16'>Marketplace</Link>
+              </NextLink>
+            </Box>
+
+            <Box padding={5} borderRadius={40} _hover={{bg: "#000000", textColor: "#FFFFFF"}}>
+              <NextLink href='/artists'>
+                <Link className='semi-16'>Artists</Link>
+              </NextLink>
+            </Box>
+
+            <Box padding={5} borderRadius={40} _hover={{bg: "#000000", textColor: "#FFFFFF"}}>
+              <a href='https://app.daohaus.club/dao/0x4/0x721c1016044a7bd95332601bcbcf889f958be5b2' target='_blank' rel='noopener noreferrer'>
+                <Link className='semi-16'>DAO</Link>
+              </a>
+            </Box>
           </HStack>
           {!account ? (
             <FrakButton onClick={connectWeb3}>Connect Wallet</FrakButton>
