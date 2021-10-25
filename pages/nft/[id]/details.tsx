@@ -61,10 +61,9 @@ export default function DetailsView() {
         fraktalFetch.fraktalNfts[0]
       ) {
         let nftObjects = await createObject2(fraktalFetch.fraktalNfts[0]);
-        console.log(nftObjects); // dudn't log
+        console.log(nftObjects);
         if (nftObjects) {
-          // dudn't pass
-          setNftObject(nftObjects); // dudn't fire
+          setNftObject(nftObjects);
         }
         if (fraktalFetch.fraktalNfts[0].offers) {
           setOffers(fraktalFetch.fraktalNfts[0].offers);
@@ -172,7 +171,13 @@ export default function DetailsView() {
   }
 
   return (
-    <Box sx={{ display: `grid`, gridTemplateColumns: `400px 4fr` }}>
+    <Box
+      sx={{
+        display: `grid`,
+        gridTemplateColumns: `400px 621px`,
+        columnGap: `16px`,
+      }}
+    >
       <Box sx={{ position: `relative` }}>
         <VStack marginRight="53px" sx={{ position: `sticky`, top: `20px` }}>
           <Link href="/">

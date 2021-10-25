@@ -6,7 +6,7 @@ import FrakButton from "../button";
 import FrakButton2 from "../button2";
 import OfferDetail from "../offerDetail";
 import { makeOffer, getMajority } from "../../utils/contractCalls";
-import { Table, Thead, Tbody, Tr, Td } from "@chakra-ui/react";
+import { Text } from "@chakra-ui/react";
 
 const BuyOutCard = ({
   account,
@@ -39,18 +39,18 @@ const BuyOutCard = ({
       }
     }
   }, [account, offers]);
-	useEffect(() => {
-		async function getData() {
-			if (tokenAddress && provider) {
-				try {
-					let tokenMajority = await getMajority(provider, tokenAddress);
-					setMajority(tokenMajority / 100);
-				} catch {
-					console.log("Not yet fraktionalized");
-				}
-			}
-		}
-		getData();
+  useEffect(() => {
+    async function getData() {
+      if (tokenAddress && provider) {
+        try {
+          let tokenMajority = await getMajority(provider, tokenAddress);
+          setMajority(tokenMajority / 100);
+        } catch {
+          console.log("Not yet fraktionalized");
+        }
+      }
+    }
+    getData();
   }, [tokenAddress, provider]);
 
   async function onOffer() {
@@ -101,47 +101,17 @@ const BuyOutCard = ({
       >
         Fraktal NFT Buyout
       </div>
-      <Box sx={{ marginTop: `2rem`, display: `flex`, justifyContent: `space-between`, width: `100%`}}>
+      <Box
+        sx={{
+          marginTop: `2rem`,
+          display: `flex`,
+          justifyContent: `space-between`,
+          width: `100%`,
+        }}
+      >
         <VStack
           style={{
-            textAlign: "start",
-            marginLeft: "24px", 
-          }}
-        >
-          <div
-            style={{
-              fontFamily: "Inter",
-              fontWeight: 600,
-              fontSize: "12px",
-              lineHeight: "14px",
-              letterSpacing: "1px",
-              color: "#A7A7A7",
-            }}
-          >
-            MIN OFFER
-          </div>
-          <HStack>
-            <img
-              src={"/eth.png"}
-              alt={"Eth"}
-              style={{ height: "26px", marginRight: "4px" }}
-            />
-            <div
-              style={{
-                fontFamily: "Inter",
-                fontWeight: 600,
-                fontSize: "32px",
-                lineHeight: "40px",
-                color: "#000000",
-              }}
-            >
-              {minPrice ? minPrice : 0}
-            </div>
-          </HStack>
-        </VStack>
-        <VStack
-          style={{
-            textAlign: "start",
+            alignItems: "flex-end",
           }}
         >
           <div
@@ -168,10 +138,8 @@ const BuyOutCard = ({
             {investors}
           </div>
         </VStack>
-        {userIsOfferer ? (
-          <FrakButton onClick={onOffer}>Take out offer</FrakButton>
-        ) : (
-          <Stack
+        <Box sx={{ display: `flex`, justifyContent: `flex-end` }}>
+          <VStack
             style={{
               textAlign: "start",
               marginLeft: "24px",
@@ -187,28 +155,73 @@ const BuyOutCard = ({
                 color: "#A7A7A7",
               }}
             >
-              BUYOUT OFFER IN ETH
+              MIN OFFER
             </div>
-            <FrakButton2 isReady={isReady} onClick={onOffer} setFunction={onSetValue}>
-              {offering ? "Making offer" : "Offer"}
-            </FrakButton2>
-          </Stack>
-        )}
+            <HStack>
+              <img
+                src={"/eth.png"}
+                alt={"Eth"}
+                style={{ height: "26px", marginRight: "4px" }}
+              />
+              <div
+                style={{
+                  fontFamily: "Inter",
+                  fontWeight: 600,
+                  fontSize: "32px",
+                  lineHeight: "40px",
+                  color: "#000000",
+                }}
+              >
+                {minPrice ? minPrice : 0}
+              </div>
+            </HStack>
+          </VStack>
+          {userIsOfferer ? (
+            <FrakButton onClick={onOffer}>Take out offer</FrakButton>
+          ) : (
+            <Stack
+              style={{
+                textAlign: "start",
+                marginLeft: "24px",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "Inter",
+                  fontWeight: 600,
+                  fontSize: "12px",
+                  lineHeight: "14px",
+                  letterSpacing: "1px",
+                  color: "#A7A7A7",
+                }}
+              >
+                BUYOUT OFFER IN ETH
+              </div>
+              <FrakButton2
+                isReady={isReady}
+                onClick={onOffer}
+                setFunction={onSetValue}
+              >
+                {offering ? "Making offer" : "Offer"}
+              </FrakButton2>
+            </Stack>
+          )}
+        </Box>
       </Box>
       <div
         style={{
-          fontWeight: 300,
-          fontSize: "12px",
-          lineHeight: "14px",
+          fontWeight: 400,
+          fontSize: "16px",
+          lineHeight: "16px",
           marginTop: "24px",
           marginBottom: "32px",
+          opacity: `0.75`,
         }}
       >
         {majority}% of the investors have to accept your offer for it to go
         through.
       </div>
-
-      <Divider />
+      <Divider sx={{ borderColor: `#A7A7A7` }} />
       <div
         style={{
           fontSize: "20px",
@@ -220,18 +233,59 @@ const BuyOutCard = ({
         Offers
       </div>
       <div>
-        {offers && offers.length && itemStatus != "Retrieved" ? (
-          <Table>
-            <Thead>
-              <Tr>
-                <Td>DATE</Td>
-                <Td>ADDRESS</Td>
-                <Td>OFFER</Td>
-                <Td>ACTION</Td>
-              </Tr>
-            </Thead>
-
-            <Tbody>
+        <>
+          {offers && offers.length && itemStatus != "Retrieved" ? (
+            <>
+              <Box sx={{ display: `flex` }}>
+                <Text
+                  w="116px"
+                  sx={{
+                    fontFamily: `Inter`,
+                    opacity: `0.7`,
+                    fontVariant: `small-caps`,
+                    textTransform: `lowercase`,
+                    minWidth: `116px`,
+                  }}
+                >
+                  Date
+                </Text>
+                <Text
+                  w="160px"
+                  sx={{
+                    fontFamily: `Inter`,
+                    opacity: `0.7`,
+                    fontVariant: `small-caps`,
+                    textTransform: `lowercase`,
+                    minWidth: `160px`,
+                  }}
+                >
+                  Address
+                </Text>
+                <Text
+                  w="72px"
+                  sx={{
+                    fontFamily: `Inter`,
+                    opacity: `0.7`,
+                    fontVariant: `small-caps`,
+                    textTransform: `lowercase`,
+                    textAlign: `right`,
+                  }}
+                >
+                  Offer
+                </Text>
+                <Text
+                  w="210px"
+                  sx={{
+                    fontFamily: `Inter`,
+                    opacity: `0.7`,
+                    fontVariant: `small-caps`,
+                    textTransform: `lowercase`,
+                    textAlign: `right`,
+                  }}
+                >
+                  Action
+                </Text>
+              </Box>
               {offers.map(x => {
                 return (
                   <OfferDetail
@@ -245,13 +299,13 @@ const BuyOutCard = ({
                   />
                 );
               })}
-            </Tbody>
-          </Table>
-        ) : (
-          <div style={{ marginTop: "24px" }}>
-            There are no offers for this NFT.
-          </div>
-        )}
+            </>
+          ) : (
+            <div style={{ marginTop: "24px" }}>
+              There are no offers for this NFT.
+            </div>
+          )}
+        </>
       </div>
     </div>
   );
