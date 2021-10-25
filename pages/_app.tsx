@@ -1,7 +1,5 @@
-import { Box, ChakraProvider, extendTheme, VStack } from "@chakra-ui/react";
-import Header from "../components/header";
+import { ChakraProvider, extendTheme, VStack } from "@chakra-ui/react";
 import Footer from "../components/footer";
-
 import "../styles/globals.css";
 import "../styles/fonts.css";
 import Web3ContextProvider from "../contexts/Web3Context";

@@ -20,9 +20,9 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const handleSortSelect = (item: string) => {
+    setSelectionMode(false);
     setSortType(item);
     changeOrder(item);
-    setSelectionMode(false);
   };
 
   const changeOrder = type => {
@@ -98,7 +98,7 @@ const Home: React.FC = () => {
           <Text className="semi-48" marginEnd="2rem">
             Marketplace
           </Text>
-          <Menu>
+          <Menu closeOnSelect={true}>
             <MenuButton
               as={Button}
               alignSelf="center"
@@ -116,8 +116,8 @@ const Home: React.FC = () => {
               <MenuItem onClick={() => handleSortSelect("Popular")}>
                 Popular
               </MenuItem>
-              <MenuItem onClick={() => handleSortSelect("Ending Soonest")}>
-                Ending Soonest
+              <MenuItem onClick={() => handleSortSelect("Availability")}>
+                Availability
               </MenuItem>
               <MenuItem onClick={() => handleSortSelect("Newly Listed")}>
                 Newly Listed
@@ -129,11 +129,10 @@ const Home: React.FC = () => {
             <FrakButton>List NFT</FrakButton>
           </NextLink>
         </Flex>
-        {loading ? (
-          "loading.."
-        ) : (
+        {loading && "loading..."}
+        {!loading && (
           <div>
-            {nftItems.length ? (
+            {nftItems?.length > 0 && (
               <>
                 <InfiniteScroll
                   dataLength={nftItems.length}
@@ -167,7 +166,8 @@ const Home: React.FC = () => {
                   </Grid>
                 </InfiniteScroll>
               </>
-            ) : (
+            )}
+            {nftItems?.length <= 0 && (
               <VStack>
                 <Text className="medium-16">Whoops, no NFTs are for sale.</Text>
                 <Text className="medium-16">

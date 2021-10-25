@@ -45,9 +45,12 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
       }
     }
     return (
-      <HStack style={{marginTop:'24px'}}>
+      <HStack style={{
+        marginTop:'24px',
+        justifyContent:'space-between'
+      }}>
         <VStack style={{
-          textAlign:'start'
+          textAlign:'start',
         }}>
           <div style={{
             fontFamily:'Inter',
@@ -55,7 +58,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
             fontSize:'12px',
             lineHeight:'14px',
             letterSpacing:'1px',
-            color:'#A7A7A7'
+            color:'#A7A7A7',
           }}>
             AVAILABLE
           </div>
@@ -117,7 +120,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
           </div>
         </VStack>
         <VStack style={{
-          textAlign:'start',
+          textAlign:'end',
           marginLeft:'24px'
         }}>
           <div style={{
@@ -126,6 +129,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
             fontSize:'12px',
             lineHeight:'14px',
             letterSpacing:'1px',
+            textAlign: 'end',
             color:'#A7A7A7'
           }}>
             BUY FRAKTIONS
