@@ -54,14 +54,12 @@ export default function DetailsView() {
       setTokenAddress(tokenAddressSplitted);
 
       let fraktalFetch = await getSubgraphData("fraktal", tokenAddressSplitted);
-      console.log("object", fraktalFetch);
       if (
         fraktalFetch &&
         fraktalFetch.fraktalNfts &&
         fraktalFetch.fraktalNfts[0]
       ) {
         let nftObjects = await createObject2(fraktalFetch.fraktalNfts[0]);
-        console.log(nftObjects);
         if (nftObjects) {
           setNftObject(nftObjects);
         }
@@ -75,7 +73,6 @@ export default function DetailsView() {
           return x.value > 0;
         });
         if (revenuesValid) {
-          console.log("revenues", revenuesValid);
           setRevenues(revenuesValid);
         }
       }
@@ -211,7 +208,6 @@ export default function DetailsView() {
                   lineHeight: "19px",
                 }}
               >
-                {console.log(nftObject)}
                 {nftObject ? shortenHash(nftObject.creator) : "loading"}
               </div>
             </VStack>

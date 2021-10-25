@@ -1,7 +1,5 @@
-import { HStack } from "@chakra-ui/layout";
 import { utils } from "ethers";
 import React, { forwardRef, useState, useEffect } from "react";
-import Button from "../button";
 import {
   voteOffer,
   getLocked,
@@ -12,7 +10,7 @@ import {
   approveMarket,
 } from "../../utils/contractCalls";
 import { shortenHash, timezone } from "../../utils/helpers";
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, HStack } from "@chakra-ui/react";
 
 interface offerItemProps {
   account: String;
@@ -74,7 +72,7 @@ const OfferDetail = forwardRef<HTMLDivElement, offerItemProps>(
     }
 
     return (
-      <Box sx={{ display: `flex` }}>
+      <Box sx={{ display: `flex`, alignItems: `center`, margin: `8px 0` }}>
         <Text sx={{ minWidth: `116px` }}>{timezone(offerItem.timestamp)}</Text>
         <Text
           sx={{
@@ -95,133 +93,76 @@ const OfferDetail = forwardRef<HTMLDivElement, offerItemProps>(
             ? `${utils.formatEther(offerItem.value)} ETH`
             : "N/A"}
         </Text>
-        {/* <Text w="210px" sx={{ textAlign: `right` }}></Text> */}
         <Box w="210px" sx={{ textAlign: `right` }}>
-          {fraktionsBalance > 0 ? (
+          {fraktionsBalance >= 1 ? (
             <div>
               {fraktionsApproved ? (
                 <div>
                   {fraktionsLocked ? (
-                    <Button
-                      isOutlined
-                      onClick={() => cancelVote()}
-                      style={{
-                        color: "#FF0000",
-                        borderColor: "#FF0000",
-                        width: "192px",
+                    <Box
+                      sx={{
+                        border: `2px solid red`,
+                        fontSize: `16px`,
+                        display: `inline-block`,
+                        boxSizing: `border-box`,
+                        backgroundColor: `white`,
+                        padding: `4px 16px`,
+                        color: `red`,
+                        fontWeight: `500`,
+                        fontFamily: `Inter`,
+                        borderRadius: `24px`,
                       }}
+                      _hover={{ cursor: `pointer` }}
+                      onClick={() => cancelVote()}
                     >
                       Reject
-                    </Button>
+                    </Box>
                   ) : (
-                    <Button
-                      isOutlined
-                      style={{
-                        color: "#00C4B8",
+                    <Box
+                      sx={{
                         borderColor: "#00C4B8",
-                        width: "192px",
-                        marginRight: "16px",
+                        fontSize: `16px`,
+                        display: `inline-block`,
+                        boxSizing: `border-box`,
+                        backgroundColor: `hsla(168, 100%, 38%, 1)`,
+                        padding: `4px 16px`,
+                        color: `white`,
+                        fontWeight: `500`,
+                        fontFamily: `Inter`,
+                        borderRadius: `24px`,
                       }}
+                      _hover={{ cursor: `pointer` }}
                       onClick={() => voteOnOffer()}
                     >
                       Accept
-                    </Button>
+                    </Box>
                   )}
                 </div>
               ) : (
-                <Button
-                  isOutlined
-                  style={{
-                    color: "#000000",
+                <Box
+                  sx={{
                     borderColor: "#00C4B8",
-                    width: "192px",
-                    marginRight: "16px",
+                    fontSize: `16px`,
+                    display: `inline-block`,
+                    boxSizing: `border-box`,
+                    backgroundColor: `hsla(168, 100%, 38%, 1)`,
+                    padding: `4px 16px`,
+                    color: `white`,
+                    fontWeight: `500`,
+                    fontFamily: `Inter`,
+                    borderRadius: `24px`,
                   }}
+                  _hover={{ cursor: `pointer` }}
                   onClick={() => approveContract()}
                 >
                   Approve Fraktions
-                </Button>
+                </Box>
               )}
             </div>
           ) : (
             <div>buy Fraktions to vote!</div>
           )}
         </Box>
-        {/*
-        <Td>
-          {offerItem.value > 0
-            ? utils.formatEther(offerItem.value)
-            : "Retrieved"}{" "}
-          ETH
-        </Td> */}
-        {/* <Td> */}
-        {/* {fraktionsBalance > 0 ? (
-            <div>
-              {fraktionsApproved ? (
-                <div>
-                  {fraktionsLocked ? (
-                    <Button
-                      isOutlined
-                      onClick={() => cancelVote()}
-                      style={{
-                        color: "#FF0000",
-                        borderColor: "#FF0000",
-                        width: "192px",
-                      }}
-                    >
-                      Reject
-                    </Button>
-                  ) : (
-                    <Button
-                      isOutlined
-                      style={{
-                        color: "#00C4B8",
-                        borderColor: "#00C4B8",
-                        width: "192px",
-                        marginRight: "16px",
-                      }}
-                      onClick={() => voteOnOffer()}
-                    >
-                      Accept
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                <Button
-                  isOutlined
-                  style={{
-                    color: "#000000",
-                    borderColor: "#00C4B8",
-                    width: "192px",
-                    marginRight: "16px",
-                  }}
-                  onClick={() => approveContract()}
-                >
-                  Approve Fraktions
-                </Button>
-              )}
-            </div>
-          ) : (
-            <div>buy Fraktions to vote!</div>
-          )} */}
-        {/*if winner, should claim the fraktal from here*/}
-        {/* {offerItem.winner == true && (
-            <div>
-              <Button
-                isOutlined
-                style={{
-                  color: "#000000",
-                  borderColor: "#00C4B8",
-                  width: "192px",
-                  marginRight: "16px",
-                }}
-                onClick={() => claimFraktal()}
-              >
-                Claim bought Fraktal
-              </Button>
-            </div>
-          )} */}
-        {/* </Td> */}
       </Box>
     );
   }
