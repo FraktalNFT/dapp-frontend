@@ -42,7 +42,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
             </Text>{" "}
             or{" "}
             <Text fontWeight='bold' as='span'>
-              Goerli Testnet
+              Rinkeby Testnet
             </Text>{" "}
           </Box>
         </VStack>
