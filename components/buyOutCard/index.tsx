@@ -262,7 +262,7 @@ const BuyOutCard = ({
                   Address
                 </Text>
                 <Text
-                  w="72px"
+                  w="80px"
                   sx={{
                     fontFamily: `Inter`,
                     opacity: `0.7`,

@@ -76,17 +76,77 @@ const OfferDetail = forwardRef<HTMLDivElement, offerItemProps>(
     return (
       <Box sx={{ display: `flex` }}>
         <Text sx={{ minWidth: `116px` }}>{timezone(offerItem.timestamp)}</Text>
-        <Text sx={{ minWidth: `160px` }}>
-          {shortenHash(offerItem.offerer.id)}
+        <Text
+          sx={{
+            minWidth: `160px`,
+            color: `hsla(224, 86%, 51%, 1)`,
+          }}
+        >
+          <a
+            href={`https://etherscan.io/address/${offerItem.offerer.id}`}
+            rel="nofollow"
+            target="_blank"
+          >
+            {shortenHash(offerItem.offerer.id)}
+          </a>
         </Text>
-        <Text w="80" sx={{ textAlign: `right` }}>
+        <Text w="80px" sx={{ textAlign: `right` }}>
           {offerItem.value > 0
-            ? utils.formatEther(offerItem.value)
-            : "Retrieved"}{" "}
-          ETH
+            ? `${utils.formatEther(offerItem.value)} ETH`
+            : "N/A"}
         </Text>
-        <Text w="210px" sx={{ textAlign: `right` }}></Text>
-
+        {/* <Text w="210px" sx={{ textAlign: `right` }}></Text> */}
+        <Box w="210px" sx={{ textAlign: `right` }}>
+          {fraktionsBalance > 0 ? (
+            <div>
+              {fraktionsApproved ? (
+                <div>
+                  {fraktionsLocked ? (
+                    <Button
+                      isOutlined
+                      onClick={() => cancelVote()}
+                      style={{
+                        color: "#FF0000",
+                        borderColor: "#FF0000",
+                        width: "192px",
+                      }}
+                    >
+                      Reject
+                    </Button>
+                  ) : (
+                    <Button
+                      isOutlined
+                      style={{
+                        color: "#00C4B8",
+                        borderColor: "#00C4B8",
+                        width: "192px",
+                        marginRight: "16px",
+                      }}
+                      onClick={() => voteOnOffer()}
+                    >
+                      Accept
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <Button
+                  isOutlined
+                  style={{
+                    color: "#000000",
+                    borderColor: "#00C4B8",
+                    width: "192px",
+                    marginRight: "16px",
+                  }}
+                  onClick={() => approveContract()}
+                >
+                  Approve Fraktions
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div>buy Fraktions to vote!</div>
+          )}
+        </Box>
         {/*
         <Td>
           {offerItem.value > 0
