@@ -52,7 +52,10 @@ export default function DetailsView() {
       const tokenAddress = getParams("nft");
       const tokenAddressSplitted = tokenAddress.split("/details")[0];
       setTokenAddress(tokenAddressSplitted);
-
+      let fraktionsFetch = await getSubgraphData('fraktions',tokenAddressSplitted)
+      if(fraktionsFetch.listItems){
+        setFraktionsListed(fraktionsFetch.listItems)
+      }
       let fraktalFetch = await getSubgraphData("fraktal", tokenAddressSplitted);
       if (
         fraktalFetch &&
