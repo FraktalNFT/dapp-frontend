@@ -3,7 +3,7 @@ import React, { ReactNode, useMemo } from "react";
 import { useWeb3Context } from "../../contexts/Web3Context";
 import { addChainToMetaMask } from "../../utils/helpers";
 import Header from "../header";
-import ChainWarning from '../chainWarning';
+import ChainWarning from "../chainWarning";
 
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { providerChainId } = useWeb3Context();
@@ -16,9 +16,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <>
       <Header />
-      {!isValid &&
-        <ChainWarning />
-      }
+      {!isValid && <ChainWarning />}
       {children}
     </>
   );
