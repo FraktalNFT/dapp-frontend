@@ -112,7 +112,7 @@ const RevenuesList = ({
               <FrakButton2
                 isReady={revenueValue > 0}
                 onClick={launchRevenuePayment}
-                onSet={e => setRevenueValue(e)}
+                setFunction={e => setRevenueValue(e)}
               >
                 {isCreating ? "CREATING" : "DEPOSIT"}
               </FrakButton2>
