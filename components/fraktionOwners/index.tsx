@@ -17,35 +17,48 @@ import { getSubgraphData } from "../../utils/graphQueries";
 // if account has fraktions.. display info to list?
 
 export default function FraktionOwners(props) {
-  let internalData = props.data;
+  const [internalData, setInternalData] = useState({});
   let nftObject = props.nftObject;
 
-  const [owners, setOwners] = useState([]);
+  // const [owners, setOwners] = useState([]);
 
   useEffect(() => {
     async function getOwners(id) {
-      const res = await getSubgraphData("fraktal_owners", id);
-      console.log(res);
+      // const res = await getSubgraphData("fraktal_owners", id); // borken :(
+      const res = {
+        fraktalNfts: [
+          {
+            fraktions: [
+              {
+                amount: "5000",
+                owner: {
+                  address: "0x42541a2Ba03cAe418CdB70525c55a0A0a5FD254F",
+                },
+              },
+              {
+                amount: "1000",
+                owner: {
+                  address: "0x42541a2ba03cae418cdb70525c55a0a0a5fd254f",
+                },
+              },
+              {
+                amount: "10",
+                owner: {
+                  address: "0x3cd751e6b0078be393132286c442345e5dc49699",
+                },
+              },
+            ],
+          },
+        ],
+      };
+      setInternalData(res);
     }
-    getOwners(nftObject.id);
-  }, []);
+    if (nftObject.id) {
+      console.log(nftObject.id);
+      getOwners(nftObject.id);
+    }
+  }, [nftObject]);
 
-  if (internalData.length <= 0) {
-    internalData = [
-      {
-        address: `0xBc4A2b0B65e39bAE9bedad1798B824EAf0A60639`,
-        ownership: `2%`,
-      },
-      {
-        address: `0xBc4A2b0B65e39bAE9bedad1798B824EAf0A60639`,
-        ownership: `0.012%`,
-      },
-      {
-        address: `0xBc4A2b0B65e39bAE9bedad1798B824EAf0A60639`,
-        ownership: `0.12%`,
-      },
-    ];
-  }
   return (
     <div
       style={{
@@ -93,34 +106,38 @@ export default function FraktionOwners(props) {
             Ownership
           </Text>
         </Box>
-        {internalData.map((user: object, index: number) => {
-          let first4 = user.address.substring(0, 6); // (0x + 4 digits)
-          let last4 = user.address.substring(
-            user.address.length - 4,
-            user.address.length
-          );
-          let shortAddress = `${first4}...${last4}`;
-          return (
-            <Box
-              sx={{
-                display: `flex`,
-                alignItems: `center`,
-                justifyContent: `space-between`,
-                margin: `4px 0`,
-              }}
-            >
-              <Text
-                sx={{ color: `hsla(224, 86%, 51%, 1)` }}
-                _hover={{ cursor: `pointer` }}
-              >
-                <a href={`https://etherscan.io/address/${user.address}`}>
-                  {shortAddress}
-                </a>
-              </Text>
-              <Text>{user.ownership}</Text>
-            </Box>
-          );
-        })}
+        {internalData.fraktalNfts &&
+          internalData?.fraktalNfts[0].fraktions?.map(
+            (user: object, index: number) => {
+              let first4 = user.owner.address.substring(0, 6); // (0x + 4 digits)
+              let last4 = user.owner.address.substring(
+                user.owner.address.length - 4,
+                user.owner.address.length
+              );
+              let shortAddress = `${first4}...${last4}`;
+              let percentOwned = (parseInt(user.amount) / 10000) * 100;
+              return (
+                <Box
+                  sx={{
+                    display: `flex`,
+                    alignItems: `center`,
+                    justifyContent: `space-between`,
+                    margin: `4px 0`,
+                  }}
+                >
+                  <Text
+                    sx={{ color: `hsla(224, 86%, 51%, 1)` }}
+                    _hover={{ cursor: `pointer` }}
+                  >
+                    <a href={`https://etherscan.io/address/${user.address}`}>
+                      {shortAddress}
+                    </a>
+                  </Text>
+                  <Text>{percentOwned}%</Text>
+                </Box>
+              );
+            }
+          )}
       </div>
     </div>
   );

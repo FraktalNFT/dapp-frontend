@@ -168,8 +168,6 @@ export default function DetailsView() {
     }
   }
 
-  console.log(nftObject);
-
   return (
     <Box
       sx={{

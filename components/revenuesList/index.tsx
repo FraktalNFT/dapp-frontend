@@ -29,7 +29,11 @@ const RevenuesList = ({
   async function launchRevenuePayment() {
     setIsCreating(true);
     let valueIn = utils.parseEther(revenueValue.toString()); //+0.000000000001
-    await createRevenuePayment(valueIn, provider, tokenAddress);
+    try {
+      await createRevenuePayment(valueIn, provider, tokenAddress);
+    } catch (error) {
+      console.log("creating revenue failed, reason: ", error);
+    }
     setIsCreating(false);
     setValueSetter(false);
   }
@@ -44,7 +48,13 @@ const RevenuesList = ({
         marginTop: "40px 0px",
       }}
     >
-      <HStack>
+      <Box
+        sx={{
+          display: `flex`,
+          justifyContent: `space-between`,
+          alignItems: `center`,
+        }}
+      >
         <div
           style={{
             color: "#5A32F3",
@@ -76,10 +86,16 @@ const RevenuesList = ({
             </button>
           </div>
         )}
-      </HStack>
+      </Box>
       <div>
         {valueSetter && (
-          <HStack>
+          <Box
+            sx={{
+              display: `grid`,
+              gridTemplateColumns: `4fr 5fr`,
+              alignItems: `start`,
+            }}
+          >
             <div
               style={{
                 fontFamily: "Inter",
@@ -94,7 +110,7 @@ const RevenuesList = ({
             <VStack
               style={{
                 textAlign: "start",
-                margin: "16px 24px",
+                margin: "0 24px",
               }}
             >
               <div
@@ -112,12 +128,12 @@ const RevenuesList = ({
               <FrakButton2
                 isReady={revenueValue > 0}
                 onClick={launchRevenuePayment}
-                onSet={e => setRevenueValue(e)}
+                setFunction={e => setRevenueValue(e)}
               >
-                {isCreating ? "CREATING" : "DEPOSIT"}
+                SEND
               </FrakButton2>
             </VStack>
-          </HStack>
+          </Box>
         )}
       </div>
       <div>
