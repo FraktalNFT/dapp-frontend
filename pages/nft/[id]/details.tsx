@@ -24,6 +24,7 @@ import {
 } from "../../../utils/contractCalls";
 import { useRouter } from "next/router";
 import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
+// import Modal from '../../../components/modal';
 
 export default function DetailsView() {
   const router = useRouter();
@@ -46,6 +47,7 @@ export default function DetailsView() {
   const [userFraktions, setUserFraktions] = useState(0);
   const [isOwner, setIsOwner] = useState(false);
   const [revenues, setRevenues] = useState();
+  const [txInProgress, setTxInProgress]=useState(false);
   // use callbacks
   useEffect(() => {
     async function getData() {
@@ -329,6 +331,14 @@ export default function DetailsView() {
           />
         </div>
       </Stack>
+{/*
+      <Modal
+        open={txInProgress}
+        onClose={()=>setTxInProgress(false)}
+      >
+        Tx's in course!
+      </Modal>
+    */}
     </Box>
   );
 }

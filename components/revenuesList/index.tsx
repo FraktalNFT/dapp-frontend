@@ -32,6 +32,7 @@ const RevenuesList = ({
     await createRevenuePayment(valueIn, provider, tokenAddress);
     setIsCreating(false);
     setValueSetter(false);
+    // reload page or modify the list.
   }
 
   return (
