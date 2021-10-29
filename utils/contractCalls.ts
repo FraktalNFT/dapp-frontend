@@ -21,6 +21,7 @@ const marketAbi = [
   "function listItem(address _tokenAddress,uint256 _price,uint256 _numberOfShares) external returns (bool)",
   "function unlistItem(address tokenAddress)",
   "function maxPriceRegistered(address) view returns (uint256)",
+  "function exportFraktal(address tokenAddress)"
 ]
 const tokenAbi = [
   "function isApprovedForAll(address account,address operator) external view returns (bool)",
@@ -214,6 +215,13 @@ export async function importFraktal(tokenAddress, fraktionsIndex, provider, mark
   const override = {gasLimit:2000000}
   const customContract = new Contract(marketAddress, marketAbi, signer);
   let tx = await customContract.importFraktal(tokenAddress, fraktionsIndex, override);
+  let receipt = processTx(tx);
+  return receipt;
+}
+export async function exportFraktal(tokenAddress, provider, marketAddress){
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
+  let tx = await customContract.exportFraktal(tokenAddress);
   let receipt = processTx(tx);
   return receipt;
 }
