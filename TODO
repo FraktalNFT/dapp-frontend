@@ -1,9 +1,8 @@
 TODO::
 --------------------------------------------------------------------------------
-- Add a Defraktionalize function in the market to handle the escrow of the fraktal (otherwise is free to claim)
 
 BUGS:
-  - DeFrak does not return the Fraktal!!!!
+
 
   CONTRACTS:
   ------------------------------------------------------------------------------------------------
