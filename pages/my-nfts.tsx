@@ -4,6 +4,7 @@ import React, {useEffect, useState} from "react";
 // import NFTItemManager from "../components/nft-item-manager";
 import NFTItemOS from '../components/nft-item-opensea';
 import NFTItem from '../components/nft-item';
+import RescueCard from '../components/rescueCard';
 import NextLink from "next/link";
 import styles from "../styles/my-nfts.module.css";
 import FrakButton from "../components/button";
@@ -288,23 +289,13 @@ export default function MyNFTsView() {
           </div>
         </div>
       )}
+      {/*///////////////*/}
 
-      <div className={styles.subText}>You have earned</div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          marginTop: "8px",
-        }}
-      >
-        <div className={styles.claimContainer}>
-          <div style={{ marginLeft: "24px" }}>
-            <div className={styles.claimHeader}>ETH</div>
-            <div className={styles.claimAmount}>{Math.round(totalBalance*1000)/1000}</div>
-          </div>
-          <div className={styles.claimCTA} onClick={()=>rescueEth(provider, marketAddress)}>Claim</div>
-        </div>
-      </div>
+      <RescueCard
+        marketAddress= {marketAddress}
+        provider= {provider}
+        gains= {Math.round(totalBalance*1000)/1000}
+      />
       {/*///////////////*/}
       <div className={styles.header}>
         Your Wallet NFTs
