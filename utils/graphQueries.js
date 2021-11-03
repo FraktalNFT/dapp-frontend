@@ -339,7 +339,9 @@ const fraktalOwners = gql`
   query ($id: ID!) {
     fraktalNfts(where: { id: $id }) {
       fraktions {
-        owner
+        owner {
+          id
+        }
         amount
       }
     }

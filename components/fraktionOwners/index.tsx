@@ -16,45 +16,35 @@ import { getSubgraphData } from "../../utils/graphQueries";
 
 // if account has fraktions.. display info to list?
 
+type InternalData = {
+  fraktalNfts: Array<FraktionsArray>;
+};
+
+type FraktionsArray = {
+  fraktions: Array<Fraktions>;
+};
+
+type Fraktions = {
+  amount: string;
+  owner: Owner;
+};
+
+type Owner = {
+  id: string;
+};
+
 export default function FraktionOwners(props) {
-  const [internalData, setInternalData] = useState({});
+  const [internalData, setInternalData] = useState<InternalData | undefined>(
+    undefined
+  );
   let nftObject = props.nftObject;
 
-  // const [owners, setOwners] = useState([]);
-
   useEffect(() => {
-    async function getOwners(id) {
-      // const res = await getSubgraphData("fraktal_owners", id); // borken :(
-      const res = {
-        fraktalNfts: [
-          {
-            fraktions: [
-              {
-                amount: "5000",
-                owner: {
-                  address: "0x42541a2Ba03cAe418CdB70525c55a0A0a5FD254F",
-                },
-              },
-              {
-                amount: "1000",
-                owner: {
-                  address: "0x42541a2ba03cae418cdb70525c55a0a0a5fd254f",
-                },
-              },
-              {
-                amount: "10",
-                owner: {
-                  address: "0x3cd751e6b0078be393132286c442345e5dc49699",
-                },
-              },
-            ],
-          },
-        ],
-      };
+    async function getOwners(id: string) {
+      const res = await getSubgraphData("fraktal_owners", id);
       setInternalData(res);
     }
     if (nftObject.id) {
-      console.log(nftObject.id);
       getOwners(nftObject.id);
     }
   }, [nftObject]);
@@ -106,16 +96,16 @@ export default function FraktionOwners(props) {
             Ownership
           </Text>
         </Box>
-        {internalData.fraktalNfts &&
+        {internalData?.fraktalNfts &&
           internalData?.fraktalNfts[0].fraktions?.map(
-            (user: object, index: number) => {
-              let first4 = user.owner.address.substring(0, 6); // (0x + 4 digits)
-              let last4 = user.owner.address.substring(
-                user.owner.address.length - 4,
-                user.owner.address.length
+            (user: Fraktions, index: number) => {
+              let first4 = user?.owner?.id?.substring(0, 6); // (0x + 4 digits)
+              let last4 = user?.owner?.id?.substring(
+                user?.owner?.id?.length - 4,
+                user?.owner?.id?.length
               );
               let shortAddress = `${first4}...${last4}`;
-              let percentOwned = (parseInt(user.amount) / 10000) * 100;
+              let percentOwned = (parseInt(user?.amount) / 10000) * 100;
               return (
                 <Box
                   sx={{
@@ -129,7 +119,7 @@ export default function FraktionOwners(props) {
                     sx={{ color: `hsla(224, 86%, 51%, 1)` }}
                     _hover={{ cursor: `pointer` }}
                   >
-                    <a href={`https://etherscan.io/address/${user.address}`}>
+                    <a href={`https://etherscan.io/address/${user.owner.id}`}>
                       {shortAddress}
                     </a>
                   </Text>
