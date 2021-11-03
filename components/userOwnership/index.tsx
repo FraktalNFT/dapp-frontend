@@ -6,7 +6,7 @@ import {
   approveMarket,
   claimERC721,
   claimERC1155,
-  defraktionalize,
+  exportFraktal,
   getIndexUsed
 } from '../../utils/contractCalls';
 
@@ -39,11 +39,11 @@ const UserOwnership=(({
 
   async function defraktionalization() {
     let tx;
-    if(!isApproved){
-      tx = await approveMarket(marketAddress, provider, tokenAddress)
-    }
+    // if(!isApproved){
+    //   tx = await approveMarket(marketAddress, provider, tokenAddress)
+    // }
     if(tx || isApproved){
-      await defraktionalize(provider, tokenAddress)
+      await exportFraktal(tokenAddress, provider, marketAddress)
       // defraktionalize leaves the nft in the market!!!
       // can claim (etherscan) ANYONE!
     }

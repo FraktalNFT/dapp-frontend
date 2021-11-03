@@ -25,6 +25,7 @@ import {
 } from "../../../utils/contractCalls";
 import { useRouter } from "next/router";
 import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
+// import Modal from '../../../components/modal';
 
 export default function DetailsView() {
   const router = useRouter();
@@ -47,13 +48,17 @@ export default function DetailsView() {
   const [userFraktions, setUserFraktions] = useState(0);
   const [isOwner, setIsOwner] = useState(false);
   const [revenues, setRevenues] = useState();
+  const [txInProgress, setTxInProgress]=useState(false);
   // use callbacks
   useEffect(() => {
     async function getData() {
       const tokenAddress = getParams("nft");
       const tokenAddressSplitted = tokenAddress.split("/details")[0];
       setTokenAddress(tokenAddressSplitted);
-
+      let fraktionsFetch = await getSubgraphData('fraktions',tokenAddressSplitted)
+      if(fraktionsFetch.listItems){
+        setFraktionsListed(fraktionsFetch.listItems)
+      }
       let fraktalFetch = await getSubgraphData("fraktal", tokenAddressSplitted);
       if (
         fraktalFetch &&
@@ -330,6 +335,14 @@ export default function DetailsView() {
           <FraktionOwners data={[]} nftObject={nftObject} />
         </div>
       </Stack>
+{/*
+      <Modal
+        open={txInProgress}
+        onClose={()=>setTxInProgress(false)}
+      >
+        Tx's in course!
+      </Modal>
+    */}
     </Box>
   );
 }

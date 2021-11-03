@@ -58,9 +58,9 @@ const OfferDetail = forwardRef<HTMLDivElement, offerItemProps>(
 
     async function approveContract() {
       let done = await approveMarket(marketAddress, provider, tokenAddress);
-      if (done) {
-        setFraktionsApproved(true);
-      }
+      // if (done) {
+      //   setFraktionsApproved(true);
+      // }
     }
     async function claimFraktal() {
       // this one goes to offersCard
