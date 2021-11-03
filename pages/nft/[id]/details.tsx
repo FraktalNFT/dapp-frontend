@@ -2,7 +2,7 @@ import Link from "next/link";
 import { utils } from "ethers";
 import FrakButton from "../../../components/button";
 import styles from "./auction.module.css";
-import { HStack, VStack, Box, Stack } from "@chakra-ui/layout";
+import { HStack, VStack, Box, Stack, Spinner, Heading } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import FraktionsList from "../../../components/fraktionsList";
 import RevenuesList from "../../../components/revenuesList";
@@ -27,6 +27,23 @@ import { useRouter } from "next/router";
 import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
 // import Modal from '../../../components/modal';
 
+type nftObject = {
+  balances: Array<Balance>;
+  createdAt: string;
+  creator: string;
+  description: string;
+  id: string;
+  imageURL: string;
+  marketId: string;
+  name: string;
+  status: string;
+};
+
+type Balance = {
+  amount: string;
+  locked: string;
+};
+
 export default function DetailsView() {
   const router = useRouter();
   const [fraktalOwners, setFraktalOwners] = useState(1);
@@ -37,8 +54,8 @@ export default function DetailsView() {
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
   const [offers, setOffers] = useState();
   const [minOffer, setMinOffer] = useState(0);
-  const [nftObject, setNftObject] = useState({});
-  const [tokenAddress, setTokenAddress] = useState();
+  const [nftObject, setNftObject] = useState<nftObject | undefined>(undefined);
+  const [tokenAddress, setTokenAddress] = useState<string>("");
   const [fraktionsListed, setFraktionsListed] = useState([]);
   const [userHasListed, setUserHasListed] = useState(false);
   const [collateralNft, setCollateralNft] = useState();
@@ -48,24 +65,24 @@ export default function DetailsView() {
   const [userFraktions, setUserFraktions] = useState(0);
   const [isOwner, setIsOwner] = useState(false);
   const [revenues, setRevenues] = useState();
-  const [txInProgress, setTxInProgress]=useState(false);
+  const [txInProgress, setTxInProgress] = useState(false);
   // use callbacks
   useEffect(() => {
     async function getData() {
-      const tokenAddress = getParams("nft");
-      const tokenAddressSplitted = tokenAddress.split("/details")[0];
-      setTokenAddress(tokenAddressSplitted);
-      let fraktionsFetch = await getSubgraphData('fraktions',tokenAddressSplitted)
-      if(fraktionsFetch.listItems){
-        setFraktionsListed(fraktionsFetch.listItems)
+      const pathname = window?.location.pathname;
+      const params = pathname.split("/");
+      setTokenAddress(params[2]);
+      let fraktionsFetch = await getSubgraphData("fraktions", params[2]);
+      if (fraktionsFetch.listItems) {
+        setFraktionsListed(fraktionsFetch.listItems);
       }
-      let fraktalFetch = await getSubgraphData("fraktal", tokenAddressSplitted);
+      let fraktalFetch = await getSubgraphData("fraktal", params[2]);
       if (
         fraktalFetch &&
         fraktalFetch.fraktalNfts &&
         fraktalFetch.fraktalNfts[0]
       ) {
-        let nftObjects = await createObject2(fraktalFetch.fraktalNfts[0]);
+        let nftObjects = await createObject2(fraktalFetch?.fraktalNfts[0]);
         if (nftObjects) {
           setNftObject(nftObjects);
         }
@@ -83,15 +100,19 @@ export default function DetailsView() {
         }
       }
     }
-    getData();
+    let attemptCounter = 0;
+    while (typeof nftObject === "undefined" && attemptCounter < 10) {
+      getData();
+      attemptCounter++;
+    }
   }, []);
 
   useEffect(() => {
     async function getData() {
       if (fraktionsListed && account && tokenAddress) {
         let fraktionsFetch = await getSubgraphData("fraktions", tokenAddress);
-        let userFraktionsListed = fraktionsFetch.listItems.find(
-          x => x.seller.id == account.toLocaleLowerCase()
+        let userFraktionsListed = fraktionsFetch?.listItems?.find(
+          x => x?.seller?.id == account.toLocaleLowerCase()
         );
         if (userFraktionsListed && userFraktionsListed.amount > 0) {
           setUserHasListed(true);
@@ -187,7 +208,7 @@ export default function DetailsView() {
             <div className={styles.goBack}>← back to all NFTS</div>
           </Link>
           <Image
-            src={nftObject ? nftObject.imageURL : null}
+            src={nftObject ? nftObject?.imageURL : null}
             w="400px"
             h="400px"
             style={{ borderRadius: "4px 4px 0px 0px", objectFit: `cover` }}
@@ -214,7 +235,13 @@ export default function DetailsView() {
                   lineHeight: "19px",
                 }}
               >
-                {nftObject ? shortenHash(nftObject.creator) : "loading"}
+                {nftObject ? (
+                  shortenHash(nftObject?.creator)
+                ) : (
+                  <Box>
+                    <Spinner size="md" speed="0.5s" />
+                  </Box>
+                )}
               </div>
             </VStack>
             <VStack>
@@ -238,7 +265,13 @@ export default function DetailsView() {
                   lineHeight: "19px",
                 }}
               >
-                {nftObject ? timezone(nftObject.createdAt) : "loading"}
+                {nftObject ? (
+                  timezone(nftObject?.createdAt)
+                ) : (
+                  <Box>
+                    <Spinner size="md" speed="0.5s" />
+                  </Box>
+                )}
               </div>
             </VStack>
           </HStack>
@@ -252,7 +285,7 @@ export default function DetailsView() {
             isApproved={fraktionsApproved}
             marketAddress={marketAddress}
             tokenAddress={tokenAddress}
-            marketId={nftObject ? nftObject.marketId : null}
+            marketId={nftObject ? nftObject?.marketId : null}
             factoryAddress={factoryAddress}
             provider={provider}
             factoryApproved={factoryApproved}
@@ -285,7 +318,14 @@ export default function DetailsView() {
             lineHeight: "64px",
           }}
         >
-          {nftObject ? nftObject.name : "Loading"}
+          {nftObject ? (
+            nftObject?.name
+          ) : (
+            <Box>
+              <Heading>Loading</Heading>
+              <Spinner size="xl" speed="0.5s" />
+            </Box>
+          )}
         </div>
         <div
           style={{
@@ -296,9 +336,9 @@ export default function DetailsView() {
             marginBottom: "40px",
           }}
         >
-          {nftObject && nftObject.description ? nftObject.description : null}
+          {nftObject?.description ? nftObject?.description : null}
         </div>
-        {nftObject && nftObject.status == "open" ? (
+        {nftObject && nftObject?.status == "open" ? (
           <FraktionsList
             fraktionsListed={fraktionsListed}
             tokenAddress={tokenAddress}
@@ -312,14 +352,12 @@ export default function DetailsView() {
             minPrice={minOffer}
             fraktionsBalance={userFraktions}
             fraktionsApproved={fraktionsApproved}
-            investors={
-              nftObject && nftObject.balances ? nftObject.balances.length : 0
-            }
+            investors={nftObject?.balances ? nftObject?.balances.length : 0}
             offers={offers}
             tokenAddress={tokenAddress}
             marketAddress={marketAddress}
             provider={provider}
-            itemStatus={nftObject && nftObject.status ? nftObject.status : null}
+            itemStatus={nftObject?.status ? nftObject?.status : null}
           />
         </div>
         <div style={{ marginTop: "40px" }}>
@@ -335,7 +373,7 @@ export default function DetailsView() {
           <FraktionOwners data={[]} nftObject={nftObject} />
         </div>
       </Stack>
-{/*
+      {/*
       <Modal
         open={txInProgress}
         onClose={()=>setTxInProgress(false)}

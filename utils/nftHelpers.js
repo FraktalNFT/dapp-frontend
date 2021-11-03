@@ -1,84 +1,85 @@
-const { create, CID } = require('ipfs-http-client');
+const { create, CID } = require("ipfs-http-client");
 import { utils } from "ethers";
-import { getSubgraphData } from './graphQueries';
+import { getSubgraphData } from "./graphQueries";
 
 const ipfsClient = create({
   host: "ipfs.infura.io",
   port: "5001",
-  protocol: "https",});
+  protocol: "https",
+});
 
 // Convert Binary Into JSON
-const binArrayToJson = function(binArray)
-{
-    var str = "";
-    for (var i = 0; i < binArray.length; i++) {
-        str += String.fromCharCode(parseInt(binArray[i]));
-    }
-    return JSON.parse(str)
+const binArrayToJson = function (binArray) {
+  var str = "";
+  for (var i = 0; i < binArray.length; i++) {
+    str += String.fromCharCode(parseInt(binArray[i]));
+  }
+  return JSON.parse(str);
 };
 
-function checkImageCID(cid){ // this does not handle others than IPFS... correct THAT!
-  let correctedCid
-  if(cid.startsWith('https://ipfs.io/')){
-    let splitted = cid.split('https://ipfs.io/ipfs/')
-    correctedCid = splitted[1]
-    let cidv1 = toBase32(correctedCid)
-    return `https://${cidv1}.ipfs.dweb.link`
-  } else if(cid.startsWith('ipfs://')){
-    let splitted = cid.split('ipfs://')
-    correctedCid = splitted[1]
-    let cidv1 = toBase32(correctedCid)
-    return `https://${cidv1}.ipfs.dweb.link`
-
-  }else if (cid.startsWith('Qm')){
-      correctedCid = cid
-      let cidv1 = toBase32(correctedCid)
-      return `https://${cidv1}.ipfs.dweb.link`
-  }else{
+function checkImageCID(cid) {
+  // this does not handle others than IPFS... correct THAT!
+  let correctedCid;
+  if (cid.startsWith("https://ipfs.io/")) {
+    let splitted = cid.split("https://ipfs.io/ipfs/");
+    correctedCid = splitted[1];
+    let cidv1 = toBase32(correctedCid);
+    return `https://${cidv1}.ipfs.dweb.link`;
+  } else if (cid.startsWith("ipfs://")) {
+    let splitted = cid.split("ipfs://");
+    correctedCid = splitted[1];
+    let cidv1 = toBase32(correctedCid);
+    return `https://${cidv1}.ipfs.dweb.link`;
+  } else if (cid.startsWith("Qm")) {
+    correctedCid = cid;
+    let cidv1 = toBase32(correctedCid);
+    return `https://${cidv1}.ipfs.dweb.link`;
+  } else {
     return cid;
   }
-};
+}
 
-function toBase32(value) { // to transform V0 to V1 and use as `https://${cidV1}.ipfs.dweb.link`
-  var cid = new CID(value)
-  return cid.toV1().toBaseEncodedString('base32')
-};
+function toBase32(value) {
+  // to transform V0 to V1 and use as `https://${cidV1}.ipfs.dweb.link`
+  var cid = new CID(value);
+  return cid.toV1().toBaseEncodedString("base32");
+}
 
-async function fetchNftMetadata(hash){
-  if(hash.startsWith('Qm')){
-    let chunks
+async function fetchNftMetadata(hash) {
+  if (hash.startsWith("Qm")) {
+    let chunks;
     for await (const chunk of ipfsClient.cat(hash)) {
       chunks = binArrayToJson(chunk);
     }
     // console.log('found qm.., data:',chunks)
     return chunks;
   } else {
-    let res = await fetch(hash)
-    if(res){
-      let result = res.json()
+    let res = await fetch(hash);
+    if (res) {
+      let result = res.json();
       // console.log('found other, data:',result)
-      return result
+      return result;
     }
-  }
-};
-
-async function getFraktalData(address){
-  let data = await getSubgraphData('fraktal', address);
-  if(data?.fraktalNfts?.length){
-    return {
-      fraktalId:data.fraktalNfts[0].marketId,
-      collateral:data.fraktalNfts[0].collateral
-    };
-  } else {
-    return {fraktalId:null, collateral:null};
   }
 }
 
-export async function createOpenSeaObject(data){
-  try{
+async function getFraktalData(address) {
+  let data = await getSubgraphData("fraktal", address);
+  if (data?.fraktalNfts?.length) {
+    return {
+      fraktalId: data.fraktalNfts[0].marketId,
+      collateral: data.fraktalNfts[0].collateral,
+    };
+  } else {
+    return { fraktalId: null, collateral: null };
+  }
+}
+
+export async function createOpenSeaObject(data) {
+  try {
     let response = {
       id: data.asset_contract.address,
-      creator:data.creator.address,
+      creator: data.creator.address,
       token_schema: data.asset_contract.schema_name,
       tokenId: data.token_id,
       createdAt: data.asset_contract.created_date,
@@ -87,24 +88,24 @@ export async function createOpenSeaObject(data){
       marketId: null,
       collateral: null,
       collateralType: null,
-    }
+    };
     // console.log('address',data.asset_contract.address)
     let fraktalData = await getFraktalData(data.asset_contract.address);
     // console.log('fraktaldata',fraktalData)
-    if(fraktalData?.fraktalId?.length){
+    if (fraktalData?.fraktalId?.length) {
       response.marketId = fraktalData.fraktalId;
     }
-    if(fraktalData.collateral){
+    if (fraktalData.collateral) {
       response.collateral = fraktalData.collateral.id;
       response.collateralType = fraktalData.collateral.type;
     }
     return response;
-  }catch{
+  } catch {
     return null;
   }
 }
 
-export async function createObject(data){
+export async function createObject(data) {
   // handle token_schema
 
   // ERC721 + ipfs(?)
@@ -115,13 +116,13 @@ export async function createObject(data){
 
   // and possibly tokenId
 
-  try{
-    let nftMetadata = await fetchNftMetadata(data.nft.hash)
+  try {
+    let nftMetadata = await fetchNftMetadata(data.nft.hash);
     // console.log('meta',nftMetadata)
-    if(nftMetadata){
+    if (nftMetadata) {
       return {
         id: data.nft.id,
-        creator:data.nft.creator.id,
+        creator: data.nft.creator.id,
         marketId: data.nft.marketId,
         // balances: data.nft.fraktions,
         userBalance: data.amount,
@@ -131,48 +132,42 @@ export async function createObject(data){
         name: nftMetadata.name,
         description: nftMetadata.description,
         imageURL: checkImageCID(nftMetadata.image),
-      }
+      };
     }
-  }catch{
-    console.log('Error fetching ',data);
+  } catch {
+    console.log("Error fetching ", data);
     return null;
   }
-};
+}
 
-export async function createObject2(data){
-  try{
-    let nftMetadata = await fetchNftMetadata(data.hash)
-    // console.log('meta',nftMetadata)
+export async function createObject2(data) {
+  try {
+    let nftMetadata = await fetchNftMetadata(data.hash);
+    console.log("meta", nftMetadata);
     let object = {
-      id: data.id,
-      creator:data.creator.id,
-      marketId: data.marketId,
-      balances: data.fraktions,
-      createdAt: data.createdAt,
-      status: data.status,
-    }
-    if(nftMetadata && nftMetadata.name){
-        object.name = nftMetadata.name
-    }
-    if(nftMetadata && nftMetadata.description){
-        object.description = nftMetadata.description
-    }
-    if(nftMetadata && nftMetadata.image){
-        object.imageURL = checkImageCID(nftMetadata.image)
-    }
+      balances: data?.fraktions,
+      createdAt: data?.createdAt,
+      creator: data?.creator?.id,
+      description: nftMetadata?.description,
+      id: data?.id,
+      imageURL: nftMetadata?.image,
+      marketId: data?.marketId,
+      status: data?.status,
+      name: nftMetadata?.name,
+    };
     return object;
-  }catch{
-    console.log('Error fetching 2 ',data.hash);
+  } catch {
+    console.log("Error fetching 2 ", data.hash);
     return null;
   }
-};
+}
 
-export async function createListed(data){
-  try{
-    let nftMetadata = await fetchNftMetadata(data.fraktal.hash)
-    if(nftMetadata){
+export async function createListed(data) {
+  try {
+    let nftMetadata = await fetchNftMetadata(data.fraktal.hash);
+    if (nftMetadata) {
       return {
-        creator:data.fraktal.creator.id,
+        creator: data.fraktal.creator.id,
         marketId: data.fraktal.marketId,
         createdAt: data.fraktal.createdAt,
         tokenAddress: data.fraktal.id,
@@ -185,9 +180,9 @@ export async function createListed(data){
         name: nftMetadata.name,
         description: nftMetadata.description,
         imageURL: checkImageCID(nftMetadata.image),
-      }
+      };
     }
-  }catch (err){
-    console.log('Error',err);
+  } catch (err) {
+    console.log("Error", err);
   }
-};
+}

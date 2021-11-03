@@ -1,17 +1,5 @@
-import {
-  Box,
-  Center,
-  StackProps,
-  Text,
-  VStack,
-  HStack,
-  Stack,
-} from "@chakra-ui/layout";
-import React, { forwardRef, useState, useEffect } from "react";
-import { createRevenuePayment } from "../../utils/contractCalls";
-import RevenuesDetail from "../revenuesDetail";
-import FrakButton2 from "../button2";
-import { utils } from "ethers";
+import { Box, Text, HStack, Spinner } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
 import { getSubgraphData } from "../../utils/graphQueries";
 
 // if account has fraktions.. display info to list?
@@ -44,8 +32,8 @@ export default function FraktionOwners(props) {
       const res = await getSubgraphData("fraktal_owners", id);
       setInternalData(res);
     }
-    if (nftObject.id) {
-      getOwners(nftObject.id);
+    if (nftObject?.id) {
+      getOwners(nftObject?.id);
     }
   }, [nftObject]);
 
@@ -128,6 +116,13 @@ export default function FraktionOwners(props) {
               );
             }
           )}
+        {!internalData?.fraktalNfts && (
+          <Box
+            sx={{ display: `flex`, justifyContent: `center`, margin: `2rem` }}
+          >
+            <Spinner size="xl" speed="0.5s" />
+          </Box>
+        )}
       </div>
     </div>
   );

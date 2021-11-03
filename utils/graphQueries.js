@@ -2,12 +2,8 @@ import { gql, request } from "graphql-request";
 import { utils } from "ethers";
 const { CID } = require("ipfs-http-client");
 
-<<<<<<< HEAD
 const APIURL =
   "https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.1.24";
-=======
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.1.26';
->>>>>>> main
 
 const creator_query = gql`
   query ($id: ID!) {
