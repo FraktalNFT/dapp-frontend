@@ -99,24 +99,47 @@ const OfferDetail = forwardRef<HTMLDivElement, offerItemProps>(
               {fraktionsApproved ? (
                 <div>
                   {fraktionsLocked ? (
-                    <Box
-                      sx={{
-                        border: `2px solid red`,
-                        fontSize: `16px`,
-                        display: `inline-block`,
-                        boxSizing: `border-box`,
-                        backgroundColor: `white`,
-                        padding: `4px 16px`,
-                        color: `red`,
-                        fontWeight: `500`,
-                        fontFamily: `Inter`,
-                        borderRadius: `24px`,
-                      }}
-                      _hover={{ cursor: `pointer` }}
-                      onClick={() => cancelVote()}
-                    >
-                      Reject
-                    </Box>
+                    <div>
+                      {offerItem.winner ?
+                        <Box
+                          sx={{
+                            border: `2px solid green`,
+                            fontSize: `16px`,
+                            display: `inline-block`,
+                            boxSizing: `border-box`,
+                            backgroundColor: `white`,
+                            padding: `4px 16px`,
+                            color: `green`,
+                            fontWeight: `500`,
+                            fontFamily: `Inter`,
+                            borderRadius: `24px`,
+                          }}
+                          _hover={{ cursor: `pointer` }}
+                          onClick={() => claimFraktal()}
+                        >
+                          Claim
+                        </Box>
+                        :
+                        <Box
+                          sx={{
+                            border: `2px solid red`,
+                            fontSize: `16px`,
+                            display: `inline-block`,
+                            boxSizing: `border-box`,
+                            backgroundColor: `white`,
+                            padding: `4px 16px`,
+                            color: `red`,
+                            fontWeight: `500`,
+                            fontFamily: `Inter`,
+                            borderRadius: `24px`,
+                          }}
+                          _hover={{ cursor: `pointer` }}
+                          onClick={() => cancelVote()}
+                        >
+                          Reject
+                        </Box>
+                      }
+                    </div>
                   ) : (
                     <Box
                       sx={{
