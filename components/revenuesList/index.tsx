@@ -5,7 +5,7 @@ import {
   Text,
   VStack,
   HStack,
-} from "@chakra-ui/layout";
+} from "@chakra-ui/react";
 import React, { forwardRef, useState, useEffect } from "react";
 import { createRevenuePayment } from "../../utils/contractCalls";
 import RevenuesDetail from "../revenuesDetail";
@@ -13,18 +13,18 @@ import Button from "../button";
 import FrakButton2 from "../button2";
 import { utils } from "ethers";
 import styles from "../../pages/nft/[id]/manage.module.css";
+import { useWeb3Context } from "../../contexts/Web3Context";
 // if account has fraktions.. display info to list?
 
-const RevenuesList = ({
-  account,
-  revenuesCreated,
-  tokenAddress,
-  marketAddress,
-  provider,
-}) => {
+const RevenuesList = ({ revenuesCreated, tokenAddress }) => {
+  const { account, provider } = useWeb3Context();
   const [revenueValue, setRevenueValue] = useState(0);
   const [isCreating, setIsCreating] = useState(false);
   const [valueSetter, setValueSetter] = useState(false);
+  console.log("account", account);
+  console.log("revenuesCreated: ", revenuesCreated);
+  console.log("tokenAddress: ", tokenAddress);
+  console.log("provider: ", provider);
   // const totalValue = (x) => utils.parseEther((x).toString());
   async function launchRevenuePayment() {
     setIsCreating(true);
@@ -47,6 +47,7 @@ const RevenuesList = ({
         borderColor: "#E0E0E0",
         padding: "16px",
         marginTop: "40px 0px",
+        width: `621.59px`,
       }}
     >
       <Box
@@ -140,12 +141,6 @@ const RevenuesList = ({
       <div>
         {revenuesCreated && revenuesCreated.length > 0 ? (
           <div>
-            <HStack>
-              <div>Creator</div>
-              <div>Date</div>
-              <div>Total</div>
-              <div>Functions</div>
-            </HStack>
             {revenuesCreated.map(x => {
               return (
                 <RevenuesDetail
