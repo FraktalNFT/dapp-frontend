@@ -143,7 +143,6 @@ export async function createObject(data) {
 export async function createObject2(data) {
   try {
     let nftMetadata = await fetchNftMetadata(data.hash);
-    console.log("meta", nftMetadata);
     let object = {
       balances: data?.fraktions,
       createdAt: data?.createdAt,

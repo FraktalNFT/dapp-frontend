@@ -6,23 +6,23 @@ import { BigNumber } from "ethers";
 import { Image } from "@chakra-ui/image";
 import styles from "./closed.module.css";
 import FrakButton from "../../../components/button";
-import {shortenHash, timezone, getParams} from '../../../utils/helpers';
-import {getSubgraphData, createObject} from '../../../utils/graphQueries';
+import { shortenHash, timezone, getParams } from "../../../utils/helpers";
+import { getSubgraphData, createObject } from "../../../utils/graphQueries";
 export default function ClosedNFTView() {
   const [index, setIndex] = useState();
   const [nftObject, setNftObject] = useState();
 
-  useEffect(async ()=>{
-    const address = getParams('nft');
-    const index = parseFloat(address.split('/closed')[0])
-    let obj = await getSubgraphData('marketid_fraktal',index)
-    if(obj && obj.fraktalNFTs){
-      let nftObjects = await createObject(obj.fraktalNFTs[0])
-      if(nftObjects){
-        setNftObject(nftObjects)
+  useEffect(async () => {
+    const address = getParams("nft");
+    const index = parseFloat(address.split("/closed")[0]);
+    let obj = await getSubgraphData("marketid_fraktal", index);
+    if (obj && obj.fraktalNFTs) {
+      let nftObjects = await createObject(obj.fraktalNFTs[0]);
+      if (nftObjects) {
+        setNftObject(nftObjects);
       }
     }
-  },[])
+  }, []);
 
   const [makeOffer, setMakeOffer] = useState(false);
   const exampleNFT = {
@@ -47,12 +47,23 @@ export default function ClosedNFTView() {
         <Link href="/">
           <div className={styles.goBack}>← back to all NFTS</div>
         </Link>
-        <div className={styles.header}>{nftObject?nftObject.name:'loading'}</div>
-        <div style={{textAlign: 'center', color: 'grey', fontSize:'21px', fontWeight:'bold'}}>{nftObject?nftObject.description:'loading'}</div>
+        <div className={styles.header}>
+          {nftObject ? nftObject.name : "loading"}
+        </div>
+        <div
+          style={{
+            textAlign: "center",
+            color: "grey",
+            fontSize: "21px",
+            fontWeight: "bold",
+          }}
+        >
+          {nftObject ? nftObject.description : "loading"}
+        </div>
         <VStack spacing="32px" marginTop="40px" align="flex-center">
           <div>
             <Image
-              src={nftObject?nftObject.imageURL:exampleNFT.imageURL}
+              src={nftObject ? nftObject.imageURL : exampleNFT.imageURL}
               w="100%"
               h="100%"
               style={{ borderRadius: "4px 4px 0px 0px" }}
@@ -60,13 +71,15 @@ export default function ClosedNFTView() {
             <div className={styles.NFTCard}>
               <div className={styles.cardHeader}>ARTIST</div>
               <div className={styles.cardText} style={{ color: "#985cff" }}>
-                {nftObject?shortenHash(nftObject.creator):exampleNFT.artistAddress}
+                {nftObject
+                  ? shortenHash(nftObject.creator)
+                  : exampleNFT.artistAddress}
               </div>
               <div style={{ marginTop: "8px" }} className={styles.cardHeader}>
                 DATE OF CREATION
               </div>
               <div className={styles.cardText}>
-                {nftObject?timezone(nftObject.createdAt):''}
+                {nftObject ? timezone(nftObject.createdAt) : ""}
               </div>
             </div>
           </div>

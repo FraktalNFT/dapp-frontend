@@ -370,7 +370,7 @@ export default function DetailsView() {
           />
         </div>
         <div style={{ marginTop: "40px" }}>
-          <FraktionOwners data={[]} nftObject={nftObject} />
+          <FraktionOwners nftObject={nftObject} />
         </div>
       </Stack>
       {/*
