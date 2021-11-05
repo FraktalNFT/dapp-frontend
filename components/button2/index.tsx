@@ -29,7 +29,7 @@ const FrakButton2 = forwardRef<
           border: `1px solid transparent`,
           borderRadius: `15px 0px 0px 15px`,
           height: `40px`,
-          marginRight: `81px`,
+          marginRight: `134px`,
         }}
       />
       <Button
@@ -39,13 +39,13 @@ const FrakButton2 = forwardRef<
         onClick={onClick}
         sx={{
           borderRadius: `0px 16px 16px 0px`,
+          borderTop: `2px solid #405466`,
+          borderRight: `2px solid #405466`,
+          borderBottom: `2px solid #405466`,
           fontSize: "1.8rem",
           height: `40px`,
-          width: `81px`,
+          width: `134px`,
           transform: `translateX(2px) translateY(-2px)`,
-          borderRight: `2px solid #405466`,
-          borderTop: `2px solid #405466`,
-          borderBottom: `2px solid #405466`,
           boxSizing: `content-box`,
           position: `absolute`,
           right: `0`,
@@ -56,7 +56,6 @@ const FrakButton2 = forwardRef<
         _active={{ background: "black.900", color: "white.900" }}
         _disabled={{
           background: "#A7A7A7 !important",
-          borderColor: "#A7A7A7 !important",
         }}
         {...rest}
       >

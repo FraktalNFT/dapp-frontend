@@ -5,7 +5,7 @@ import {
   Text,
   VStack,
   HStack,
-} from "@chakra-ui/layout";
+} from "@chakra-ui/react";
 import React, { forwardRef, useState, useEffect } from "react";
 import { createRevenuePayment } from "../../utils/contractCalls";
 import RevenuesDetail from "../revenuesDetail";
@@ -13,23 +13,27 @@ import Button from "../button";
 import FrakButton2 from "../button2";
 import { utils } from "ethers";
 import styles from "../../pages/nft/[id]/manage.module.css";
+import { useWeb3Context } from "../../contexts/Web3Context";
 // if account has fraktions.. display info to list?
 
-const RevenuesList = ({
-  account,
-  revenuesCreated,
-  tokenAddress,
-  marketAddress,
-  provider,
-}) => {
+const RevenuesList = ({ revenuesCreated, tokenAddress }) => {
+  const { account, provider } = useWeb3Context();
   const [revenueValue, setRevenueValue] = useState(0);
   const [isCreating, setIsCreating] = useState(false);
   const [valueSetter, setValueSetter] = useState(false);
+  console.log("account", account);
+  console.log("revenuesCreated: ", revenuesCreated);
+  console.log("tokenAddress: ", tokenAddress);
+  console.log("provider: ", provider);
   // const totalValue = (x) => utils.parseEther((x).toString());
   async function launchRevenuePayment() {
     setIsCreating(true);
     let valueIn = utils.parseEther(revenueValue.toString()); //+0.000000000001
-    await createRevenuePayment(valueIn, provider, tokenAddress);
+    try {
+      await createRevenuePayment(valueIn, provider, tokenAddress);
+    } catch (error) {
+      console.log("creating revenue failed, reason: ", error);
+    }
     setIsCreating(false);
     setValueSetter(false);
     // reload page or modify the list.
@@ -43,9 +47,16 @@ const RevenuesList = ({
         borderColor: "#E0E0E0",
         padding: "16px",
         marginTop: "40px 0px",
+        width: `621.59px`,
       }}
     >
-      <HStack>
+      <Box
+        sx={{
+          display: `flex`,
+          justifyContent: `space-between`,
+          alignItems: `center`,
+        }}
+      >
         <div
           style={{
             color: "#5A32F3",
@@ -77,10 +88,16 @@ const RevenuesList = ({
             </button>
           </div>
         )}
-      </HStack>
+      </Box>
       <div>
         {valueSetter && (
-          <HStack>
+          <Box
+            sx={{
+              display: `grid`,
+              gridTemplateColumns: `4fr 5fr`,
+              alignItems: `start`,
+            }}
+          >
             <div
               style={{
                 fontFamily: "Inter",
@@ -95,7 +112,7 @@ const RevenuesList = ({
             <VStack
               style={{
                 textAlign: "start",
-                margin: "16px 24px",
+                margin: "0 24px",
               }}
             >
               <div
@@ -115,21 +132,15 @@ const RevenuesList = ({
                 onClick={launchRevenuePayment}
                 setFunction={e => setRevenueValue(e)}
               >
-                {isCreating ? "CREATING" : "DEPOSIT"}
+                SEND
               </FrakButton2>
             </VStack>
-          </HStack>
+          </Box>
         )}
       </div>
       <div>
         {revenuesCreated && revenuesCreated.length > 0 ? (
           <div>
-            <HStack>
-              <div>Creator</div>
-              <div>Date</div>
-              <div>Total</div>
-              <div>Functions</div>
-            </HStack>
             {revenuesCreated.map(x => {
               return (
                 <RevenuesDetail

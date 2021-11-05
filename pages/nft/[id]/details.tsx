@@ -8,6 +8,7 @@ import FraktionsList from "../../../components/fraktionsList";
 import RevenuesList from "../../../components/revenuesList";
 import UserOwnership from "../../../components/userOwnership";
 import BuyOutCard from "../../../components/buyOutCard";
+import FraktionOwners from "../../../components/fraktionOwners";
 import { Image } from "@chakra-ui/image";
 import { shortenHash, timezone, getParams } from "../../../utils/helpers";
 import { getSubgraphData } from "../../../utils/graphQueries";
@@ -47,16 +48,19 @@ export default function DetailsView() {
   const [userFraktions, setUserFraktions] = useState(0);
   const [isOwner, setIsOwner] = useState(false);
   const [revenues, setRevenues] = useState();
-  const [txInProgress, setTxInProgress]=useState(false);
+  const [txInProgress, setTxInProgress] = useState(false);
   // use callbacks
   useEffect(() => {
     async function getData() {
       const tokenAddress = getParams("nft");
       const tokenAddressSplitted = tokenAddress.split("/details")[0];
       setTokenAddress(tokenAddressSplitted);
-      let fraktionsFetch = await getSubgraphData('fraktions',tokenAddressSplitted)
-      if(fraktionsFetch.listItems){
-        setFraktionsListed(fraktionsFetch.listItems)
+      let fraktionsFetch = await getSubgraphData(
+        "fraktions",
+        tokenAddressSplitted
+      );
+      if (fraktionsFetch.listItems) {
+        setFraktionsListed(fraktionsFetch.listItems);
       }
       let fraktalFetch = await getSubgraphData("fraktal", tokenAddressSplitted);
       if (
@@ -327,11 +331,13 @@ export default function DetailsView() {
             revenuesCreated={revenues}
             tokenAddress={tokenAddress}
             marketAddress={marketAddress}
-            provider={provider}
           />
         </div>
+        <div style={{ marginTop: "40px" }}>
+          <FraktionOwners data={[]} nftObject={nftObject} />
+        </div>
       </Stack>
-{/*
+      {/*
       <Modal
         open={txInProgress}
         onClose={()=>setTxInProgress(false)}
