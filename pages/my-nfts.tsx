@@ -168,6 +168,7 @@ export default function MyNFTsView() {
           nftsERC1155_wallet = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC1155'})// && x.token_id != '0'
 
           totalNFTs = nftsERC721_wallet.concat(nftsERC1155_wallet);
+
           let userFraktalsFetched = fobjects.users[0].fraktals;
           let userFraktalObjects = await Promise.all(userFraktalsFetched.map(x=>{return createObject2(x)}))
           let fraktalsClean;
@@ -178,10 +179,11 @@ export default function MyNFTsView() {
           let userFraktalAddresses = fraktalsClean.map(x => {return x.id});
           let userFraktionsAddreses = fraktionsObjects.map(x => {return x.id});
           let totalAddresses = userFraktalAddresses.concat(userFraktionsAddreses);
+
           let nftsFiltered = totalNFTs.map(x=>{
             if(!totalAddresses.includes(x.asset_contract.address)){
-            return x
-          }
+              return x
+            }
           })
           // console.log('listas:', nftsFiltered)
           let nftObjects = await Promise.all(nftsFiltered.map(x=>{return createOpenSeaObject(x)}))
