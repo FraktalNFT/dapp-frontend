@@ -3,8 +3,6 @@ TODO::
 
 BUGS:
 
-
-
   CONTRACTS:
   ------------------------------------------------------------------------------------------------
   - User can unlock and keep voting, but result is taken from total locked attribute
