@@ -36,6 +36,7 @@ const RevenuesList = ({
     }
     setIsCreating(false);
     setValueSetter(false);
+    // reload page or modify the list.
   }
 
   return (

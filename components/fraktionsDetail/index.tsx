@@ -137,7 +137,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
           <FrakButton2
             isReady={isReady}
             onClick={onBuy}
-            onSet={onSetAmount}
+            setFunction={onSetAmount}
           >
             {buying ? "BUYING" : "BUY"}
           </FrakButton2>
