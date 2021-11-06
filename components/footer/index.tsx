@@ -1,50 +1,36 @@
 import { Image } from "@chakra-ui/image";
-import { Center, HStack, Text, Link } from "@chakra-ui/layout";
+import { Center, HStack, Text, Link, VStack } from "@chakra-ui/layout";
 
 const Footer: React.FC = () => {
   return (
-    <Center justifyContent="space-between" w="96.4rem" mx="auto" py="3.6rem">
-      <HStack spacing="2.4rem">
+    <VStack justifyContent="space-between" w="96.4rem" mx="auto" py="2.6rem">
+      <HStack spacing="3.4rem">
         <Link
-          href="https://telegram.com"
+          href="https://twitter.com/fraktalnft"
           target="_blank"
           rel="noreferrer noopener"
         >
-          <Image src="/footer/icon-telegram.svg" />
+          <Image src="/footer/twitter.svg"/>
         </Link>
         <Link
-          href="https://reddit.com"
+          href="https://discord.gg/jF7PGKha"
           target="_blank"
           rel="noreferrer noopener"
         >
-          <Image src="/footer/icon-reddit.svg" />
+          <Image src="/footer/discord.svg"/>
         </Link>
         <Link
-          href="https://medium.com"
+          href="https://medium.com/@fraktal"
           target="_blank"
           rel="noreferrer noopener"
         >
-          <Image src="/footer/icon-medium.svg" />
-        </Link>
-        <Link
-          href="https://twitter.com"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          <Image src="/footer/icon-twitter.svg" />
-        </Link>
-        <Link
-          href="https://facebook.com"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          <Image src="/footer/icon-facebook.svg" />
+          <Image src="/footer/medium.svg"/>
         </Link>
       </HStack>
       <Text className="regular-16">
-        Copyright © Fraktal 2021. All Rights Reserved.
+        Made in increments by Fraktal.
       </Text>
-    </Center>
+    </VStack>
   );
 };
 
