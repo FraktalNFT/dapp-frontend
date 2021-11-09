@@ -160,6 +160,7 @@ const UserOwnership=(({
             Claim Collateral
           </FrakButton>
         }
+        <br/>
         <FrakButton
         onClick={()=>importFraktalToMarket()}
         >

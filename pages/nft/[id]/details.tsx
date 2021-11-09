@@ -44,11 +44,11 @@ export default function DetailsView() {
   const [collateralNft, setCollateralNft] = useState();
   const [fraktionsApproved, setFraktionsApproved] = useState(false);
   const [factoryApproved, setFactoryApproved] = useState(false);
-  const [fraktionsIndex, setFraktionsIndex] = useState();
   const [userFraktions, setUserFraktions] = useState(0);
   const [isOwner, setIsOwner] = useState(false);
   const [revenues, setRevenues] = useState();
   const [txInProgress, setTxInProgress] = useState(false);
+  const [fraktionsIndex, setFraktionsIndex] = useState();
   // use callbacks
   useEffect(() => {
     async function getData() {
@@ -268,7 +268,7 @@ export default function DetailsView() {
               </FrakButton>
             ) : (
               <FrakButton
-                disabled={fraktionsIndex != 0 && userFraktions < 1}
+                disabled={fraktionsIndex == 0 || userFraktions < 1}
                 onClick={() =>
                   router.push(`/nft/${nftObject.marketId}/list-item`)
                 }
@@ -334,7 +334,7 @@ export default function DetailsView() {
           />
         </div>
         <div style={{ marginTop: "40px" }}>
-          <FraktionOwners data={[]} nftObject={nftObject} />
+          <FraktionOwners data={nftObject.balances} nftObject={nftObject} />
         </div>
       </Stack>
       {/*
