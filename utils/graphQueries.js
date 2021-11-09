@@ -34,7 +34,6 @@ const fraktions_query = gql`
     }
   }
 `;
-
 const owner_query = gql`
   query ($id: ID!) {
     fraktalNfts(where: { owner: $id }) {
