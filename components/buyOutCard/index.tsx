@@ -122,6 +122,7 @@ const BuyOutCard = ({
               lineHeight: "14px",
               letterSpacing: "1px",
               color: "#A7A7A7",
+              alignSelf: 'end'
             }}
           >
             INVESTORS
@@ -153,6 +154,7 @@ const BuyOutCard = ({
                 lineHeight: "14px",
                 letterSpacing: "1px",
                 color: "#A7A7A7",
+                alignSelf: 'end'
               }}
             >
               MIN OFFER

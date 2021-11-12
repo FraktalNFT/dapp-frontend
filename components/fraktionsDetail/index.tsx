@@ -59,6 +59,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
             lineHeight:'14px',
             letterSpacing:'1px',
             color:'#A7A7A7',
+            alignSelf: 'end'
           }}>
             AVAILABLE
           </div>
@@ -77,7 +78,8 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
             fontSize:'12px',
             lineHeight:'14px',
             letterSpacing:'1px',
-            color:'#656464'
+            color:'#656464',
+            alignSelf: 'end'
           }}>
             of 10,000
           </div>
@@ -92,7 +94,8 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
             fontSize:'12px',
             lineHeight:'14px',
             letterSpacing:'1px',
-            color:'#A7A7A7'
+            color:'#A7A7A7',
+            alignSelf: 'end'
           }}>
             PRICE
           </div>
@@ -114,7 +117,8 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
             fontSize:'12px',
             lineHeight:'14px',
             letterSpacing:'1px',
-            color:'#656464'
+            color:'#656464',
+            alignSelf: 'end'
           }}>
             per Fraktion
           </div>
