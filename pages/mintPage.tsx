@@ -1,6 +1,7 @@
 // import Link from "next/link";
 // import { utils } from "ethers";
 import FrakButton3 from "../components/button3";
+import FrakButton4 from "../components/button4";
 import styles from "../styles/mint-nft.module.css";
 import { VStack, Box, Stack } from "@chakra-ui/layout";
 import { Link } from "@chakra-ui/react";
@@ -136,7 +137,7 @@ export default function MintPage() {
                 setFunction={()=> addFile()}
                 inputPlaceholder = 'PNG, GIF, WEBP, MP4 or MP3'
               >
-                {file ? "Loaded" : "Choose image"}
+                {file ? "Change image" : "Choose image"}
               </FrakButton3>
             </div>
             <div
@@ -168,7 +169,27 @@ export default function MintPage() {
           inputs for listing
         </div>
         <div>
-          action & state buttons
+          <FrakButton4
+            status = {name ? 'open' : 'done'}
+            disabled = {!name || !imageData}
+            onClick = {()=>console.log('create NFT')}
+          >
+          1. Mint
+          </FrakButton4>
+          <FrakButton4
+            status = {name ? 'open' : 'done'}
+            disabled = {true}
+            onClick = {()=>console.log('create NFT')}
+          >
+          2. Fraktionalize
+          </FrakButton4>
+          <FrakButton4
+            status = {name ? 'open' : 'done'}
+            disabled = {true}
+            onClick = {()=>console.log('create NFT')}
+          >
+          3. List
+          </FrakButton4>
         </div>
 
       </Stack>
