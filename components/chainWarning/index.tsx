@@ -1,4 +1,5 @@
 import { utils } from 'ethers';
+import { Flex } from '@chakra-ui/layout';
 const ChainWarning: React.FC = () => {
 
   const switchChainOnMetaMask = async (): Promise<boolean> => {
@@ -24,31 +25,36 @@ const ChainWarning: React.FC = () => {
 
 
   return (
-    <div style={{
-      width: '100%',
-      border: '1px solid #FF0000',
-      justifyContent: 'center',
-      display: 'flex',
-      marginTop: '32px',
-      padding: '16px',
-      borderRadius: '4px',
-    }}>
+    <Flex w="96.4rem" alignSelf="center">
       <div style={{
-        fontWeight: 500,
-        fontSize: '16px',
-        lineHeight: '19px',
-        color: '#000000',
-      }}>Wrong network</div>
-      <div style={{
+        width: '100%',
+        backgroundColor: '#E80E5D',
+        justifyContent: 'center',
+        display: 'flex',
+        marginTop: '32px',
+        padding: '16px',
         cursor: 'pointer',
-        color: '#656464',
-        fontSize: '14px',
-        lineHeight: '17px',
-        margin: '0px 4px'
+        borderRadius: '4px',
       }}
-      onClick={()=>switchChainOnMetaMask()}
-      >Click here to switch to Rinkeby</div>
-    </div>
+        onClick={()=>switchChainOnMetaMask()}>
+        <div style={{
+          fontWeight: 500,
+          fontSize: '16px',
+          lineHeight: '19px',
+          color: '#FFFFFF',
+        }}>
+          Wrong network!
+        </div>
+        <div style={{
+          color: '#FFFFFF',
+          fontSize: '14px',
+          lineHeight: '17px',
+          margin: '0px 4px'
+        }}>
+          Click here to switch to Rinkeby.
+        </div>
+      </div>
+    </Flex>
   );
 };
 
