@@ -2,9 +2,9 @@ import { Button, ButtonProps } from "@chakra-ui/button";
 import { Input } from "@chakra-ui/react";
 import { forwardRef } from "react";
 
-const FrakButton2 = forwardRef<
+const FrakButton3 = forwardRef<
   HTMLButtonElement,
-  ButtonProps & { isReady?: boolean; setFunction: Function; inputPlaceholder: String }
+  ButtonProps & { isReady?: boolean; setFunction: Function; inputPlaceholder: string }
 >(({ isReady, onClick, setFunction, inputPlaceholder, children, ...rest }) => {
   return (
     <div
@@ -19,9 +19,13 @@ const FrakButton2 = forwardRef<
       }}
     >
       <Input
+        type="file"
+        id="imageInput"
+        multiple={false}
         onChange={d => setFunction(d.target.value)}
         placeholder={inputPlaceholder ? inputPlaceholder : null}
         style={{
+          display:'none',
           textAlign: "right",
           color: "#000000",
           fontWeight: 500,
@@ -66,4 +70,4 @@ const FrakButton2 = forwardRef<
   );
 });
 
-export default FrakButton2;
+export default FrakButton3;
