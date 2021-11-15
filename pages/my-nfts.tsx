@@ -4,25 +4,26 @@ import React, {useEffect, useState} from "react";
 // import NFTItemManager from "../components/nft-item-manager";
 import NFTItemOS from '../components/nft-item-opensea';
 import NFTItem from '../components/nft-item';
+import RescueCard from '../components/rescueCard';
 import NextLink from "next/link";
 import styles from "../styles/my-nfts.module.css";
 import FrakButton from "../components/button";
 import { useWeb3Context } from '../contexts/Web3Context';
-import { utils } from 'ethers';
+// import { utils } from 'ethers';
 import { getSubgraphData } from '../utils/graphQueries';
 import { createObject, createObject2, createOpenSeaObject } from '../utils/nftHelpers';
 import {
-  rescueEth,
-  claimFraktalSold,
+  // rescueEth,
+  // claimFraktalSold,
   importFraktal,
-  claimERC1155,
-  claimERC721,
+  // claimERC1155,
+  // claimERC721,
   approveMarket,
   importERC721,
   importERC1155,
   getApproved,
   // getLockedTo,
-  makeOffer
+  // makeOffer
 } from '../utils/contractCalls';
 import { assetsInWallet } from '../utils/openSeaAPI';
 import { useRouter } from 'next/router';
@@ -36,60 +37,60 @@ export default function MyNFTsView() {
   // const [offers, setOffers] = useState();
   const [userFraktals, setUserFraktals] = useState();
 
-  async function getAccountFraktions(){
+  async function getAccountFraktalData(){
     let objects = await getSubgraphData('wallet',account.toLocaleLowerCase())
     // console.log('fraktions wallet ',objects)
     return objects;
   };
-  async function getUserOffers(){
-    let objects = await getSubgraphData('offers',account.toLocaleLowerCase())
-    return objects;
-  };
+  // async function getUserOffers(){
+  //   let objects = await getSubgraphData('offers',account.toLocaleLowerCase())
+  //   return objects;
+  // };
 
-  async function takeOutOffer(address) {
-    try {
-      makeOffer(
-        utils.parseEther('0'),
-        address,
-        provider,
-        marketAddress).then(()=>{
-          router.push('/my-nfts');
-        })
-    }catch(e){
-      console.log('There has been an error: ',e)
-    }
-  }
+  // async function takeOutOffer(address) {
+  //   try {
+  //     makeOffer(
+  //       utils.parseEther('0'),
+  //       address,
+  //       provider,
+  //       marketAddress).then(()=>{
+  //         router.push('/my-nfts');
+  //       })
+  //   }catch(e){
+  //     console.log('There has been an error: ',e)
+  //   }
+  // }
 
-  async function claimNFT(item){
-    let approved = await getApproved(account, factoryAddress, provider, item.id);
-    let done:Boolean;
-    if(!approved){
-      done = await approveContract(factoryAddress, item.id);
-    } else {
-      done = true;
-    }
-    let tx;
-    if(done){
-      if(item.collateralType == 'ERC721'){
-        tx = await claimERC721(item.marketId, provider, factoryAddress)
-      }else{
-        tx = await claimERC1155(item.marketId, provider, factoryAddress)
-      }
-    }
-    if(tx){
-      router.push('/my-nfts');
-    }
-  }
+  // async function claimNFT(item){
+  //   let approved = await getApproved(account, factoryAddress, provider, item.id);
+  //   let done:Boolean;
+  //   if(!approved){
+  //     done = await approveContract(factoryAddress, item.id);
+  //   } else {
+  //     done = true;
+  //   }
+  //   let tx;
+  //   if(done){
+  //     if(item.collateralType == 'ERC721'){
+  //       tx = await claimERC721(item.marketId, provider, factoryAddress)
+  //     }else{
+  //       tx = await claimERC1155(item.marketId, provider, factoryAddress)
+  //     }
+  //   }
+  //   if(tx){
+  //     router.push('/my-nfts');
+  //   }
+  // }
 
-  async function claimFraktal(id) {
-    try {
-      await claimFraktalSold(id, provider, contractAddress).then(()=>{
-        router.push('/my-nfts');
-      });
-    } catch(err){
-      console.log('Error: ',err);
-    }
-  }
+  // async function claimFraktal(id) {
+  //   try {
+  //     await claimFraktalSold(id, provider, contractAddress).then(()=>{
+  //       router.push('/my-nfts');
+  //     });
+  //   } catch(err){
+  //     console.log('Error: ',err);
+  //   }
+  // }
 
   async function approveContract(contract, tokenAddress){
     let done = await approveMarket(contract, provider, tokenAddress)
@@ -139,8 +140,8 @@ export default function MyNFTsView() {
   useEffect(async()=>{
     if(account) {
       let openseaAssets = await assetsInWallet(account);
-      // let fraktalObjects = ;
-      let fobjects = await getAccountFraktions();
+
+      let fobjects = await getAccountFraktalData(); //checks the user in Fraktal subgraph
       let nftsERC721_wallet;
       let nftsERC1155_wallet;
       let totalNFTs = [];
@@ -157,6 +158,7 @@ export default function MyNFTsView() {
         }else{
           setFraktionItems([])
         }
+// maybe integrate this part.. all of the 'user exists' functions together
       }
 
       if(openseaAssets && openseaAssets.assets && openseaAssets.assets.length){
@@ -167,20 +169,28 @@ export default function MyNFTsView() {
           nftsERC1155_wallet = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC1155'})// && x.token_id != '0'
 
           totalNFTs = nftsERC721_wallet.concat(nftsERC1155_wallet);
-          let userFraktalsFetched = fobjects.users[0].fraktals;
-          let userFraktalObjects = await Promise.all(userFraktalsFetched.map(x=>{return createObject2(x)}))
+
+// handle new users!
           let fraktalsClean;
-          if(userFraktalObjects){
-            fraktalsClean = userFraktalObjects.filter(x=>{return x != null && x.imageURL.length});
-            setUserFraktals(fraktalsClean)
+          let totalAddresses;
+          if(!fobjects || !fobjects.users[0] || !fobjects.users[0].fraktals){
+              totalAddresses = [];
+          }else{
+            let userFraktalsFetched = fobjects.users[0].fraktals;
+            let userFraktalObjects = await Promise.all(userFraktalsFetched.map(x=>{return createObject2(x)}))
+            if(userFraktalObjects){
+              fraktalsClean = userFraktalObjects.filter(x=>{return x != null && x.imageURL.length});
+              setUserFraktals(fraktalsClean)
+            }
+            let userFraktalAddresses = fraktalsClean.map(x => {return x.id});
+            let userFraktionsAddreses = fraktionsObjects.map(x => {return x.id});
+            totalAddresses = userFraktalAddresses.concat(userFraktionsAddreses);
           }
-          let userFraktalAddresses = fraktalsClean.map(x => {return x.id});
-          let userFraktionsAddreses = fraktionsObjects.map(x => {return x.id});
-          let totalAddresses = userFraktalAddresses.concat(userFraktionsAddreses);
+
           let nftsFiltered = totalNFTs.map(x=>{
             if(!totalAddresses.includes(x.asset_contract.address)){
-            return x
-          }
+              return x
+            }
           })
           // console.log('listas:', nftsFiltered)
           let nftObjects = await Promise.all(nftsFiltered.map(x=>{return createOpenSeaObject(x)}))
@@ -288,23 +298,13 @@ export default function MyNFTsView() {
           </div>
         </div>
       )}
+      {/*///////////////*/}
 
-      <div className={styles.subText}>You have earned</div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          marginTop: "8px",
-        }}
-      >
-        <div className={styles.claimContainer}>
-          <div style={{ marginLeft: "24px" }}>
-            <div className={styles.claimHeader}>ETH</div>
-            <div className={styles.claimAmount}>{Math.round(totalBalance*1000)/1000}</div>
-          </div>
-          <div className={styles.claimCTA} onClick={()=>rescueEth(provider, marketAddress)}>Claim</div>
-        </div>
-      </div>
+      <RescueCard
+        marketAddress= {marketAddress}
+        provider= {provider}
+        gains= {Math.round(totalBalance*1000)/1000}
+      />
       {/*///////////////*/}
       <div className={styles.header}>
         Your Wallet NFTs
