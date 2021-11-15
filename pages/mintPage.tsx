@@ -1,10 +1,11 @@
 // import Link from "next/link";
 // import { utils } from "ethers";
-import FrakButton3 from "../components/button3";
 import FrakButton4 from "../components/button4";
-import styles from "../styles/mint-nft.module.css";
+import MintCard from "../components/mintCard";
+import ListCard from "../components/listCard";
 import { VStack, Box, Stack } from "@chakra-ui/layout";
-import { Link } from "@chakra-ui/react";
+import { Link, Checkbox } from "@chakra-ui/react";
+// import { Checkbox, CheckboxGroup } from "@chakra-ui/react"
 import { useEffect, useState } from "react";
 import { Image as ImageComponent }  from "@chakra-ui/image";
 import { useWeb3Context } from "../contexts/Web3Context";
@@ -18,17 +19,19 @@ export default function MintPage() {
   const router = useRouter();
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
   const [status, setStatus] = useState('mint');
-  const [nftObject, setNftObject] = useState({});
   const [imageData, setImageData] = useState(null);
   const [imageSize, setImageSize] = useState([]);
   const [name, setName] = useState();
   const [description, setDescription] = useState();
   const [file, setFile] = useState();
+  const [listItemCheck, setListItemCheck] = useState(true);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0.);
 
-  function openLocal(){
-    document.getElementById('imageInput').files = null;
-    document.getElementById('imageInput').click()
-  }
+// FUNCTIONS FOR MINTING, LISTING
+
+// HANDLE IMPORT NFT's ()
+
   async function addFile(){
     const selectedFile = document.getElementById('imageInput').files[0];
     setFile(selectedFile)
@@ -104,77 +107,47 @@ export default function MintPage() {
             onClick={()=>setStatus('import')}
           >Import NFT</Link>
         </div>
-        { status == 'mint' &&
-          <div>
-            <div style={{
-              fontSize:'12px',
-              lineHeight: '14px',
-              fontWeight: 600,
-              letterSpacing: '1px',
-              textTransform: 'uppercase',
-              color: '#656464'
-            }}>NAME</div>
-            <input
-              className={styles.input}
-              id="nameIn"
-              placeholder = "Give your NFT a Unique and Catchy Name"
-              onChange={(e)=>setName(e.target.value)}
-            />
-            <div>
-              <div style={{
-                fontSize:'12px',
-                lineHeight: '14px',
-                marginTop: '24px',
-                fontWeight: 600,
-                letterSpacing: '1px',
-                textTransform: 'uppercase',
-                color: '#656464'
-              }}>image</div>
-              <FrakButton3
-                style={{marginTop: ''}}
-                isReady={true}
-                onClick={()=> openLocal()}
-                setFunction={()=> addFile()}
-                inputPlaceholder = 'PNG, GIF, WEBP, MP4 or MP3'
-              >
-                {file ? "Change image" : "Choose image"}
-              </FrakButton3>
-            </div>
-            <div
-              style={{
-                fontSize:'12px',
-                lineHeight: '14px',
-                marginTop: '55px',
-                letterSpacing: '1px',
-                textTransform: 'uppercase',
-                color: '#656464',
-                fontWeight: 600
-              }}
-            >
-              DESCRIPTION (OPTIONAL)
-            </div>
-            <input
-            className={styles.input}
-            id="descriptionIn"
-            placeholder="Write something about your NFT  "
-            onChange={(e)=>setDescription(e.target.value)}
-            />
-          </div>
+        { status == 'mint' ?
+          <MintCard
+            setName = {setName}
+            setDescription = {setDescription}
+            addFile = {addFile}
+            file = {file}
+          />
+          :
+          <div>Select the nft to import</div>
         }
-
-        <div>
-          checkbox for listing
+        <div
+          style = {{
+            fontSize: '16px',
+            fontWeight: 500,
+            lineHeight: '19px',
+            color: '#000000',
+            marginTop: '8.5px',
+          }}
+        >
+          <Checkbox
+            isChecked = {listItemCheck}
+            onChange = {() => setListItemCheck(!listItemCheck)}
+            size = 'lg'
+          >List your Fraktions for sale</Checkbox>
         </div>
         <div>
-          inputs for listing
+          {listItemCheck &&
+            <ListCard
+            totalPrice = {totalPrice}
+            setTotalPrice = {setTotalPrice}
+            setTotalAmount = {setTotalAmount}
+            />
+          }
         </div>
-        <div>
+        <div style={{marginTop: '24px', justifyItems: 'space-between'}}>
           <FrakButton4
             status = {name ? 'open' : 'done'}
             disabled = {!name || !imageData}
             onClick = {()=>console.log('create NFT')}
           >
-          1. Mint
+          {status == 'mint' ? `1. Mint` : `1. Import`}
           </FrakButton4>
           <FrakButton4
             status = {name ? 'open' : 'done'}

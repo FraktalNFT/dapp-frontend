@@ -15,7 +15,7 @@ const FrakButton4 = forwardRef<
       color={"white.900"}
       borderColor={"transparent"}
       rounded="full"
-      _hover={{ background: "white.900", color: "black.900" }}
+      _hover={{ background: "white.900", color: "black.900", border: '2px solid black' }}
       _active={{ background: "#00C49D.500", color: "white.900" }}
       _disabled={{ background: "#A7A7A7 !important" }}
       {...rest}
