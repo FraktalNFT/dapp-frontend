@@ -39,6 +39,7 @@ const BuyOutCard = ({
       }
     }
   }, [account, offers]);
+  
   useEffect(() => {
     async function getData() {
       if (tokenAddress && provider) {

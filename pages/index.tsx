@@ -52,10 +52,13 @@ const Home: React.FC = () => {
 
   const getMoreListedItems = async () => {
     const data = await getSubgraphData("listed_items", "");
-    let dataOnSale = data.listItems.filter(x => {
+    let dataOnSale;
+    if (data?.listItems?.length > 1) {
+    dataOnSale = data?.listItems?.filter(x => {
       return x.fraktal.status == "open";
     }); // this goes in the graphql query
-    if (dataOnSale) {
+    }
+    if (dataOnSale?.length > 1) {
       // console.log('dataOnSale', dataOnSale)
       let objects = await Promise.all(
         dataOnSale.map(x => {
