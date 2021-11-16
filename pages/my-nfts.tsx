@@ -1,6 +1,6 @@
 import { Grid, VStack } from "@chakra-ui/layout";
 import Head from "next/head";
-import React, {useState} from "react";
+import React from "react";
 import NFTItemOS from '../components/nft-item-opensea';
 import NFTItem from '../components/nft-item';
 import RescueCard from '../components/rescueCard';
@@ -9,20 +9,12 @@ import styles from "../styles/my-nfts.module.css";
 import FrakButton from "../components/button";
 import { useWeb3Context } from '../contexts/Web3Context';
 import { useUserContext } from '../contexts/userContext';
-// import { utils } from 'ethers';
-import { getSubgraphData } from '../utils/graphQueries';
 import {
-  // rescueEth,
-  // claimFraktalSold,
   importFraktal,
-  // claimERC1155,
-  // claimERC721,
   approveMarket,
   importERC721,
   importERC1155,
   getApproved,
-  // getLockedTo,
-  // makeOffer
 } from '../utils/contractCalls';
 import { useRouter } from 'next/router';
 
@@ -168,7 +160,6 @@ export default function MyNFTsView() {
         </div>
       )}
       {/*///////////////*/}
-
       <RescueCard
         marketAddress= {marketAddress}
         provider= {provider}

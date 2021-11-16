@@ -1,11 +1,12 @@
 import FrakButton4 from "../components/button4";
 import MintCard from "../components/mintCard";
 import ListCard from "../components/listCard";
-import { VStack, Box, Stack } from "@chakra-ui/layout";
+import { VStack, Box, Stack, Grid } from "@chakra-ui/layout";
 import { Link, Checkbox } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Image as ImageComponent }  from "@chakra-ui/image";
 import { useWeb3Context } from "../contexts/Web3Context";
+import { useUserContext } from "../contexts/userContext";
 import { utils } from "ethers";
 import {
   createNFT,
@@ -14,12 +15,15 @@ import {
   getIndexUsed,
   listItem
 } from "../utils/contractCalls";
-import { awaitTokenAddress } from '../utils/helpers';
 import { pinByHash } from '../utils/pinataPinner';
 import { useRouter } from "next/router";
+import NFTItem from '../components/nft-item';
+import NFTItemOS from '../components/nft-item-opensea';
+
 const { create } = require('ipfs-http-client');
 
 export default function MintPage() {
+  const { fraktals, nfts } = useUserContext();
   const router = useRouter();
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
   const [ipfsNode, setIpfsNode] = useState();
@@ -37,6 +41,8 @@ export default function MintPage() {
   const [fraktionalized, setFraktionalized] = useState(false);
   const [listed, setListed] = useState(false);
   const [tokenMintedAddress, setTokenMintedAddress] = useState();
+  const [tokenToImport, setTokenToImport] = useState();
+
 // FUNCTIONS FOR MINTING
 useEffect(()=>{
   const ipfsClient = create({
@@ -88,10 +94,6 @@ async function addFile(){
 const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
 
 
-  // HANDLE IMPORT NFT's ()
-
-//
-
 // FUNCTIONS FOR LISTING
   const fraktalReady = minted
     && totalAmount > 0
@@ -130,7 +132,6 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
   }
 
   let msg = () => {
-    let retMsg;
     if(!minted){
       return 'Mint your new token to start the process of Fraktionalization and Listing.'
     }else if(minted && !isApproved){
@@ -152,7 +153,6 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
       }}
     >
       <Box sx={{ position: `relative` }}>
-
         <VStack marginRight="53px" sx={{ position: `sticky`, top: `20px` }}>
           <div style={{
             fontWeight: 800,
@@ -191,6 +191,7 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
             className='semi-16'
             borderRadius='25'
             padding='5'
+            _active={{bg: "black", textColor: "white"}}
             _hover={{bg: "black", textColor: "white"}}
             onClick={()=>setStatus('mint')}
           >Mint NFT</Link>
@@ -210,7 +211,74 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
             file = {file}
           />
           :
-          <div>Select the nft to import</div>}
+          <div>
+          {!tokenToImport ?
+            <div>
+            SELECT AN NFT FROM YOUR WALLET
+            {fraktals && fraktals.length &&
+              <div>Your Fraktals
+              <div>
+                <Grid
+                  mt='40px !important'
+                  ml='0'
+                  mr='0'
+                  mb='5.6rem !important'
+                  w='100%'
+                  templateColumns='repeat(3, 1fr)'
+                  gap='3.2rem'
+                >
+                  {fraktals.map(item => (
+                    <div key={item.id+'-'+item.tokenId}>
+                      <NFTItem
+                        item={item}
+                        name={item.name}
+                        amount={null}
+                        price={null}
+                        imageURL={item.imageURL}
+                      />
+                    </div>
+                  ))}
+                </Grid>
+              </div>
+              </div>
+            }
+            {nfts && nfts.length &&
+              <div>
+                <div>Your wallet NFT's
+                <Grid
+                mt='40px !important'
+                ml='0'
+                mr='0'
+                mb='5.6rem !important'
+                w='100%'
+                templateColumns='repeat(3, 1fr)'
+                gap='3.2rem'
+                >
+                {nfts.map(item => (
+                  <div
+                    key={item.id+'-'+item.tokenId}
+                    onClick={()=>setTokenToImport(item)}
+                  >
+                    <NFTItem
+                      item={item}
+                      name={item.name}
+                      amount={null}
+                      price={null}
+                      imageURL={item.imageURL}
+                    />
+                  </div>
+                ))}
+                </Grid>
+                </div>
+            </div>
+            }
+            </div>
+            :
+            <div onClick={()=>setTokenToImport()}>once data is selected, continue the process of import</div>
+          }
+          </div>
+        }
+
           <Checkbox
             isChecked = {listItemCheck}
             onChange = {() => setListItemCheck(!listItemCheck)}
@@ -271,7 +339,7 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
             fontSize: '16px',
             fontWeight: 600,
             lineHeight: '19px'
-        }}>
+          }}>
           {msg()}
           </div>
         </Stack>
