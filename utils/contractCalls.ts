@@ -2,7 +2,7 @@
 // sintetize all functions (or view vs state)
 
 import { Contract } from "@ethersproject/contracts";
-import { loadSigner, processTx } from './helpers';
+import { loadSigner, processTx, awaitTokenAddress } from './helpers';
 //tested
 const factoryAbi = [
   "function mint(string urlIpfs, uint16 majority)",
@@ -206,8 +206,9 @@ export async function createNFT(hash, provider, contractAddress){
   const signer = await loadSigner(provider);
   const customContract = new Contract(contractAddress, factoryAbi, signer);
   let tx = await customContract.mint(hash, defaultMajority);
-  let receipt = processTx(tx);
-  return receipt;
+  let tokenAddress = awaitTokenAddress(tx);
+  // let receipt = processTx(tx);
+  return tokenAddress;
 }
 
 export async function importFraktal(tokenAddress, fraktionsIndex, provider, marketAddress){

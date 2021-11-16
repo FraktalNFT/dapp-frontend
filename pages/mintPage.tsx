@@ -1,23 +1,28 @@
-// import Link from "next/link";
-// import { utils } from "ethers";
 import FrakButton4 from "../components/button4";
 import MintCard from "../components/mintCard";
 import ListCard from "../components/listCard";
 import { VStack, Box, Stack } from "@chakra-ui/layout";
 import { Link, Checkbox } from "@chakra-ui/react";
-// import { Checkbox, CheckboxGroup } from "@chakra-ui/react"
 import { useEffect, useState } from "react";
 import { Image as ImageComponent }  from "@chakra-ui/image";
 import { useWeb3Context } from "../contexts/Web3Context";
+import { utils } from "ethers";
 import {
-  createNFT
+  createNFT,
+  approveMarket,
+  importFraktal,
+  getIndexUsed,
+  listItem
 } from "../utils/contractCalls";
+import { awaitTokenAddress } from '../utils/helpers';
+import { pinByHash } from '../utils/pinataPinner';
 import { useRouter } from "next/router";
-import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
+const { create } = require('ipfs-http-client');
 
 export default function MintPage() {
   const router = useRouter();
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
+  const [ipfsNode, setIpfsNode] = useState();
   const [status, setStatus] = useState('mint');
   const [imageData, setImageData] = useState(null);
   const [imageSize, setImageSize] = useState([]);
@@ -27,28 +32,118 @@ export default function MintPage() {
   const [listItemCheck, setListItemCheck] = useState(true);
   const [totalAmount, setTotalAmount] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0.);
+  const [minted, setMinted] = useState(false);
+  const [isApproved, setIsApproved] = useState(false);
+  const [fraktionalized, setFraktionalized] = useState(false);
+  const [listed, setListed] = useState(false);
+  const [tokenMintedAddress, setTokenMintedAddress] = useState();
+// FUNCTIONS FOR MINTING
+useEffect(()=>{
+  const ipfsClient = create({
+    host: "ipfs.infura.io",
+    port: "5001",
+    protocol: "https",})
+    setIpfsNode(ipfsClient)
+  },[])
 
-// FUNCTIONS FOR MINTING, LISTING
-
-// HANDLE IMPORT NFT's ()
-
-  async function addFile(){
-    const selectedFile = document.getElementById('imageInput').files[0];
-    setFile(selectedFile)
-    let reader = new FileReader();
-    reader.readAsDataURL(selectedFile);
-    reader.onloadend = function () {
-      setImageData(reader.result)
-      var image = new Image();
-      image.src = reader.result;
-      image.onload = function() {
-        setImageSize(this.width, this.height)
-      }
+async function uploadAndPin(data){
+  let dataUpload
+  try{
+    dataUpload = await ipfsNode.add(data);
+  }catch(e){
+    console.log('Error: ',e)
+    return 'Error uploading the file'
+  }
+  await pinByHash(dataUpload.cid.toString()) // Pinata
+  return dataUpload;
+}
+async function prepareNftData(){
+  let results = await uploadAndPin(file)
+  let metadata = {name:name, description:description, image:results.path}
+  minter(metadata)
+}
+async function minter(metadata) {
+  let metadataCid =  await uploadAndPin(JSON.stringify(metadata))
+  if(metadataCid){
+    createNFT(metadataCid.cid.toString(), provider, factoryAddress).then(res => {
+      setTokenMintedAddress(res)
+      setMinted(true);
+    });
+  }
+}
+async function addFile(){
+  const selectedFile = document.getElementById('imageInput').files[0];
+  setFile(selectedFile)
+  let reader = new FileReader();
+  reader.readAsDataURL(selectedFile);
+  reader.onloadend = function () {
+    setImageData(reader.result)
+    var image = new Image();
+    image.src = reader.result;
+    image.onload = function() {
+      setImageSize(this.width, this.height)
     }
   }
-  const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
+}
+const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
+
+
+  // HANDLE IMPORT NFT's ()
+
+//
+
+// FUNCTIONS FOR LISTING
+  const fraktalReady = minted
+    && totalAmount > 0
+    && totalAmount <= 10000
+    && totalPrice > 0
+    && isApproved;
+
+  async function approveToken() {
+    await approveMarket(marketAddress, provider, tokenMintedAddress).then(()=>{
+      setIsApproved(true);
+    })
+  }
+
+  async function importFraktalToMarket(){
+    let index = 0;
+    let isUsed = true;
+    while(isUsed == true){
+      index += 1;
+      isUsed = await getIndexUsed(index, provider, tokenMintedAddress);
+    }
+    if(isUsed == false){
+      await importFraktal(tokenMintedAddress,index,provider,marketAddress).then(() => {
+        setFraktionalized(true);
+      });
+    }
+  }
+  async function listNewItem(){
+    listItem(
+      tokenMintedAddress,
+      totalAmount,
+      utils.parseUnits(totalPrice).div(totalAmount),
+      provider,
+      marketAddress).then(()=>{
+        router.push('/');
+      })
+  }
+
+  let msg = () => {
+    let retMsg;
+    if(!minted){
+      return 'Mint your new token to start the process of Fraktionalization and Listing.'
+    }else if(minted && !isApproved){
+      return 'NFT succesfully minted! Approve the transfer of your Fraktal NFT and future Fraktions transfers.'
+    }else if(minted && isApproved && !fraktionalized){
+      return 'Transfer rights granted! Now transfer your Fraktal NFT to the Marketplace. The Fraktions will remain in your wallet.'
+    }else{
+      return 'Fraktal NFT received! List your Fraktions on the Marketplace. If someone buys your Fraktions the Marketplace contract will transfer them'
+    }
+  }
 
   return (
+    <div>
     <Box
       sx={{
         display: `grid`,
@@ -107,7 +202,7 @@ export default function MintPage() {
             onClick={()=>setStatus('import')}
           >Import NFT</Link>
         </div>
-        { status == 'mint' ?
+        {status == 'mint' ?
           <MintCard
             setName = {setName}
             setDescription = {setDescription}
@@ -115,65 +210,72 @@ export default function MintPage() {
             file = {file}
           />
           :
-          <div>Select the nft to import</div>
-        }
-        <div
-          style = {{
-            fontSize: '16px',
-            fontWeight: 500,
-            lineHeight: '19px',
-            color: '#000000',
-            marginTop: '8.5px',
-          }}
-        >
+          <div>Select the nft to import</div>}
           <Checkbox
             isChecked = {listItemCheck}
             onChange = {() => setListItemCheck(!listItemCheck)}
             size = 'lg'
           >List your Fraktions for sale</Checkbox>
-        </div>
-        <div>
-          {listItemCheck &&
-            <ListCard
-            totalPrice = {totalPrice}
-            setTotalPrice = {setTotalPrice}
-            setTotalAmount = {setTotalAmount}
-            />
-          }
-        </div>
-        <div style={{marginTop: '24px', justifyItems: 'space-between'}}>
-          <FrakButton4
-            status = {name ? 'open' : 'done'}
-            disabled = {!name || !imageData}
-            onClick = {()=>console.log('create NFT')}
-          >
-          {status == 'mint' ? `1. Mint` : `1. Import`}
-          </FrakButton4>
-          <FrakButton4
-            status = {name ? 'open' : 'done'}
-            disabled = {true}
-            onClick = {()=>console.log('create NFT')}
-          >
-          2. Fraktionalize
-          </FrakButton4>
-          <FrakButton4
-            status = {name ? 'open' : 'done'}
-            disabled = {true}
-            onClick = {()=>console.log('create NFT')}
-          >
-          3. List
-          </FrakButton4>
-        </div>
-
-      </Stack>
-      {/*
-      <Modal
-        open={txInProgress}
-        onClose={()=>setTxInProgress(false)}
-      >
-        Tx's in course!
-      </Modal>
-    */}
-    </Box>
+          <div>
+            {listItemCheck &&
+              <ListCard
+              totalPrice = {totalPrice}
+              setTotalPrice = {setTotalPrice}
+              setTotalAmount = {setTotalAmount}
+              />
+            }
+          </div>
+          <div style={{marginTop: '24px', justifyItems: 'space-between'}}>
+          {status == 'mint' ?
+            <FrakButton4
+              status = {!minted ? 'open' : 'done'}
+              disabled = {!name || !imageData}
+              onClick = {()=>prepareNftData()}
+            >
+            1. Mint
+            </FrakButton4>
+            :
+            <FrakButton4
+              status = {!minted ? 'open' : 'done'}
+              disabled = {!name || !imageData}
+              onClick = {()=>console.log('import')}
+            >
+            1. Import
+            </FrakButton4>
+            }
+            <FrakButton4
+              status = {!isApproved ? 'open' : 'done'}
+              disabled = {!tokenMintedAddress}
+              onClick = {()=>approveToken()}
+            >
+            2. Approve
+            </FrakButton4>
+            <FrakButton4
+              status = {!fraktionalized ? 'open' : 'done'}
+              disabled = {!isApproved || !tokenMintedAddress}
+              onClick = {()=>importFraktalToMarket()}
+            >
+            3. Transfer
+            </FrakButton4>
+            <FrakButton4
+              status = {!listed ? 'open' : 'done'}
+              disabled = {!fraktalReady}
+              onClick = {()=>listNewItem()}
+            >
+            4. List
+            </FrakButton4>
+          </div>
+          <div style={{
+            marginTop: '16px',
+            color: '#405466',
+            fontSize: '16px',
+            fontWeight: 600,
+            lineHeight: '19px'
+        }}>
+          {msg()}
+          </div>
+        </Stack>
+      </Box>
+    </div>
   );
 }
