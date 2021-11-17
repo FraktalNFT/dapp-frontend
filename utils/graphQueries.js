@@ -2,10 +2,11 @@ import { gql, request } from "graphql-request";
 import { utils } from "ethers";
 const { CID } = require("ipfs-http-client");
 
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.6';
+const APIURL =
+  "https://api.thegraph.com/subgraphs/name/drhongos/fraktalrinkeby";
 
 const creator_query = gql`
-  query ($id: ID!) {
+  query($id: ID!) {
     fraktalNfts(where: { creator: $id }) {
       id
       marketId
@@ -19,7 +20,7 @@ const creator_query = gql`
 `;
 
 const fraktions_query = gql`
-  query ($id: ID!) {
+  query($id: ID!) {
     listItems(first: 10, where: { fraktal: $id, amount_gt: 0 }) {
       id
       fraktal {
@@ -36,7 +37,7 @@ const fraktions_query = gql`
 `;
 
 const owner_query = gql`
-  query ($id: ID!) {
+  query($id: ID!) {
     fraktalNfts(where: { owner: $id }) {
       id
       marketId
@@ -65,7 +66,7 @@ const owner_query = gql`
   }
 `;
 const marketid_query = gql`
-  query ($id: ID!) {
+  query($id: ID!) {
     fraktalNfts(where: { marketId: $id }) {
       id
       marketId
@@ -141,7 +142,7 @@ const creators_small_review = gql`
 `;
 
 const account_fraktions_query = gql`
-  query ($id: ID!) {
+  query($id: ID!) {
     fraktionsBalances(first: 10, where: { owner: $id, amount_gt: 0 }) {
       id
       amount
@@ -161,7 +162,7 @@ const account_fraktions_query = gql`
   }
 `;
 const fraktal_fraktions_query = gql`
-  query ($id: ID!) {
+  query($id: ID!) {
     fraktionsBalances(first: 10, where: { nft: $id, amount_gt: 0 }) {
       id
       amount
@@ -210,7 +211,7 @@ const listedItems = gql`
   }
 `;
 const listedItemsId = gql`
-  query ($id: ID!) {
+  query($id: ID!) {
     listItems(where: { id: $id, amount_gt: 0 }) {
       id
       price
@@ -245,7 +246,7 @@ const listedItemsId = gql`
   }
 `;
 const user_wallet_query = gql`
-  query ($id: ID!) {
+  query($id: ID!) {
     users(where: { id: $id }) {
       id
       balance
@@ -283,7 +284,7 @@ const user_wallet_query = gql`
   }
 `;
 const user_bought_query = gql`
-  query ($id: ID!) {
+  query($id: ID!) {
     fraktalNfts(where: { status: "sold" }) {
       id
       marketId
@@ -307,7 +308,7 @@ const user_bought_query = gql`
 `;
 
 const user_offers_query = gql`
-  query ($id: ID!) {
+  query($id: ID!) {
     users(where: { id: $id }) {
       id
       offersMade(where: { value_gt: 0 }) {
@@ -335,7 +336,7 @@ const user_offers_query = gql`
 `;
 
 const fraktalOwners = gql`
-  query ($id: ID!) {
+  query($id: ID!) {
     fraktalNfts(where: { id: $id }) {
       fraktions {
         owner
@@ -346,7 +347,7 @@ const fraktalOwners = gql`
 `;
 
 const fraktalId_query = gql`
-  query ($id: ID!) {
+  query($id: ID!) {
     fraktalNfts(where: { id: $id }) {
       id
       marketId
