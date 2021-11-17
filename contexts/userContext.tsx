@@ -47,7 +47,12 @@ const UserContextProvider: React.FC = ({ children }) => {
     fetchNFTs();
   },[account])
 
+  async function getFraktions(){
+
+  }
+
   const fetchNFTs = useCallback(
+    // if user not in subgraph, fails to complete and show other nfts
     async () => {
       try {
         setLoading(true);
@@ -67,7 +72,6 @@ const UserContextProvider: React.FC = ({ children }) => {
             if(fraktionsObjects){
               fraktionsObjectsClean = fraktionsObjects.filter(x=>{return x != null});
           }
-          // console.log('os assets',openseaAssets)
           if(openseaAssets && openseaAssets.assets && openseaAssets.assets.length){
               nftsERC721_wallet = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC721'})
               if(nftsERC721_wallet && nftsERC721_wallet.length){
@@ -83,7 +87,7 @@ const UserContextProvider: React.FC = ({ children }) => {
                 let userFraktalsFetched = fobjects.users[0].fraktals;
                 let userFraktalObjects = await Promise.all(userFraktalsFetched.map(x=>{return createObject2(x)}))
                 if(userFraktalObjects){
-                  fraktalsClean = userFraktalObjects.filter(x=>{return x != null && x.imageURL.length});
+                  fraktalsClean = userFraktalObjects.filter(x=>{return x != null && x.imageURL.length && x.status != 'retrieved'});
                 }
                 let userFraktalAddresses = fraktalsClean.map(x => {return x.id});
                 let userFraktionsAddreses = fraktionsObjects.map(x => {return x.id});
@@ -94,9 +98,9 @@ const UserContextProvider: React.FC = ({ children }) => {
                   return x
                 }
               })
-              // console.log('user nfts: ',nftsFiltered)
               let nftObjects = await Promise.all(nftsFiltered.map(x=>{return createOpenSeaObject(x)}))
               let nftObjectsClean;
+              // console.log('user nfts: ',nftObjects)
               if(nftObjects){
                 nftObjectsClean = nftObjects.filter(x=>{return x != null && x.imageURL.length});
               } else {
@@ -110,9 +114,7 @@ const UserContextProvider: React.FC = ({ children }) => {
                 balance: userBalanceFormatted
               }));
           }
-          // luego adaptar las necesidades de la dapp
-          // actualizar en los cambios de estado
-          // detectar cambios de usuario y refresh
+          // detect account and states change > refresh
         }
         }
       } catch (err) {

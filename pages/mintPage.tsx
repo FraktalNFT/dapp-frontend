@@ -142,8 +142,9 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
     } else {
       address = await importERC1155(parseInt(tokenToImport.tokenId), tokenToImport.id, provider, factoryAddress)
     }
-    if(address){      
+    if(address){
       setTokenMintedAddress(address);
+      setMinted(true);
     }
   }
 
