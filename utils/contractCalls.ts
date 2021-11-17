@@ -229,20 +229,24 @@ export async function exportFraktal(tokenAddress, provider, marketAddress){
 
 export async function importERC721(tokenId, tokenAddress, provider, factoryAddress){
   const signer = await loadSigner(provider);
-  const override = {gasLimit:2000000}
+  const override = {gasLimit:1000000}
   const customContract = new Contract(factoryAddress, factoryAbi, signer);
   let tx = await customContract.importERC721(tokenAddress,tokenId, defaultMajority, override)
-  let receipt = processTx(tx);
-  return receipt;
+  // let receipt = processTx(tx);
+  // let receipt = processTx(tx);
+  let mintedTokenAddress = awaitTokenAddress(tx);
+  return mintedTokenAddress;
 }
 
 export async function importERC1155(tokenId, tokenAddress, provider, factoryAddress){
   const signer = await loadSigner(provider);
-  const override = {gasLimit:2000000}
+  const override = {gasLimit:1000000}
   const customContract = new Contract(factoryAddress, factoryAbi, signer);
   let tx = await customContract.importERC1155(tokenAddress,tokenId, defaultMajority, override)
-  let receipt = processTx(tx);
-  return receipt;
+  // let receipt = processTx(tx);
+  // return receipt;
+  let mintedTokenAddress = awaitTokenAddress(tx);
+  return mintedTokenAddress;
 }
 
 export async function listItem(tokenAddress,amount,price,provider,marketAddress){

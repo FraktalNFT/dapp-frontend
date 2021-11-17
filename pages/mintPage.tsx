@@ -13,7 +13,11 @@ import {
   approveMarket,
   importFraktal,
   getIndexUsed,
-  listItem
+  listItem,
+  getApproved,
+  approveContract,
+  importERC721,
+  importERC1155
 } from "../utils/contractCalls";
 import { pinByHash } from '../utils/pinataPinner';
 import { useRouter } from "next/router";
@@ -42,6 +46,7 @@ export default function MintPage() {
   const [listed, setListed] = useState(false);
   const [tokenMintedAddress, setTokenMintedAddress] = useState();
   const [tokenToImport, setTokenToImport] = useState();
+  const [nftApproved, setNftApproved] = useState(false);
 
 // FUNCTIONS FOR MINTING
 useEffect(()=>{
@@ -120,6 +125,28 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
       });
     }
   }
+
+  async function approveNFT(){
+    if(tokenToImport && tokenToImport.id){
+      let res = await approveMarket(factoryAddress, provider, tokenToImport.id);
+      if(res){
+        setNftApproved(true)
+      }
+    }
+  }
+
+  async function importNFT(){
+    let address;
+    if(tokenToImport.token_schema == 'ERC721'){
+      address = await importERC721(parseInt(tokenToImport.tokenId), tokenToImport.id, provider, factoryAddress)
+    } else {
+      address = await importERC1155(parseInt(tokenToImport.tokenId), tokenToImport.id, provider, factoryAddress)
+    }
+    if(address){      
+      setTokenMintedAddress(address);
+    }
+  }
+
   async function listNewItem(){
     listItem(
       tokenMintedAddress,
@@ -203,6 +230,7 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
             onClick={()=>setStatus('import')}
           >Import NFT</Link>
         </div>
+        <div>
         {status == 'mint' ?
           <MintCard
             setName = {setName}
@@ -212,7 +240,7 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
           />
           :
           <div>
-          {!tokenToImport ?
+          {!tokenToImport && !tokenMintedAddress ?
             <div>
             SELECT AN NFT FROM YOUR WALLET
             {fraktals && fraktals.length &&
@@ -228,7 +256,14 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
                   gap='3.2rem'
                 >
                   {fraktals.map(item => (
-                    <div key={item.id+'-'+item.tokenId}>
+                    <div
+                      onClick={()=>{
+                        setTokenMintedAddress(item.id)
+                        setName(item.name)
+                        setImageData(item.imageURL)
+                      }}
+                      key={item.id+'-'+item.tokenId}
+                    >
                       <NFTItem
                         item={item}
                         name={item.name}
@@ -257,7 +292,11 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
                 {nfts.map(item => (
                   <div
                     key={item.id+'-'+item.tokenId}
-                    onClick={()=>setTokenToImport(item)}
+                    onClick={()=>{
+                      setTokenToImport(item)
+                      setImageData(item.imageURL)
+                      setName(item.name)
+                    }}
                   >
                     <NFTItem
                       item={item}
@@ -274,24 +313,34 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
             }
             </div>
             :
-            <div onClick={()=>setTokenToImport()}>once data is selected, continue the process of import</div>
+            <div>
+              <div onClick={()=>{
+                setTokenToImport(null)
+                setTokenMintedAddress(null)
+                setName(null)
+                setImageData(null)
+              }}>Go Back</div>
+            </div>
+
           }
           </div>
         }
-
-          <Checkbox
-            isChecked = {listItemCheck}
-            onChange = {() => setListItemCheck(!listItemCheck)}
-            size = 'lg'
-          >List your Fraktions for sale</Checkbox>
-          <div>
-            {listItemCheck &&
-              <ListCard
-              totalPrice = {totalPrice}
-              setTotalPrice = {setTotalPrice}
-              setTotalAmount = {setTotalAmount}
-              />
-            }
+        </div>
+          <div style={{marginTop: '16px'}}>
+            <Checkbox
+              isChecked = {listItemCheck}
+              onChange = {() => setListItemCheck(!listItemCheck)}
+              size = 'lg'
+            >List your Fraktions for sale</Checkbox>
+            <div>
+              {listItemCheck &&
+                <ListCard
+                totalPrice = {totalPrice}
+                setTotalPrice = {setTotalPrice}
+                setTotalAmount = {setTotalAmount}
+                />
+              }
+            </div>
           </div>
           <div style={{marginTop: '24px', justifyItems: 'space-between'}}>
           {status == 'mint' ?
@@ -303,13 +352,22 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
             1. Mint
             </FrakButton4>
             :
-            <FrakButton4
-              status = {!minted ? 'open' : 'done'}
-              disabled = {!name || !imageData}
-              onClick = {()=>console.log('import')}
-            >
-            1. Import
-            </FrakButton4>
+            <div>
+              <FrakButton4
+                status = {!nftApproved ? 'open' : 'done'}
+                disabled = {!tokenToImport || !tokenToImport.id}
+                onClick = {()=>approveNFT()}
+              >
+              1.1 Approve NFT
+              </FrakButton4>
+              <FrakButton4
+                status = {!minted ? 'open' : 'done'}
+                disabled = {!nftApproved}
+                onClick = {()=>importNFT()}
+              >
+              1.2 Import
+              </FrakButton4>
+            </div>
             }
             <FrakButton4
               status = {!isApproved ? 'open' : 'done'}

@@ -67,12 +67,13 @@ const UserContextProvider: React.FC = ({ children }) => {
             if(fraktionsObjects){
               fraktionsObjectsClean = fraktionsObjects.filter(x=>{return x != null});
           }
+          // console.log('os assets',openseaAssets)
           if(openseaAssets && openseaAssets.assets && openseaAssets.assets.length){
               nftsERC721_wallet = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC721'})
               if(nftsERC721_wallet && nftsERC721_wallet.length){
                 totalNFTs = totalNFTs.concat(nftsERC721_wallet);
               }
-              nftsERC1155_wallet = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC1155'})// && x.token_id != '0'
+              nftsERC1155_wallet = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC1155'})
               totalNFTs = nftsERC721_wallet.concat(nftsERC1155_wallet);
               let fraktalsClean;
               let totalAddresses;
@@ -93,10 +94,13 @@ const UserContextProvider: React.FC = ({ children }) => {
                   return x
                 }
               })
+              // console.log('user nfts: ',nftsFiltered)
               let nftObjects = await Promise.all(nftsFiltered.map(x=>{return createOpenSeaObject(x)}))
               let nftObjectsClean;
               if(nftObjects){
                 nftObjectsClean = nftObjects.filter(x=>{return x != null && x.imageURL.length});
+              } else {
+                nftObjectsClean = nftObjects;
               }
               setUserState(userState => ({
                 ...userState,
