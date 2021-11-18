@@ -22,7 +22,6 @@ import {
 import { pinByHash } from '../utils/pinataPinner';
 import { useRouter } from "next/router";
 import NFTItem from '../components/nft-item';
-import NFTItemOS from '../components/nft-item-opensea';
 
 const { create } = require('ipfs-http-client');
 
@@ -47,6 +46,10 @@ export default function MintPage() {
   const [tokenMintedAddress, setTokenMintedAddress] = useState();
   const [tokenToImport, setTokenToImport] = useState();
   const [nftApproved, setNftApproved] = useState(false);
+
+    // detect states (where is NFT and if its ready to list so send it here for listing!)
+
+
 
 // FUNCTIONS FOR MINTING
 useEffect(()=>{
