@@ -22,10 +22,6 @@ import {
 import { pinByHash } from '../utils/pinataPinner';
 import { useRouter } from "next/router";
 import NFTItem from '../components/nft-item';
-<<<<<<< HEAD
-import NFTItemOS from '../components/nft-item-opensea';
-=======
->>>>>>> aaaef8da71e8f017bf5d6be3763fdadb5523c2e5
 
 const { create } = require('ipfs-http-client');
 
@@ -44,20 +40,43 @@ export default function MintPage() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0.);
   const [minted, setMinted] = useState(false);
-  const [isApproved, setIsApproved] = useState(false);
   const [fraktionalized, setFraktionalized] = useState(false);
-  const [listed, setListed] = useState(false);
+  const [listed, setListed] = useState(false);//not used..
   const [tokenMintedAddress, setTokenMintedAddress] = useState();
   const [tokenToImport, setTokenToImport] = useState();
-  const [nftApproved, setNftApproved] = useState(false);
 
-<<<<<<< HEAD
-=======
-    // detect states (where is NFT and if its ready to list so send it here for listing!)
+  // detect states (where is NFT and if its ready to list so send it here for listing!)
+  const [marketApproved, setMarketApproved] = useState(false);
+  const [factoryApproved, setFactoryApproved] = useState(false);
 
+useEffect(async () => {
+  if(tokenMintedAddress){
+    let marketApproval = await getApproved(
+      account,
+      marketAddress,
+      provider,
+      tokenMintedAddress
+    );
+    if(marketApproval){
+      setMarketApproved(marketApproval)
+    }
+  }
+},[tokenMintedAddress]);
 
+useEffect(async () => {
+  if(tokenToImport){
+    let factoryApproval = await getApproved(
+      account,
+      factoryAddress,
+      provider,
+      tokenToImport.id
+    );
+    if(factoryApproval){
+      setFactoryApproved(factoryApproval)
+    }
+  }
+},[tokenToImport]);
 
->>>>>>> aaaef8da71e8f017bf5d6be3763fdadb5523c2e5
 // FUNCTIONS FOR MINTING
 useEffect(()=>{
   const ipfsClient = create({
@@ -110,15 +129,15 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
 
 
 // FUNCTIONS FOR LISTING
-  const fraktalReady = minted
+  const fraktalReady = tokenMintedAddress
     && totalAmount > 0
     && totalAmount <= 10000
     && totalPrice > 0
-    && isApproved;
+    && marketApproved;
 
   async function approveToken() {
     await approveMarket(marketAddress, provider, tokenMintedAddress).then(()=>{
-      setIsApproved(true);
+      setMarketApproved(true);
     })
   }
 
@@ -140,7 +159,7 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
     if(tokenToImport && tokenToImport.id){
       let res = await approveMarket(factoryAddress, provider, tokenToImport.id);
       if(res){
-        setNftApproved(true)
+        setFactoryApproved(true)
       }
     }
   }
@@ -172,9 +191,9 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
   let msg = () => {
     if(!minted){
       return 'Mint your new token to start the process of Fraktionalization and Listing.'
-    }else if(minted && !isApproved){
+    }else if(minted && !marketApproved){
       return 'NFT succesfully minted! Approve the transfer of your Fraktal NFT and future Fraktions transfers.'
-    }else if(minted && isApproved && !fraktionalized){
+    }else if(minted && marketApproved && !fraktionalized){
       return 'Transfer rights granted! Now transfer your Fraktal NFT to the Marketplace. The Fraktions will remain in your wallet.'
     }else{
       return 'Fraktal NFT received! List your Fraktions on the Marketplace. If someone buys your Fraktions the Marketplace contract will transfer them'
@@ -365,7 +384,7 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
             :
             <div>
               <FrakButton4
-                status = {!nftApproved ? 'open' : 'done'}
+                status = {!factoryApproved ? 'open' : 'done'}
                 disabled = {!tokenToImport || !tokenToImport.id}
                 onClick = {()=>approveNFT()}
               >
@@ -373,7 +392,7 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
               </FrakButton4>
               <FrakButton4
                 status = {!minted ? 'open' : 'done'}
-                disabled = {!nftApproved}
+                disabled = {!factoryApproved}
                 onClick = {()=>importNFT()}
               >
               1.2 Import
@@ -381,7 +400,7 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
             </div>
             }
             <FrakButton4
-              status = {!isApproved ? 'open' : 'done'}
+              status = {!marketApproved ? 'open' : 'done'}
               disabled = {!tokenMintedAddress}
               onClick = {()=>approveToken()}
             >
@@ -389,7 +408,7 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
             </FrakButton4>
             <FrakButton4
               status = {!fraktionalized ? 'open' : 'done'}
-              disabled = {!isApproved || !tokenMintedAddress}
+              disabled = {!marketApproved || !tokenMintedAddress}
               onClick = {()=>importFraktalToMarket()}
             >
             3. Transfer
