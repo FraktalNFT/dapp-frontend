@@ -12,8 +12,8 @@ import { createObject, createObject2, createOpenSeaObject } from '../utils/nftHe
 
 type UserContextType = {
   fraktals: null | any[];
-  fraktions: null | any[];
-  nfts: null | any[];
+  fraktions: null | undefined |  any[];
+  nfts: null | undefined | any[];
   balance: number;
 };
 
@@ -105,7 +105,7 @@ const UserContextProvider: React.FC = ({ children }) => {
           })
           let nftObjects = await Promise.all(nftsFiltered.map(x=>{return createOpenSeaObject(x)}))
           if(nftObjects){
-            nftObjectsClean = nftObjects.filter(x=>{return x != null && x.imageURL.length});
+            nftObjectsClean = nftObjects.filter(x => {return x != null && x.imageURL.length});
           } else {
             nftObjectsClean = nftObjects;
           }
