@@ -108,3 +108,20 @@ export async function processTx(tx){
   console.log(receipt);
   return receipt;
 }
+
+export const awaitTokenAddress = async (tx) => {
+  const receipt = await tx.wait();
+  const abi = new utils.Interface([
+    'event Minted(address creator,string urlIpfs,address tokenAddress,uint nftId)',
+  ]);
+  const eventFragment = abi.events[Object.keys(abi.events)[0]];
+  const eventTopic = abi.getEventTopic(eventFragment);
+  const event = receipt.logs.find((e) => e.topics[0] === eventTopic);
+  if (!event) return '';
+  const decodedLog = abi.decodeEventLog(
+    eventFragment,
+    event.data,
+    event.topics,
+  );
+  return decodedLog.tokenAddress;
+};

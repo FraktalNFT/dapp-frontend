@@ -1,10 +1,5 @@
-import { Divider } from "@chakra-ui/react";
-import { VStack, HStack, Box, Stack } from "@chakra-ui/layout";
-import React, { useState, useEffect } from "react";
-import { utils } from "ethers";
-import FrakButton from "../button";
-import FrakButton2 from "../button2";
-import OfferDetail from "../offerDetail";
+import { VStack, HStack, Box } from "@chakra-ui/layout";
+import React, { useState } from "react";
 import { rescueEth } from "../../utils/contractCalls";
 import { Text } from "@chakra-ui/react";
 
@@ -13,8 +8,7 @@ const RescueCard = ({
   provider,
   gains,
 }) => {
-  const [isReady, setIsReady] = useState(false);
-
+  // const [isReady, setIsReady] = useState(false);
   return (
     <div
       style={{

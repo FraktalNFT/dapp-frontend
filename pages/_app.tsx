@@ -3,6 +3,7 @@ import Footer from "../components/footer";
 import "../styles/globals.css";
 import "../styles/fonts.css";
 import Web3ContextProvider from "../contexts/Web3Context";
+import UserContextProvider from "../contexts/userContext";
 import Layout from "../components/layout";
 
 const customTheme = extendTheme({
@@ -26,12 +27,14 @@ function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider theme={customTheme}>
       <Web3ContextProvider>
-        <Layout>
-          <VStack maxW='96.4rem' mx='auto' pt='6.4rem' flex={1} id='app'>
-            <Component {...pageProps} />
-          </VStack>
-          <Footer />
-        </Layout>
+        <UserContextProvider>
+          <Layout>
+            <VStack maxW='96.4rem' mx='auto' pt='6.4rem' flex={1} id='app'>
+              <Component {...pageProps} />
+            </VStack>
+            <Footer />
+          </Layout>
+        </UserContextProvider>
       </Web3ContextProvider>
     </ChakraProvider>
   );
