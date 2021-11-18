@@ -2,7 +2,7 @@
 // sintetize all functions (or view vs state)
 
 import { Contract } from "@ethersproject/contracts";
-import { loadSigner, processTx } from './helpers';
+import { loadSigner, processTx, awaitTokenAddress } from './helpers';
 //tested
 const factoryAbi = [
   "function mint(string urlIpfs, uint16 majority)",
@@ -206,8 +206,9 @@ export async function createNFT(hash, provider, contractAddress){
   const signer = await loadSigner(provider);
   const customContract = new Contract(contractAddress, factoryAbi, signer);
   let tx = await customContract.mint(hash, defaultMajority);
-  let receipt = processTx(tx);
-  return receipt;
+  let tokenAddress = awaitTokenAddress(tx);
+  // let receipt = processTx(tx);
+  return tokenAddress;
 }
 
 export async function importFraktal(tokenAddress, fraktionsIndex, provider, marketAddress){
@@ -228,20 +229,24 @@ export async function exportFraktal(tokenAddress, provider, marketAddress){
 
 export async function importERC721(tokenId, tokenAddress, provider, factoryAddress){
   const signer = await loadSigner(provider);
-  const override = {gasLimit:2000000}
+  const override = {gasLimit:1000000}
   const customContract = new Contract(factoryAddress, factoryAbi, signer);
   let tx = await customContract.importERC721(tokenAddress,tokenId, defaultMajority, override)
-  let receipt = processTx(tx);
-  return receipt;
+  // let receipt = processTx(tx);
+  // let receipt = processTx(tx);
+  let mintedTokenAddress = awaitTokenAddress(tx);
+  return mintedTokenAddress;
 }
 
 export async function importERC1155(tokenId, tokenAddress, provider, factoryAddress){
   const signer = await loadSigner(provider);
-  const override = {gasLimit:2000000}
+  const override = {gasLimit:1000000}
   const customContract = new Contract(factoryAddress, factoryAbi, signer);
   let tx = await customContract.importERC1155(tokenAddress,tokenId, defaultMajority, override)
-  let receipt = processTx(tx);
-  return receipt;
+  // let receipt = processTx(tx);
+  // return receipt;
+  let mintedTokenAddress = awaitTokenAddress(tx);
+  return mintedTokenAddress;
 }
 
 export async function listItem(tokenAddress,amount,price,provider,marketAddress){

@@ -1,7 +1,6 @@
 import { Grid, VStack } from "@chakra-ui/layout";
 import Head from "next/head";
-import React, {useEffect, useState} from "react";
-// import NFTItemManager from "../components/nft-item-manager";
+import React from "react";
 import NFTItemOS from '../components/nft-item-opensea';
 import NFTItem from '../components/nft-item';
 import RescueCard from '../components/rescueCard';
@@ -9,88 +8,20 @@ import NextLink from "next/link";
 import styles from "../styles/my-nfts.module.css";
 import FrakButton from "../components/button";
 import { useWeb3Context } from '../contexts/Web3Context';
-// import { utils } from 'ethers';
-import { getSubgraphData } from '../utils/graphQueries';
-import { createObject, createObject2, createOpenSeaObject } from '../utils/nftHelpers';
+import { useUserContext } from '../contexts/userContext';
 import {
-  // rescueEth,
-  // claimFraktalSold,
   importFraktal,
-  // claimERC1155,
-  // claimERC721,
   approveMarket,
   importERC721,
   importERC1155,
   getApproved,
-  // getLockedTo,
-  // makeOffer
 } from '../utils/contractCalls';
-import { assetsInWallet } from '../utils/openSeaAPI';
 import { useRouter } from 'next/router';
 
 export default function MyNFTsView() {
   const router = useRouter();
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
-  const [nftItems, setNftItems] = useState();
-  const [fraktionItems, setFraktionItems] = useState();
-  const [totalBalance, setTotalBalance] = useState(0);
-  // const [offers, setOffers] = useState();
-  const [userFraktals, setUserFraktals] = useState();
-
-  async function getAccountFraktalData(){
-    let objects = await getSubgraphData('wallet',account.toLocaleLowerCase())
-    // console.log('fraktions wallet ',objects)
-    return objects;
-  };
-  // async function getUserOffers(){
-  //   let objects = await getSubgraphData('offers',account.toLocaleLowerCase())
-  //   return objects;
-  // };
-
-  // async function takeOutOffer(address) {
-  //   try {
-  //     makeOffer(
-  //       utils.parseEther('0'),
-  //       address,
-  //       provider,
-  //       marketAddress).then(()=>{
-  //         router.push('/my-nfts');
-  //       })
-  //   }catch(e){
-  //     console.log('There has been an error: ',e)
-  //   }
-  // }
-
-  // async function claimNFT(item){
-  //   let approved = await getApproved(account, factoryAddress, provider, item.id);
-  //   let done:Boolean;
-  //   if(!approved){
-  //     done = await approveContract(factoryAddress, item.id);
-  //   } else {
-  //     done = true;
-  //   }
-  //   let tx;
-  //   if(done){
-  //     if(item.collateralType == 'ERC721'){
-  //       tx = await claimERC721(item.marketId, provider, factoryAddress)
-  //     }else{
-  //       tx = await claimERC1155(item.marketId, provider, factoryAddress)
-  //     }
-  //   }
-  //   if(tx){
-  //     router.push('/my-nfts');
-  //   }
-  // }
-
-  // async function claimFraktal(id) {
-  //   try {
-  //     await claimFraktalSold(id, provider, contractAddress).then(()=>{
-  //       router.push('/my-nfts');
-  //     });
-  //   } catch(err){
-  //     console.log('Error: ',err);
-  //   }
-  // }
+  const { fraktals, fraktions, nfts, balance } = useUserContext();
 
   async function approveContract(contract, tokenAddress){
     let done = await approveMarket(contract, provider, tokenAddress)
@@ -137,73 +68,6 @@ export default function MyNFTsView() {
       router.reload();
     }
   }
-  useEffect(async()=>{
-    if(account) {
-      let openseaAssets = await assetsInWallet(account);
-
-      let fobjects = await getAccountFraktalData(); //checks the user in Fraktal subgraph
-      let nftsERC721_wallet;
-      let nftsERC1155_wallet;
-      let totalNFTs = [];
-      let fraktionsObjects;
-      if(fobjects && fobjects.users.length){
-        let userBalance = fobjects.users[0].balance
-        setTotalBalance(parseFloat(userBalance)/10**18)
-        // console.log('fraktions',fobjects.users[0])
-        let validFraktions = fobjects.users[0].fraktions.filter(x=>{return x.status != 'retrieved'})
-        fraktionsObjects = await Promise.all(validFraktions.map(x=>{return createObject(x)}))
-        if(fraktionsObjects){
-          let fraktionsObjectsClean = fraktionsObjects.filter(x=>{return x != null});
-          setFraktionItems(fraktionsObjectsClean)
-        }else{
-          setFraktionItems([])
-        }
-// maybe integrate this part.. all of the 'user exists' functions together
-      }
-
-      if(openseaAssets && openseaAssets.assets && openseaAssets.assets.length){
-          nftsERC721_wallet = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC721'})
-          if(nftsERC721_wallet && nftsERC721_wallet.length){
-            totalNFTs = totalNFTs.concat(nftsERC721_wallet);
-          }
-          nftsERC1155_wallet = openseaAssets.assets.filter(x=>{return x.asset_contract.schema_name == 'ERC1155'})// && x.token_id != '0'
-
-          totalNFTs = nftsERC721_wallet.concat(nftsERC1155_wallet);
-
-// handle new users!
-          let fraktalsClean;
-          let totalAddresses;
-          if(!fobjects || !fobjects.users[0] || !fobjects.users[0].fraktals){
-              totalAddresses = [];
-          }else{
-            let userFraktalsFetched = fobjects.users[0].fraktals;
-            let userFraktalObjects = await Promise.all(userFraktalsFetched.map(x=>{return createObject2(x)}))
-            if(userFraktalObjects){
-              fraktalsClean = userFraktalObjects.filter(x=>{return x != null && x.imageURL.length});
-              setUserFraktals(fraktalsClean)
-            }
-            let userFraktalAddresses = fraktalsClean.map(x => {return x.id});
-            let userFraktionsAddreses = fraktionsObjects.map(x => {return x.id});
-            totalAddresses = userFraktalAddresses.concat(userFraktionsAddreses);
-          }
-
-          let nftsFiltered = totalNFTs.map(x=>{
-            if(!totalAddresses.includes(x.asset_contract.address)){
-              return x
-            }
-          })
-          // console.log('listas:', nftsFiltered)
-          let nftObjects = await Promise.all(nftsFiltered.map(x=>{return createOpenSeaObject(x)}))
-          if(nftObjects){
-            let nftObjectsClean = nftObjects.filter(x=>{return x != null && x.imageURL.length});
-            setNftItems(nftObjectsClean)
-          }else{
-            setNftItems([])
-          }
-      }
-
-    }
-  },[account]);
 
   return (
     <VStack spacing='0' mb='12.8rem'>
@@ -213,7 +77,7 @@ export default function MyNFTsView() {
       <div className={styles.header}>
         Your Fraktal NFTs
       </div>
-      {userFraktals?.length ? (
+      {fraktals?.length ? (
         <Grid
           mt='40px !important'
           ml='0'
@@ -223,7 +87,7 @@ export default function MyNFTsView() {
           templateColumns='repeat(3, 1fr)'
           gap='3.2rem'
         >
-          {userFraktals.map(item => (
+          {fraktals.map(item => (
             <div key={item.id+'-'+item.tokenId}>
               <NextLink key={item.id} href={`/nft/${item.id}/details`}>
                 <NFTItem
@@ -244,7 +108,7 @@ export default function MyNFTsView() {
               Transfer NFT to your wallet or Mint a new NFT.
             </div>
             <div style={{ display: "flex", justifyContent: "center" }}>
-              <NextLink href={`/mint-nft`}>
+              <NextLink href={`/mintPage`}>
                 <FrakButton style={{ width: "240px", marginTop: "24px" }}>
                 Mint NFT
                 </FrakButton>
@@ -254,7 +118,7 @@ export default function MyNFTsView() {
         )}
       {/*///////////////////////////////////*/}
       <div className={styles.header2}>Your Fraktions</div>
-      {fraktionItems?.length ? (
+      {fraktions?.length ? (
         <div style={{ marginTop: "16px" }}>
           <Grid
             mt='40px !important'
@@ -265,7 +129,7 @@ export default function MyNFTsView() {
             templateColumns='repeat(3, 1fr)'
             gap='3.2rem'
           >
-            {fraktionItems && fraktionItems.map(item => (
+            {fraktions && fraktions.map(item => (
               <NextLink key={item.id} href={`/nft/${item.id}/details`}>
                 <NFTItem
                   item={item}
@@ -277,9 +141,6 @@ export default function MyNFTsView() {
               </NextLink>
             ))}
           </Grid>
-
-          {/*
-*/}
         </div>
       ) : (
         <div style={{ marginTop: "8px" }}>
@@ -299,17 +160,16 @@ export default function MyNFTsView() {
         </div>
       )}
       {/*///////////////*/}
-
       <RescueCard
         marketAddress= {marketAddress}
         provider= {provider}
-        gains= {Math.round(totalBalance*1000)/1000}
+        gains= {Math.round(balance * 1000)/1000}
       />
       {/*///////////////*/}
       <div className={styles.header}>
         Your Wallet NFTs
       </div>
-      {nftItems?.length ? (
+      {nfts?.length ? (
         <Grid
           mt='40px !important'
           ml='0'
@@ -319,7 +179,7 @@ export default function MyNFTsView() {
           templateColumns='repeat(3, 1fr)'
           gap='3.2rem'
         >
-          {nftItems.map(item => (
+          {nfts.map(item => (
             <div key={item.id+'-'+item.tokenId}>
             {item.token_schema == 'ERC1155' && item.tokenId == 0 ?
               <NFTItemOS
@@ -344,42 +204,6 @@ export default function MyNFTsView() {
           </div>
         </div>
       )}
-      {/*offers && offers.length &&
-        <div>
-          <div className={styles.header2}>OFFERS</div>
-          <Grid
-          mt='40px !important'
-          ml='0'
-          mr='0'
-          mb='5.6rem !important'
-          w='100%'
-          templateColumns='repeat(3, 1fr)'
-          gap='3.2rem'
-          >
-          {offers && offers.map(item => (
-            <div key={item.id}>
-            {item.status == "buyer" ?
-              <div>
-                <NFTItem
-                  item={item}
-                  onClick={()=>claimFraktal(item.marketId)}
-                  CTAText="Claim Fraktal"
-                />
-              </div>
-              :
-              <div>
-                <NFTItem
-                  item={item}
-                  onClick={()=>takeOutOffer(item.id)}
-                  CTAText="Take out offer"
-                />
-              </div>
-            }
-            </div>
-          ))}
-          </Grid>
-        </div>
-      */}
     </VStack>
   )
 };

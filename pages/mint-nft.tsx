@@ -113,7 +113,8 @@ export default function MintNFTView() {
                     marginTop: "16px",
                   }}
                 >
-              <input type="file"
+              <input
+                type="file"
                 id="imageInput"
                 style={{"display":"none"}}
                 onChange={()=> addFile()}

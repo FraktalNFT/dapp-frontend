@@ -11,13 +11,13 @@ export const contracts = [ // old ones
 ]
 export const marketContracts = [
   {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
-  // {providerChainId:4, address:'0xABE7c1cEbA60591f1Bd0deE5453589Dc7E6C83E1'}, // OLD proxy
-  {providerChainId:4, address:'0xE592641ddA55049dF27b6738D12cA977e68b3bB5'}, // proxy
+  {providerChainId:4, address:'0xD71CB14bB50C39D090083C6c3be934AF2b435fEB'}, // proxy
   // {providerChainId:4, address:'0xDD301042351A08512b5E728154B1B3E81908A628'}, logic
 ]
 export const factoryContracts = [
   {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
-  {providerChainId:4, address:'0x7edb6a54D10B4e3039Fd11D1A59582a6294a6ffE'},
+  {providerChainId:4, address:'0xA64E2EF06B06FFd77Abec0FCb375Fb368ABEF06e'},
+  // {providerChainId:4, address:'0x7edb6a54D10B4e3039Fd11D1A59582a6294a6ffE'},
 ]
 
 export const networkNames = {

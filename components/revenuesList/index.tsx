@@ -21,10 +21,7 @@ const RevenuesList = ({ revenuesCreated, tokenAddress }) => {
   const [revenueValue, setRevenueValue] = useState(0);
   const [isCreating, setIsCreating] = useState(false);
   const [valueSetter, setValueSetter] = useState(false);
-  console.log("account", account);
-  console.log("revenuesCreated: ", revenuesCreated);
-  console.log("tokenAddress: ", tokenAddress);
-  console.log("provider: ", provider);
+
   // const totalValue = (x) => utils.parseEther((x).toString());
   async function launchRevenuePayment() {
     setIsCreating(true);
