@@ -105,7 +105,7 @@ const UserContextProvider: React.FC = ({ children }) => {
           })
           let nftObjects = await Promise.all(nftsFiltered.map(x=>{return createOpenSeaObject(x)}))
           if(nftObjects){
-            nftObjectsClean = nftObjects.filter(x=>{return x != null && x.imageURL.length});
+            nftObjectsClean = nftObjects.filter(x => {return x != null && x.imageURL.length});
           } else {
             nftObjectsClean = nftObjects;
           }
