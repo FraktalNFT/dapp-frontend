@@ -50,9 +50,9 @@ export default function ImportNFTPage() {
 
   // Show Loading State
   useEffect(() => {
-    console.log(new Date(), " ", nfts);
     if (nfts !== null) {
       setIsLoading(false);
+      setNoNFTs(false);
     }
     if (nfts === null) {
       setTimeout(() => {

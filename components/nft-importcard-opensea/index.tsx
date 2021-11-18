@@ -30,6 +30,8 @@ const NFTImportCardOS = forwardRef<HTMLDivElement, NFTItemProps>(
         borderColor='white.100'
         onClick={onClick}
         ref={ref}
+        sx={{transition: `all 0.25s`}}
+        _hover={{transform: `translateY(-16px)`}}
       >
         <Box minH='30rem' w='100%' position='relative' >
           <Image src={item.imageURL} width='100%' height='100%' style={{verticalAlign:'auto'}}/>
