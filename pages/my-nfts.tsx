@@ -1,4 +1,5 @@
 import { Grid, VStack } from "@chakra-ui/layout";
+import { Image } from "@chakra-ui/react";
 import Head from "next/head";
 import React from "react";
 import NFTItemOS from '../components/nft-item-opensea';
@@ -9,6 +10,7 @@ import styles from "../styles/my-nfts.module.css";
 import FrakButton from "../components/button";
 import { useWeb3Context } from '../contexts/Web3Context';
 import { useUserContext } from '../contexts/userContext';
+import { useMintingContext } from "@/contexts/NFTIsMintingContext";
 import {
   importFraktal,
   approveMarket,
@@ -22,6 +24,8 @@ export default function MyNFTsView() {
   const router = useRouter();
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
   const { fraktals, fraktions, nfts, balance } = useUserContext();
+
+  const { isMinting } = useMintingContext();
 
   async function approveContract(contract, tokenAddress){
     let done = await approveMarket(contract, provider, tokenAddress)
@@ -101,6 +105,7 @@ export default function MyNFTsView() {
 
             </div>
           ))}
+          {isMinting && <Image src='/nft-loading-card.svg' alt='NFTLoading' />}
         </Grid>
         ) : (
           <div style={{ marginTop: "8px" }}>
