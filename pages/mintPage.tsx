@@ -327,7 +327,7 @@ useEffect(()=>{
               borderRadius="25"
               padding="5"
               _hover={{ bg: "black", textColor: "white" }}
-              onClick={() => setStatus("import")}
+              onClick={() => router.push("/import-nft")}
             >
               Import NFT
             </Link>
@@ -450,60 +450,6 @@ useEffect(()=>{
                 />
               )}
             </div>
-          </div>
-          <div style={{ marginTop: "24px", justifyItems: "space-between" }}>
-            {status == "mint" ? (
-              <>
-              <FrakButton4
-                status = {!factoryApproved ? 'open' : 'done'}
-                disabled = {!tokenToImport || !tokenToImport.id}
-                onClick = {()=>approveNFT()}
-              >
-                1. Mint
-              </FrakButton4>
-              
-              <FrakButton4
-                status = {!minted ? 'open' : 'done'}
-                disabled = {!factoryApproved}
-                onClick = {()=>importNFT()}
-              >
-              1.2 Import
-              </FrakButton4>
-              </>) : 
-            }
-            </div>
-            <FrakButton4
-              status = {!marketApproved ? 'open' : 'done'}
-              disabled = {!tokenMintedAddress}
-              onClick = {()=>approveToken()}
-            >
-              2. Approve
-            </FrakButton4>
-            <FrakButton4
-              status = {!fraktionalized ? 'open' : 'done'}
-              disabled = {!marketApproved || !tokenMintedAddress}
-              onClick = {()=>importFraktalToMarket()}
-            >
-              3. Transfer
-            </FrakButton4>
-            <FrakButton4
-              status={!listed ? "open" : "done"}
-              disabled={!fraktalReady}
-              onClick={() => listNewItem()}
-            >
-              4. List
-            </FrakButton4>
-          </div>
-          <div
-            style={{
-              marginTop: "16px",
-              color: "#405466",
-              fontSize: "16px",
-              fontWeight: 600,
-              lineHeight: "19px",
-            }}
-          >
-            {msg()}
           </div>
         </Stack>
       </Box>

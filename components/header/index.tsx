@@ -22,7 +22,7 @@ const Header = () => {
             mr='3.2rem'
             display={{ base: "none", md: "flex" }}
           >
-            <NextLink href='/mintPage' >
+            <NextLink href='/list-nft' >
               <Link className='semi-16' borderRadius='25' padding='5' _hover={{bg: "black", textColor: "white"}}>List NFT</Link>
             </NextLink>
             <NextLink href='/'>
