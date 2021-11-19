@@ -30,6 +30,9 @@ const NFTItemOS = forwardRef<HTMLDivElement, NFTItemProps>(
         borderColor='white.100'
         onClick={onClick}
         ref={ref}
+        _hover={{
+          transform: `translateY(-16px)`
+        }}
       >
         <Box minH='30rem' w='100%' position='relative' >
           <Image src={item.imageURL} width='100%' height='100%' style={{verticalAlign:'auto'}}/>
