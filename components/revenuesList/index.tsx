@@ -1,20 +1,13 @@
 import {
   Box,
-  Center,
-  StackProps,
-  Text,
   VStack,
-  HStack,
 } from "@chakra-ui/react";
-import React, { forwardRef, useState, useEffect } from "react";
+import React, { useState } from "react";
 import { createRevenuePayment } from "../../utils/contractCalls";
 import RevenuesDetail from "../revenuesDetail";
-import Button from "../button";
 import FrakButton2 from "../button2";
 import { utils } from "ethers";
-import styles from "../../pages/nft/[id]/manage.module.css";
 import { useWeb3Context } from "../../contexts/Web3Context";
-// if account has fraktions.. display info to list?
 
 const RevenuesList = ({ revenuesCreated, tokenAddress }) => {
   const { account, provider } = useWeb3Context();

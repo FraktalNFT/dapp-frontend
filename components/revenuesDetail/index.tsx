@@ -7,7 +7,6 @@ import {
   getApproved,
   approveMarket,
 } from "../../utils/contractCalls";
-import { shortenHash, timezone } from "../../utils/helpers";
 
 interface revenueItemProps {
   value: Number;
@@ -27,7 +26,7 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
     value,
     creator,
     tokenAddress,
-    // buyout,
+    buyout,
     revenueAddress,
     provider,
   }) => {
@@ -37,7 +36,7 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
     const [isApproved, setIsApproved] = useState(false);
     const [isApproving, setIsApproving] = useState(false);
 
-    const buyout = true;
+    // const buyout = true;
 
     useEffect(() => {
       async function getData() {
@@ -54,7 +53,7 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
         }
       }
       getData();
-    }, [account, shares, released, buyout]);
+    }, [account, shares, buyout]);
 
     useEffect(() => {
       async function getData() {
@@ -184,7 +183,7 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
             }}
             _hover={{ cursor: `not-allowed` }}
           >
-            You must own shares to claim
+            {released == 0 ? `You must own shares to claim` : `Already released`}
           </Box>
         )}
       </HStack>
