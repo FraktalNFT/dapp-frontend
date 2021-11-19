@@ -101,8 +101,8 @@ export async function processTx(tx){
   let receipt;
   try{
     receipt = await tx.wait();
-  }catch(e){
-    receipt = 'Error: ',e.toString()
+  } catch(e) {
+    receipt = {error: `Error: ${e}`}
   }
   console.log('Transaction receipt');
   console.log(receipt);
