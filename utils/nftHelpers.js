@@ -189,5 +189,6 @@ export async function createListed(data){
     }
   }catch (err){
     console.log('Error',err);
+    return {error: `Error: ${err}`};
   }
 };

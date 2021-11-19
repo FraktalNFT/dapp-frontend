@@ -92,31 +92,32 @@ useEffect(()=>{
     setIpfsNode(ipfsClient)
   },[])
 
-async function uploadAndPin(data){
-  let dataUpload
-  try{
-    dataUpload = await ipfsNode.add(data);
-  }catch(e){
-    console.log('Error: ',e)
-    return 'Error uploading the file'
-  }
-  await pinByHash(dataUpload.cid.toString()) // Pinata
-  return dataUpload;
-}
-async function prepareNftData(){
-  let results = await uploadAndPin(file)
-  let metadata = {name:name, description:description, image:results.path}
-  minter(metadata)
-}
-async function minter(metadata) {
-  let metadataCid =  await uploadAndPin(JSON.stringify(metadata))
-  if(metadataCid){
-    createNFT(metadataCid.cid.toString(), provider, factoryAddress).then(res => {
-      setTokenMintedAddress(res)
-      setMinted(true);
-    });
-    setIpfsNode(ipfsClient);
-  }, []);
+// async function uploadAndPin(data){
+//   let dataUpload
+//   try{
+//     dataUpload = await ipfsNode.add(data);
+//   }catch(e){
+//     console.log('Error: ',e)
+//     return 'Error uploading the file'
+//   }
+//   await pinByHash(dataUpload.cid.toString()) // Pinata
+//   return dataUpload;
+// }
+// async function prepareNftData(){
+//   let results = await uploadAndPin(file)
+//   let metadata = {name:name, description:description, image:results.path}
+//   minter(metadata)
+// }
+// async function minter(metadata) {
+//   let metadataCid =  await uploadAndPin(JSON.stringify(metadata))
+//   if(metadataCid){
+//     createNFT(metadataCid.cid.toString(), provider, factoryAddress).then(res => {
+//       setTokenMintedAddress(res)
+//       setMinted(true);
+//     });
+//     setIpfsNode(ipfsClient);
+//   }
+// }
 
   async function uploadAndPin(data) {
     let dataUpload;
@@ -129,6 +130,7 @@ async function minter(metadata) {
     await pinByHash(dataUpload.cid.toString()); // Pinata
     return dataUpload;
   }
+
   async function prepareNftData() {
     let results = await uploadAndPin(file);
     let metadata = {
@@ -459,6 +461,7 @@ async function minter(metadata) {
               >
                 1. Mint
               </FrakButton4>
+              
               <FrakButton4
                 status = {!minted ? 'open' : 'done'}
                 disabled = {!factoryApproved}
@@ -466,7 +469,7 @@ async function minter(metadata) {
               >
               1.2 Import
               </FrakButton4>
-              </>
+              </>) : 
             }
             </div>
             <FrakButton4
