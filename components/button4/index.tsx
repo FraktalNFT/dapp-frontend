@@ -1,9 +1,5 @@
 import { Button, ButtonProps } from "@chakra-ui/button";
 import { forwardRef } from "react";
-<<<<<<< HEAD
-
-=======
->>>>>>> main
 const FrakButton4 = forwardRef<
   HTMLButtonElement,
   ButtonProps & { status?: string }

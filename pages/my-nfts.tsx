@@ -108,9 +108,9 @@ export default function MyNFTsView() {
               Transfer NFT to your wallet or Mint a new NFT.
             </div>
             <div style={{ display: "flex", justifyContent: "center" }}>
-              <NextLink href={`/mintPage`}>
+              <NextLink href={`/list-nft`}>
                 <FrakButton style={{ width: "240px", marginTop: "24px" }}>
-                Mint NFT
+                  Mint NFT
                 </FrakButton>
               </NextLink>
             </div>
