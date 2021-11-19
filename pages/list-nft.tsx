@@ -15,7 +15,6 @@ import {
   getIndexUsed,
   listItem,
   getApproved,
-  approveContract,
   importERC721,
   importERC1155
 } from "../utils/contractCalls";
@@ -115,7 +114,7 @@ const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
     })
   }
 
-  async function importFraktalToMarket(){
+  async function importFraktalToMarket() {
     let index = 0;
     let isUsed = true;
     while(isUsed == true){
