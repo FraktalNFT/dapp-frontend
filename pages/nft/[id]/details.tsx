@@ -24,16 +24,11 @@ import {
   isFraktalOwner,
 } from "../../../utils/contractCalls";
 import { useRouter } from "next/router";
-import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
+// import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
 // import Modal from '../../../components/modal';
 
 export default function DetailsView() {
   const router = useRouter();
-  const [fraktalOwners, setFraktalOwners] = useState(1);
-  const [valueSetter, setValueSetter] = useState(false);
-  const [isOfferer, setIsOfferer] = useState(false);
-  const [itemSold, setItemSold] = useState(false);
-
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
   const [offers, setOffers] = useState();
   const [minOffer, setMinOffer] = useState(0);
@@ -47,18 +42,19 @@ export default function DetailsView() {
   const [userFraktions, setUserFraktions] = useState(0);
   const [isOwner, setIsOwner] = useState(false);
   const [revenues, setRevenues] = useState();
-  const [txInProgress, setTxInProgress] = useState(false);
+  // const [txInProgress, setTxInProgress] = useState(false);
   const [fraktionsIndex, setFraktionsIndex] = useState();
   // use callbacks
   useEffect(() => {
     async function getData() {
       const tokenAddress = getParams("nft");
-      const tokenAddressSplitted = tokenAddress.split("/details")[0];
+      const tokenAddressSplitted = tokenAddress.split("/details")[0].toLocaleLowerCase();
       setTokenAddress(tokenAddressSplitted);
       let fraktionsFetch = await getSubgraphData(
         "fraktions",
         tokenAddressSplitted
       );
+      console.log(fraktionsFetch)
       if (fraktionsFetch.listItems) {
         setFraktionsListed(fraktionsFetch.listItems);
       }

@@ -40,21 +40,80 @@ export default function MintPage() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const [minted, setMinted] = useState(false);
-  const [isApproved, setIsApproved] = useState(false);
   const [fraktionalized, setFraktionalized] = useState(false);
-  const [listed, setListed] = useState(false);
+  const [listed, setListed] = useState(false);//not used..
   const [tokenMintedAddress, setTokenMintedAddress] = useState();
   const [tokenToImport, setTokenToImport] = useState();
-  const [nftApproved, setNftApproved] = useState(false);
 
   // detect states (where is NFT and if its ready to list so send it here for listing!)
+  const [marketApproved, setMarketApproved] = useState(false);
+  const [factoryApproved, setFactoryApproved] = useState(false);
 
-  // FUNCTIONS FOR MINTING
-  useEffect(() => {
-    const ipfsClient = create({
-      host: "ipfs.infura.io",
-      port: "5001",
-      protocol: "https",
+useEffect(() => {
+  async function getData() {
+  if(tokenMintedAddress){
+    let marketApproval = await getApproved(
+      account,
+      marketAddress,
+      provider,
+      tokenMintedAddress
+    );
+    if(marketApproval){
+      setMarketApproved(marketApproval)
+    }
+  }
+}
+getData();
+},[tokenMintedAddress]);
+
+useEffect(() => {
+  async function getStuff() {
+  if(tokenToImport){
+    let factoryApproval = await getApproved(
+      account,
+      factoryAddress,
+      provider,
+      tokenToImport.id
+    );
+    if(factoryApproval){
+      setFactoryApproved(factoryApproval)
+    }
+  }
+}
+getStuff();
+},[tokenToImport]);
+
+// FUNCTIONS FOR MINTING
+useEffect(()=>{
+  const ipfsClient = create({
+    host: "ipfs.infura.io",
+    port: "5001",
+    protocol: "https",})
+    setIpfsNode(ipfsClient)
+  },[])
+
+async function uploadAndPin(data){
+  let dataUpload
+  try{
+    dataUpload = await ipfsNode.add(data);
+  }catch(e){
+    console.log('Error: ',e)
+    return 'Error uploading the file'
+  }
+  await pinByHash(dataUpload.cid.toString()) // Pinata
+  return dataUpload;
+}
+async function prepareNftData(){
+  let results = await uploadAndPin(file)
+  let metadata = {name:name, description:description, image:results.path}
+  minter(metadata)
+}
+async function minter(metadata) {
+  let metadataCid =  await uploadAndPin(JSON.stringify(metadata))
+  if(metadataCid){
+    createNFT(metadataCid.cid.toString(), provider, factoryAddress).then(res => {
+      setTokenMintedAddress(res)
+      setMinted(true);
     });
     setIpfsNode(ipfsClient);
   }, []);
@@ -108,20 +167,18 @@ export default function MintPage() {
     return (imageSize[1] / imageSize[0]) * width;
   };
 
-  // FUNCTIONS FOR LISTING
-  const fraktalReady =
-    minted &&
-    totalAmount > 0 &&
-    totalAmount <= 10000 &&
-    totalPrice > 0 &&
-    isApproved;
+
+// FUNCTIONS FOR LISTING
+  const fraktalReady = tokenMintedAddress
+    && totalAmount > 0
+    && totalAmount <= 10000
+    && totalPrice > 0
+    && marketApproved;
 
   async function approveToken() {
-    await approveMarket(marketAddress, provider, tokenMintedAddress).then(
-      () => {
-        setIsApproved(true);
-      }
-    );
+    await approveMarket(marketAddress, provider, tokenMintedAddress).then(()=>{
+      setMarketApproved(true);
+    })
   }
 
   async function importFraktalToMarket() {
@@ -146,8 +203,8 @@ export default function MintPage() {
   async function approveNFT() {
     if (tokenToImport && tokenToImport.id) {
       let res = await approveMarket(factoryAddress, provider, tokenToImport.id);
-      if (res) {
-        setNftApproved(true);
+      if(res){
+        setFactoryApproved(true)
       }
     }
   }
@@ -188,14 +245,14 @@ export default function MintPage() {
   }
 
   let msg = () => {
-    if (!minted) {
-      return "Mint your new token to start the process of Fraktionalization and Listing.";
-    } else if (minted && !isApproved) {
-      return "NFT succesfully minted! Approve the transfer of your Fraktal NFT and future Fraktions transfers.";
-    } else if (minted && isApproved && !fraktionalized) {
-      return "Transfer rights granted! Now transfer your Fraktal NFT to the Marketplace. The Fraktions will remain in your wallet.";
-    } else {
-      return "Fraktal NFT received! List your Fraktions on the Marketplace. If someone buys your Fraktions the Marketplace contract will transfer them";
+    if(!minted){
+      return 'Mint your new token to start the process of Fraktionalization and Listing.'
+    }else if(minted && !marketApproved){
+      return 'NFT succesfully minted! Approve the transfer of your Fraktal NFT and future Fraktions transfers.'
+    }else if(minted && marketApproved && !fraktionalized){
+      return 'Transfer rights granted! Now transfer your Fraktal NFT to the Marketplace. The Fraktions will remain in your wallet.'
+    }else{
+      return 'Fraktal NFT received! List your Fraktions on the Marketplace. If someone buys your Fraktions the Marketplace contract will transfer them'
     }
   };
 
@@ -394,42 +451,35 @@ export default function MintPage() {
           </div>
           <div style={{ marginTop: "24px", justifyItems: "space-between" }}>
             {status == "mint" ? (
+              <>
               <FrakButton4
-                status={!minted ? "open" : "done"}
-                disabled={!name || !imageData}
-                onClick={() => prepareNftData()}
+                status = {!factoryApproved ? 'open' : 'done'}
+                disabled = {!tokenToImport || !tokenToImport.id}
+                onClick = {()=>approveNFT()}
               >
                 1. Mint
               </FrakButton4>
-            ) : (
-              <div>
-                <FrakButton4
-                  status={!nftApproved ? "open" : "done"}
-                  disabled={!tokenToImport || !tokenToImport.id}
-                  onClick={() => approveNFT()}
-                >
-                  1.1 Approve NFT
-                </FrakButton4>
-                <FrakButton4
-                  status={!minted ? "open" : "done"}
-                  disabled={!nftApproved}
-                  onClick={() => importNFT()}
-                >
-                  1.2 Import
-                </FrakButton4>
-              </div>
-            )}
+              <FrakButton4
+                status = {!minted ? 'open' : 'done'}
+                disabled = {!factoryApproved}
+                onClick = {()=>importNFT()}
+              >
+              1.2 Import
+              </FrakButton4>
+              </>
+            }
+            </div>
             <FrakButton4
-              status={!isApproved ? "open" : "done"}
-              disabled={!tokenMintedAddress}
-              onClick={() => approveToken()}
+              status = {!marketApproved ? 'open' : 'done'}
+              disabled = {!tokenMintedAddress}
+              onClick = {()=>approveToken()}
             >
               2. Approve
             </FrakButton4>
             <FrakButton4
-              status={!fraktionalized ? "open" : "done"}
-              disabled={!isApproved || !tokenMintedAddress}
-              onClick={() => importFraktalToMarket()}
+              status = {!fraktionalized ? 'open' : 'done'}
+              disabled = {!marketApproved || !tokenMintedAddress}
+              onClick = {()=>importFraktalToMarket()}
             >
               3. Transfer
             </FrakButton4>

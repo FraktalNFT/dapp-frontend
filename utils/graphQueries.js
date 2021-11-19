@@ -2,7 +2,9 @@ import { gql, request } from "graphql-request";
 import { utils } from "ethers";
 const { CID } = require("ipfs-http-client");
 
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.15';
+const APIURL = 'https://api.thegraph.com/subgraphs/name/drhongos/fraktalrinkeby';
+// https://api.thegraph.com/subgraphs/name/drhongos/fraktalrinkeby // hosted
+// https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.15
 
 const creator_query = gql`
   query($id: ID!) {
@@ -116,7 +118,6 @@ const creators_review = gql`
         marketId
         hash
         creator
-        owner
         createdAt
       }
     }
@@ -132,7 +133,6 @@ const creators_small_review = gql`
         marketId
         hash
         creator
-        owner
         createdAt
       }
     }
@@ -266,9 +266,6 @@ const user_wallet_query = gql`
           hash
           createdAt
           creator {
-            id
-          }
-          owner {
             id
           }
           collateral {
