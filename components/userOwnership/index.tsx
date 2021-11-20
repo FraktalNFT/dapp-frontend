@@ -85,7 +85,7 @@ const UserOwnership=(({
     }}>Your Ownership</div>
     {!isFraktalOwner ?
       <div>
-        <HStack justifyContent='space-between' marginTop='10px'>
+        <HStack sx={{width: `100%`}} justifyContent='space-between' marginTop='10px'>
           <VStack>
             <div style={{
               fontFamily:'Inter',
