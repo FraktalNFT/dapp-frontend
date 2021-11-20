@@ -92,56 +92,14 @@ export default function MintPage() {
 //     setIpfsNode(ipfsClient)
 //   },[])
 
-// // async function uploadAndPin(data){
-// //   let dataUpload
-// //   try{
-// //     dataUpload = await ipfsNode.add(data);
-// //   }catch(e){
-// //     console.log('Error: ',e)
-// //     return 'Error uploading the file'
-// //   }
-// //   await pinByHash(dataUpload.cid.toString()) // Pinata
-// //   return dataUpload;
-// // }
-// // async function prepareNftData(){
-// //   let results = await uploadAndPin(file)
-// //   let metadata = {name:name, description:description, image:results.path}
-// //   minter(metadata)
-// // }
-// // async function minter(metadata) {
-// //   let metadataCid =  await uploadAndPin(JSON.stringify(metadata))
-// //   if(metadataCid){
-// //     createNFT(metadataCid.cid.toString(), provider, factoryAddress).then(res => {
-// //       setTokenMintedAddress(res)
-// //       setMinted(true);
-// //     });
-// //     setIpfsNode(ipfsClient);
-// //   }
-// // }
-
-//   async function uploadAndPin(data) {
-//     let dataUpload;
-//     try {
-//       dataUpload = await ipfsNode.add(data);
-//     } catch (e) {
-//       console.log("Error: ", e);
-//       return "Error uploading the file";
-//     }
-//     await pinByHash(dataUpload.cid.toString()); // Pinata
-//     return dataUpload;
+// async function uploadAndPin(data){
+//   let dataUpload
+//   try{
+//     dataUpload = await ipfsNode.add(data);
+//   }catch(e){
+//     console.log('Error: ',e)
+//     return 'Error uploading the file'
 //   }
-// <<<<<<< HEAD
-
-//   async function prepareNftData() {
-//     let results = await uploadAndPin(file);
-//     let metadata = {
-//       name: name,
-//       description: description,
-//       image: results.path,
-//     };
-//     minter(metadata);
-//   }
-// =======
 //   await pinByHash(dataUpload.cid.toString()) // Pinata
 //   return dataUpload;
 // }
@@ -180,7 +138,6 @@ export default function MintPage() {
 //     };
 //     minter(metadata);
 //   }
-// >>>>>>> main
 //   async function minter(metadata) {
 //     let metadataCid = await uploadAndPin(JSON.stringify(metadata));
 //     if (metadataCid) {
@@ -368,11 +325,7 @@ export default function MintPage() {
 //               borderRadius="25"
 //               padding="5"
 //               _hover={{ bg: "black", textColor: "white" }}
-// <<<<<<< HEAD
-//               onClick={() => router.push("/import-nft")}
-// =======
 //               onClick={() => setStatus("import")}
-// >>>>>>> main
 //             >
 //               Import NFT
 //             </Link>
@@ -551,10 +504,10 @@ export default function MintPage() {
 //           >
 //             {msg()}
 //           </div>
-// >>>>>>> main
 //         </Stack>
 //       </Box>
 //     </div>
 //   );
-return (<><Text>Wrong Page</Text></>)
+
+return (<><h2>Wrong Page :)</h2></>)
 }
