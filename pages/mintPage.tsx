@@ -1,7 +1,7 @@
 import FrakButton4 from "../components/button4";
 import MintCard from "../components/mintCard";
 import ListCard from "../components/listCard";
-import { VStack, Box, Stack, Grid } from "@chakra-ui/layout";
+import { VStack, Box, Stack, Grid, Text } from "@chakra-ui/layout";
 import { Link, Checkbox } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Image as ImageComponent } from "@chakra-ui/image";
@@ -449,6 +449,8 @@ export default function MintPage() {
 //               )}
 //             </div>
 //           </div>
+// <<<<<<< HEAD
+// =======
 //           <div style={{ marginTop: "24px", justifyItems: "space-between" }}>
 //             {status == "mint" ? (
 //               <>

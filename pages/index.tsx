@@ -58,13 +58,19 @@ const Home: React.FC = () => {
       return x.fraktal.status == "open";
     }); // this goes in the graphql query
     }
+    console.log(dataOnSale);
     if (dataOnSale?.length > 1) {
       // console.log('dataOnSale', dataOnSale)
       let objects = await Promise.all(
         dataOnSale.map(x => {
-          return createListed(x);
+            let res = createListed(x);
+            if (typeof res !== 'undefined') {
+              return res;
+            }
         })
       ); //.then((results)=>setNftItems([...nftItems, ...results]));
+      console.log(objects);
+      debugger;
       let deduplicatedObjects = objects.filter(item => {
         const objectMatch = nftItems.find(nft => nft.id === item.id);
         if (typeof objectMatch === "undefined") {
