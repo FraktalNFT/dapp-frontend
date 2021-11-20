@@ -8,7 +8,7 @@ const Header = () => {
   const { connectWeb3, account } = useWeb3Context();
   return (
     <Box minH='10rem' py='2.6rem' as='header' bg={"white"}>
-      <Flex maxW='126.4rem' mx='auto' as='nav' justify='space-between'>
+      <Flex maxW='96.4rem' mx='auto' as='nav' justify='space-between'>
         <HStack spacing='8'>
           <NextLink href='/'>
             <Link>
@@ -20,19 +20,20 @@ const Header = () => {
           <HStack
             spacing='2.2rem'
             mr='3.2rem'
+            paddingTop='2'
             display={{ base: "none", md: "flex" }}
           >
             <NextLink href='/list-nft' >
-              <Link className='semi-16' borderRadius='25' padding='5' _hover={{bg: "black", textColor: "white"}}>List NFT</Link>
+              <Link className='semi-16' borderRadius='25' padding='3' _hover={{bg: "black", textColor: "white"}}>List NFT</Link>
             </NextLink>
             <NextLink href='/'>
-              <Link className='semi-16' borderRadius='25' padding='5' _hover={{bg: "black", textColor: "white"}}>Marketplace</Link>
+              <Link className='semi-16' borderRadius='25' padding='3' _hover={{bg: "black", textColor: "white"}}>Marketplace</Link>
             </NextLink>
             <NextLink href='/artists'>
-              <Link className='semi-16' borderRadius='25' padding='5' _hover={{bg: "black", textColor: "white"}}>Artists</Link>
+              <Link className='semi-16' borderRadius='25' padding='3' _hover={{bg: "black", textColor: "white"}}>Artists</Link>
             </NextLink>
             <a href='https://app.daohaus.club/dao/0x4/0x721c1016044a7bd95332601bcbcf889f958be5b2' target='_blank' rel='noopener noreferrer'>
-              <Link className='semi-16' borderRadius='25' padding='5' _hover={{bg: "black", textColor: "white"}}>DAO</Link>
+              <Link className='semi-16' borderRadius='25' padding='3' _hover={{bg: "black", textColor: "white"}}>DAO</Link>
             </a>
             <Link
               href="https://twitter.com/fraktalnft"
