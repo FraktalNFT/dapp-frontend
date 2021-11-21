@@ -11,6 +11,7 @@ import {
 } from "../../utils/contractCalls";
 import { shortenHash, timezone } from "../../utils/helpers";
 import { Box, Text, HStack } from "@chakra-ui/react";
+import toast from 'react-hot-toast';
 
 interface offerItemProps {
   account: String;
@@ -33,6 +34,7 @@ const OfferDetail = forwardRef<HTMLDivElement, offerItemProps>(
     fraktionsApproved,
   }) => {
     const [fraktionsLocked, setFraktionsLocked] = useState(false);
+
     useEffect(() => {
       async function getData() {
         if (account && tokenAddress && offerItem.status != "sold") {
@@ -48,26 +50,44 @@ const OfferDetail = forwardRef<HTMLDivElement, offerItemProps>(
     }
 
     async function voteOnOffer() {
-      let tx = await voteOffer(
+      toast("Voting in progress...");
+      let response = await voteOffer(
         offerItem.offerer.id,
         tokenAddress,
         provider,
         marketAddress
       );
+      if (response?.error) {
+        toast.error("Voting Failed");
+      }
+      if (!response?.error) {
+        toast.success("Vote cast");
+      }
     }
 
     async function approveContract() {
-      let done = await approveMarket(marketAddress, provider, tokenAddress);
+      toast("Approving...");
+      let response = await approveMarket(marketAddress, provider, tokenAddress);
+      if (response?.error) {
+        toast.error("Approval Failed.");
+      }
+      if (!response?.error) {
+        toast.success("Approval Successful.");
+      }
       // if (done) {
       //   setFraktionsApproved(true);
       // }
+
     }
     async function claimFraktal() {
       // this one goes to offersCard
+      toast("Claiming...");
       try {
-        await claimFraktalSold(tokenAddress, provider, marketAddress);
+        let response = await claimFraktalSold(tokenAddress, provider, marketAddress);
+        toast.success("Claim successful.");
       } catch (e) {
         console.log("There has been an error: ", e);
+        toast.error("Claiming failed.");
       }
     }
 
@@ -100,7 +120,7 @@ const OfferDetail = forwardRef<HTMLDivElement, offerItemProps>(
                 <div>
                   {fraktionsLocked ? (
                     <div>
-                      {offerItem.winner ?
+                      {offerItem.winner ? (
                         <Box
                           sx={{
                             border: `2px solid green`,
@@ -119,7 +139,7 @@ const OfferDetail = forwardRef<HTMLDivElement, offerItemProps>(
                         >
                           Claim
                         </Box>
-                        :
+                      ) : (
                         <Box
                           sx={{
                             border: `2px solid red`,
@@ -138,7 +158,7 @@ const OfferDetail = forwardRef<HTMLDivElement, offerItemProps>(
                         >
                           Reject
                         </Box>
-                      }
+                      )}
                     </div>
                   ) : (
                     <Box

@@ -140,7 +140,7 @@ const BuyOutCard = ({
             {investors}
           </div>
         </VStack>
-        <Box sx={{ display: `flex`, justifyContent: `flex-end` }}>
+        <Box sx={{ display: `flex`, justifyContent: `flex-end`, alignItems: `center`, gap: `16px` }}>
           <VStack
             style={{
               textAlign: "start",
@@ -181,9 +181,10 @@ const BuyOutCard = ({
               </div>
             </HStack>
           </VStack>
-          {userIsOfferer ? (
+          {userIsOfferer && (
             <FrakButton onClick={onOffer}>Take out offer</FrakButton>
-          ) : (
+          )} 
+          {!userIsOfferer && (
             <Stack
               style={{
                 textAlign: "start",
