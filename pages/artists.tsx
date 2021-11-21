@@ -12,6 +12,7 @@ import { getSubgraphData } from '../utils/graphQueries';
 import { createObject2 } from '../utils/nftHelpers';
 import { useWeb3Context } from '../contexts/Web3Context';
 import InfiniteScroll from "react-infinite-scroll-component";
+import ArtistCard from "@/components/artistCard/ArtistCard";
 
 export default function ArtistsView() {
   	const SORT_TYPES = ["Popular", "New"];
@@ -139,16 +140,10 @@ export default function ArtistsView() {
 					>
 					{artistsItems.map((item, i) => {
 						
+						console.log(item)
 						return (
 							<NextLink href={`/artist/${item.id}`} key={`link--${item.id}-${i}`}>
-								<NFTItem
-									key={`item--${artists[i]?.id}-${i}`}
-									imageURL={item.imageURL}
-									name={shortenHash(item.name)}
-									price={item.totalGallery}
-									item={null}
-									amount={null}
-									wait={250*(i+1)}
+								<ArtistCard bg={item.imageURL}
 								/>
 							</NextLink>
 						)

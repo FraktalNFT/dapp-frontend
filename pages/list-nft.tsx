@@ -79,7 +79,7 @@ export default function MintPage() {
     };
     minter(metadata);
   }
-  
+
   async function minter(metadata) {
     let metadataCid = await uploadAndPin(JSON.stringify(metadata));
     if (metadataCid) {
@@ -91,6 +91,7 @@ export default function MintPage() {
       );
     }
   }
+
   async function addFile() {
     const selectedFile = document.getElementById("imageInput").files[0];
     setFile(selectedFile);
@@ -105,6 +106,7 @@ export default function MintPage() {
       };
     };
   }
+  
   const proportionalImage = width => {
     return (imageSize[1] / imageSize[0]) * width;
   };
