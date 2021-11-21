@@ -6,7 +6,8 @@ import { BigNumber } from "ethers";
 import { Image } from "@chakra-ui/image";
 import styles from "./auction.module.css";
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
-import {getSubgraphData, createObject} from '../../../utils/graphQueries';
+import {getSubgraphData} from '../../../utils/graphQueries';
+import { createObject } from "utils/nftHelpers";
 export default function AuctionNFTView() {
   const [index, setIndex] = useState();
   const [nftObject, setNftObject] = useState();

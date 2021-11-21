@@ -7,7 +7,8 @@ import { Image } from "@chakra-ui/image";
 import styles from "./closed.module.css";
 import FrakButton from "../../../components/button";
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
-import {getSubgraphData, createObject} from '../../../utils/graphQueries';
+import {getSubgraphData} from '../../../utils/graphQueries';
+import { createObject } from "utils/nftHelpers";
 export default function ClosedNFTView() {
   const [index, setIndex] = useState();
   const [nftObject, setNftObject] = useState();

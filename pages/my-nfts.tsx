@@ -1,4 +1,5 @@
-import { Grid, VStack } from "@chakra-ui/layout";
+import { Box, Center, Flex, Grid, Link, Spacer, Text, VStack } from "@chakra-ui/layout";
+import { Image } from "@chakra-ui/react";
 import Head from "next/head";
 import React from "react";
 import NFTItemOS from '../components/nft-item-opensea';
@@ -9,6 +10,7 @@ import styles from "../styles/my-nfts.module.css";
 import FrakButton from "../components/button";
 import { useWeb3Context } from '../contexts/Web3Context';
 import { useUserContext } from '../contexts/userContext';
+import { useMintingContext } from "@/contexts/NFTIsMintingContext";
 import {
   importFraktal,
   approveMarket,
@@ -22,6 +24,8 @@ export default function MyNFTsView() {
   const router = useRouter();
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
   const { fraktals, fraktions, nfts, balance } = useUserContext();
+
+  const { isMinting } = useMintingContext();
 
   async function approveContract(contract, tokenAddress){
     let done = await approveMarket(contract, provider, tokenAddress)
@@ -70,13 +74,26 @@ export default function MyNFTsView() {
   }
 
   return (
-    <VStack spacing='0' mb='12.8rem'>
+    <VStack width="96.4rem">
+
       <Head>
         <title>Fraktal - My NFTs</title>
       </Head>
-      <div className={styles.header}>
-        Your Fraktal NFTs
-      </div>
+
+      <Flex w="100%">
+        <Box className={styles.header}>
+          Your NFTs
+        </Box>
+        <Spacer />
+        <Box>
+          <NextLink href={`/list-nft`}>
+            <FrakButton style={{ width: "160px", marginTop: "6px"}}>
+              Add NFT
+            </FrakButton>
+          </NextLink>
+        </Box>
+      </Flex>
+
       {fraktals?.length ? (
         <Grid
           mt='40px !important'
@@ -101,23 +118,19 @@ export default function MyNFTsView() {
 
             </div>
           ))}
+          {isMinting && <Image src='/nft-loading-card.svg' alt='NFTLoading' />}
         </Grid>
         ) : (
-          <div style={{ marginTop: "8px" }}>
-            <div className={styles.descText}>
-              Transfer NFT to your wallet or Mint a new NFT.
-            </div>
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <NextLink href={`/mintPage`}>
-                <FrakButton style={{ width: "240px", marginTop: "24px" }}>
-                Mint NFT
-                </FrakButton>
-              </NextLink>
-            </div>
-          </div>
+          <Center height="104px" width="100%" borderRadius="24" bgColor="#F9F9F9">
+            <Text>You do not have any NFTs.  <Link color="purple.500" href="/list-nft">Mint or Import</Link> a new NFT.</Text>
+          </Center>
         )}
-      {/*///////////////////////////////////*/}
-      <div className={styles.header2}>Your Fraktions</div>
+
+        
+      <Flex w="100%" paddingTop="64px"> 
+        <div className={styles.header}>Your Fraktions</div>
+      </Flex>
+
       {fraktions?.length ? (
         <div style={{ marginTop: "16px" }}>
           <Grid
@@ -143,12 +156,13 @@ export default function MyNFTsView() {
           </Grid>
         </div>
       ) : (
-        <div style={{ marginTop: "8px" }}>
-          <div className={styles.descText}>
-            Head over to the marketplace and invest to get some Fraktions!
-          </div>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <NextLink href={"/"}>
+        <Center w="100%" borderRadius="24" bgColor="#F9F9F9" paddingTop="40px" paddingBottom="40px">
+          <VStack>
+            <Text noOfLines={2} textAlign="center">
+              Head over to the <Link color="purple.500" href="/">Marketplace</Link> and invest to get some Fraktions!<br/>
+              If you have already invested, contributions do not appear until the auctions are over.
+            </Text>
+             <NextLink href={"/"}>
               <FrakButton
                 isOutlined
                 style={{ width: "240px", marginTop: "24px" }}
@@ -156,19 +170,34 @@ export default function MyNFTsView() {
                 Back to Marketplace
               </FrakButton>
             </NextLink>
-          </div>
-        </div>
+          </VStack>
+        </Center>
       )}
-      {/*///////////////*/}
-      <RescueCard
-        marketAddress= {marketAddress}
-        provider= {provider}
-        gains= {Math.round(balance * 1000)/1000}
-      />
-      {/*///////////////*/}
-      <div className={styles.header}>
-        Your Wallet NFTs
-      </div>
+      
+
+
+      <Box width="100%" paddingTop="64px">
+        <RescueCard
+          marketAddress= {marketAddress}
+          provider= {provider}
+          gains= {Math.round(balance * 1000)/1000}
+        />
+      </Box>
+
+
+
+      <Flex w="100%" paddingTop="64px"> 
+        <div className={styles.header}>Your Wallet NFTs</div>
+        <Spacer />
+        <Box justifyContent="center-vertical">
+          <NextLink href={`/list-nft`}>
+            <FrakButton style={{ width: "151px", marginTop: "6px" }}>
+              Import
+            </FrakButton>
+          </NextLink>
+        </Box>
+      </Flex>
+
       {nfts?.length ? (
         <Grid
           mt='40px !important'
@@ -198,11 +227,11 @@ export default function MyNFTsView() {
           ))}
         </Grid>
       ) : (
-        <div style={{ marginTop: "8px" }}>
-          <div className={styles.descText}>
-            You dont have NFTs in your wallet.
-          </div>
-        </div>
+        <Center w="100%" borderRadius="24" bgColor="#F9F9F9" paddingTop="40px" paddingBottom="40px" mb='5.6rem !important'>
+            <Text>
+              No NFTs in your wallet.
+            </Text>
+        </Center>
       )}
     </VStack>
   )

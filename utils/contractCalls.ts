@@ -3,6 +3,7 @@
 
 import { Contract } from "@ethersproject/contracts";
 import { loadSigner, processTx, awaitTokenAddress } from "./helpers";
+import { useMintingContext } from "@/contexts/NFTIsMintingContext";
 //tested
 const factoryAbi = [
   "function mint(string urlIpfs, uint16 majority)",
@@ -218,11 +219,16 @@ export async function lockShares(from, to, provider, tokenContract) {
 const defaultMajority = 8000; //later give this argument to the creator (or owner)
 
 export async function createNFT(hash, provider, contractAddress) {
+  const { setIsMinting } = useMintingContext();
   const signer = await loadSigner(provider);
   const customContract = new Contract(contractAddress, factoryAbi, signer);
+  
+  setIsMinting(true);
   let tx = await customContract.mint(hash, defaultMajority);
-  let tokenAddress = awaitTokenAddress(tx);
+  let tokenAddress = await awaitTokenAddress(tx);
   // let receipt = processTx(tx);
+
+  setIsMinting(false);
   return tokenAddress;
 }
 

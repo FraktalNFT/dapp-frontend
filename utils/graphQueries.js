@@ -208,6 +208,7 @@ const listedItems = gql`
     }
   }
 `;
+
 const listedItemsId = gql`
   query($id: ID!) {
     listItems(where: { id: $id, amount_gt: 0 }) {
