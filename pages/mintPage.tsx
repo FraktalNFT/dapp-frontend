@@ -21,7 +21,7 @@ import {
 } from "../utils/contractCalls";
 import { pinByHash } from "../utils/pinataPinner";
 import { useRouter } from "next/router";
-import NFTItem from "../components/nft-item";
+import NFTItem from '../components/nft-item';
 
 const { create } = require("ipfs-http-client");
 
