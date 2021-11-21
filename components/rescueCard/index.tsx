@@ -82,7 +82,7 @@ const RescueCard = ({
               </HStack>
             </>
           ) : (
-            <div style={{ marginTop: "24px" }}>
+            <div style={{ marginTop: "24px", textAlign: `center`}}>
               Nothing to claim yet.
             </div>
           )}
