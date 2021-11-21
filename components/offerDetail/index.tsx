@@ -16,6 +16,7 @@ interface offerItemProps {
   account: String;
   fraktionsBalance: Number;
   offerItem: Object;
+  winner: Boolean;
   tokenAddress: String;
   marketAddress: String;
   provider: Object;
@@ -100,7 +101,7 @@ const OfferDetail = forwardRef<HTMLDivElement, offerItemProps>(
                 <div>
                   {fraktionsLocked ? (
                     <div>
-                      {offerItem.winner ?
+                      {offerItem.winner && offerItem.offerer.id == account.toLocaleLowerCase() ?
                         <Box
                           sx={{
                             border: `2px solid green`,

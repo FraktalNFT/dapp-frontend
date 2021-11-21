@@ -15,7 +15,6 @@ interface revenueItemProps {
   buyout: Boolean;
   tokenAddress: String;
   revenueAddress: String;
-  creator: String;
   provider: any;
 }
 
@@ -24,7 +23,6 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
     account,
     date,
     value,
-    creator,
     tokenAddress,
     buyout,
     revenueAddress,
