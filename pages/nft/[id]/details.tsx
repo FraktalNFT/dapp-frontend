@@ -258,11 +258,12 @@ export default function DetailsView() {
           />
 
           <div style={{ marginTop: "21px" }}>
-            {userHasListed ? (
+            {userHasListed && (
               <FrakButton onClick={() => callUnlistItem()}>
                 Unlist Fraktions
               </FrakButton>
-            ) : (
+            )}
+            {!userHasListed && (
               <FrakButton
                 disabled={fraktionsIndex == 0 || userFraktions < 1}
                 onClick={() =>
