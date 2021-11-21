@@ -368,9 +368,6 @@ const fraktalId_query = gql`
         value
         timestamp
         buyout
-        creator {
-          id
-        }
       }
       fraktions {
         owner {

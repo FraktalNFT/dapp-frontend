@@ -2,9 +2,10 @@ TODO::
 --------------------------------------------------------------------------------
 
 BUGS:
+  - creator of revenue payment is undefined
+  - Fraktions owner list shows >100% when the releasing process advances.. fraktions are burned and % is not updated :)
 
-<<<<<<< HEAD
-=======
+  - collateral not showing claim?? <<
 
 
 >>>>>>> modified addresses and check for a new user
