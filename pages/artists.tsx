@@ -13,8 +13,10 @@ import { createObject2 } from '../utils/nftHelpers';
 import { useWeb3Context } from '../contexts/Web3Context';
 import InfiniteScroll from "react-infinite-scroll-component";
 import ArtistCard from "@/components/artistCard/ArtistCard";
+import { useRouter } from "next/router";
 
 export default function ArtistsView() {
+	const router = useRouter();
   	const SORT_TYPES = ["Popular", "New"];
   	const [selectionMode, setSelectionMode] = useState(false);
   	const [sortType, setSortType] = useState("Popular");
@@ -139,12 +141,9 @@ export default function ArtistsView() {
 					gap='3.2rem'
 					>
 					{artistsItems.map((item, i) => {
-						
-						console.log(item)
 						return (
 							<NextLink href={`/artist/${item.id}`} key={`link--${item.id}-${i}`}>
-								<ArtistCard bg={item.imageURL}
-								/>
+								<ArtistCard bg={item.imageURL} onClick={() => router.push(`/artist/${item.id}`)} />
 							</NextLink>
 						)
 					})}

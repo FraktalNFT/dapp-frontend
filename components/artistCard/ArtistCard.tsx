@@ -12,6 +12,11 @@ export default function ArtistCard(props) {
           backgroundRepeat: `no-repeat`,
           backgroundPosition: `center`,
           backgroundSize: `cover`,
+          transition: `all 0.25s`,
+        }}
+        onClick={props.onClick}
+        _hover={{
+            transform: `translateY(-6px)`
         }}
       ></Box>
     </>

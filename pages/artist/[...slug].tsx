@@ -1,4 +1,4 @@
-import { Grid, Text, VStack } from "@chakra-ui/layout";
+import { Grid, Text, VStack, Heading } from "@chakra-ui/react";
 import Head from "next/head";
 import React, {useState, useEffect} from "react";
 import styles from "./artist.module.css";
@@ -13,21 +13,24 @@ export default function ArtistView() {
   const [artistAddress, setArtistAddres] = useState('');
   const [nftItems, setNftItems] = useState([]);
 
-  useEffect(async()=>{
+  useEffect(()=>{
+    async function getData() {
     let address = getParams('artist');
     if(address){
       setArtistAddres(address)
       let objects = await getSubgraphData('creator',address)
       Promise.all(objects.fraktalNfts.map(x=>{return createObject2(x)})).then((results)=>setNftItems(results))
     }
+  }
+  getData();
   },[])
 
   return (
-    <VStack spacing="0" mb="12.8rem">
+    <VStack spacing="0" mb="1rem" sx={{alignItems: `start`}}>
       <Head>
         <title>Fraktal - Artist</title>
       </Head>
-      <div className={styles.header}>{shortenHash(artistAddress)}</div>
+      <Heading sx={{fontSize: `36px`, marginBottom: `1rem`}}>{artistAddress}</Heading>
       {nftItems.length ? (
         <>
           <Grid
