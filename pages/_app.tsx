@@ -6,6 +6,7 @@ import Web3ContextProvider from "../contexts/Web3Context";
 import UserContextProvider from "../contexts/userContext";
 import { MintingFC } from "@/contexts/NFTIsMintingContext";
 import Layout from "../components/layout";
+import {Toaster} from 'react-hot-toast';
 
 const customTheme = extendTheme({
   colors: {
@@ -35,6 +36,7 @@ function MyApp({ Component, pageProps }) {
                 <Component {...pageProps} />
               </VStack>
               <Footer />
+              <Toaster />
             </Layout>
           </MintingFC>
         </UserContextProvider>

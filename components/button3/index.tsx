@@ -1,5 +1,5 @@
 import { Button, ButtonProps } from "@chakra-ui/button";
-import { Input } from "@chakra-ui/react";
+import { Input, Box } from "@chakra-ui/react";
 import { forwardRef } from "react";
 
 const FrakButton3 = forwardRef<
@@ -7,15 +7,16 @@ const FrakButton3 = forwardRef<
   ButtonProps & { isReady?: boolean; setFunction: Function; inputPlaceholder: string }
 >(({ isReady, onClick, setFunction, inputPlaceholder, children, ...rest }) => {
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         display: "flex",
         justifyContent: `space-between`,
         alignItems: `center`,
         border: `2px solid #405466`,
         borderRadius: "16px",
-        maxWidth: `288px`,
+        width: `clamp(250px, 33vw, 400px)`,
         position: `relative`,
+        height: `auto`,
       }}
     >
       <Input
@@ -52,10 +53,8 @@ const FrakButton3 = forwardRef<
           width: `134px`,
           transform: `translateX(2px) translateY(-2px)`,
           boxSizing: `content-box`,
-          position: `absolute`,
-          right: `0`,
-          top: `0`,
-          padding: `0`,
+          marginLeft: `auto`,
+          marginBottom: `-4px`,
         }}
         _hover={{ background: "black.900", color: "white.900" }}
         _active={{ background: "black.900", color: "white.900" }}
@@ -66,7 +65,7 @@ const FrakButton3 = forwardRef<
       >
         {children}
       </Button>
-    </div>
+    </Box>
   );
 });
 
