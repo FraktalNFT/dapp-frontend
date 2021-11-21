@@ -40,11 +40,13 @@ export default function ArtistView() {
             templateColumns="repeat(3, 1fr)"
             gap="3.2rem"
           >
-            {nftItems.map(item => (
+            {nftItems.map(item => {
+              console.log(item);
+              return (
               <NextLink href={`/nft/${item.id}/details`} key={item.marketId}>
                 <NFTItem key={item.id} name={item.name} imageURL={item.imageURL} />
               </NextLink>
-            ))}
+            )})}
           </Grid>
         </>
       ) : (
