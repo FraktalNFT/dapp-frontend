@@ -110,7 +110,15 @@ export async function processTx(tx){
 }
 
 export const awaitTokenAddress = async (tx) => {
-  const receipt = await tx.wait();
+  let receipt;
+  try {
+    receipt = await tx.wait();
+  } catch (error) {
+    receipt = {error: `Error: ${error}`};
+  }
+  if (receipt?.error) {
+    return receipt;
+  }
   const abi = new utils.Interface([
     'event Minted(address creator,string urlIpfs,address tokenAddress,uint nftId)',
   ]);

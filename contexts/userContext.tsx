@@ -59,6 +59,19 @@ export const UserContextProviderFC = ({ children }) => {
     }
   }, [account]);
 
+  useEffect(() => {
+    if (window && fraktals?.length > 0) {
+      const mintingNFTsString = window?.localStorage.getItem('mintingNFTs');
+      fraktals?.forEach((fraktal) => {
+        console.log('id: ', fraktal?.id);
+        console.log('minting string: ', mintingNFTsString);
+        if (fraktal?.id === mintingNFTsString) {
+          window?.localStorage.removeItem('mintingNFTs');
+        }
+      });
+    }
+  }, [fraktals]);
+
   const fetchNFTs = useCallback(
     // if user not in subgraph, fails to complete and show other nfts !!
     async () => {

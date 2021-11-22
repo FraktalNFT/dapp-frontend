@@ -219,17 +219,14 @@ export async function lockShares(from, to, provider, tokenContract) {
 const defaultMajority = 8000; //later give this argument to the creator (or owner)
 
 export async function createNFT(hash, provider, contractAddress) {
-  const { setIsMinting } = useMintingContext();
   const signer = await loadSigner(provider);
   const customContract = new Contract(contractAddress, factoryAbi, signer);
   
-  setIsMinting(true);
   let tx = await customContract.mint(hash, defaultMajority);
-  let tokenAddress = await awaitTokenAddress(tx);
+  let response = await awaitTokenAddress(tx);
   // let receipt = processTx(tx);
-
-  setIsMinting(false);
-  return tokenAddress;
+  return response;
+  // response may have response.error indicating an error, otherwise it is an address;
 }
 
 export async function importFraktal(

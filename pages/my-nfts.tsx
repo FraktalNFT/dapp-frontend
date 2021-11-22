@@ -36,7 +36,7 @@ export default function MyNFTsView() {
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
   const { fraktals, fraktions, nfts, balance, loading } = useUserContext();
 
-  const { isMinting } = useMintingContext();
+  const { isMinting, setIsMinting } = useMintingContext();
 
   useEffect(() => {
     if (account) {
@@ -52,6 +52,17 @@ export default function MyNFTsView() {
       console.log("nfts", nfts);
     }
   }, [account, fraktals, fraktions, nfts, balance]);
+
+  useEffect(() => {
+    if (window) {
+      if (!window?.localStorage.getItem("mintingNFTs")) {
+        setIsMinting(false);
+      }
+      if (window.localStorage.getItem("mintingNFTs")) {
+        setIsMinting(true);
+      }
+    }
+  }, []);
 
   async function approveContract(contract, tokenAddress) {
     let done = await approveMarket(contract, provider, tokenAddress);
@@ -131,7 +142,7 @@ export default function MyNFTsView() {
           </NextLink>
         </Box>
       </Flex>
-      {fraktals?.length > 0 && (
+      {!loading && fraktals?.length > 0 && (
         <Grid
           mt="40px !important"
           ml="0"
@@ -157,7 +168,20 @@ export default function MyNFTsView() {
           {isMinting && <Image src="/nft-loading-card.svg" alt="NFTLoading" />}
         </Grid>
       )}
-      {!loading && fraktals === null && (
+      {!loading && fraktals?.length <= 0 && isMinting && (
+        <Grid
+          mt="40px !important"
+          ml="0"
+          mr="0"
+          mb="5.6rem !important"
+          w="100%"
+          templateColumns="repeat(3, 1fr)"
+          gap="3.2rem"
+        >
+          <Image src="/nft-loading-card.svg" alt="NFTLoading" />
+        </Grid>
+      )}
+      {!loading && !isMinting && fraktals?.length <= 0 && (
         <Center height="104px" width="100%" borderRadius="24" bgColor="#F9F9F9">
           <Text>
             You do not have any NFTs.{" "}

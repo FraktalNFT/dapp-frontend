@@ -21,11 +21,14 @@ import {
 import { pinByHash } from "../utils/pinataPinner";
 import { useRouter } from "next/router";
 import NFTItem from "../components/nft-item";
+import { useMintingContext } from "@/contexts/NFTIsMintingContext";
+import toast from "react-hot-toast";
 
 const { create } = require("ipfs-http-client");
 
 export default function MintPage() {
   const { fraktals, nfts } = useUserContext();
+  const { isMinting, setIsMinting } = useMintingContext();
   const router = useRouter();
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
   const [ipfsNode, setIpfsNode] = useState();
@@ -77,18 +80,29 @@ export default function MintPage() {
       description: description,
       image: results.path,
     };
-    minter(metadata);
+    await minter(metadata);
   }
 
   async function minter(metadata) {
     let metadataCid = await uploadAndPin(JSON.stringify(metadata));
     if (metadataCid) {
-      createNFT(metadataCid.cid.toString(), provider, factoryAddress).then(
-        res => {
-          setTokenMintedAddress(res);
-          setMinted(true);
-        }
+      setIsMinting(true);
+      const response = await createNFT(
+        metadataCid.cid.toString(),
+        provider,
+        factoryAddress
       );
+      if (response?.error) {
+        toast.error("Transaction failed.");
+        setIsMinting(false);
+      }
+      if (!response?.error) {
+        toast.success("Mint completed.");
+        setIsMinting(false);
+        setTokenMintedAddress(response);
+        window?.localStorage.setItem('mintingNFTs', response);
+        setMinted(true);
+      }
     }
   }
 
@@ -106,7 +120,7 @@ export default function MintPage() {
       };
     };
   }
-  
+
   const proportionalImage = width => {
     return (imageSize[1] / imageSize[0]) * width;
   };

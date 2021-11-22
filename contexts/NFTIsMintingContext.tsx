@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 
-const NFTIsMintingContext = React.createContext(null);
+export const NFTIsMintingContext = React.createContext(null);
 
 export const MintingFC = ({children}) => {
     const [isMinting, setIsMinting] = useState(false);
@@ -22,11 +22,8 @@ export const useMintingContext = () => {
         isMinting,
         setIsMinting
     } = useContext(NFTIsMintingContext)
-    
     return {
         isMinting,
         setIsMinting
     }
 }
-
-export { NFTIsMintingContext };
