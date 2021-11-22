@@ -204,7 +204,7 @@ export default function OfferDetail({
                 _hover={{ cursor: `pointer` }}
                 onClick={() => cancelVote()}
               >
-                Reject
+                Cancel
               </Box>
             )}
           {fraktionsBalance > 0 &&
