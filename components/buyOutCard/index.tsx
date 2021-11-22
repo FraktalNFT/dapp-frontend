@@ -240,7 +240,7 @@ const BuyOutCard = ({
       </div>
       <div>
         <>
-          {offers && offers.length && itemStatus != "Retrieved" ? (
+          {offers && offers?.length && itemStatus != "Retrieved" && (
             <>
               <Box sx={{ display: `flex` }}>
                 <Text
@@ -292,11 +292,13 @@ const BuyOutCard = ({
                   Action
                 </Text>
               </Box>
-              {offers.map(x => {
+              {offers?.map((offer, index) => {
+                console.log('Offer: ', offer);
                 return (
                   <OfferDetail
+                    key={`offer-${index}`}
                     account={account}
-                    offerItem={x}
+                    offerItem={offer}
                     fraktionsBalance={fraktionsBalance}
                     tokenAddress={tokenAddress}
                     marketAddress={marketAddress}
@@ -306,7 +308,8 @@ const BuyOutCard = ({
                 );
               })}
             </>
-          ) : (
+          )} 
+          {!offers && (
             <div style={{ marginTop: "24px" }}>
               There are no offers for this NFT.
             </div>
