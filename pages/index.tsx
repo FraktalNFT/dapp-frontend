@@ -69,8 +69,6 @@ const Home: React.FC = () => {
             }
         })
       ); //.then((results)=>setNftItems([...nftItems, ...results]));
-      console.log(objects);
-      debugger;
       let deduplicatedObjects = objects.filter(item => {
         const objectMatch = nftItems.find(nft => nft.id === item.id);
         if (typeof objectMatch === "undefined") {
