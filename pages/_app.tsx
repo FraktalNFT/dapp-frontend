@@ -3,10 +3,10 @@ import Footer from "../components/footer";
 import "../styles/globals.css";
 import "../styles/fonts.css";
 import Web3ContextProvider from "../contexts/Web3Context";
-import UserContextProvider from "../contexts/userContext";
+import { UserContextProviderFC } from "../contexts/userContext";
 import { MintingFC } from "@/contexts/NFTIsMintingContext";
 import Layout from "../components/layout";
-import {Toaster} from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 
 const customTheme = extendTheme({
   colors: {
@@ -29,17 +29,17 @@ function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider theme={customTheme}>
       <Web3ContextProvider>
-        <UserContextProvider>
+        <UserContextProviderFC>
           <MintingFC>
             <Layout>
-              <VStack maxW='96.4rem' mx='auto' pt='6.4rem' flex={1} id='app'>
+              <VStack maxW="96.4rem" mx="auto" pt="6.4rem" flex={1} id="app">
                 <Component {...pageProps} />
               </VStack>
               <Footer />
               <Toaster />
             </Layout>
           </MintingFC>
-        </UserContextProvider>
+        </UserContextProviderFC>
       </Web3ContextProvider>
     </ChakraProvider>
   );

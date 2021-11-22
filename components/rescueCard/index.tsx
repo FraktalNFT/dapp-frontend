@@ -2,13 +2,23 @@ import { VStack, HStack, Box } from "@chakra-ui/layout";
 import React, { useState } from "react";
 import { rescueEth } from "../../utils/contractCalls";
 import { Text } from "@chakra-ui/react";
+import toast from 'react-hot-toast';
 
-const RescueCard = ({
-  marketAddress,
-  provider,
-  gains,
-}) => {
+const RescueCard = ({ marketAddress, provider, gains }) => {
   // const [isReady, setIsReady] = useState(false);
+
+  async function handleEthRescue() {
+    toast('Claiming ETH...');
+    const response = await rescueEth(provider, marketAddress)
+    if (!response?.error) {
+      toast.success("ETH Claimed.");
+    }
+    if (response?.error) {
+      toast.error("Transaction failed.");
+      console.error()
+    }
+  }
+  
   return (
     <div
       style={{
@@ -32,9 +42,9 @@ const RescueCard = ({
       </div>
       <div>
         <>
-          {gains > 0 ? (
+          {gains > 0 && (
             <>
-              <HStack style={{justifyContent: 'space-between'}}>
+              <HStack style={{ justifyContent: "space-between" }}>
                 <VStack>
                   <Text
                     w="116px"
@@ -53,8 +63,8 @@ const RescueCard = ({
                     sx={{
                       fontFamily: `Inter`,
                       textTransform: `uppercase`,
-                      lineHeight: '24px',
-                      fontsize:'32px',
+                      lineHeight: "24px",
+                      fontsize: "32px",
                     }}
                   >
                     {gains} ETH
@@ -72,20 +82,21 @@ const RescueCard = ({
                     fontWeight: `800`,
                     fontFamily: `Inter`,
                     borderRadius: `24px`,
-                    marginTop: '8px'
+                    marginTop: "8px",
                   }}
                   _hover={{ cursor: `pointer` }}
-                  onClick={()=>rescueEth(provider, marketAddress)}
+                  onClick={async () => await handleEthRescue()}
                 >
                   Claim
                 </Box>
               </HStack>
             </>
-          ) : (
-            <div style={{ marginTop: "24px", textAlign: `center`}}>
-              Nothing to claim yet.
-            </div>
           )}
+          {(gains == 0 || gains == null) && (
+              <div style={{ marginTop: "24px", textAlign: `center` }}>
+                Nothing to claim yet.
+              </div>
+            )}
         </>
       </div>
     </div>

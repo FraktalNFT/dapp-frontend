@@ -7,7 +7,8 @@ import {
   Spacer,
   Text,
   VStack,
-} from "@chakra-ui/layout";
+  Spinner,
+} from "@chakra-ui/react";
 import { Image } from "@chakra-ui/react";
 import Head from "next/head";
 import React from "react";
@@ -28,13 +29,29 @@ import {
   getApproved,
 } from "../utils/contractCalls";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 export default function MyNFTsView() {
   const router = useRouter();
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
-  const { fraktals, fraktions, nfts, balance } = useUserContext();
+  const { fraktals, fraktions, nfts, balance, loading } = useUserContext();
 
   const { isMinting } = useMintingContext();
+
+  useEffect(() => {
+    if (account) {
+      console.log("account", account);
+    }
+    if (fraktals) {
+      console.log("fraktals", fraktals);
+    }
+    if (fraktions) {
+      console.log("fraktions", fraktions);
+    }
+    if (nfts) {
+      console.log("nfts", nfts);
+    }
+  }, [account, fraktals, fraktions, nfts, balance]);
 
   async function approveContract(contract, tokenAddress) {
     let done = await approveMarket(contract, provider, tokenAddress);
@@ -114,8 +131,7 @@ export default function MyNFTsView() {
           </NextLink>
         </Box>
       </Flex>
-
-      {fraktals?.length ? (
+      {fraktals?.length > 0 && (
         <Grid
           mt="40px !important"
           ml="0"
@@ -140,7 +156,8 @@ export default function MyNFTsView() {
           ))}
           {isMinting && <Image src="/nft-loading-card.svg" alt="NFTLoading" />}
         </Grid>
-      ) : (
+      )}
+      {!loading && fraktals === null && (
         <Center height="104px" width="100%" borderRadius="24" bgColor="#F9F9F9">
           <Text>
             You do not have any NFTs.{" "}
@@ -151,7 +168,11 @@ export default function MyNFTsView() {
           </Text>
         </Center>
       )}
-
+      {loading && (
+        <Center height="104px" width="100%" borderRadius="24" bgColor="#F9F9F9">
+          <Spinner size="xl" />
+        </Center>
+      )}
       <Flex w="100%" paddingTop="64px">
         <div className={styles.header}>Your Fraktions</div>
       </Flex>
@@ -180,8 +201,8 @@ export default function MyNFTsView() {
               ))}
           </Grid>
         </div>
-      )} 
-      {fraktions?.length <= 0  && (
+      )}
+      {!loading && fraktions == null && (
         <Center
           w="100%"
           borderRadius="24"
@@ -211,7 +232,11 @@ export default function MyNFTsView() {
           </VStack>
         </Center>
       )}
-
+      {loading && (
+        <Center height="104px" width="100%" borderRadius="24" bgColor="#F9F9F9">
+          <Spinner size="xl" />
+        </Center>
+      )}
       <Box width="100%" paddingTop="64px">
         <RescueCard
           marketAddress={marketAddress}
@@ -219,7 +244,6 @@ export default function MyNFTsView() {
           gains={Math.round(balance * 1000) / 1000}
         />
       </Box>
-
       <Flex w="100%" paddingTop="64px">
         <div className={styles.header}>Your Wallet NFTs</div>
         <Spacer />
@@ -260,7 +284,7 @@ export default function MyNFTsView() {
           ))}
         </Grid>
       )}
-      {nfts?.length <= 0 && (
+      {!loading && nfts == null && (
         <Center
           w="100%"
           borderRadius="24"
@@ -270,6 +294,11 @@ export default function MyNFTsView() {
           mb="5.6rem !important"
         >
           <Text>No NFTs in your wallet.</Text>
+        </Center>
+      )}
+      {loading && (
+        <Center height="104px" width="100%" borderRadius="24" bgColor="#F9F9F9">
+          <Spinner size="xl" />
         </Center>
       )}
     </VStack>
