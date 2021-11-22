@@ -121,118 +121,122 @@ export default function OfferDetail({
 
   return (
     <>
-      <Box sx={{ display: `flex`, alignItems: `center`, margin: `8px 0` }}>
-        <Text sx={{ minWidth: `116px` }}>{timezone(offerItem.timestamp)}</Text>
-        <Text
-          sx={{
-            minWidth: `160px`,
-            color: `hsla(224, 86%, 51%, 1)`,
-          }}
-        >
-          <a
-            href={`https://etherscan.io/address/${offerItem.offerer.id}`}
-            rel="nofollow"
-            target="_blank"
+      {offerItem?.offerer?.id.length > 0 && (
+        <Box sx={{ display: `flex`, alignItems: `center`, margin: `8px 0` }}>
+          <Text sx={{ minWidth: `116px` }}>
+            {timezone(offerItem.timestamp)}
+          </Text>
+          <Text
+            sx={{
+              minWidth: `160px`,
+              color: `hsla(224, 86%, 51%, 1)`,
+            }}
           >
-            {shortenHash(offerItem.offerer.id)}
-          </a>
-        </Text>
-        <Text w="80px" sx={{ textAlign: `right` }}>
-          {offerItem.value > 0
-            ? `${utils.formatEther(offerItem.value)} ETH`
-            : "N/A"}
-        </Text>
-        <Box w="210px" sx={{ textAlign: `right` }}>
-          {!(fraktionsBalance > 0) && <Text>Buy Fraktions to vote!</Text>}
-          {fraktionsBalance > 0 && !fraktionsApproved && (
-            <Box
-              sx={{
-                borderColor: "#00C4B8",
-                fontSize: `16px`,
-                display: `inline-block`,
-                boxSizing: `border-box`,
-                backgroundColor: `hsla(168, 100%, 38%, 1)`,
-                padding: `4px 16px`,
-                color: `white`,
-                fontWeight: `500`,
-                fontFamily: `Inter`,
-                borderRadius: `24px`,
-              }}
-              _hover={{ cursor: `pointer` }}
-              onClick={() => approveContract()}
+            <a
+              href={`https://etherscan.io/address/${offerItem.offerer.id}`}
+              rel="nofollow"
+              target="_blank"
             >
-              Approve Fraktions
-            </Box>
-          )}
-          {fraktionsBalance > 0 && fraktionsApproved && !fraktionsLocked && (
-            <Box
-              sx={{
-                borderColor: "#00C4B8",
-                fontSize: `16px`,
-                display: `inline-block`,
-                boxSizing: `border-box`,
-                backgroundColor: `hsla(168, 100%, 38%, 1)`,
-                padding: `4px 16px`,
-                color: `white`,
-                fontWeight: `500`,
-                fontFamily: `Inter`,
-                borderRadius: `24px`,
-              }}
-              _hover={{ cursor: `pointer` }}
-              onClick={() => voteOnOffer()}
-            >
-              Accept
-            </Box>
-          )}
-          {fraktionsBalance > 0 &&
-            fraktionsApproved &&
-            fraktionsLocked &&
-            !offerItem?.winner && (
+              {shortenHash(offerItem.offerer.id)}
+            </a>
+          </Text>
+          <Text w="80px" sx={{ textAlign: `right` }}>
+            {offerItem.value > 0
+              ? `${utils.formatEther(offerItem.value)} ETH`
+              : "N/A"}
+          </Text>
+          <Box w="210px" sx={{ textAlign: `right` }}>
+            {!(fraktionsBalance > 0) && <Text>Buy Fraktions to vote!</Text>}
+            {fraktionsBalance > 0 && !fraktionsApproved && (
               <Box
                 sx={{
-                  border: `2px solid red`,
+                  borderColor: "#00C4B8",
                   fontSize: `16px`,
                   display: `inline-block`,
                   boxSizing: `border-box`,
-                  backgroundColor: `white`,
+                  backgroundColor: `hsla(168, 100%, 38%, 1)`,
                   padding: `4px 16px`,
-                  color: `red`,
+                  color: `white`,
                   fontWeight: `500`,
                   fontFamily: `Inter`,
                   borderRadius: `24px`,
                 }}
                 _hover={{ cursor: `pointer` }}
-                onClick={() => cancelVote()}
+                onClick={() => approveContract()}
               >
-                Reject
+                Approve Fraktions
               </Box>
             )}
-          {fraktionsBalance > 0 &&
-            fraktionsApproved &&
-            fraktionsLocked &&
-            offerItem?.winner &&
-            isOfferer && (
+            {fraktionsBalance > 0 && fraktionsApproved && !fraktionsLocked && (
               <Box
                 sx={{
-                  border: `2px solid green`,
+                  borderColor: "#00C4B8",
                   fontSize: `16px`,
                   display: `inline-block`,
                   boxSizing: `border-box`,
-                  backgroundColor: `white`,
+                  backgroundColor: `hsla(168, 100%, 38%, 1)`,
                   padding: `4px 16px`,
-                  color: `green`,
+                  color: `white`,
                   fontWeight: `500`,
                   fontFamily: `Inter`,
                   borderRadius: `24px`,
                 }}
                 _hover={{ cursor: `pointer` }}
-                onClick={() => claimFraktal()}
+                onClick={() => voteOnOffer()}
               >
-                Claim
+                Accept
               </Box>
             )}
+            {fraktionsBalance > 0 &&
+              fraktionsApproved &&
+              fraktionsLocked &&
+              !offerItem?.winner && (
+                <Box
+                  sx={{
+                    border: `2px solid red`,
+                    fontSize: `16px`,
+                    display: `inline-block`,
+                    boxSizing: `border-box`,
+                    backgroundColor: `white`,
+                    padding: `4px 16px`,
+                    color: `red`,
+                    fontWeight: `500`,
+                    fontFamily: `Inter`,
+                    borderRadius: `24px`,
+                  }}
+                  _hover={{ cursor: `pointer` }}
+                  onClick={() => cancelVote()}
+                >
+                  Reject
+                </Box>
+              )}
+            {fraktionsBalance > 0 &&
+              fraktionsApproved &&
+              fraktionsLocked &&
+              offerItem?.winner &&
+              isOfferer && (
+                <Box
+                  sx={{
+                    border: `2px solid green`,
+                    fontSize: `16px`,
+                    display: `inline-block`,
+                    boxSizing: `border-box`,
+                    backgroundColor: `white`,
+                    padding: `4px 16px`,
+                    color: `green`,
+                    fontWeight: `500`,
+                    fontFamily: `Inter`,
+                    borderRadius: `24px`,
+                  }}
+                  _hover={{ cursor: `pointer` }}
+                  onClick={() => claimFraktal()}
+                >
+                  Claim
+                </Box>
+              )}
+          </Box>
         </Box>
-      </Box>
+      )}
     </>
   );
 }

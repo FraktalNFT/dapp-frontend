@@ -39,7 +39,7 @@ const BuyOutCard = ({
       }
     }
   }, [account, offers]);
-  
+
   useEffect(() => {
     async function getData() {
       if (tokenAddress && provider) {
@@ -123,7 +123,7 @@ const BuyOutCard = ({
               lineHeight: "14px",
               letterSpacing: "1px",
               color: "#A7A7A7",
-              alignSelf: 'end'
+              alignSelf: "end",
             }}
           >
             INVESTORS
@@ -140,7 +140,14 @@ const BuyOutCard = ({
             {investors}
           </div>
         </VStack>
-        <Box sx={{ display: `flex`, justifyContent: `flex-end`, alignItems: `center`, gap: `16px` }}>
+        <Box
+          sx={{
+            display: `flex`,
+            justifyContent: `flex-end`,
+            alignItems: `center`,
+            gap: `16px`,
+          }}
+        >
           <VStack
             style={{
               textAlign: "start",
@@ -155,14 +162,14 @@ const BuyOutCard = ({
                 lineHeight: "14px",
                 letterSpacing: "1px",
                 color: "#A7A7A7",
-                alignSelf: 'end'
+                alignSelf: "end",
               }}
             >
               MIN OFFER
             </div>
             <HStack>
               <img
-                src={"/eth.png"}
+                src="/eth.png"
                 alt={"Eth"}
                 style={{ height: "26px", marginRight: "4px" }}
               />
@@ -175,15 +182,17 @@ const BuyOutCard = ({
                   color: "#000000",
                 }}
               >
-                {minPrice ? 
-                (minPrice.length > 7) ? minPrice.substring(0,7) : minPrice
-                : 0}
+                {minPrice
+                  ? minPrice.length > 7
+                    ? minPrice.substring(0, 7)
+                    : minPrice
+                  : 0}
               </div>
             </HStack>
           </VStack>
           {userIsOfferer && (
             <FrakButton onClick={onOffer}>Take out offer</FrakButton>
-          )} 
+          )}
           {!userIsOfferer && (
             <Stack
               style={{
@@ -292,24 +301,21 @@ const BuyOutCard = ({
                   Action
                 </Text>
               </Box>
-              {offers?.map((offer, index) => {
-                console.log('Offer: ', offer);
-                return (
-                  <OfferDetail
-                    key={`offer-${index}`}
-                    account={account}
-                    offerItem={offer}
-                    fraktionsBalance={fraktionsBalance}
-                    tokenAddress={tokenAddress}
-                    marketAddress={marketAddress}
-                    provider={provider}
-                    fraktionsApproved={fraktionsApproved}
-                  />
-                );
-              })}
+              {offers?.map((offer, index) => (
+                <OfferDetail
+                  key={`offer-${index}`}
+                  account={account}
+                  offerItem={offer}
+                  fraktionsBalance={fraktionsBalance}
+                  tokenAddress={tokenAddress}
+                  marketAddress={marketAddress}
+                  provider={provider}
+                  fraktionsApproved={fraktionsApproved}
+                />
+              ))}
             </>
-          )} 
-          {!offers && (
+          )}
+          {offers?.length <= 0 && (
             <div style={{ marginTop: "24px" }}>
               There are no offers for this NFT.
             </div>

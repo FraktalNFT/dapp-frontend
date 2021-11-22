@@ -100,7 +100,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
             PRICE
           </div>
           <HStack>
-            <img src={"/eth.png"} alt={'ETH'} style={{height:'26px', marginRight:'4px'}}/>
+            <img src="/eth.png" alt={'ETH'} style={{height:'26px', marginRight:'4px'}}/>
             <div style={{
               fontFamily:'Inter',
               fontWeight:600,
