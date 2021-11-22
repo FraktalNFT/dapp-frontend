@@ -1,37 +1,55 @@
-import { Grid, Text, VStack, Heading } from "@chakra-ui/react";
+import { Grid, Text, VStack, Heading, Spinner, Box } from "@chakra-ui/react";
 import Head from "next/head";
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./artist.module.css";
 import NFTItem from "../../components/nft-item";
 import FrakButton from "../../components/button";
 import NextLink from "next/link";
-import {shortenHash, getParams} from '../../utils/helpers';
-import {getSubgraphData } from '../../utils/graphQueries';
-import { createObject2 } from '../../utils/nftHelpers';
+import { shortenHash, getParams } from "../../utils/helpers";
+import { getSubgraphData } from "../../utils/graphQueries";
+import { createObject2 } from "../../utils/nftHelpers";
+import toast from "react-hot-toast";
 
 export default function ArtistView() {
-  const [artistAddress, setArtistAddres] = useState('');
+  const [artistAddress, setArtistAddres] = useState("");
   const [nftItems, setNftItems] = useState([]);
+  const [loading, setIsLoading] = useState<boolean>(false);
 
-  useEffect(()=>{
+  useEffect(() => {
     async function getData() {
-    let address = getParams('artist');
-    if(address){
-      setArtistAddres(address)
-      let objects = await getSubgraphData('creator',address)
-      Promise.all(objects.fraktalNfts.map(x=>{return createObject2(x)})).then((results)=>setNftItems(results))
+      setIsLoading(true);
+      toast("Fetching Data");
+      let address = getParams("artist");
+      try {
+        if (address) {
+          setArtistAddres(address);
+          let objects = await getSubgraphData("creator", address);
+          await Promise.all(
+            objects.fraktalNfts.map(x => {
+              return createObject2(x);
+            })
+          ).then(results => setNftItems(results));
+          toast.success("Data fetched");
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Fetch failed");
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }
-  getData();
-  },[])
+    getData();
+  }, []);
 
   return (
-    <VStack spacing="0" mb="1rem" sx={{alignItems: `start`}}>
+    <VStack spacing="0" mb="1rem" sx={{ alignItems: `start` }}>
       <Head>
         <title>Fraktal - Artist</title>
       </Head>
-      <Heading sx={{fontSize: `36px`, marginBottom: `1rem`}}>{artistAddress}</Heading>
-      {nftItems.length ? (
+      <Heading sx={{ fontSize: `36px`, marginBottom: `1rem` }}>
+        {artistAddress}
+      </Heading>
+      {!loading && nftItems.length > 0 && (
         <>
           <Grid
             margin="0 !important"
@@ -43,13 +61,19 @@ export default function ArtistView() {
             {nftItems.map(item => {
               console.log(item);
               return (
-              <NextLink href={`/nft/${item.id}/details`} key={item.marketId}>
-                <NFTItem key={item.id} name={item.name} imageURL={item.imageURL} />
-              </NextLink>
-            )})}
+                <NextLink href={`/nft/${item.id}/details`} key={item.marketId}>
+                  <NFTItem
+                    key={item.id}
+                    name={item.name}
+                    imageURL={item.imageURL}
+                  />
+                </NextLink>
+              );
+            })}
           </Grid>
         </>
-      ) : (
+      )} 
+      {!loading && (nftItems == null) && (
         <VStack>
           <Text className="medium-16">Whoops, no NFTs are for sale.</Text>
           <Text className="medium-16">Check back later or list your own!</Text>
@@ -58,6 +82,7 @@ export default function ArtistView() {
           </NextLink>
         </VStack>
       )}
+      {loading && <Box sx={{display: `grid`, width: `80vw`, height: `200px`, placeItems: `center`}}><Spinner size="xl" /></Box>}
     </VStack>
   );
 }
