@@ -210,7 +210,8 @@ export default function OfferDetail({
           {fraktionsBalance > 0 &&
             fraktionsApproved &&
             fraktionsLocked &&
-            offerItem?.winner && isOfferer && (
+            offerItem?.winner &&
+            isOfferer && (
               <Box
                 sx={{
                   border: `2px solid green`,
