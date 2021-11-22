@@ -36,7 +36,7 @@ export default function ListNFTView() {
   const router = useRouter();
   const {account, provider, marketAddress} = useWeb3Context();
   const [nftObject, setNftObject] = useState();
-  const [index, setIndex] = useState();
+  const [index, setIndex] = useState<string>("");
   const [totalAmount, setTotalAmount] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0.);
   const [fraktions, setFraktions] = useState(0);
@@ -59,7 +59,8 @@ export default function ListNFTView() {
     return approved;
   }
 
-  useEffect(async () => {
+  useEffect(() => {
+    async function getData() {
     if(account && nftObject && marketAddress) {
       let approvedTokens;
       try {
@@ -70,14 +71,17 @@ export default function ListNFTView() {
       }
 
     }
+  }
+  getData();
   },[account, nftObject, marketAddress, updating])
 
 
-  useEffect(async ()=>{
-    const address = getParams('nft');
-    const tokenString = address.split('/list-item')
-    const tokenAddress = tokenString[0];
-    setIndex(tokenAddress);
+  useEffect(()=>{
+    async function getData() {
+      const pathname = router.asPath;
+      const args = pathname.split('/');
+    const tokenAddress = args[2];
+    setIndex(args[2]);
     if(account){
       // previously was account-index
       // let hexIndex = indexNumber.toString(16);
@@ -115,6 +119,8 @@ export default function ListNFTView() {
           }
         }
       }
+    }
+    getData();
   },[index, account])
 
   async function callUnlistItem(){

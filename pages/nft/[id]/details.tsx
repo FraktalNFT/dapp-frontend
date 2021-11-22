@@ -33,7 +33,7 @@ export default function DetailsView() {
   const [offers, setOffers] = useState();
   const [minOffer, setMinOffer] = useState(0);
   const [nftObject, setNftObject] = useState({});
-  const [tokenAddress, setTokenAddress] = useState();
+  const [tokenAddress, setTokenAddress] = useState<string>("");
   const [fraktionsListed, setFraktionsListed] = useState([]);
   const [userHasListed, setUserHasListed] = useState(false);
   const [collateralNft, setCollateralNft] = useState();
@@ -47,8 +47,11 @@ export default function DetailsView() {
   // use callbacks
   useEffect(() => {
     async function getData() {
-      const tokenAddress = getParams("nft");
-      const tokenAddressSplitted = tokenAddress.split("/details")[0].toLocaleLowerCase();
+      const pathname = router.asPath;
+      const args = pathname.split("/");
+      console.log('args: ', args);
+      const tokenAddress = args[2];
+      const tokenAddressSplitted = tokenAddress.toLocaleLowerCase();
       setTokenAddress(tokenAddressSplitted);
       let fraktionsFetch = await getSubgraphData(
         "fraktions",

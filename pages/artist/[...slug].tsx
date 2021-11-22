@@ -9,17 +9,21 @@ import { shortenHash, getParams } from "../../utils/helpers";
 import { getSubgraphData } from "../../utils/graphQueries";
 import { createObject2 } from "../../utils/nftHelpers";
 import toast from "react-hot-toast";
+import {useRouter} from 'next/router';
 
 export default function ArtistView() {
+  const router = useRouter();
   const [artistAddress, setArtistAddres] = useState("");
   const [nftItems, setNftItems] = useState([]);
   const [loading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     async function getData() {
+      const pathname = router.asPath;
+      const args = pathname.split("/");
+      const address = args[2];
       setIsLoading(true);
       toast("Fetching Data");
-      let address = getParams("artist");
       try {
         if (address) {
           setArtistAddres(address);
