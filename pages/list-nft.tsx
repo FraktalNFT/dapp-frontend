@@ -1,8 +1,15 @@
 import FrakButton4 from "../components/button4";
 import MintCard from "../components/mintCard";
 import ListCard from "../components/listCard";
-import { VStack, Box, Stack, Grid } from "@chakra-ui/layout";
-import { Link, Checkbox } from "@chakra-ui/react";
+import {
+  VStack,
+  Box,
+  Stack,
+  Grid,
+  Text,
+  Link,
+  Checkbox,
+} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Image as ImageComponent } from "@chakra-ui/image";
 import { useWeb3Context } from "../contexts/Web3Context";
@@ -100,7 +107,7 @@ export default function MintPage() {
         toast.success("Mint completed.");
         setIsMinting(false);
         setTokenMintedAddress(response);
-        window?.localStorage.setItem('mintingNFTs', response);
+        window?.localStorage.setItem("mintingNFTs", response);
         setMinted(true);
       }
     }
@@ -232,7 +239,7 @@ export default function MintPage() {
                 fontWeight: 800,
                 fontSize: "48px",
                 lineHeight: "64px",
-                color: "#000000",
+                color: "black",
               }}
             >
               Mint NFT
@@ -274,8 +281,8 @@ export default function MintPage() {
               className="semi-16"
               borderRadius="25"
               padding="5"
-              _active={{ bg: "black", textColor: "white" }}
-              _hover={{ bg: "black", textColor: "white" }}
+              sx={{backgroundColor: `black`, color: `white`, border: `2px solid transparent` }}
+              _hover={{color: `white`}}
               onClick={() => null}
             >
               Mint NFT
@@ -299,13 +306,51 @@ export default function MintPage() {
             />
           </div>
           <div style={{ marginTop: "16px" }}>
-            <Checkbox
-              isChecked={listItemCheck}
-              onChange={() => setListItemCheck(!listItemCheck)}
-              size="lg"
-            >
-              List your Fraktions for sale
-            </Checkbox>
+            <Box sx={{ display: `flex`, gap: `12px`, alignItems: `center`, marginBottom: `8px` }}>
+              {listItemCheck && (
+                <Box
+                  sx={{
+                    width: `16px`,
+                    height: `16px`,
+                    borderRadius: `4px`,
+                    display: `block`,
+                    backgroundColor: `#00C49D`,
+                  }}
+                  _hover={{
+                    cursor: `pointer`
+                  }}
+                  onClick={() => setListItemCheck(!listItemCheck)}
+                ></Box>
+              )}
+              {!listItemCheck && (
+                <Box
+                  sx={{
+                    width: `16px`,
+                    height: `16px`,
+                    borderRadius: `4px`,
+                    border: `2px solid rgba(0,0,0,0.3)`,
+                    display: `block`,
+                  }}
+                  _hover={{
+                    cursor: `pointer`
+                  }}
+                  onClick={() => setListItemCheck(!listItemCheck)}
+                ></Box>
+              )}
+              <Text
+                sx={{
+                  fontSize: `16px`,
+                  fontFamily: `Inter, sans-serif`,
+                  fontWeight: `700`,
+                }}
+                _hover={{
+                  cursor: `pointer`
+                }}
+                onClick={() => setListItemCheck(!listItemCheck)}
+              >
+                List your Fraktion NFT for sale
+              </Text>
+            </Box>
             <div>
               {listItemCheck && (
                 <ListCard

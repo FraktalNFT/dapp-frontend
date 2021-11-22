@@ -1,5 +1,5 @@
 import { Button, ButtonProps } from "@chakra-ui/button";
-import { Input, Box } from "@chakra-ui/react";
+import { Input, Box, Text } from "@chakra-ui/react";
 import { forwardRef } from "react";
 
 const FrakButton3 = forwardRef<
@@ -19,6 +19,7 @@ const FrakButton3 = forwardRef<
         height: `auto`,
       }}
     >
+      <Text sx={{fontSize: `14px`, opacity: `0.7`, margin: `0 auto`}}>{inputPlaceholder}</Text>
       <Input
         type="file"
         id="imageInput"
