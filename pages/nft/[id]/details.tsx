@@ -10,7 +10,7 @@ import UserOwnership from "../../../components/userOwnership";
 import BuyOutCard from "../../../components/buyOutCard";
 import FraktionOwners from "../../../components/fraktionOwners";
 import { Image } from "@chakra-ui/image";
-import { shortenHash, timezone, getParams } from "../../../utils/helpers";
+import { shortenHash, timezone } from "../../../utils/helpers";
 import { getSubgraphData } from "../../../utils/graphQueries";
 import { createObject2 } from "../../../utils/nftHelpers";
 import { useWeb3Context } from "../../../contexts/Web3Context";
