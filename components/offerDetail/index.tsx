@@ -146,7 +146,7 @@ export default function OfferDetail({
               : "N/A"}
           </Text>
           <Box w="210px" sx={{ textAlign: `right` }}>
-            {!(fraktionsBalance > 0) && <Text>Buy Fraktions to vote!</Text>}
+            {(fraktionsBalance <= 0) && <Text>Buy Fraktions to vote!</Text>}
             {fraktionsBalance > 0 && !fraktionsApproved && (
               <Box
                 sx={{
@@ -167,7 +167,7 @@ export default function OfferDetail({
                 Approve Fraktions
               </Box>
             )}
-            {fraktionsBalance > 0 && fraktionsApproved && !fraktionsLocked && (
+            {(fraktionsBalance > 0) && fraktionsApproved && !fraktionsLocked && (
               <Box
                 sx={{
                   borderColor: "#00C4B8",
@@ -187,7 +187,7 @@ export default function OfferDetail({
                 Accept
               </Box>
             )}
-            {fraktionsBalance > 0 &&
+            {(fraktionsBalance > 0) &&
               fraktionsApproved &&
               fraktionsLocked &&
               !offerItem?.winner && (

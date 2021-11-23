@@ -13,7 +13,7 @@ const Footer: React.FC = () => {
           <Image src="/footer/twitter.svg"/>
         </Link>
         <Link
-          href="https://discord.gg/jF7PGKha"
+          href="https://discord.gg/B9atrdtEEx"
           target="_blank"
           rel="noreferrer noopener"
         >

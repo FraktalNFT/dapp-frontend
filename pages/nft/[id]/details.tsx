@@ -42,14 +42,28 @@ export default function DetailsView() {
   const [userFraktions, setUserFraktions] = useState(0);
   const [isOwner, setIsOwner] = useState(false);
   const [revenues, setRevenues] = useState();
+  const [isPageReady, setIsPageReady] = useState<boolean>(false);
   // const [txInProgress, setTxInProgress] = useState(false);
   const [fraktionsIndex, setFraktionsIndex] = useState();
+  const [args, setArgs] = useState([]);
   // use callbacks
+
+  useEffect(() => {
+    let pathname = router.asPath;
+    setArgs(pathname.split("/"));
+    do {
+      if (router.isReady) {
+      pathname = router.asPath;
+      setArgs(pathname.split("/"));
+      setIsPageReady(false);
+      console.log(args);
+      }
+    } while (args[2] === '[id]' );
+    setIsPageReady(true);
+  }, []);
+
   useEffect(() => {
     async function getData() {
-      const pathname = router.asPath;
-      const args = pathname.split("/");
-      console.log('args: ', args);
       const tokenAddress = args[2];
       const tokenAddressSplitted = tokenAddress.toLocaleLowerCase();
       setTokenAddress(tokenAddressSplitted);
@@ -57,7 +71,7 @@ export default function DetailsView() {
         "fraktions",
         tokenAddressSplitted
       );
-      console.log(fraktionsFetch)
+      console.log(fraktionsFetch);
       if (fraktionsFetch.listItems) {
         setFraktionsListed(fraktionsFetch.listItems);
       }
@@ -85,8 +99,10 @@ export default function DetailsView() {
         }
       }
     }
-    getData();
-  }, []);
+    if (isPageReady) {
+      getData();
+    }
+  },[isPageReady]);
 
   useEffect(() => {
     async function getData() {
