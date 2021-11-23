@@ -138,7 +138,7 @@ const RevenuesList = ({ revenuesCreated, tokenAddress }) => {
                   revenueAddress={x.id}
                   date={x.timestamp}
                   value={x.value}
-                  creator={x.creator.id}
+                  creator={x.creator?.id? x.creator.id : null}
                   buyout={x.buyout}
                   provider={provider}
                   tokenAddress={x.tokenAddress}

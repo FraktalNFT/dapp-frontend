@@ -57,7 +57,7 @@ export default function OfferDetail({
     console.log("Offer Item: ", offerItem);
     console.log("Account: ", account);
     if (account?.length > 0 && offerItem?.offerer?.id?.length > 0) {
-      if (account === offerItem?.offerer?.id) {
+      if (account.toLocaleLowerCase() === offerItem?.offerer?.id) {
         setIsOfferer(true);
       }
     }
@@ -146,7 +146,7 @@ export default function OfferDetail({
               : "N/A"}
           </Text>
           <Box w="210px" sx={{ textAlign: `right` }}>
-            {(fraktionsBalance <= 0) && <Text>Buy Fraktions to vote!</Text>}
+            {(fraktionsBalance <= 0) && !isOfferer && <Text>Buy Fraktions to vote!</Text>}
             {fraktionsBalance > 0 && !fraktionsApproved && (
               <Box
                 sx={{
@@ -210,10 +210,7 @@ export default function OfferDetail({
                   Reject
                 </Box>
               )}
-            {fraktionsBalance > 0 &&
-              fraktionsApproved &&
-              fraktionsLocked &&
-              offerItem?.winner &&
+            {offerItem?.winner &&
               isOfferer && (
                 <Box
                   sx={{
