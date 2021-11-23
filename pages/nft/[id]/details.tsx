@@ -46,6 +46,7 @@ export default function DetailsView() {
   // const [txInProgress, setTxInProgress] = useState(false);
   const [fraktionsIndex, setFraktionsIndex] = useState();
   const [args, setArgs] = useState([]);
+  const [investors, setInvestors] = useState(0);
   // use callbacks
 
   useEffect(() => {
@@ -83,6 +84,11 @@ export default function DetailsView() {
       ) {
         let nftObjects = await createObject2(fraktalFetch.fraktalNfts[0]);
         if (nftObjects) {
+          let investorsWBalance = nftObjects.balances.filter(x => {
+            return parseInt(x.amount) > 0
+          });
+          console.log('investors',investorsWBalance)
+          setInvestors(investorsWBalance.length)
           setNftObject(nftObjects);
         }
         if (fraktalFetch.fraktalNfts[0].offers) {
@@ -331,9 +337,7 @@ export default function DetailsView() {
             minPrice={minOffer}
             fraktionsBalance={userFraktions}
             fraktionsApproved={fraktionsApproved}
-            investors={
-              nftObject && nftObject.balances ? nftObject.balances.length : 0
-            }
+            investors={investors}
             offers={offers}
             tokenAddress={tokenAddress}
             marketAddress={marketAddress}
