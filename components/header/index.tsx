@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 
 const Header = () => {
   const router = useRouter();
-  console.log(router.pathname);
+  // console.log('header',router.pathname);
   const { connectWeb3, account } = useWeb3Context();
   return (
     <Box minH="10rem" py="2.6rem" as="header" bg={"white"}>

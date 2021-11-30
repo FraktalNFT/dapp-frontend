@@ -50,18 +50,18 @@ export default function DetailsView() {
   // use callbacks
 
   useEffect(() => {
-    let pathname = router.asPath;
-    setArgs(pathname.split("/"));
-    do {
-      if (router.isReady) {
-      pathname = router.asPath;
-      setArgs(pathname.split("/"));
-      setIsPageReady(false);
-      console.log(args);
-      }
-    } while (args[2] === '[id]' );
-    setIsPageReady(true);
-  }, []);
+    if (router.isReady) {
+      let pathname = router.asPath;
+      let args = pathname.split("/");
+      do {
+        pathname = router.asPath;
+        setArgs(pathname.split("/"));
+        setIsPageReady(false);
+      } while (args[2] === '[id]' || typeof(args[2]) === 'undefined');
+      // console.log('setting ready to true with:',args[2])
+      setIsPageReady(true);
+    }
+  }, [router]);
 
   useEffect(() => {
     async function getData() {
@@ -72,7 +72,7 @@ export default function DetailsView() {
         "fraktions",
         tokenAddressSplitted
       );
-      console.log(fraktionsFetch);
+      // console.log(fraktionsFetch);
       if (fraktionsFetch.listItems) {
         setFraktionsListed(fraktionsFetch.listItems);
       }
@@ -87,7 +87,7 @@ export default function DetailsView() {
           let investorsWBalance = nftObjects.balances.filter(x => {
             return parseInt(x.amount) > 0
           });
-          console.log('investors',investorsWBalance)
+          // console.log('investors',investorsWBalance)
           setInvestors(investorsWBalance.length)
           setNftObject(nftObjects);
         }
@@ -122,8 +122,10 @@ export default function DetailsView() {
         }
       } else setUserHasListed(false);
     }
-    getData();
-  }, [fraktionsListed, account, tokenAddress]);
+    if (isPageReady) { //&& tokenAddress.startsWith('0x')
+      getData();
+    }
+  }, [fraktionsListed, account, tokenAddress, isPageReady]);
 
   useEffect(() => {
     async function getData() {
@@ -158,8 +160,10 @@ export default function DetailsView() {
         }
       }
     }
-    getData();
-  }, [account, provider, tokenAddress]);
+    if (isPageReady) { // && tokenAddress.startsWith('0x')
+      getData();
+    }
+  }, [account, provider, tokenAddress, isPageReady]);
 
   useEffect(() => {
     async function getData() {
@@ -178,8 +182,10 @@ export default function DetailsView() {
         setMinOffer(minPriceParsed);
       }
     }
-    getData();
-  }, [nftObject, marketAddress]);
+    if (isPageReady) { // && tokenAddress.startsWith('0x')
+      getData();
+    }
+  }, [nftObject, marketAddress, isPageReady]);
 
   async function callUnlistItem() {
     let tx = await unlistItem(tokenAddress, provider, marketAddress);
