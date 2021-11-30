@@ -2,9 +2,8 @@ import { gql, request } from "graphql-request";
 import { utils } from "ethers";
 const { CID } = require("ipfs-http-client");
 
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.17';
+const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.18';
 // https://api.thegraph.com/subgraphs/name/drhongos/fraktalrinkeby // hosted
-// https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.15
 
 const creator_query = gql`
   query($id: ID!) {
