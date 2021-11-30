@@ -29,7 +29,7 @@ export default function FraktionOwners(props) {
       setInternalData(filteredData);
     }
     if (nftObject.id) {
-      console.log(nftObject.id);
+      // console.log('nftObject.id in fraktionsOwners',nftObject.id);
       getOwners(nftObject.id);
     }
   }, [nftObject, props]);
