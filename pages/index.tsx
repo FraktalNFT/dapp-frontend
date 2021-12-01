@@ -47,26 +47,39 @@ const Home: React.FC = () => {
       await getMoreListedItems();
       setLoading(false);
     }
+    if (window?.sessionStorage.getItem('nftitems')) {
+      const stringedNFTItems = window?.sessionStorage.getItem('nftitems')
+      const unstringedNFTItems = JSON.parse(stringedNFTItems);
+      console.log(unstringedNFTItems);
+      setNftItems(unstringedNFTItems);
+    } else {
+    // touch API iff no local version
     getData();
+    }
+    // data storage handling
+    // const clearStorage = () => {
+    //   window.sessionStorage.clear();
+    // };
+    // window?.addEventListener("beforeunload", clearStorage);
+    // return () => window.removeEventListener("beforeunload", clearStorage);
   }, []);
 
   const getMoreListedItems = async () => {
     const data = await getSubgraphData("listed_items", "");
     let dataOnSale;
     if (data?.listItems?.length > 1) {
-    dataOnSale = data?.listItems?.filter(x => {
-      return x.fraktal.status == "open";
-    }); // this goes in the graphql query
+      dataOnSale = data?.listItems?.filter(x => {
+        return x.fraktal.status == "open";
+      }); // this goes in the graphql query
     }
-    console.log(dataOnSale);
     if (dataOnSale?.length > 1) {
       // console.log('dataOnSale', dataOnSale)
       let objects = await Promise.all(
         dataOnSale.map(x => {
-            let res = createListed(x);
-            if (typeof res !== 'undefined') {
-              return res;
-            }
+          let res = createListed(x);
+          if (typeof res !== "undefined") {
+            return res;
+          }
         })
       ); //.then((results)=>setNftItems([...nftItems, ...results]));
       let deduplicatedObjects = objects.filter(item => {
@@ -83,6 +96,12 @@ const Home: React.FC = () => {
       }
     }
   };
+
+  // Store NFT Items in Session Storage
+  useEffect(() => {
+    const stringedNFTItems = JSON.stringify(nftItems);
+    window?.sessionStorage?.setItem('nftitems', stringedNFTItems);
+  }, [nftItems]);
 
   const demoNFTItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
     (_, index) => ({
