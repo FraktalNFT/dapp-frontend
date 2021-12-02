@@ -111,7 +111,7 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
         >
           gains
         </Text>
-        <div>{value / 10 ** 18} ETH</div>
+        <div>{(value / 10 ** 18)*(shares/10000)} ETH</div>
         {isClaimable() && (
           <div>
             {buyout && !isApproved ? (
