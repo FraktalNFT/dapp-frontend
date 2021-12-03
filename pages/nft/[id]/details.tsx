@@ -2,7 +2,7 @@ import Link from "next/link";
 import { utils } from "ethers";
 import FrakButton from "../../../components/button";
 import styles from "./auction.module.css";
-import { HStack, VStack, Box, Stack } from "@chakra-ui/layout";
+import { HStack, VStack, Box, Stack, Spinner } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import FraktionsList from "../../../components/fraktionsList";
 import RevenuesList from "../../../components/revenuesList";
@@ -49,6 +49,8 @@ export default function DetailsView() {
   const [investors, setInvestors] = useState(0);
   // use callbacks
 
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     if (router.isReady) {
       let pathname = router.asPath;
@@ -63,132 +65,147 @@ export default function DetailsView() {
     }
   }, [router]);
 
-  useEffect(() => {
-    async function getData() {
-      const tokenAddress = args[2];
-      const tokenAddressSplitted = tokenAddress.toLocaleLowerCase();
-      setTokenAddress(tokenAddressSplitted);
-      let fraktionsFetch = await getSubgraphData(
-        "fraktions",
-        tokenAddressSplitted
-      );
-      // console.log(fraktionsFetch);
-      if (fraktionsFetch.listItems) {
-        setFraktionsListed(fraktionsFetch.listItems);
-      }
-      let fraktalFetch = await getSubgraphData("fraktal", tokenAddressSplitted);
-      if (
-        fraktalFetch &&
-        fraktalFetch.fraktalNfts &&
-        fraktalFetch.fraktalNfts[0]
-      ) {
-        let nftObjects = await createObject2(fraktalFetch.fraktalNfts[0]);
-        if (nftObjects) {
-          let investorsWBalance = nftObjects.balances.filter(x => {
-            return parseInt(x.amount) > 0;
-          });
-          // console.log('investors',investorsWBalance)
-          setInvestors(investorsWBalance.length);
-          setNftObject(nftObjects);
-        }
-        if (fraktalFetch.fraktalNfts[0].offers) {
-          setOffers(fraktalFetch.fraktalNfts[0].offers);
-        }
-        if (fraktalFetch.fraktalNfts[0].collateral) {
-          setCollateralNft(fraktalFetch.fraktalNfts[0].collateral);
-        }
-        let revenuesValid = fraktalFetch.fraktalNfts[0].revenues.filter(x => {
-          return x.value > 0;
+  async function getFraktal() {
+    const tokenAddress = args[2];
+    const tokenAddressSplitted = tokenAddress.toLocaleLowerCase();
+    setTokenAddress(tokenAddressSplitted);
+    let fraktionsFetch = await getSubgraphData(
+      "fraktions",
+      tokenAddressSplitted
+    );
+    // console.log(fraktionsFetch);
+    if (fraktionsFetch.listItems) {
+      setFraktionsListed(fraktionsFetch.listItems);
+    }
+    let fraktalFetch = await getSubgraphData("fraktal", tokenAddressSplitted);
+    if (
+      fraktalFetch &&
+      fraktalFetch.fraktalNfts &&
+      fraktalFetch.fraktalNfts[0]
+    ) {
+      let nftObjects = await createObject2(fraktalFetch.fraktalNfts[0]);
+      if (nftObjects) {
+        let investorsWBalance = nftObjects.balances.filter(x => {
+          return parseInt(x.amount) > 0;
         });
-        if (revenuesValid) {
-          setRevenues(revenuesValid);
-        }
+        // console.log('investors',investorsWBalance)
+        setInvestors(investorsWBalance.length);
+        setNftObject(nftObjects);
+      }
+      if (fraktalFetch.fraktalNfts[0].offers) {
+        setOffers(fraktalFetch.fraktalNfts[0].offers);
+      }
+      if (fraktalFetch.fraktalNfts[0].collateral) {
+        setCollateralNft(fraktalFetch.fraktalNfts[0].collateral);
+      }
+      let revenuesValid = fraktalFetch.fraktalNfts[0].revenues.filter(x => {
+        return x.value > 0;
+      });
+      if (revenuesValid) {
+        setRevenues(revenuesValid);
       }
     }
-    if (isPageReady) {
-      getData();
-    }
-  }, [isPageReady]);
+  }
 
-  useEffect(() => {
-    async function getData() {
-      if (fraktionsListed && account && tokenAddress) {
-        let fraktionsFetch = await getSubgraphData("fraktions", tokenAddress);
-        let userFraktionsListed = fraktionsFetch.listItems.find(
-          x => x.seller.id == account.toLocaleLowerCase()
+  async function getFraktions() {
+    if (fraktionsListed && account && tokenAddress) {
+      let fraktionsFetch = await getSubgraphData("fraktions", tokenAddress);
+      let userFraktionsListed = fraktionsFetch?.listItems?.find(
+        x => x.seller.id == account.toLocaleLowerCase()
+      );
+      if (userFraktionsListed && userFraktionsListed?.amount > 0) {
+        setUserHasListed(true);
+      }
+    } else setUserHasListed(false);
+  }
+
+  async function getContractData() {
+    if (tokenAddress && account && provider) {
+      try {
+        let userBalance = await getBalanceFraktions(
+          account,
+          provider,
+          tokenAddress
         );
-        if (userFraktionsListed && userFraktionsListed.amount > 0) {
-          setUserHasListed(true);
-        }
-      } else setUserHasListed(false);
-    }
-    if (isPageReady) {
-      //&& tokenAddress.startsWith('0x')
-      getData();
-    }
-  }, [fraktionsListed, account, tokenAddress, isPageReady]);
-
-  useEffect(() => {
-    async function getData() {
-      if (tokenAddress && account && provider) {
-        try {
-          let userBalance = await getBalanceFraktions(
-            account,
-            provider,
-            tokenAddress
-          );
-          let index = await getFraktionsIndex(provider, tokenAddress);
-          let marketApproved = await getApproved(
-            account,
-            marketAddress,
-            provider,
-            tokenAddress
-          );
-          let factoryApproved = await getApproved(
-            account,
-            factoryAddress,
-            provider,
-            tokenAddress
-          );
-          let isOwner = await isFraktalOwner(account, provider, tokenAddress);
-          setFraktionsIndex(index);
-          setFraktionsApproved(marketApproved);
-          setFactoryApproved(factoryApproved);
-          setUserFraktions(userBalance);
-          setIsOwner(isOwner);
-        } catch (e) {
-          console.error("Error:", e);
-        }
+        let index = await getFraktionsIndex(provider, tokenAddress);
+        let marketApproved = await getApproved(
+          account,
+          marketAddress,
+          provider,
+          tokenAddress
+        );
+        let factoryApproved = await getApproved(
+          account,
+          factoryAddress,
+          provider,
+          tokenAddress
+        );
+        let isOwner = await isFraktalOwner(account, provider, tokenAddress);
+        setFraktionsIndex(index);
+        setFraktionsApproved(marketApproved);
+        setFactoryApproved(factoryApproved);
+        setUserFraktions(userBalance);
+        setIsOwner(isOwner);
+      } catch (e) {
+        console.error("Error:", e);
       }
     }
-    if (isPageReady) {
-      // && tokenAddress.startsWith('0x')
-      getData();
+  }
+
+  async function getOffers() {
+    if (tokenAddress && marketAddress) {
+      let minPriceParsed;
+      try {
+        let minPrice = await getMinimumOffer(
+          tokenAddress,
+          provider,
+          marketAddress
+        );
+        minPriceParsed = utils.formatEther(minPrice);
+      } catch {
+        minPriceParsed = 0;
+      }
+      setMinOffer(minPriceParsed);
     }
-  }, [account, provider, tokenAddress, isPageReady]);
+  }
+
+  const [fraktionsGot, setFraktionsGot] = useState(false);
+  const [fraktalsGot, setFraktalsGot] = useState(false);
+  const [offersGot, setOffersGot] = useState(false);
+  const [contractDataGot, setContractDataGot] = useState(false);
 
   useEffect(() => {
-    async function getData() {
-      if (tokenAddress && marketAddress) {
-        let minPriceParsed;
-        try {
-          let minPrice = await getMinimumOffer(
-            tokenAddress,
-            provider,
-            marketAddress
-          );
-          minPriceParsed = utils.formatEther(minPrice);
-        } catch {
-          minPriceParsed = 0;
+    async function getAllData() {
+      if (isPageReady) {
+        if (!fraktionsGot) {
+          await getFraktions();
+          setFraktionsGot(true);
         }
-        setMinOffer(minPriceParsed);
+        if (!fraktalsGot) {
+          await getFraktal();
+          setFraktalsGot(true);
+        }
+        if (!offersGot) {
+          await getOffers();
+          setOffersGot(true);
+        }
+        if (!contractDataGot) {
+          await getContractData();
+          setContractDataGot(true);
+        }
+        setIsLoading(false);
       }
     }
-    if (isPageReady) {
-      // && tokenAddress.startsWith('0x')
-      getData();
-    }
-  }, [nftObject, marketAddress, isPageReady]);
+    getAllData();
+  }, [
+    isPageReady,
+    account,
+    provider,
+    tokenAddress,
+    fraktionsListed,
+    nftObject,
+    marketAddress,
+  ]);
 
   async function callUnlistItem() {
     let tx = await unlistItem(tokenAddress, provider, marketAddress);
@@ -207,165 +224,178 @@ export default function DetailsView() {
   }
 
   return (
-    <Box
-      sx={{
-        display: `grid`,
-        gridTemplateColumns: `400px 621px`,
-        columnGap: `16px`,
-      }}
-    >
-      <Box sx={{ position: `relative` }}>
-        <VStack marginRight="53px" sx={{ position: `sticky`, top: `20px` }}>
-          <Link href="/">
-            <div className={styles.goBack}>← back to all NFTS</div>
-          </Link>
-          <Image
-            src={nftObject ? nftObject.imageURL : null}
-            w="400px"
-            h="400px"
-            style={{ borderRadius: "4px 4px 0px 0px", objectFit: `cover` }}
-          />
-          <HStack justifyContent="space-between" marginTop="16px">
-            <VStack>
-              <div
-                style={{
-                  fontFamily: "Inter",
-                  fontWeight: 600,
-                  fontSize: "12px",
-                  lineHeight: "14px",
-                  letterSpacing: "1px",
-                  color: "#A7A7A7",
-                }}
-              >
-                ARTIST
-              </div>
-              <div
-                style={{
-                  fontFamily: "Inter",
-                  fontWeight: 500,
-                  fontSize: "16px",
-                  lineHeight: "19px",
-                }}
-              >
-                {nftObject ? shortenHash(nftObject.creator) : "loading"}
-              </div>
-            </VStack>
-            <VStack>
-              <div
-                style={{
-                  fontFamily: "Inter",
-                  fontWeight: 600,
-                  fontSize: "12px",
-                  lineHeight: "14px",
-                  letterSpacing: "1px",
-                  color: "#A7A7A7",
-                }}
-              >
-                DATE OF CREATION
-              </div>
-              <div
-                style={{
-                  fontFamily: "Inter",
-                  fontWeight: 500,
-                  fontSize: "16px",
-                  lineHeight: "19px",
-                }}
-              >
-                {nftObject ? timezone(nftObject.createdAt) : "loading"}
-              </div>
-            </VStack>
-          </HStack>
-          {/* for the defrak bug, i leave this function to claim the fraktal
+    <>
+      {isLoading && (
+        <>
+          <Box sx={{ display: `grid`, width: `100%`, placeItems: `center` }}>
+            <Spinner size="xl" />
+          </Box>
+        </>
+      )}
+      {!isLoading && (
+        <Box
+          sx={{
+            display: `grid`,
+            gridTemplateColumns: `400px 621px`,
+            columnGap: `16px`,
+          }}
+        >
+          <Box sx={{ position: `relative` }}>
+            <VStack marginRight="53px" sx={{ position: `sticky`, top: `20px` }}>
+              <Link href="/">
+                <div className={styles.goBack}>← back to all NFTS</div>
+              </Link>
+              <Image
+                src={nftObject ? nftObject.imageURL : null}
+                w="400px"
+                h="400px"
+                style={{ borderRadius: "4px 4px 0px 0px", objectFit: `cover` }}
+              />
+              <HStack justifyContent="space-between" marginTop="16px">
+                <VStack>
+                  <div
+                    style={{
+                      fontFamily: "Inter",
+                      fontWeight: 600,
+                      fontSize: "12px",
+                      lineHeight: "14px",
+                      letterSpacing: "1px",
+                      color: "#A7A7A7",
+                    }}
+                  >
+                    ARTIST
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "Inter",
+                      fontWeight: 500,
+                      fontSize: "16px",
+                      lineHeight: "19px",
+                    }}
+                  >
+                    {nftObject ? shortenHash(nftObject.creator) : "loading"}
+                  </div>
+                </VStack>
+                <VStack>
+                  <div
+                    style={{
+                      fontFamily: "Inter",
+                      fontWeight: 600,
+                      fontSize: "12px",
+                      lineHeight: "14px",
+                      letterSpacing: "1px",
+                      color: "#A7A7A7",
+                    }}
+                  >
+                    DATE OF CREATION
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "Inter",
+                      fontWeight: 500,
+                      fontSize: "16px",
+                      lineHeight: "19px",
+                    }}
+                  >
+                    {nftObject ? timezone(nftObject.createdAt) : "loading"}
+                  </div>
+                </VStack>
+              </HStack>
+              {/* for the defrak bug, i leave this function to claim the fraktal
           <button onClick={()=>claimFraktal()}>Claim</button>
           */}
-          <UserOwnership
-            fraktions={userFraktions}
-            isFraktalOwner={isOwner}
-            collateral={collateralNft}
-            isApproved={fraktionsApproved}
-            marketAddress={marketAddress}
-            tokenAddress={tokenAddress}
-            marketId={nftObject ? nftObject.marketId : null}
-            factoryAddress={factoryAddress}
-            provider={provider}
-            factoryApproved={factoryApproved}
-          />
-          <div style={{ marginTop: "21px" }}>
-            {userHasListed && (
-              <FrakButton onClick={() => callUnlistItem()}>
-                Unlist Fraktions
-              </FrakButton>
-            )}
-            {!userHasListed && (
-              <FrakButton
-                disabled={fraktionsIndex == 0 || userFraktions < 1}
-                onClick={() =>
-                  router.push(`/nft/${nftObject.marketId}/list-item`)
+              <UserOwnership
+                fraktions={userFraktions}
+                isFraktalOwner={isOwner}
+                collateral={collateralNft}
+                isApproved={fraktionsApproved}
+                marketAddress={marketAddress}
+                tokenAddress={tokenAddress}
+                marketId={nftObject ? nftObject.marketId : null}
+                factoryAddress={factoryAddress}
+                provider={provider}
+                factoryApproved={factoryApproved}
+              />
+              <div style={{ marginTop: "21px" }}>
+                {userHasListed && (
+                  <FrakButton onClick={() => callUnlistItem()}>
+                    Unlist Fraktions
+                  </FrakButton>
+                )}
+                {!userHasListed && (
+                  <FrakButton
+                    disabled={fraktionsIndex == 0 || userFraktions < 1}
+                    onClick={() =>
+                      router.push(`/nft/${nftObject.marketId}/list-item`)
+                    }
+                  >
+                    List Fraktions
+                  </FrakButton>
+                )}
+              </div>
+            </VStack>
+          </Box>
+          <Stack spacing="0" mb="12.8rem">
+            <div
+              style={{
+                fontSize: "48px",
+                fontFamily: "Inter",
+                fontWeight: 800,
+                lineHeight: "64px",
+              }}
+            >
+              {nftObject ? nftObject.name : "Loading"}
+            </div>
+            <div
+              style={{
+                fontSize: "16px",
+                fontFamily: "Inter",
+                fontWeight: 400,
+                lineHeight: "22px",
+                marginBottom: "40px",
+              }}
+            >
+              {nftObject && nftObject.description
+                ? nftObject.description
+                : null}
+            </div>
+            {nftObject && nftObject.status == "open" ? (
+              <FraktionsList
+                fraktionsListed={fraktionsListed}
+                tokenAddress={tokenAddress}
+                marketAddress={marketAddress}
+                provider={provider}
+              />
+            ) : null}
+            <div style={{ marginTop: "40px" }}>
+              <BuyOutCard
+                account={account}
+                minPrice={minOffer}
+                fraktionsBalance={userFraktions}
+                fraktionsApproved={fraktionsApproved}
+                investors={investors}
+                offers={offers}
+                tokenAddress={tokenAddress}
+                marketAddress={marketAddress}
+                provider={provider}
+                itemStatus={
+                  nftObject && nftObject.status ? nftObject.status : null
                 }
-              >
-                List Fraktions
-              </FrakButton>
-            )}
-          </div>
-        </VStack>
-      </Box>
-      <Stack spacing="0" mb="12.8rem">
-        <div
-          style={{
-            fontSize: "48px",
-            fontFamily: "Inter",
-            fontWeight: 800,
-            lineHeight: "64px",
-          }}
-        >
-          {nftObject ? nftObject.name : "Loading"}
-        </div>
-        <div
-          style={{
-            fontSize: "16px",
-            fontFamily: "Inter",
-            fontWeight: 400,
-            lineHeight: "22px",
-            marginBottom: "40px",
-          }}
-        >
-          {nftObject && nftObject.description ? nftObject.description : null}
-        </div>
-        {nftObject && nftObject.status == "open" ? (
-          <FraktionsList
-            fraktionsListed={fraktionsListed}
-            tokenAddress={tokenAddress}
-            marketAddress={marketAddress}
-            provider={provider}
-          />
-        ) : null}
-        <div style={{ marginTop: "40px" }}>
-          <BuyOutCard
-            account={account}
-            minPrice={minOffer}
-            fraktionsBalance={userFraktions}
-            fraktionsApproved={fraktionsApproved}
-            investors={investors}
-            offers={offers}
-            tokenAddress={tokenAddress}
-            marketAddress={marketAddress}
-            provider={provider}
-            itemStatus={nftObject && nftObject.status ? nftObject.status : null}
-          />
-        </div>
-        <div style={{ marginTop: "40px" }}>
-          <RevenuesList
-            account={account}
-            revenuesCreated={revenues}
-            tokenAddress={tokenAddress}
-            marketAddress={marketAddress}
-          />
-        </div>
-        <div style={{ marginTop: "40px" }}>
-          <FraktionOwners data={nftObject.balances} nftObject={nftObject} />
-        </div>
-      </Stack>
-      {/*
+              />
+            </div>
+            <div style={{ marginTop: "40px" }}>
+              <RevenuesList
+                account={account}
+                revenuesCreated={revenues}
+                tokenAddress={tokenAddress}
+                marketAddress={marketAddress}
+              />
+            </div>
+            <div style={{ marginTop: "40px" }}>
+              <FraktionOwners data={nftObject.balances} nftObject={nftObject} />
+            </div>
+          </Stack>
+          {/*
       <Modal
         open={txInProgress}
         onClose={()=>setTxInProgress(false)}
@@ -373,6 +403,8 @@ export default function DetailsView() {
         Tx's in course!
       </Modal>
     */}
-    </Box>
+        </Box>
+      )}
+    </>
   );
 }
