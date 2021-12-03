@@ -66,7 +66,7 @@ export default function FixPriceNFTView() {
           provider,
           marketAddress).then(()=>router.reload());
       }catch(err){
-        console.log('Error',err);
+        console.error('Error',err);
       }
   }
 
@@ -94,7 +94,7 @@ export default function FixPriceNFTView() {
         })
 
     }catch(e){
-      console.log('There has been an error: ',e)
+      console.error('There has been an error: ',e)
     }
   }
 
@@ -105,7 +105,7 @@ export default function FixPriceNFTView() {
         router.push('/my-nfts');
       }
     }catch(e){
-      console.log('There has been an error: ',e)
+      console.error('There has been an error: ',e)
     }
   }
 

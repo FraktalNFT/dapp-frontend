@@ -41,7 +41,7 @@ export default function MintNFTView() {
     try {
       dataUpload = await ipfsNode.add(data);
     } catch (e) {
-      console.log("Error: ", e);
+      console.error("Error: ", e);
       return "Error uploading the file";
     }
     await pinByHash(dataUpload.cid.toString()); // Pinata

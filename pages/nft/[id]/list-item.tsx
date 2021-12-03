@@ -67,7 +67,7 @@ export default function ListNFTView() {
         approvedTokens = await getIsApprovedForAll(nftObject.id);
         setIsApproved(approvedTokens);
       }catch(e){
-        console.log('Error: ',e);
+        console.error('Error: ',e);
       }
 
     }
@@ -148,7 +148,7 @@ export default function ListNFTView() {
         let tx = await fraktionalize(id, provider, marketAddress);
         if (tx) {setPrepare(false)}
       }catch(e){
-        console.log('There has been an error: ',e)
+        console.error('There has been an error: ',e)
       }
   }
   async function predefraktionalize(id){ // leave it for after, will handle 'defraktionalized' nfts
@@ -160,7 +160,7 @@ export default function ListNFTView() {
           setUnlocked(true)
         }
       }catch(e){
-        console.log('There has been an error: ',e)
+        console.error('There has been an error: ',e)
       }
   }
   async function approveContract(){

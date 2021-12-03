@@ -59,7 +59,6 @@ const Home: React.FC = () => {
     if (window?.sessionStorage.getItem("nftitems")) {
       const stringedNFTItems = window?.sessionStorage.getItem("nftitems");
       const unstringedNFTItems = JSON.parse(stringedNFTItems);
-      console.log(unstringedNFTItems);
       setNftItems(unstringedNFTItems);
     } else {
       // touch API iff no local version

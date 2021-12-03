@@ -41,36 +41,31 @@ export default function MyNFTsView() {
   useEffect(() => {
     let nftLocalDataString = window?.localStorage.getItem("mintingNFTs");
     let nftLocalData = JSON.parse(nftLocalDataString);
-    console.log("nftLocalData", nftLocalData);
     nftLocalData?.forEach((address, index) => {
-      console.log("iterating through local nfts");
       fraktals?.forEach(frak => {
-        console.log("iterating through fraktions");
         if (address.toLocaleLowerCase() === frak.id) {
-          console.log("match discovered");
           nftLocalData.splice(index, 1);
         }
       });
     });
-    console.log("new nftLocalData", nftLocalData);
     nftLocalDataString = JSON.stringify(nftLocalData);
     window?.localStorage.setItem("mintingNFTs", nftLocalDataString);
   }, [fraktals]);
 
-  useEffect(() => {
-    if (account) {
-      console.log("account", account);
-    }
-    if (fraktals) {
-      console.log("fraktals", fraktals);
-    }
-    if (fraktions) {
-      console.log("fraktions", fraktions);
-    }
-    if (nfts) {
-      console.log("nfts", nfts);
-    }
-  }, [account, fraktals, fraktions, nfts, balance]);
+  // useEffect(() => {
+  //   if (account) {
+  //     console.log("account", account);
+  //   }
+  //   if (fraktals) {
+  //     console.log("fraktals", fraktals);
+  //   }
+  //   if (fraktions) {
+  //     console.log("fraktions", fraktions);
+  //   }
+  //   if (nfts) {
+  //     console.log("nfts", nfts);
+  //   }
+  // }, [account, fraktals, fraktions, nfts, balance]);
 
   useEffect(() => {
     if (window) {

@@ -43,9 +43,7 @@ export default function ArtistsView() {
 
   async function fetchNewArtists() {
     const data = await getSubgraphData("artists", "");
-    console.log("infinite scroll fetching more");
     if (data && factoryAddress) {
-      console.log("infinite scroll fetching more conditional passed");
       let onlyCreators = data.users.filter(x => {
         return x.created.length > 0;
       });
@@ -83,10 +81,8 @@ export default function ArtistsView() {
 
   useEffect(() => {
     const fetchInitialArtists = async () => {
-      console.log("fetching artists....");
       const data = await getSubgraphData("firstArtists", "");
       if (data && factoryAddress) {
-        console.log("fetching artists conditional passed.");
         let onlyCreators = data.users.filter(x => {
           return x.created.length > 0;
         });

@@ -299,7 +299,6 @@ export default function ImportNFTPage() {
       )}
       {!isLoading && importingNFT && (
         <>
-          {console.log(tokenToImport)}
           <Grid
             sx={{
               gridTemplateColumns: `2fr 4fr`,

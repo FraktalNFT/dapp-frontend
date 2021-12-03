@@ -57,7 +57,7 @@ export default function DetailsView() {
         pathname = router.asPath;
         setArgs(pathname.split("/"));
         setIsPageReady(false);
-      } while (args[2] === '[id]' || typeof(args[2]) === 'undefined');
+      } while (args[2] === "[id]" || typeof args[2] === "undefined");
       // console.log('setting ready to true with:',args[2])
       setIsPageReady(true);
     }
@@ -85,10 +85,10 @@ export default function DetailsView() {
         let nftObjects = await createObject2(fraktalFetch.fraktalNfts[0]);
         if (nftObjects) {
           let investorsWBalance = nftObjects.balances.filter(x => {
-            return parseInt(x.amount) > 0
+            return parseInt(x.amount) > 0;
           });
           // console.log('investors',investorsWBalance)
-          setInvestors(investorsWBalance.length)
+          setInvestors(investorsWBalance.length);
           setNftObject(nftObjects);
         }
         if (fraktalFetch.fraktalNfts[0].offers) {
@@ -108,7 +108,7 @@ export default function DetailsView() {
     if (isPageReady) {
       getData();
     }
-  },[isPageReady]);
+  }, [isPageReady]);
 
   useEffect(() => {
     async function getData() {
@@ -122,7 +122,8 @@ export default function DetailsView() {
         }
       } else setUserHasListed(false);
     }
-    if (isPageReady) { //&& tokenAddress.startsWith('0x')
+    if (isPageReady) {
+      //&& tokenAddress.startsWith('0x')
       getData();
     }
   }, [fraktionsListed, account, tokenAddress, isPageReady]);
@@ -156,11 +157,12 @@ export default function DetailsView() {
           setUserFraktions(userBalance);
           setIsOwner(isOwner);
         } catch (e) {
-          console.log("Error:", e);
+          console.error("Error:", e);
         }
       }
     }
-    if (isPageReady) { // && tokenAddress.startsWith('0x')
+    if (isPageReady) {
+      // && tokenAddress.startsWith('0x')
       getData();
     }
   }, [account, provider, tokenAddress, isPageReady]);
@@ -182,7 +184,8 @@ export default function DetailsView() {
         setMinOffer(minPriceParsed);
       }
     }
-    if (isPageReady) { // && tokenAddress.startsWith('0x')
+    if (isPageReady) {
+      // && tokenAddress.startsWith('0x')
       getData();
     }
   }, [nftObject, marketAddress, isPageReady]);
@@ -199,7 +202,7 @@ export default function DetailsView() {
     try {
       await claimFraktalSold(tokenAddress, provider, marketAddress);
     } catch (e) {
-      console.log("There has been an error: ", e);
+      console.error("There has been an error: ", e);
     }
   }
 

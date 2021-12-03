@@ -9,7 +9,7 @@ import { shortenHash, getParams } from "../../utils/helpers";
 import { getSubgraphData } from "../../utils/graphQueries";
 import { createObject2 } from "../../utils/nftHelpers";
 import toast from "react-hot-toast";
-import {useRouter} from 'next/router';
+import { useRouter } from "next/router";
 
 export default function ArtistView() {
   const router = useRouter();
@@ -63,7 +63,6 @@ export default function ArtistView() {
             gap="3.2rem"
           >
             {nftItems.map(item => {
-              console.log(item);
               return (
                 <NextLink href={`/nft/${item.id}/details`} key={item.marketId}>
                   <NFTItem
@@ -76,8 +75,8 @@ export default function ArtistView() {
             })}
           </Grid>
         </>
-      )} 
-      {!loading && (nftItems == null) && (
+      )}
+      {!loading && nftItems == null && (
         <VStack>
           <Text className="medium-16">Whoops, no NFTs are for sale.</Text>
           <Text className="medium-16">Check back later or list your own!</Text>
@@ -86,7 +85,18 @@ export default function ArtistView() {
           </NextLink>
         </VStack>
       )}
-      {loading && <Box sx={{display: `grid`, width: `80vw`, height: `200px`, placeItems: `center`}}><Spinner size="xl" /></Box>}
+      {loading && (
+        <Box
+          sx={{
+            display: `grid`,
+            width: `80vw`,
+            height: `200px`,
+            placeItems: `center`,
+          }}
+        >
+          <Spinner size="xl" />
+        </Box>
+      )}
     </VStack>
   );
 }
