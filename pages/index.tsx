@@ -1,5 +1,13 @@
 import { Flex, Grid, Spacer, Text, VStack } from "@chakra-ui/layout";
-import { MenuButton, Menu, Button, MenuList, MenuItem } from "@chakra-ui/react";
+import {
+  MenuButton,
+  Menu,
+  Button,
+  MenuList,
+  MenuItem,
+  Box,
+  Spinner,
+} from "@chakra-ui/react";
 import { BigNumber } from "ethers";
 import Head from "next/head";
 import NextLink from "next/link";
@@ -41,20 +49,21 @@ const Home: React.FC = () => {
     setNftItems(sortedItems);
   };
 
+  async function getData() {
+    setLoading(true);
+    await getMoreListedItems();
+    setLoading(false);
+  }
+
   useEffect(() => {
-    async function getData() {
-      setLoading(true);
-      await getMoreListedItems();
-      setLoading(false);
-    }
-    if (window?.sessionStorage.getItem('nftitems')) {
-      const stringedNFTItems = window?.sessionStorage.getItem('nftitems')
+    if (window?.sessionStorage.getItem("nftitems")) {
+      const stringedNFTItems = window?.sessionStorage.getItem("nftitems");
       const unstringedNFTItems = JSON.parse(stringedNFTItems);
       console.log(unstringedNFTItems);
       setNftItems(unstringedNFTItems);
     } else {
-    // touch API iff no local version
-    getData();
+      // touch API iff no local version
+      getData();
     }
     // data storage handling
     // const clearStorage = () => {
@@ -100,7 +109,7 @@ const Home: React.FC = () => {
   // Store NFT Items in Session Storage
   useEffect(() => {
     const stringedNFTItems = JSON.stringify(nftItems);
-    window?.sessionStorage?.setItem('nftitems', stringedNFTItems);
+    window?.sessionStorage?.setItem("nftitems", stringedNFTItems);
   }, [nftItems]);
 
   const demoNFTItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
@@ -151,11 +160,25 @@ const Home: React.FC = () => {
             </MenuList>
           </Menu>
           <Spacer />
-          <NextLink href="/my-nfts">
-            <FrakButton>List NFT</FrakButton>
-          </NextLink>
+          <Box sx={{ display: `flex`, gap: `16px` }}>
+            <FrakButton onClick={() => getData()}>Refresh NFTs</FrakButton>
+            <NextLink href="/my-nfts">
+              <FrakButton>List NFT</FrakButton>
+            </NextLink>
+          </Box>
         </Flex>
-        {loading && "loading..."}
+        {loading && (
+          <Box
+            sx={{
+              width: `100%`,
+              height: `35rem`,
+              display: `grid`,
+              placeItems: `center`,
+            }}
+          >
+            <Spinner size="xl" />
+          </Box>
+        )}
         {!loading && (
           <div>
             {nftItems?.length > 0 && (
