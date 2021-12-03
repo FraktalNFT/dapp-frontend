@@ -86,7 +86,7 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
       try {
         release(provider, revenueAddress);
       } catch (e) {
-        console.log("There has been an error: ", e);
+        console.error("There has been an error: ", e);
       }
       setIsClaiming(false);
     }
@@ -111,7 +111,8 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
         >
           gains
         </Text>
-        <div>{(value / 10 ** 18)*(shares/10000)} ETH</div>
+        {/* value = total value, shares = shares the user has */}
+        <div>{(value / 10 ** 18) * (shares / 10000)} ETH</div>
         {isClaimable() && (
           <div>
             {buyout && !isApproved ? (
@@ -183,7 +184,9 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
             }}
             _hover={{ cursor: `not-allowed` }}
           >
-            {released == 0 ? `You must own shares to claim` : `Already released`}
+            {released == 0
+              ? `You must own shares to claim`
+              : `Already released`}
           </Box>
         )}
       </HStack>

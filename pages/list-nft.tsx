@@ -397,27 +397,31 @@ export default function MintPage() {
             >
               1. Mint
             </FrakButton4>
-            <FrakButton4
-              status={!isApproved ? "open" : "done"}
-              disabled={!tokenMintedAddress}
-              onClick={() => approveToken()}
-            >
-              2. Approve
-            </FrakButton4>
-            <FrakButton4
-              status={!fraktionalized ? "open" : "done"}
-              disabled={!isApproved || !tokenMintedAddress}
-              onClick={() => importFraktalToMarket()}
-            >
-              3. Transfer
-            </FrakButton4>
-            <FrakButton4
-              status={!listed ? "open" : "done"}
-              disabled={!fraktalReady}
-              onClick={() => listNewItem()}
-            >
-              4. List
-            </FrakButton4>
+            {listItemCheck && (
+              <>
+                <FrakButton4
+                  status={!isApproved ? "open" : "done"}
+                  disabled={!tokenMintedAddress}
+                  onClick={() => approveToken()}
+                >
+                  2. Approve
+                </FrakButton4>
+                <FrakButton4
+                  status={!fraktionalized ? "open" : "done"}
+                  disabled={!isApproved || !tokenMintedAddress}
+                  onClick={() => importFraktalToMarket()}
+                >
+                  3. Transfer
+                </FrakButton4>
+                <FrakButton4
+                  status={!listed ? "open" : "done"}
+                  disabled={!fraktalReady}
+                  onClick={() => listNewItem()}
+                >
+                  4. List
+                </FrakButton4>
+              </>
+            )}
           </div>
           <div
             style={{

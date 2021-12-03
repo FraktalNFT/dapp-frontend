@@ -290,7 +290,6 @@ export default function DetailsView() {
             provider={provider}
             factoryApproved={factoryApproved}
           />
-
           <div style={{ marginTop: "21px" }}>
             {userHasListed && (
               <FrakButton onClick={() => callUnlistItem()}>

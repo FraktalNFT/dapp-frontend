@@ -1,7 +1,4 @@
-import {
-  Box,
-  VStack,
-} from "@chakra-ui/react";
+import { Box, VStack } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { createRevenuePayment } from "../../utils/contractCalls";
 import RevenuesDetail from "../revenuesDetail";
@@ -22,7 +19,7 @@ const RevenuesList = ({ revenuesCreated, tokenAddress }) => {
     try {
       await createRevenuePayment(valueIn, provider, tokenAddress);
     } catch (error) {
-      console.log("creating revenue failed, reason: ", error);
+      console.error("creating revenue failed, reason: ", error);
     }
     setIsCreating(false);
     setValueSetter(false);
@@ -138,7 +135,7 @@ const RevenuesList = ({ revenuesCreated, tokenAddress }) => {
                   revenueAddress={x.id}
                   date={x.timestamp}
                   value={x.value}
-                  creator={x.creator?.id? x.creator.id : null}
+                  creator={x.creator?.id ? x.creator.id : null}
                   buyout={x.buyout}
                   provider={provider}
                   tokenAddress={x.tokenAddress}
