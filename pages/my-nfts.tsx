@@ -39,6 +39,25 @@ export default function MyNFTsView() {
   const { isMinting, setIsMinting } = useMintingContext();
 
   useEffect(() => {
+    let nftLocalDataString = window?.localStorage.getItem("mintingNFTs");
+    let nftLocalData = JSON.parse(nftLocalDataString);
+    console.log("nftLocalData", nftLocalData);
+    nftLocalData?.forEach((address, index) => {
+      console.log("iterating through local nfts");
+      fraktals?.forEach(frak => {
+        console.log("iterating through fraktions");
+        if (address.toLocaleLowerCase() === frak.id) {
+          console.log("match discovered");
+          nftLocalData.splice(index, 1);
+        }
+      });
+    });
+    console.log("new nftLocalData", nftLocalData);
+    nftLocalDataString = JSON.stringify(nftLocalData);
+    window?.localStorage.setItem("mintingNFTs", nftLocalDataString);
+  }, [fraktals]);
+
+  useEffect(() => {
     if (account) {
       console.log("account", account);
     }
@@ -58,8 +77,15 @@ export default function MyNFTsView() {
       if (!window?.localStorage.getItem("mintingNFTs")) {
         setIsMinting(false);
       }
-      if (window.localStorage.getItem("mintingNFTs")) {
-        setIsMinting(true);
+      if (window?.localStorage.getItem("mintingNFTs")) {
+        let mintingNFTsString = window?.localStorage.getItem("mintingNFTs");
+        let mintingNFTs = JSON.parse(mintingNFTsString);
+        if (mintingNFTs.length > 0) {
+          setIsMinting(true);
+        }
+        if (mintingNFTs.length <= 0) {
+          setIsMinting(false);
+        }
       }
     }
   }, []);

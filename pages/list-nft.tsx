@@ -107,7 +107,17 @@ export default function MintPage() {
         toast.success("Mint completed.");
         setIsMinting(false);
         setTokenMintedAddress(response);
-        window?.localStorage.setItem("mintingNFTs", response);
+
+        let mintingArray = [];
+        if (window?.localStorage.getItem("mintingNFTS")) {
+          let mintingNFTSString = window?.localStorage.getItem("mintingNFTS");
+          let mintingNFTS = JSON.parse(mintingNFTSString);
+          mintingArray = [...mintingNFTS, response];
+        } else {
+          mintingArray = [response];
+        }
+        let mintingArrayString = JSON.stringify(mintingArray);
+        window?.localStorage.setItem("mintingNFTs", mintingArrayString);
         setMinted(true);
       }
     }
@@ -281,8 +291,12 @@ export default function MintPage() {
               className="semi-16"
               borderRadius="25"
               padding="5"
-              sx={{backgroundColor: `black`, color: `white`, border: `2px solid transparent` }}
-              _hover={{color: `white`}}
+              sx={{
+                backgroundColor: `black`,
+                color: `white`,
+                border: `2px solid transparent`,
+              }}
+              _hover={{ color: `white` }}
               onClick={() => null}
             >
               Mint NFT
@@ -306,7 +320,14 @@ export default function MintPage() {
             />
           </div>
           <div style={{ marginTop: "16px" }}>
-            <Box sx={{ display: `flex`, gap: `12px`, alignItems: `center`, marginBottom: `8px` }}>
+            <Box
+              sx={{
+                display: `flex`,
+                gap: `12px`,
+                alignItems: `center`,
+                marginBottom: `8px`,
+              }}
+            >
               {listItemCheck && (
                 <Box
                   sx={{
@@ -317,7 +338,7 @@ export default function MintPage() {
                     backgroundColor: `#00C49D`,
                   }}
                   _hover={{
-                    cursor: `pointer`
+                    cursor: `pointer`,
                   }}
                   onClick={() => setListItemCheck(!listItemCheck)}
                 ></Box>
@@ -332,7 +353,7 @@ export default function MintPage() {
                     display: `block`,
                   }}
                   _hover={{
-                    cursor: `pointer`
+                    cursor: `pointer`,
                   }}
                   onClick={() => setListItemCheck(!listItemCheck)}
                 ></Box>
@@ -344,7 +365,7 @@ export default function MintPage() {
                   fontWeight: `700`,
                 }}
                 _hover={{
-                  cursor: `pointer`
+                  cursor: `pointer`,
                 }}
                 onClick={() => setListItemCheck(!listItemCheck)}
               >

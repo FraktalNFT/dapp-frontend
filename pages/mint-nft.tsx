@@ -4,12 +4,12 @@ import Head from "next/head";
 import styles from "../styles/mint-nft.module.css";
 import Button from "../components/button";
 import { HStack } from "@chakra-ui/layout";
-import { Image as ImageComponent }  from "@chakra-ui/image";
+import { Image as ImageComponent } from "@chakra-ui/image";
 import { useWeb3Context } from "../contexts/Web3Context";
-import { pinByHash } from '../utils/pinataPinner';
-import { createNFT} from '../utils/contractCalls';
-import { useRouter } from 'next/router';
-const { create } = require('ipfs-http-client');
+import { pinByHash } from "../utils/pinataPinner";
+import { createNFT } from "../utils/contractCalls";
+import { useRouter } from "next/router";
+const { create } = require("ipfs-http-client");
 
 export default function MintNFTView() {
   const router = useRouter();
@@ -21,80 +21,101 @@ export default function MintNFTView() {
   const [description, setDescription] = useState();
   const [file, setFile] = useState();
 
-  useEffect(()=>{
+  useEffect(() => {
     const ipfsClient = create({
       host: "ipfs.infura.io",
       port: "5001",
-      protocol: "https",})
-    setIpfsNode(ipfsClient)
-  },[])
+      protocol: "https",
+    });
+    setIpfsNode(ipfsClient);
+  }, []);
 
-  function openLocal(){
-    document.getElementById('imageInput').files = null;
-    document.getElementById('imageInput').click()
+  function openLocal() {
+    document.getElementById("imageInput").files = null;
+    document.getElementById("imageInput").click();
     // test type? or add accept attributes in input?
   }
 
-  async function uploadAndPin(data){
-    let dataUpload
-    try{
+  async function uploadAndPin(data) {
+    let dataUpload;
+    try {
       dataUpload = await ipfsNode.add(data);
-    }catch(e){
-      console.log('Error: ',e)
-      return 'Error uploading the file'
+    } catch (e) {
+      console.log("Error: ", e);
+      return "Error uploading the file";
     }
-    await pinByHash(dataUpload.cid.toString()) // Pinata
+    await pinByHash(dataUpload.cid.toString()); // Pinata
     return dataUpload;
   }
 
-  async function prepareNftData(){
-    let results = await uploadAndPin(file)
-    let metadata = {name:name, description:description, image:results.path}
-    minter(metadata)
+  async function prepareNftData() {
+    let results = await uploadAndPin(file);
+    let metadata = {
+      name: name,
+      description: description,
+      image: results.path,
+    };
+    minter(metadata);
   }
   async function minter(metadata) {
-    let metadataCid =  await uploadAndPin(JSON.stringify(metadata))
-    if(metadataCid){
-      createNFT(metadataCid.cid.toString(), provider, factoryAddress).then(()=>{
-        router.push('/my-nfts');
-      });
+    let metadataCid = await uploadAndPin(JSON.stringify(metadata));
+    if (metadataCid) {
+      createNFT(metadataCid.cid.toString(), provider, factoryAddress).then(
+        () => {
+          router.push("/my-nfts");
+        }
+      );
     }
   }
 
-  async function addFile(){
-    const selectedFile = document.getElementById('imageInput').files[0];
-    setFile(selectedFile)
+  async function addFile() {
+    const selectedFile = document.getElementById("imageInput").files[0];
+    setFile(selectedFile);
     let reader = new FileReader();
     reader.readAsDataURL(selectedFile);
     reader.onloadend = function () {
-        setImageData(reader.result)
-        var image = new Image();
-        image.src = reader.result;
-        image.onload = function() {
-          setImageSize(this.width, this.height)
-          }
-      }
+      setImageData(reader.result);
+      var image = new Image();
+      image.src = reader.result;
+      image.onload = function () {
+        setImageSize(this.width, this.height);
+      };
+    };
   }
-  const proportionalImage = (width) => {return (imageSize[1]/imageSize[0])*width}
+  const proportionalImage = width => {
+    return (imageSize[1] / imageSize[0]) * width;
+  };
   return (
-    <VStack spacing='0' mb='12.8rem'>
+    <VStack spacing="0" mb="12.8rem">
       <Head>
         <title>Fraktal - Mint NFT</title>
       </Head>
       <div className={styles.header}>Mint NFT</div>
       <HStack
-        spacing='32px'
-        marginTop='40px !important'
-        alignItems='flex-start'
+        spacing="32px"
+        marginTop="40px !important"
+        alignItems="flex-start"
       >
         <div>
           <div className={styles.inputHeader}>NAME</div>
-          <input className={styles.input}  id="nameIn"  onChange={(e)=>setName(e.target.value)}/>
+          <input
+            className={styles.input}
+            id="nameIn"
+            onChange={e => setName(e.target.value)}
+          />
           <div className={styles.inputHeader} style={{ marginTop: "32px" }}>
             DESCRIPTION (OPTIONAL)
           </div>
-          <input className={styles.input} id="descriptionIn"   onChange={(e)=>setDescription(e.target.value)}/>
-          <Button disabled={!imageData || !name} style={{ display: "block", marginTop: "40px" }} onClick={()=>prepareNftData()}>
+          <input
+            className={styles.input}
+            id="descriptionIn"
+            onChange={e => setDescription(e.target.value)}
+          />
+          <Button
+            disabled={!imageData || !name}
+            style={{ display: "block", marginTop: "40px" }}
+            onClick={() => prepareNftData()}
+          >
             Create NFT
           </Button>
         </div>
@@ -113,14 +134,13 @@ export default function MintNFTView() {
                     marginTop: "16px",
                   }}
                 >
-              <input
-                type="file"
-                id="imageInput"
-                style={{"display":"none"}}
-                onChange={()=> addFile()}
-                multiple={false}
-                >
-                </input>
+                  <input
+                    type="file"
+                    id="imageInput"
+                    style={{ display: "none" }}
+                    onChange={() => addFile()}
+                    multiple={false}
+                  ></input>
                   <Button
                     isOutlined
                     style={{ width: "160px" }}
@@ -149,7 +169,11 @@ export default function MintNFTView() {
                     alignItems: "center",
                   }}
                 >
-                  <ImageComponent src={imageData} w={"200px"} h={proportionalImage(200)} />
+                  <ImageComponent
+                    src={imageData}
+                    w={"200px"}
+                    h={proportionalImage(200)}
+                  />
                 </div>
               </>
             )}
