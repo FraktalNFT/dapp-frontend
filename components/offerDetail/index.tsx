@@ -54,8 +54,8 @@ export default function OfferDetail({
       marketAddress,
       fraktionsApproved,
     };
-    console.log("Offer Item: ", offerItem);
-    console.log("Account: ", account);
+    // console.log("Offer Item: ", offerItem);
+    // console.log("Account: ", account);
     if (account?.length > 0 && offerItem?.offerer?.id?.length > 0) {
       if (account.toLocaleLowerCase() === offerItem?.offerer?.id) {
         setIsOfferer(true);
@@ -114,7 +114,7 @@ export default function OfferDetail({
       );
       toast.success("Claim successful.");
     } catch (e) {
-      console.log("There has been an error: ", e);
+      console.error("There has been an error: ", e);
       toast.error("Claiming failed.");
     }
   }
@@ -146,7 +146,9 @@ export default function OfferDetail({
               : "N/A"}
           </Text>
           <Box w="210px" sx={{ textAlign: `right` }}>
-            {(fraktionsBalance <= 0) && !isOfferer && <Text>Buy Fraktions to vote!</Text>}
+            {fraktionsBalance <= 0 && !isOfferer && (
+              <Text>Buy Fraktions to vote!</Text>
+            )}
             {fraktionsBalance > 0 && !fraktionsApproved && (
               <Box
                 sx={{
@@ -167,7 +169,7 @@ export default function OfferDetail({
                 Approve Fraktions
               </Box>
             )}
-            {(fraktionsBalance > 0) && fraktionsApproved && !fraktionsLocked && (
+            {fraktionsBalance > 0 && fraktionsApproved && !fraktionsLocked && (
               <Box
                 sx={{
                   borderColor: "#00C4B8",
@@ -187,7 +189,7 @@ export default function OfferDetail({
                 Accept
               </Box>
             )}
-            {(fraktionsBalance > 0) &&
+            {fraktionsBalance > 0 &&
               fraktionsApproved &&
               fraktionsLocked &&
               !offerItem?.winner && (
@@ -210,27 +212,26 @@ export default function OfferDetail({
                   Reject
                 </Box>
               )}
-            {offerItem?.winner &&
-              isOfferer && (
-                <Box
-                  sx={{
-                    border: `2px solid green`,
-                    fontSize: `16px`,
-                    display: `inline-block`,
-                    boxSizing: `border-box`,
-                    backgroundColor: `white`,
-                    padding: `4px 16px`,
-                    color: `green`,
-                    fontWeight: `500`,
-                    fontFamily: `Inter`,
-                    borderRadius: `24px`,
-                  }}
-                  _hover={{ cursor: `pointer` }}
-                  onClick={() => claimFraktal()}
-                >
-                  Claim
-                </Box>
-              )}
+            {offerItem?.winner && isOfferer && (
+              <Box
+                sx={{
+                  border: `2px solid green`,
+                  fontSize: `16px`,
+                  display: `inline-block`,
+                  boxSizing: `border-box`,
+                  backgroundColor: `white`,
+                  padding: `4px 16px`,
+                  color: `green`,
+                  fontWeight: `500`,
+                  fontFamily: `Inter`,
+                  borderRadius: `24px`,
+                }}
+                _hover={{ cursor: `pointer` }}
+                onClick={() => claimFraktal()}
+              >
+                Claim
+              </Box>
+            )}
           </Box>
         </Box>
       )}

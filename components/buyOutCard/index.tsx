@@ -47,7 +47,7 @@ const BuyOutCard = ({
           let tokenMajority = await getMajority(provider, tokenAddress);
           setMajority(tokenMajority / 100);
         } catch {
-          console.log("Not yet fraktionalized");
+          console.error("Not yet fraktionalized");
         }
       }
     }
@@ -68,7 +68,7 @@ const BuyOutCard = ({
         setValueToOffer("0");
       });
     } catch (err) {
-      console.log("Error", err);
+      console.error("Error: ", err);
     }
   }
 
@@ -249,7 +249,7 @@ const BuyOutCard = ({
       </div>
       <div>
         <>
-          {offers && offers?.length && itemStatus != "Retrieved" && (
+          {offers?.length > 0 && itemStatus != "Retrieved" && (
             <>
               <Box sx={{ display: `flex` }}>
                 <Text
