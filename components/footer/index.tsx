@@ -28,7 +28,7 @@ const Footer: React.FC = () => {
         </Link>
       </HStack>
       <Text className="regular-16">
-        Made in increments by Fraktal.
+        Made in increments by Fraktal
       </Text>
     </VStack>
   );
