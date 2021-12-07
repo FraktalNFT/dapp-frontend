@@ -162,7 +162,7 @@ const Home: React.FC = () => {
           <Box sx={{ display: `flex`, gap: `16px` }}>
             <FrakButton onClick={() => getData()}>Refresh NFTs</FrakButton>
             <NextLink href="/my-nfts">
-              <FrakButton>List NFT</FrakButton>
+              <FrakButton>Sell Fraktions</FrakButton>
             </NextLink>
           </Box>
         </Flex>
