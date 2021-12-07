@@ -18,7 +18,7 @@ const RescueCard = ({ marketAddress, provider, gains }) => {
       console.error()
     }
   }
-  
+
   return (
     <div
       style={{
@@ -38,7 +38,7 @@ const RescueCard = ({ marketAddress, provider, gains }) => {
           lineHeight: "29px",
         }}
       >
-        Claim your sold Fraktions
+        Marketplace Profits
       </div>
       <div>
         <>
@@ -56,7 +56,7 @@ const RescueCard = ({ marketAddress, provider, gains }) => {
                       minWidth: `116px`,
                     }}
                   >
-                    Gains
+                    
                   </Text>
                   <Text
                     w="116px"
