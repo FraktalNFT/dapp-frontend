@@ -137,7 +137,7 @@ const Header = () => {
               </Box>
             </Link>
             <Link
-              href="https://medium.com/@fraktal"
+              href="https://blog.fraktal.io/"
               target="_blank"
               rel="noreferrer noopener"
             >
