@@ -20,7 +20,7 @@ const Footer: React.FC = () => {
           <Image src="/footer/discord.svg"/>
         </Link>
         <Link
-          href="https://medium.com/@fraktal"
+          href="https://blog.fraktal.io/"
           target="_blank"
           rel="noreferrer noopener"
         >
@@ -28,7 +28,7 @@ const Footer: React.FC = () => {
         </Link>
       </HStack>
       <Text className="regular-16">
-        Made in increments by Fraktal.
+        Made in increments by Fraktal
       </Text>
     </VStack>
   );

@@ -56,7 +56,7 @@ const MintCard = ({ setName, setDescription, addFile, file }) => {
           setFunction={() => addFile()}
           inputPlaceholder="PNG, GIF, WEBP, MP4 or MP3"
         >
-          {file ? "Change image" : "Choose image"}
+          {file ? "Change File" : "Choose File"}
         </FrakButton3>
         <Box sx={{height: `16px`}}></Box>
       </div>
