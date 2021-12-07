@@ -158,7 +158,7 @@ export default function MyNFTsView() {
         <Box>
           <NextLink href={`/list-nft`}>
             <FrakButton style={{ width: "160px", marginTop: "6px" }}>
-              Add NFT
+              Mint NFT
             </FrakButton>
           </NextLink>
         </Box>
