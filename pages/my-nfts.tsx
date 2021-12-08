@@ -186,7 +186,7 @@ export default function MyNFTsView() {
               </NextLink>
             </div>
           ))}
-          {isMinting && <Image src="/nft-loading-card.svg" alt="NFTLoading" />}
+        
         </Grid>
       )}
       {!loading && fraktals?.length <= 0 && isMinting && (
@@ -292,7 +292,7 @@ export default function MyNFTsView() {
       <Flex w="100%" paddingTop="64px">
         <div className={styles.header}>Your Wallet NFTs</div>
         <Spacer />
-      
+
       </Flex>
       {nfts?.length > 0 && (
         <Grid
