@@ -107,6 +107,21 @@ const Header = () => {
 
             {/*_hover={{backgroundColor: `black`}}*/}
             <Link
+              href="https://www.instagram.com/fraktal.io/"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <Box
+                sx={{
+                  display: `grid`,
+                  placeItems: `center`,
+                  borderRadius: `12px`,
+                }}
+              >
+                <Image src="/footer/icons8-instagram.svg" />
+              </Box>
+            </Link>
+            <Link
               href="https://twitter.com/fraktalnft"
               target="_blank"
               rel="noreferrer noopener"
@@ -118,9 +133,10 @@ const Header = () => {
                   borderRadius: `12px`,
                 }}
               >
-                <Image src="/footer/twitter.svg" />
+                <Image src="/footer/icons8-twitter.svg" />
               </Box>
             </Link>
+        
             <Link
               href="https://discord.gg/B9atrdtEEx"
               target="_blank"
@@ -133,24 +149,10 @@ const Header = () => {
                   borderRadius: `12px`,
                 }}
               >
-                <Image src="/footer/discord.svg" />
+                <Image src="/footer/icons8-discord.svg" />
               </Box>
             </Link>
-            <Link
-              href="https://blog.fraktal.io/"
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <Box
-                sx={{
-                  display: `grid`,
-                  placeItems: `center`,
-                  borderRadius: `12px`,
-                }}
-              >
-                <Image src="/footer/medium.svg" />
-              </Box>
-            </Link>
+
           </HStack>
           {!account ? (
             <FrakButton onClick={connectWeb3}>Connect Wallet</FrakButton>
