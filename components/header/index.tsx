@@ -115,7 +115,7 @@ const Header = () => {
                 sx={{
                   display: `grid`,
                   placeItems: `center`,
-                  borderRadius: `12px`,
+                  borderRadius: `6px`,
                 }}
               >
                 <Image src="/footer/icons8-instagram.svg" />
@@ -130,7 +130,7 @@ const Header = () => {
                 sx={{
                   display: `grid`,
                   placeItems: `center`,
-                  borderRadius: `12px`,
+                  borderRadius: `6px`,
                 }}
               >
                 <Image src="/footer/icons8-twitter.svg" />
@@ -145,7 +145,7 @@ const Header = () => {
                 sx={{
                   display: `grid`,
                   placeItems: `center`,
-                  borderRadius: `12px`,
+                  borderRadius: `6px`,
                 }}
               >
                 <Image src="/footer/icons8-medium.svg" />
@@ -160,7 +160,7 @@ const Header = () => {
                 sx={{
                   display: `grid`,
                   placeItems: `center`,
-                  borderRadius: `12px`,
+                  borderRadius: `6px`,
                 }}
               >
                 <Image src="/footer/icons8-discord.svg" />
