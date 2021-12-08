@@ -36,9 +36,9 @@ export default function MyNFTsView() {
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
   const { fraktals, fraktions, nfts, balance, loading } = useUserContext();
 
-  const { isMinting, setIsMinting } = useMintingContext();
+{/*  const { isMinting, setIsMinting } = useMintingContext(); */}
 
-  useEffect(() => {
+{/*  useEffect(() => {
     let nftLocalDataString = window?.localStorage.getItem("mintingNFTs");
     let nftLocalData = JSON.parse(nftLocalDataString);
     nftLocalData?.forEach((address, index) => {
@@ -50,7 +50,7 @@ export default function MyNFTsView() {
     });
     nftLocalDataString = JSON.stringify(nftLocalData);
     window?.localStorage.setItem("mintingNFTs", nftLocalDataString);
-  }, [fraktals]);
+  }, [fraktals]); */}
 
   // useEffect(() => {
   //   if (account) {
@@ -67,7 +67,7 @@ export default function MyNFTsView() {
   //   }
   // }, [account, fraktals, fraktions, nfts, balance]);
 
-  useEffect(() => {
+{/*  useEffect(() => {
     if (window) {
       if (!window?.localStorage.getItem("mintingNFTs")) {
         setIsMinting(false);
@@ -83,7 +83,7 @@ export default function MyNFTsView() {
         }
       }
     }
-  }, []);
+  }, []); */}
 
   async function approveContract(contract, tokenAddress) {
     let done = await approveMarket(contract, provider, tokenAddress);
@@ -292,7 +292,7 @@ export default function MyNFTsView() {
       <Flex w="100%" paddingTop="64px">
         <div className={styles.header}>Your Wallet NFTs</div>
         <Spacer />
-      
+
       </Flex>
       {nfts?.length > 0 && (
         <Grid
