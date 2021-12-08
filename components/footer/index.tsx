@@ -37,7 +37,7 @@ const Footer: React.FC = () => {
 
       </HStack>
       <Text className="regular-16">
-        Made in increments by <a href="https://app.daohaus.club/dao/0xa4b1/0x751eda5aa0a1c026f51942e266ed82795428ae34/" target="_blank"><u>Fraktal DAO</u></a>
+        Made in increments by <a href="https://app.daohaus.club/dao/0xa4b1/0x751eda5aa0a1c026f51942e266ed82795428ae34/" target="_blank"><b>Fraktal DAO</b></a>
       </Text>
     </VStack>
   );
