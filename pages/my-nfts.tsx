@@ -294,9 +294,7 @@ export default function MyNFTsView() {
         <Spacer />
         <Box justifyContent="center-vertical">
           <NextLink href={`/list-nft`}>
-            <FrakButton style={{ width: "151px", marginTop: "6px" }}>
-              Import
-            </FrakButton>
+          
           </NextLink>
         </Box>
       </Flex>
