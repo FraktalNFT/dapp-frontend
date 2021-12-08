@@ -94,7 +94,7 @@ const Header = () => {
               )}
             </NextLink>
 
-            <Link
+  {/*          <Link
               href="https://app.daohaus.club/dao/0xa4b1/0x751eda5aa0a1c026f51942e266ed82795428ae34/"
               target="_blank"
               className="semi-16"
@@ -103,7 +103,7 @@ const Header = () => {
               _hover={{ backgroundColor: "black", textColor: "white" }}
             >
               DAO
-            </Link>
+            </Link> */}
 
             {/*_hover={{backgroundColor: `black`}}*/}
             <Link
@@ -136,7 +136,7 @@ const Header = () => {
                 <Image src="/footer/icons8-twitter.svg" />
               </Box>
             </Link>
-        
+
             <Link
               href="https://discord.gg/B9atrdtEEx"
               target="_blank"
@@ -168,7 +168,7 @@ const Header = () => {
                     "linear(to-r, #BE6DFF, #BE6DFF, #9A31FE, #9A31FE, #7213F2)",
                 }}
               >
-                {shortenHash(account)}
+                {shortenHash(account)} | View my NFTs
               </FrakButton>
             </NextLink>
           )}
