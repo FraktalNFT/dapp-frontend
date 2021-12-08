@@ -115,7 +115,7 @@ const Header = () => {
                 sx={{
                   display: `grid`,
                   placeItems: `center`,
-                  borderRadius: `6px`,
+                  borderRadius: `12px`,
                 }}
               >
                 <Image src="/footer/icons8-instagram.svg" />
@@ -130,27 +130,13 @@ const Header = () => {
                 sx={{
                   display: `grid`,
                   placeItems: `center`,
-                  borderRadius: `6px`,
+                  borderRadius: `12px`,
                 }}
               >
                 <Image src="/footer/icons8-twitter.svg" />
               </Box>
             </Link>
-            <Link
-              href="https://blog.fraktal.io/"
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <Box
-                sx={{
-                  display: `grid`,
-                  placeItems: `center`,
-                  borderRadius: `6px`,
-                }}
-              >
-                <Image src="/footer/icons8-medium.svg" />
-              </Box>
-            </Link>
+        
             <Link
               href="https://discord.gg/B9atrdtEEx"
               target="_blank"
@@ -160,7 +146,7 @@ const Header = () => {
                 sx={{
                   display: `grid`,
                   placeItems: `center`,
-                  borderRadius: `6px`,
+                  borderRadius: `12px`,
                 }}
               >
                 <Image src="/footer/icons8-discord.svg" />
