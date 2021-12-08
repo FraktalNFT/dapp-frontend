@@ -292,13 +292,7 @@ export default function MyNFTsView() {
       <Flex w="100%" paddingTop="64px">
         <div className={styles.header}>Your Wallet NFTs</div>
         <Spacer />
-        <Box justifyContent="center-vertical">
-          <NextLink href={`/list-nft`}>
-            <FrakButton style={{ width: "151px", marginTop: "6px" }}>
-              Import
-            </FrakButton>
-          </NextLink>
-        </Box>
+      
       </Flex>
       {nfts?.length > 0 && (
         <Grid
