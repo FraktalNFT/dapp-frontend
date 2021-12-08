@@ -20,19 +20,20 @@ const Footer: React.FC = () => {
           <Image src="/footer/icons8-twitter.svg"/>
         </Link>
         <Link
-          href="https://discord.gg/B9atrdtEEx"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          <Image src="/footer/icons8-discord.svg"/>
-        </Link>
-        <Link
           href="https://blog.fraktal.io/"
           target="_blank"
           rel="noreferrer noopener"
         >
           <Image src="/footer/icons8-medium.svg"/>
         </Link>
+        <Link
+          href="https://discord.gg/B9atrdtEEx"
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          <Image src="/footer/icons8-discord.svg"/>
+        </Link>
+
 
       </HStack>
       <Text className="regular-16">
