@@ -216,6 +216,7 @@ const BuyOutCard = ({
                 isReady={isReady}
                 onClick={onOffer}
                 setFunction={onSetValue}
+                inputPlaceholder={'ETH'}
               >
                 {offering ? "Making offer" : "Offer"}
               </FrakButton2>

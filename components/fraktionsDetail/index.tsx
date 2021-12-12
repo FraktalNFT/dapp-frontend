@@ -177,6 +177,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
             isReady={isReady}
             onClick={onBuy}
             setFunction={onSetAmount}
+            inputPlaceholder={'Fraktions'}
           >
             {buying ? "BUYING" : "BUY"}
           </FrakButton2>
@@ -191,7 +192,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
                 color: "#656464",
               }}
             >
-              equals {amountToBuy / 100}% of ownership for { amountToBuy * utils.formatEther(price) } ETH
+              equals {amountToBuy / 100}% of ownership
             </div>
           ) : null}
         </VStack>
