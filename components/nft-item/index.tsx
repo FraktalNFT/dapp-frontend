@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import NextLink from "next/link";
 import { Image } from "@chakra-ui/image";
 import {
   Box,
@@ -18,6 +19,8 @@ import {
 } from "@chakra-ui/react";
 import { FrakCard } from "../../types";
 import { motion, isValidMotionProp, HTMLMotionProps } from "framer-motion";
+import FrakButton from "../../components/button";
+import { useUserContext } from "@/contexts/userContext";
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
@@ -33,6 +36,9 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
   ({ item, amount, price, imageURL, name, onClick, CTAText, wait }, ref) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
+    const { fraktions } = useUserContext();
+
+    const canList = item && !! (fraktions || []).find(fraktion => fraktion.id === item.id);
 
     // useEffect(() => {
     //   setIsImageLoaded(false);
@@ -144,6 +150,14 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                   </Text>
                 )}
               </Flex>
+
+              { canList && (
+                <Box textAlign="center" marginTop={5}>
+                  <NextLink href={`nft/${item.id}/list-item`}>
+                    <FrakButton size="sm">Sell Fraktions</FrakButton>
+                  </NextLink>
+                </Box>
+              )}
             </Box>
           </Box>
         )}
