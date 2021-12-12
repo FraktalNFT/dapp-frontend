@@ -75,10 +75,10 @@ export default function MyNFTsView() {
       if (window?.localStorage.getItem("mintingNFTs")) {
         let mintingNFTsString = window?.localStorage.getItem("mintingNFTs");
         let mintingNFTs = JSON.parse(mintingNFTsString);
-        if (mintingNFTs.length > 0) {
+        if (mintingNFTs && mintingNFTs.length > 0) {
           setIsMinting(true);
         }
-        if (mintingNFTs.length <= 0) {
+        if (mintingNFTs && mintingNFTs.length <= 0) {
           setIsMinting(false);
         }
       }
@@ -186,7 +186,7 @@ export default function MyNFTsView() {
               </NextLink>
             </div>
           ))}
-        
+          
         </Grid>
       )}
       {!loading && fraktals?.length <= 0 && isMinting && (
@@ -219,7 +219,7 @@ export default function MyNFTsView() {
         </Center>
       )}
       <Flex w="100%" paddingTop="64px">
-        <div className={styles.header}>Your Fraktions</div>
+        <div className={styles.header} id="yourFraktions">Your Fraktions</div>
       </Flex>
       {fraktions?.length >= 1 && (
         <div style={{ marginTop: "16px" }}>
