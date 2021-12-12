@@ -161,7 +161,7 @@ const Home: React.FC = () => {
           <Spacer />
           <Box sx={{ display: `flex`, gap: `16px` }}>
           
-            <NextLink href="/my-nfts">
+            <NextLink href="/my-nfts#yourFraktions">
               <FrakButton>Sell Fraktions</FrakButton>
             </NextLink>
           </Box>
