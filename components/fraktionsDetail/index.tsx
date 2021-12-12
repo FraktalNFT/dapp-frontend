@@ -177,6 +177,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
             isReady={isReady}
             onClick={onBuy}
             setFunction={onSetAmount}
+            inputPlaceholder={'Fraktions'}
           >
             {buying ? "BUYING" : "BUY"}
           </FrakButton2>
