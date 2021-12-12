@@ -19,12 +19,12 @@ import { getSubgraphData } from "../utils/graphQueries";
 import { createListed } from "../utils/nftHelpers";
 import { FiChevronDown } from "react-icons/fi";
 import InfiniteScroll from "react-infinite-scroll-component";
-const SORT_TYPES = ["Availability", "Popular", "Newly Listed"];
+const SORT_TYPES = ["Lowest Price", "Highest Price", "Newly Listed", "Popular"];
 
 const Home: React.FC = () => {
   const [nftItems, setNftItems] = useState([]);
   const [selectionMode, setSelectionMode] = useState(false);
-  const [sortType, setSortType] = useState("Newly Listed");
+  const [sortType, setSortType] = useState("Popular");
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const handleSortSelect = (item: string) => {
@@ -34,18 +34,22 @@ const Home: React.FC = () => {
   };
 
   const changeOrder = type => {
+
     let sortedItems;
-    if (type == "Availability") {
-      sortedItems = nftItems.sort((a, b) =>
-        parseInt(a.amount) > parseInt(b.amount) ? -1 : 1
-      );
-    } else if (type == "Popular") {
-      sortedItems = nftItems.sort((a, b) => (a.holders > b.holders ? -1 : 1));
-    } else {
-      sortedItems = nftItems.sort((a, b) =>
-        a.createdAt > b.createdAt ? -1 : 1
-      );
+
+    if (type == "Lowest Price") {
+      sortedItems = nftItems.sort((a, b) => a.price > b.price ? 1 : -1);
     }
+    else if (type == "Highest Price") {
+      sortedItems = nftItems.sort((a, b) => a.price > b.price ? -1 : 1);
+    }
+    else if (type == "Newly Listed") {
+      sortedItems = nftItems.sort((a, b) => a.createdAt > b.createdAt ? -1 : 1);
+    }
+    else {//Popular
+      sortedItems = nftItems.sort((a, b) => (a.holders > b.holders ? -1 : 1));
+    }
+
     setNftItems(sortedItems);
   };
 
@@ -71,6 +75,12 @@ const Home: React.FC = () => {
     // window?.addEventListener("beforeunload", clearStorage);
     // return () => window.removeEventListener("beforeunload", clearStorage);
   }, []);
+
+  useEffect(() => {
+    if(nftItems) {
+      changeOrder(sortType);
+    }
+  }, [nftItems])
 
   const getMoreListedItems = async () => {
     const data = await getSubgraphData("listed_items", "");
@@ -132,7 +142,7 @@ const Home: React.FC = () => {
           <Text className="semi-48" marginEnd="2rem">
             Marketplace
           </Text>
-          <Menu closeOnSelect={true}>
+          <Menu closeOnSelect={false} closeOnBlur={false}>
             <MenuButton
               as={Button}
               alignSelf="center"
@@ -147,21 +157,17 @@ const Home: React.FC = () => {
               Sort: {sortType}
             </MenuButton>
             <MenuList>
-              <MenuItem onClick={() => handleSortSelect("Popular")}>
-                Popular
-              </MenuItem>
-              <MenuItem onClick={() => handleSortSelect("Availability")}>
-                Availability
-              </MenuItem>
-              <MenuItem onClick={() => handleSortSelect("Newly Listed")}>
-                Newly Listed
-              </MenuItem>
+              {SORT_TYPES.map((type) => (
+                <MenuItem onClick={() => handleSortSelect(type)}>
+                  {type}
+                </MenuItem>
+              ))}
             </MenuList>
           </Menu>
           <Spacer />
           <Box sx={{ display: `flex`, gap: `16px` }}>
-          
-            <NextLink href="/my-nfts#yourFraktions">
+
+            <NextLink href="/my-nfts">
               <FrakButton>Sell Fraktions</FrakButton>
             </NextLink>
           </Box>
