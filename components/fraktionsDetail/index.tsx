@@ -191,7 +191,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
                 color: "#656464",
               }}
             >
-              equals {amountToBuy / 100}% of ownership
+              equals {amountToBuy / 100}% of ownership for { amountToBuy * utils.formatEther(price) } ETH
             </div>
           ) : null}
         </VStack>
