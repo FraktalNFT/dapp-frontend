@@ -19,6 +19,7 @@ import { getSubgraphData } from "../utils/graphQueries";
 import { createListed } from "../utils/nftHelpers";
 import { FiChevronDown } from "react-icons/fi";
 import InfiniteScroll from "react-infinite-scroll-component";
+//const SORT_TYPES = ["Availability", "Popular", "Newly Listed"];
 const SORT_TYPES = ["Lowest Price", "Highest Price", "Newly Listed", "Popular"];
 
 const Home: React.FC = () => {
@@ -142,7 +143,7 @@ const Home: React.FC = () => {
           <Text className="semi-48" marginEnd="2rem">
             Marketplace
           </Text>
-          <Menu closeOnSelect={false} closeOnBlur={false}>
+          <Menu closeOnSelect={true} closeOnBlur={true}>
             <MenuButton
               as={Button}
               alignSelf="center"
