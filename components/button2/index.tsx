@@ -1,11 +1,12 @@
 import { Button, ButtonProps } from "@chakra-ui/button";
-import { Input } from "@chakra-ui/react";
+import { Input, Text } from "@chakra-ui/react";
 import { forwardRef } from "react";
+
 
 const FrakButton2 = forwardRef<
   HTMLButtonElement,
-  ButtonProps & { isReady?: boolean; setFunction: Function; inputPlaceholder: String }
->(({ isReady, onClick, setFunction, inputPlaceholder, children, ...rest }) => {
+  ButtonProps & { isReady?: boolean; setFunction: Function; inputPlaceholder: String ; currency: String}
+>(({ isReady, onClick, setFunction, inputPlaceholder, currency, children, ...rest }) => {
   return (
     <div
       style={{
@@ -14,25 +15,46 @@ const FrakButton2 = forwardRef<
         alignItems: `center`,
         border: `2px solid #405466`,
         borderRadius: "16px",
-        maxWidth: `288px`,
+        maxWidth: `300px`,
         position: `relative`,
       }}
     >
+
       <Input
         onChange={d => setFunction(d.target.value)}
         placeholder={inputPlaceholder ? inputPlaceholder : null}
-        style={{
+        _focus={{ outline: "none" }}
+        style={
+        {
+
+        //background:"#EFEFEF",
           textAlign: "right",
           color: "#000000",
           fontWeight: 500,
-          fontSize: "24px",
+          fontSize: "20px",
           outline: `none`,
-          border: `1px solid transparent`,
+          border: `none`,
           borderRadius: `15px 0px 0px 15px`,
           height: `40px`,
-          marginRight: `134px`,
+          marginRight: `0px`,
         }}
       />
+      <div>
+    <Text
+    style={{
+    
+    	border: `1px solid transparent`,
+    	color: '#777777',
+    	fontSize: "14px", 
+    	marginRight: `100px`,
+    	maxwidth:'50px',
+    	padding:'4px',
+    	position: 'relative',
+    	marginRight: `100px`,
+    	boxSizing: `content-box`,
+    	transform: `translateX(2px) translateY(-2px)`,                
+	}}>{currency ? currency : null}</Text>
+	</div>
       <Button
         disabled={!isReady}
         background={isReady ? "#405466" : "#A7A7A7"}
@@ -45,7 +67,7 @@ const FrakButton2 = forwardRef<
           borderBottom: `2px solid #405466`,
           fontSize: "1.8rem",
           height: `40px`,
-          width: `134px`,
+          width: `100px`,
           transform: `translateX(2px) translateY(-2px)`,
           boxSizing: `content-box`,
           position: `absolute`,
@@ -59,7 +81,7 @@ const FrakButton2 = forwardRef<
           background: "#A7A7A7 !important",
         }}
         {...rest}
-      >
+      > 
         {children}
       </Button>
     </div>
