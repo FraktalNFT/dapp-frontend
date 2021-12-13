@@ -177,7 +177,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
             isReady={isReady}
             onClick={onBuy}
             setFunction={onSetAmount}
-            currency={'Fraktions'}
+            currency={'FRAKTIONS'}
           >
             {buying ? "BUYING" : "BUY"}
           </FrakButton2>
