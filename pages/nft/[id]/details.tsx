@@ -273,7 +273,13 @@ export default function DetailsView() {
                       lineHeight: "19px",
                     }}
                   >
-                    {nftObject ? shortenHash(nftObject.creator) : "loading"}
+                  {nftObject ?
+                  <a href={`https://etherscan.io/address/${nftObject.creator}`}>
+                    {shortenHash(nftObject.creator)}
+                  </a>
+                    :
+                    "loading"
+                  }
                   </div>
                 </VStack>
                 <VStack>
