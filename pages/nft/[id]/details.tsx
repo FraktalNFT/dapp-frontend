@@ -27,6 +27,9 @@ import { useRouter } from "next/router";
 // import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
 // import Modal from '../../../components/modal';
 
+
+const etherscanAddress = "https://rinkeby.etherscan.io/address/";
+
 export default function DetailsView() {
   const router = useRouter();
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
@@ -174,6 +177,7 @@ export default function DetailsView() {
   const [offersGot, setOffersGot] = useState(false);
   const [contractDataGot, setContractDataGot] = useState(false);
 
+
   useEffect(() => {
     async function getAllData() {
       if (isPageReady) {
@@ -222,6 +226,7 @@ export default function DetailsView() {
       console.error("There has been an error: ", e);
     }
   }
+
 
   return (
     <>
@@ -300,6 +305,32 @@ export default function DetailsView() {
                     {nftObject ? timezone(nftObject.createdAt) : "loading"}
                   </div>
                 </VStack>
+              </HStack>
+              <HStack>
+              <VStack>
+              <div
+                    style={{
+                      fontFamily: "Inter",
+                      fontWeight: 600,
+                      fontSize: "12px",
+                      lineHeight: "14px",
+                      letterSpacing: "1px",
+                      color: "#A7A7A7",
+                    }}
+                  >
+                    NFT Contract Address
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "Inter",
+                      fontWeight: 500,
+                      fontSize: "16px",
+                      lineHeight: "19px",
+                    }}
+                  >
+                    <a href={etherscanAddress+nftObject.id+"/"}>{nftObject ? shortenHash(nftObject.id) : "loading"}</a>
+                  </div>
+              </VStack>
               </HStack>
               {/* for the defrak bug, i leave this function to claim the fraktal
           <button onClick={()=>claimFraktal()}>Claim</button>
