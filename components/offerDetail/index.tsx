@@ -119,6 +119,8 @@ export default function OfferDetail({
     }
   }
 
+  const isCanceledOffer = () => offerItem.value <= 0
+  
   return (
     <>
       {offerItem?.offerer?.id.length > 0 && (
@@ -146,10 +148,12 @@ export default function OfferDetail({
               : "N/A"}
           </Text>
           <Box w="210px" sx={{ textAlign: `right` }}>
-            {fraktionsBalance <= 0 && !isOfferer && (
+            {!isCanceledOffer() && fraktionsBalance <= 0 && !isOfferer && (
               <Text>Buy Fraktions to vote!</Text>
             )}
-            {fraktionsBalance > 0 && !fraktionsApproved && (
+            {isCanceledOffer() && (<Text>Canceled</Text>)}
+            {!isCanceledOffer() && 
+            fraktionsBalance > 0 && !fraktionsApproved && (
               <Box
                 sx={{
                   borderColor: "#00C4B8",
@@ -169,7 +173,7 @@ export default function OfferDetail({
                 Approve Fraktions
               </Box>
             )}
-            {fraktionsBalance > 0 && fraktionsApproved && !fraktionsLocked && (
+            {!isCanceledOffer() && fraktionsBalance > 0 && fraktionsApproved && !fraktionsLocked && (
               <Box
                 sx={{
                   borderColor: "#00C4B8",
@@ -190,6 +194,7 @@ export default function OfferDetail({
               </Box>
             )}
             {fraktionsBalance > 0 &&
+            !isCanceledOffer() && 
               fraktionsApproved &&
               fraktionsLocked &&
               !offerItem?.winner && (
