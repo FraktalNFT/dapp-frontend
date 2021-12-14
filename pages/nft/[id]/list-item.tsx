@@ -238,7 +238,7 @@ export default function ListNFTView() {
             </div>
             <div className={styles.auctionCardDivider} />
             <div style={{ marginRight: "24px" }}>
-              <div className={styles.auctionCardHeader}>List properties</div>
+              <div className={styles.auctionCardHeader}>You currently have {fraktions} Fraktions for sale</div>
               <div className={styles.auctionCardDetailsContainer}>
                 <div style={{ marginRight: "60px" }}>
                   <div className={styles.auctionCardDetailsNumber}>{totalPrice}</div>
