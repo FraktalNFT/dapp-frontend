@@ -1,5 +1,5 @@
 import {  VStack, HStack } from "@chakra-ui/layout";
-import React from "react";
+import React, { useEffect } from "react";
 import FrakButton from '../button';
 import {
   importFraktal,
@@ -22,8 +22,6 @@ const UserOwnership=(({
   marketId,
   factoryApproved
 }) => {
-
-
   async function claimNFT(){
     // this requires the factory to be approved
     if(!factoryApproved){
@@ -66,6 +64,12 @@ const UserOwnership=(({
       await importFraktal(tokenAddress,index,provider,marketAddress);
     }
   }
+
+  useEffect(() => {
+    if (window.location.search.includes('?frak=1')) {
+      importFraktalToMarket();
+    }
+  }, []);
 
   return(
     <div style={{
