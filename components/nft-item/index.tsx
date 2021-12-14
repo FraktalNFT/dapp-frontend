@@ -36,8 +36,9 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
   ({ item, amount, price, imageURL, name, onClick, CTAText, wait }, ref) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
-    const { fraktions } = useUserContext();
+    const { fraktions, fraktals } = useUserContext();
 
+    const canFrak = item && !! (fraktals || []).find(fraktion => fraktion.id === item.id);
     const canList = item && !! (fraktions || []).find(fraktion => fraktion.id === item.id);
 
     // useEffect(() => {
@@ -150,6 +151,14 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                   </Text>
                 )}
               </Flex>
+
+              { canFrak && (
+                <Box textAlign="center" marginTop={5}>
+                  <NextLink href={`nft/${item.id}/details?frak=1`}>
+                    <FrakButton size="sm">Frak it</FrakButton>
+                  </NextLink>
+                </Box>
+              )}
 
               { canList && (
                 <Box textAlign="center" marginTop={5}>
