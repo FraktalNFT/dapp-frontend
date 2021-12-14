@@ -301,6 +301,32 @@ export default function DetailsView() {
                   </div>
                 </VStack>
               </HStack>
+              <HStack>
+              <VStack>
+              <div
+                    style={{
+                      fontFamily: "Inter",
+                      fontWeight: 600,
+                      fontSize: "12px",
+                      lineHeight: "14px",
+                      letterSpacing: "1px",
+                      color: "#A7A7A7",
+                    }}
+                  >
+                    NFT Contract Address
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "Inter",
+                      fontWeight: 500,
+                      fontSize: "16px",
+                      lineHeight: "19px",
+                    }}
+                  >
+                    <a href={"https://etherscan.io/address/"+nftObject.id+"/"}>{nftObject ? shortenHash(nftObject.id) : "loading"}</a>
+                  </div>
+              </VStack>
+              </HStack>
               {/* for the defrak bug, i leave this function to claim the fraktal
           <button onClick={()=>claimFraktal()}>Claim</button>
           */}
