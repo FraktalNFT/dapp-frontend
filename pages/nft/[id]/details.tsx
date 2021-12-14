@@ -27,6 +27,9 @@ import { useRouter } from "next/router";
 // import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
 // import Modal from '../../../components/modal';
 
+
+const etherscanAddress = "https://rinkeby.etherscan.io/address/";
+
 export default function DetailsView() {
   const router = useRouter();
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
@@ -174,6 +177,7 @@ export default function DetailsView() {
   const [offersGot, setOffersGot] = useState(false);
   const [contractDataGot, setContractDataGot] = useState(false);
 
+
   useEffect(() => {
     async function getAllData() {
       if (isPageReady) {
@@ -222,13 +226,7 @@ export default function DetailsView() {
       console.error("There has been an error: ", e);
     }
   }
-  function getEtherscanAddress(){
-  if (process.env.NODE_ENV==='development'||process.env.NODE_ENV==='test')
-  {
-  return "https://rinkeby.etherscan.io/address/";
-  }else{
-  return "https://etherscan.io/address/";}
-  }
+
 
   return (
     <>
@@ -330,7 +328,7 @@ export default function DetailsView() {
                       lineHeight: "19px",
                     }}
                   >
-                    <a href={getEtherscanAddress()+nftObject.id+"/"}>{nftObject ? shortenHash(nftObject.id) : "loading"}</a>
+                    <a href={etherscanAddress+nftObject.id+"/"}>{nftObject ? shortenHash(nftObject.id) : "loading"}</a>
                   </div>
               </VStack>
               </HStack>
