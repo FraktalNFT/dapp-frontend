@@ -222,6 +222,13 @@ export default function DetailsView() {
       console.error("There has been an error: ", e);
     }
   }
+  function getEtherscanAddress(){
+  if (process.env.NODE_ENV==='development'||process.env.NODE_ENV==='test')
+  {
+  return "https://rinkeby.etherscan.io/address/";
+  }else{
+  return "https://etherscan.io/address/";}
+  }
 
   return (
     <>
@@ -323,7 +330,7 @@ export default function DetailsView() {
                       lineHeight: "19px",
                     }}
                   >
-                    <a href={"https://etherscan.io/address/"+nftObject.id+"/"}>{nftObject ? shortenHash(nftObject.id) : "loading"}</a>
+                    <a href={getEtherscanAddress()+nftObject.id+"/"}>{nftObject ? shortenHash(nftObject.id) : "loading"}</a>
                   </div>
               </VStack>
               </HStack>
