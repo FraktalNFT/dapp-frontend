@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Text } from "@chakra-ui/react";
 import { utils } from "ethers";
 import FrakButton from "../../../components/button";
 import styles from "./auction.module.css";
@@ -278,7 +279,18 @@ export default function DetailsView() {
                       lineHeight: "19px",
                     }}
                   >
-                    {nftObject ? shortenHash(nftObject.creator) : "loading"}
+                    <Text
+                      sx={{ color: `hsla(224, 86%, 51%, 1)` }}
+                      _hover={{ cursor: `pointer` }}
+                    >
+                      <a onClick={() => router.push(`/artist/${nftObject.creator}`) }>
+                        {nftObject ?
+                          shortenHash(nftObject.creator)
+                          :
+                          "loading"
+                        }
+                      </a>
+                    </Text>
                   </div>
                 </VStack>
                 <VStack>
