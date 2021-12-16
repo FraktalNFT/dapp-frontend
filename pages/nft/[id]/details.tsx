@@ -282,14 +282,13 @@ export default function DetailsView() {
                     <Text
                       sx={{ color: `hsla(224, 86%, 51%, 1)` }}
                       _hover={{ cursor: `pointer` }}
+                      onClick={() => router.push(`/artist/${nftObject.creator}`)}
                     >
-                      <a onClick={() => router.push(`/artist/${nftObject.creator}`) }>
-                        {nftObject ?
-                          shortenHash(nftObject.creator)
-                          :
-                          "loading"
-                        }
-                      </a>
+                      {nftObject ?
+                        shortenHash(nftObject.creator)
+                        :
+                        "loading"
+                      }
                     </Text>
                   </div>
                 </VStack>
