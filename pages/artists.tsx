@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Box, Grid, HStack, VStack, Text, Spinner } from "@chakra-ui/react";
+import { Box, Grid, HStack, VStack, Text, Spinner, Input } from "@chakra-ui/react";
 import Head from "next/head";
 import NextLink from "next/link";
 import NFTItem from "../components/nft-item";
 import Dropdown from "../components/dropdown";
 import FrakButton from "../components/button";
-import styles from "../styles/artists.module.css";
 import { Image } from "@chakra-ui/image";
 import { shortenHash } from "../utils/helpers";
 import { getSubgraphData } from "../utils/graphQueries";
@@ -18,6 +17,7 @@ import { useRouter } from "next/router";
 export default function ArtistsView() {
   const router = useRouter();
   const SORT_TYPES = ["Popular", "New"];
+  const [artistInput, setArtistInput] = useState('');
   const [selectionMode, setSelectionMode] = useState(false);
   const [sortType, setSortType] = useState("Popular");
   const [artists, setArtists] = useState([]);
@@ -39,6 +39,40 @@ export default function ArtistsView() {
       totalGallery: x.created.length,
     }));
     return artistsObj;
+  }
+
+  async function handleSubmit() {
+    const data = await getSubgraphData("firstArtists", "");
+    if (data && factoryAddress) {
+      let onlySearched = data.users.filter((x) => {
+        for (let i = 0; i < artistInput.length; ++i) {
+          if (artistInput[i] !== x.id[i])
+            return;
+        }
+        return x.id;
+      })
+      let onlyCreators = onlySearched.filter(x => {
+        return x.created.length > 0;
+      });
+      let noImporters = onlyCreators.filter(x => {
+        return x.id != factoryAddress.toLocaleLowerCase();
+      });
+      setArtists(noImporters);
+      let fraktalSamples = noImporters.map(x => {
+        return x.created[0];
+      });
+      let fraktalsSamplesObjects = await Promise.all(
+        fraktalSamples.map(x => {
+          return createObject2(x);
+        })
+      );
+      let artistsObj = getArtistsObjects(noImporters, fraktalsSamplesObjects);
+      if (artistsObj) {
+        setArtistsItems(artistsObj);
+      } else {
+        setArtistsItems([]);
+      }
+    }
   }
 
   async function fetchNewArtists() {
@@ -135,13 +169,32 @@ export default function ArtistsView() {
           )}
         </Box>
         <Text className="semi-48">Artists</Text>
-        <div className={styles.searchContainer}>
-          <input
+        <Box
+          borderRadius='32px'
+          border='2px solid #e0e0e0'
+          display='flex'
+          alignItems='center'
+          justifyContent='space-between'
+          width='300px'
+          padding={'12px 16px 12px 24px'}
+        >
+          <Input
             placeholder={"Search ENS or ETH address "}
-            className={styles.searchInput}
+            variant='unstyled'
+            fontSize='16px'
+            fontWeight='500'
+            marginRight='16px'
+            width='100%'
+            _placeholder={{ color: '#e0e0e0' }}
+            onChange={d => setArtistInput(d.target.value)}
+            onKeyPress={event => {
+              if (event.key === 'Enter') {
+                handleSubmit();
+              }
+            }}
           />
           <Image src="/search.svg" />
-        </div>
+        </Box>
       </HStack>
       {!loading && artistsItems.length > 0 && (
         <>
