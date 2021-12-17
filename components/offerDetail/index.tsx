@@ -151,6 +151,9 @@ export default function OfferDetail({
             {!isCanceledOffer() && fraktionsBalance <= 0 && !isOfferer && (
               <Text>Buy Fraktions to vote!</Text>
             )}
+            {!isCanceledOffer() && fraktionsBalance > 0 && !isOfferer && !!offerItem?.winner && (
+              <Text>Pending Buyer Claiming NFT</Text>
+            )}
             {isCanceledOffer() && (<Text>Canceled</Text>)}
             {!isCanceledOffer() && 
             fraktionsBalance > 0 && !fraktionsApproved && (
