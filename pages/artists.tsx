@@ -42,7 +42,15 @@ export default function ArtistsView() {
   }
 
   async function handleSubmit() {
-    const data = await getSubgraphData("firstArtists", "");
+    if (artistInput === '') {
+      await fetchInitialArtists();
+      if (hasMore === false) {
+        setHasMore(true);
+      }
+      return;
+    } else
+     setHasMore(false);
+    const data = await getSubgraphData("artists", "");
     if (data && factoryAddress) {
       let onlySearched = data.users.filter((x) => {
         for (let i = 0; i < artistInput.length; ++i) {
@@ -113,33 +121,34 @@ export default function ArtistsView() {
     }
   }
 
-  useEffect(() => {
-    const fetchInitialArtists = async () => {
-      const data = await getSubgraphData("firstArtists", "");
-      if (data && factoryAddress) {
-        let onlyCreators = data.users.filter(x => {
-          return x.created.length > 0;
-        });
-        let noImporters = onlyCreators.filter(x => {
-          return x.id != factoryAddress.toLocaleLowerCase();
-        }); // why?
-        setArtists(noImporters); // why?
-        let fraktalSamples = noImporters.map(x => {
-          return x.created[0];
-        }); // list the first NFT in the list of 'nfts this artist made'
-        let fraktalsSamplesObjects = await Promise.all(
-          fraktalSamples.map(x => {
-            return createObject2(x);
-          })
-        );
-        let artistsObj = getArtistsObjects(noImporters, fraktalsSamplesObjects);
-        if (artistsObj) {
-          setArtistsItems(artistsObj);
-        } else {
-          setArtistsItems([]);
-        }
+  const fetchInitialArtists = async () => {
+    const data = await getSubgraphData("firstArtists", "");
+    if (data && factoryAddress) {
+      let onlyCreators = data.users.filter(x => {
+        return x.created.length > 0;
+      });
+      let noImporters = onlyCreators.filter(x => {
+        return x.id != factoryAddress.toLocaleLowerCase();
+      }); // why?
+      setArtists(noImporters); // why?
+      let fraktalSamples = noImporters.map(x => {
+        return x.created[0];
+      }); // list the first NFT in the list of 'nfts this artist made'
+      let fraktalsSamplesObjects = await Promise.all(
+        fraktalSamples.map(x => {
+          return createObject2(x);
+        })
+      );
+      let artistsObj = getArtistsObjects(noImporters, fraktalsSamplesObjects);
+      if (artistsObj) {
+        setArtistsItems(artistsObj);
+      } else {
+        setArtistsItems([]);
       }
-    };
+    }
+  };
+
+  useEffect(() => {
     fetchInitialArtists();
   }, [factoryAddress]);
 
