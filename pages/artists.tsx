@@ -44,7 +44,7 @@ export default function ArtistsView() {
   async function handleSubmit() {
     if (artistInput === '') {
       await fetchInitialArtists();
-      if (hasMore === false) {
+      if (!hasMore) {
         setHasMore(true);
       }
       return;
