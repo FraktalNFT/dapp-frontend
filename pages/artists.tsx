@@ -41,7 +41,7 @@ export default function ArtistsView() {
     return artistsObj;
   }
 
-  async function handleSubmit() {
+  async function updateInputInitialState() {
     if (artistInput === '') {
       await fetchInitialArtists();
       if (!hasMore) {
@@ -49,15 +49,16 @@ export default function ArtistsView() {
       }
       return;
     } else
-     setHasMore(false);
+    setHasMore(false);
+  }
+
+  async function handleArtistSubmit() {
+    await updateInputInitialState();
     const data = await getSubgraphData("artists", "");
     if (data && factoryAddress) {
-      let onlySearched = data.users.filter((x) => {
-        for (let i = 0; i < artistInput.length; ++i) {
-          if (artistInput[i] !== x.id[i])
-            return;
-        }
-        return x.id;
+      let onlySearched = data.users.filter(x => {
+        if (x.id.includes(artistInput))
+          return x;
       })
       let onlyCreators = onlySearched.filter(x => {
         return x.created.length > 0;
@@ -198,7 +199,7 @@ export default function ArtistsView() {
             onChange={d => setArtistInput(d.target.value)}
             onKeyPress={event => {
               if (event.key === 'Enter') {
-                handleSubmit();
+                handleArtistSubmit();
               }
             }}
           />
