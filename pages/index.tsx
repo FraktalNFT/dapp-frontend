@@ -141,9 +141,10 @@ const Home: React.FC = () => {
           "imageURL": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png",
           "wait":"2000",
         };
-        if(newArray[0].creator!=sampleAuctionItem.creator){
+        if(newArray[0].endTime!=sampleAuctionItem.endTime){
           newArray.unshift(sampleAuctionItem);
         }
+        
 
         // setNftItems(newItemList);
         setNftData(newArray);
