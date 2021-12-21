@@ -23,8 +23,26 @@ export default function AuctionNFTView() {
       }
       let obj = await getSubgraphData('marketid_fraktal',index)
       // let nftObjects = await createObject(obj.fraktalNFTs[0])
-      if(nftObjects){
-        setNftObject(nftObjects)
+      const sampleEndtime = String((Date.now()/1000)+(60*60));
+      const sampleAuctionItem = {
+        "creator": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
+        "marketId": "38",
+        "createdAt": "1638534229",
+        "endTime": sampleEndtime,
+        // "endTime": "1640893165",
+        "tokenAddress": "0xb02c6cf605e871d7ad975147372ab1227425cb61",
+        "holders": 3,
+        "raised": "0",
+        "id": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa-0xb02c6cf605e871d7ad975147372ab1227425cb612",
+        "price": "700.0",
+        "amount": "1",
+        "seller": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
+        "name": "Auction Test Item",
+        "imageURL": "/sample-item.png",
+        "wait":"2000",
+      };
+      if(sampleAuctionItem){
+        setNftObject(sampleAuctionItem)
       }
   },[])
   const exampleNFT = {
@@ -36,25 +54,6 @@ export default function AuctionNFTView() {
     createdAt: new Date().toISOString(),
     countdown: new Date("06-25-2021"),
   };
-  const sampleEndtime = String((Date.now()/1000)+(60*60));
-  const sampleAuctionItem = {
-    "creator": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
-    "marketId": "38",
-    "createdAt": "1638534229",
-    "endTime": sampleEndtime,
-    // "endTime": "1640893165",
-    "tokenAddress": "0xb02c6cf605e871d7ad975147372ab1227425cb61",
-    "holders": 3,
-    "raised": "0",
-    "id": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa-0xb02c6cf605e871d7ad975147372ab1227425cb612",
-    "price": "700.0",
-    "amount": "1",
-    "seller": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
-    "name": "Auction Test Item",
-    "imageURL": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png",
-    "wait":"2000",
-  };
-  let nftObjects = sampleAuctionItem;
   
   const renderer = ({ days, hours, minutes, seconds, completed })=>{
     if (completed) {
