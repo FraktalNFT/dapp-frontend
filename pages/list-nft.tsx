@@ -1,5 +1,6 @@
 import FrakButton4 from "../components/button4";
 import MintCard from "../components/mintCard";
+import ListCardAuction from "../components/listCardAuction";
 import ListCard from "../components/listCard";
 import {
   VStack,
@@ -9,6 +10,11 @@ import {
   Text,
   Link,
   Checkbox,
+  Tabs, 
+  TabList, 
+  TabPanels, 
+  Tab, 
+  TabPanel
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Image as ImageComponent } from "@chakra-ui/image";
@@ -374,11 +380,32 @@ export default function MintPage() {
             </Box>
             <div>
               {listItemCheck && (
+                <Tabs isFitted variant='enclosed'
+                >
+                  <TabList mb='1em'>
+                    <Tab
+                    >Fixed Price</Tab>
+                    <Tab
+                    >Auction</Tab>
+                  </TabList>
+                  <TabPanels>
+                    <TabPanel>
                 <ListCard
                   totalPrice={totalPrice}
                   setTotalPrice={setTotalPrice}
                   setTotalAmount={setTotalAmount}
                 />
+                </TabPanel>
+                <TabPanel>
+                <ListCardAuction
+                    totalPrice={totalPrice}
+                    setTotalPrice={setTotalPrice}
+                    setTotalAmount={setTotalAmount}
+                    
+                  />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
               )}
             </div>
           </div>

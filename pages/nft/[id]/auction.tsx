@@ -8,9 +8,12 @@ import styles from "./auction.module.css";
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
 import {getSubgraphData} from '../../../utils/graphQueries';
 import { createObject } from "utils/nftHelpers";
+import Countdown,{zeroPad} from 'react-countdown';
 export default function AuctionNFTView() {
   const [index, setIndex] = useState();
   const [nftObject, setNftObject] = useState();
+  const handleContribute = () => {
+  }
 
   useEffect(async ()=>{
       const address = getParams('nft');
@@ -19,7 +22,7 @@ export default function AuctionNFTView() {
         setIndex(index)
       }
       let obj = await getSubgraphData('marketid_fraktal',index)
-      let nftObjects = await createObject(obj.fraktalNFTs[0])
+      // let nftObjects = await createObject(obj.fraktalNFTs[0])
       if(nftObjects){
         setNftObject(nftObjects)
       }
@@ -33,6 +36,74 @@ export default function AuctionNFTView() {
     createdAt: new Date().toISOString(),
     countdown: new Date("06-25-2021"),
   };
+  const sampleEndtime = String((Date.now()/1000)+(60*60));
+  const sampleAuctionItem = {
+    "creator": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
+    "marketId": "38",
+    "createdAt": "1638534229",
+    "endTime": sampleEndtime,
+    // "endTime": "1640893165",
+    "tokenAddress": "0xb02c6cf605e871d7ad975147372ab1227425cb61",
+    "holders": 3,
+    "raised": "0",
+    "id": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa-0xb02c6cf605e871d7ad975147372ab1227425cb612",
+    "price": "700.0",
+    "amount": "1",
+    "seller": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
+    "name": "Auction Test Item",
+    "imageURL": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png",
+    "wait":"2000",
+  };
+  let nftObjects = sampleAuctionItem;
+  
+  const renderer = ({ days, hours, minutes, seconds, completed })=>{
+    if (completed) {
+      // Render a completed state
+      return <div>Ended</div>;
+    } else {
+      // Render a countdown
+      if(days>0){
+        return <div style={{ marginRight: "52px"}}>
+        <div className={styles.auctionCardHeader}>Time Remaining</div>
+          <div className={styles.auctionCardDetailsContainer}>
+            <div style={{ marginRight: "48px" }}>
+              <div className={styles.auctionCardDetailsNumber}>{zeroPad(days)}</div>
+              <div className={styles.auctionCardDetailsText}>Days</div>
+            </div>
+            <div style={{ marginRight: "28px" }}>
+              <div className={styles.auctionCardDetailsNumber}>{zeroPad(hours)}</div>
+              <div className={styles.auctionCardDetailsText}>Hours</div>
+            </div>
+            <div>
+              <div className={styles.auctionCardDetailsNumber}>{zeroPad(minutes)}</div>
+              <div className={styles.auctionCardDetailsText}>Minutes</div>
+            </div>
+          </div>
+        </div>;
+      }
+      else{
+        return (
+        <div style={{ marginRight: "52px" }}>
+        <div className={styles.auctionCardHeader}>Time Remaining</div>
+          <div className={styles.auctionCardDetailsContainer}>
+            <div style={{ marginRight: "48px" }}>
+              <div className={styles.auctionCardDetailsNumber}>{zeroPad(hours)}</div>
+              <div className={styles.auctionCardDetailsText}>Hours</div>
+            </div>
+            <div style={{ marginRight: "28px" }}>
+              <div className={styles.auctionCardDetailsNumber}>{zeroPad(minutes)}</div>
+              <div className={styles.auctionCardDetailsText}>Minutes</div>
+            </div>
+            <div>
+              <div className={styles.auctionCardDetailsNumber}>{zeroPad(seconds)}</div>
+              <div className={styles.auctionCardDetailsText}>Seconds</div>
+            </div>
+          </div>
+        </div>
+        );
+      }
+    }
+  }
   return (
     <VStack spacing="0" mb="12.8rem">
       <Head>
@@ -67,22 +138,9 @@ export default function AuctionNFTView() {
           </div>
           <div className={styles.auctionCard}>
             <div style={{ marginRight: "52px" }}>
-              <div className={styles.auctionCardHeader}>Time Remaining</div>
-              <div className={styles.auctionCardDetailsContainer}>
-                <div style={{ marginRight: "48px" }}>
-                  <div className={styles.auctionCardDetailsNumber}>03</div>
-                  <div className={styles.auctionCardDetailsText}>Hours</div>
+            {nftObject&&<Countdown renderer={renderer} date={Number(nftObject.endTime)*1000} autoStart
+                />}
                 </div>
-                <div style={{ marginRight: "28px" }}>
-                  <div className={styles.auctionCardDetailsNumber}>45</div>
-                  <div className={styles.auctionCardDetailsText}>Minutes</div>
-                </div>
-                <div>
-                  <div className={styles.auctionCardDetailsNumber}>15</div>
-                  <div className={styles.auctionCardDetailsText}>Seconds</div>
-                </div>
-              </div>
-            </div>
             <div className={styles.auctionCardDivider} />
             <div style={{ marginRight: "24px" }}>
               <div className={styles.auctionCardHeader}>Contributed</div>
@@ -106,7 +164,8 @@ export default function AuctionNFTView() {
                   placeholder={"0.01"}
                 />
               </div>
-              <div className={styles.contributeCTA}>Contribute</div>
+              <button className={styles.contributeCTA} onClick={handleContribute}
+              >Contribute</button>
             </div>
           </div>
         </VStack>

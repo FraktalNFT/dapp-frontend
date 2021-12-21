@@ -19,12 +19,15 @@ import { getSubgraphData } from "../utils/graphQueries";
 import { createListed } from "../utils/nftHelpers";
 import { FiChevronDown } from "react-icons/fi";
 import InfiniteScroll from "react-infinite-scroll-component";
+import NFTAuctionItem from "@/components/nft-auction-item";
 const SORT_TYPES = ["Availability", "Popular", "Newly Listed"];
 
 const Home: React.FC = () => {
   const [nftItems, setNftItems] = useState([]);
+  const [nftData,setNftData] = useState([]);
   const [selectionMode, setSelectionMode] = useState(false);
   const [sortType, setSortType] = useState("Newly Listed");
+  const [listType, setListType] = useState("All Listings");
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const handleSortSelect = (item: string) => {
@@ -49,6 +52,25 @@ const Home: React.FC = () => {
     setNftItems(sortedItems);
   };
 
+  const handleListingSelect = (item: string) => {
+    setSelectionMode(false);
+    setListType(item);
+    changeList(item);
+  };
+
+
+  const changeList = type => {
+    let sortedItems;
+    if (type == "All Listings") {
+      sortedItems = nftData;
+    } else if (type == "Fixed Price") {
+      sortedItems = nftData.filter((item) => !item.endTime);
+    } else {
+      sortedItems = nftData.filter((item) => item.endTime>0);
+    }
+    setNftItems(sortedItems);
+  };
+
   async function getData() {
     setLoading(true);
     await getMoreListedItems();
@@ -60,6 +82,7 @@ const Home: React.FC = () => {
       const stringedNFTItems = window?.sessionStorage.getItem("nftitems");
       const unstringedNFTItems = JSON.parse(stringedNFTItems);
       setNftItems(unstringedNFTItems);
+      setNftData(unstringedNFTItems);
     } else {
       // touch API iff no local version
       getData();
@@ -100,6 +123,30 @@ const Home: React.FC = () => {
         setHasMore(false);
       } else {
         const newArray = [...nftItems, ...deduplicatedObjects];
+        const sampleEndtime = String((Date.now()/1000)+(60*60));
+        const sampleAuctionItem = {
+          "creator": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
+          "marketId": "38",
+          "createdAt": "1638534229",
+          "endTime": sampleEndtime,
+          // "endTime": "1640893165",
+          "tokenAddress": "0xb02c6cf605e871d7ad975147372ab1227425cb61",
+          "holders": 3,
+          "raised": "0",
+          "id": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa-0xb02c6cf605e871d7ad975147372ab1227425cb612",
+          "price": "700.0",
+          "amount": "1",
+          "seller": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
+          "name": "Auction Test Item",
+          "imageURL": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png",
+          "wait":"2000",
+        };
+        if(newArray[0].creator!=sampleAuctionItem.creator){
+          newArray.unshift(sampleAuctionItem);
+        }
+
+        // setNftItems(newItemList);
+        setNftData(newArray);
         setNftItems(newArray);
       }
     }
@@ -107,7 +154,7 @@ const Home: React.FC = () => {
 
   // Store NFT Items in Session Storage
   useEffect(() => {
-    const stringedNFTItems = JSON.stringify(nftItems);
+    const stringedNFTItems = JSON.stringify(nftData);
     window?.sessionStorage?.setItem("nftitems", stringedNFTItems);
   }, [nftItems]);
 
@@ -158,6 +205,32 @@ const Home: React.FC = () => {
               </MenuItem>
             </MenuList>
           </Menu>
+          <Menu closeOnSelect={true}  >
+            <MenuButton
+              as={Button}
+              alignSelf="center"
+              fontSize="12"
+              bg="transparent"
+              height="5rem"
+              width="18rem"
+              rightIcon={<FiChevronDown />}
+              fontWeight="bold"
+              transition="all 0.2s"
+            >
+              Listing: {listType}
+            </MenuButton>
+            <MenuList>
+              <MenuItem onClick={() => handleListingSelect("All Listings")}>
+                All Listings
+              </MenuItem>
+              <MenuItem onClick={() => handleListingSelect("Fixed Price")}>
+                Fixed Price
+              </MenuItem>
+              <MenuItem onClick={() => handleListingSelect("Auctions")}>
+                Auctions
+              </MenuItem>
+            </MenuList>
+          </Menu>
           <Spacer />
           <Box sx={{ display: `flex`, gap: `16px` }}>
           
@@ -196,21 +269,43 @@ const Home: React.FC = () => {
                     templateColumns="repeat(3, 1fr)"
                     gap="3.2rem"
                   >
-                    {nftItems.map((item, index) => (
-                      <NextLink
-                        key={item.id}
-                        href={`/nft/${item.tokenAddress}/details`}
-                      >
-                        <NFTItem
-                          name={item.name}
-                          amount={item.amount}
-                          price={item.price}
-                          imageURL={item.imageURL}
-                          wait={250 * (index + 1)}
-                          item={null}
-                        />
-                      </NextLink>
-                    ))}
+                    {nftItems.map((item, index) => {
+                      if(item.endTime){//for auction
+                        return (
+                          <NextLink
+                            key={item.id}
+                            href={`/nft/${item.tokenAddress}/auction`}
+                          >
+                            <NFTAuctionItem
+                              name={item.name}
+                              amount={item.amount}
+                              price={item.price}
+                              imageURL={item.imageURL}
+                              wait={250 * (index + 1)}
+                              item={null}
+                              endTime={item.endTime}
+                            />
+                          </NextLink>
+                          )
+                      }else{
+                        return (
+                          <NextLink
+                            key={item.id}
+                            href={`/nft/${item.tokenAddress}/details`}
+                          >
+                            <NFTItem
+                              name={item.name}
+                              amount={item.amount}
+                              price={item.price}
+                              imageURL={item.imageURL}
+                              wait={250 * (index + 1)}
+                              item={null}
+                            />
+                          </NextLink>
+                          )
+                      }
+                      
+                    })}
                   </Grid>
                 </InfiniteScroll>
               </>

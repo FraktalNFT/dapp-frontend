@@ -14,6 +14,7 @@ import Head from "next/head";
 import React from "react";
 import NFTItemOS from "../components/nft-item-opensea";
 import NFTItem from "../components/nft-item";
+import NFTAuctionItem from "@/components/nft-auction-item";
 import RescueCard from "../components/rescueCard";
 import NextLink from "next/link";
 import styles from "../styles/my-nfts.module.css";
@@ -35,6 +36,47 @@ export default function MyNFTsView() {
   const router = useRouter();
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
   const { fraktals, fraktions, nfts, balance, loading } = useUserContext();
+
+
+
+  const sampleEndtime = String((Date.now()/1000)+(60*45));
+  const sampleAuctionItem = {
+    "creator": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
+    "marketId": "38",
+    "createdAt": "1638534229",
+    "endTime": sampleEndtime,
+    // "endTime": "1640893165",
+    "tokenAddress": "0xb02c6cf605e871d7ad975147372ab1227425cb61",
+    "holders": 3,
+    "raised": "0",
+    "id": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa-0xb02c6cf605e871d7ad975147372ab1227425cb612",
+    "price": "700.0",
+    "amount": "1",
+    "seller": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
+    "name": "Auction Test Item(in progress)",
+    "imageURL": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png",
+    "wait":"2000",
+  };
+  const sampleEndtime2 = String((Date.now()/1000)+(5));
+  const sampleAuctionItem2 = {
+    "creator": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
+    "marketId": "38",
+    "createdAt": "1638534229",
+    "endTime": sampleEndtime2,
+    // "endTime": "1640893165",
+    "tokenAddress": "0xb02c6cf605e871d7ad975147372ab1227425cb61",
+    "holders": 3,
+    "raised": "0",
+    "id": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa-0xb02c6cf605e871d7ad975147372ab1227425cb612",
+    "price": "700.0",
+    "amount": "1",
+    "seller": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
+    "name": "Auction Test Item(promply ending)",
+    "imageURL": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png",
+    "wait":"2000",
+  };
+  // const auction = [];
+  const auctions = [sampleAuctionItem,sampleAuctionItem2];
 
   const { isMinting, setIsMinting } = useMintingContext();
 
@@ -280,6 +322,44 @@ export default function MyNFTsView() {
       {loading && (
         <Center height="104px" width="100%" borderRadius="24" bgColor="#F9F9F9">
           <Spinner size="xl" />
+        </Center>
+      )}
+      <Flex w="100%" paddingTop="64px">
+        <div className={styles.header} id="auctions">Auctions</div>
+      </Flex>
+      {auctions?.length >= 1 && (
+        <div style={{ marginTop: "16px" }}>
+          <Grid
+            mt="40px !important"
+            ml="0"
+            mr="0"
+            mb="5.6rem !important"
+            w="100%"
+            templateColumns="repeat(3, 1fr)"
+            gap="3.2rem"
+          >
+            {auctions &&
+              auctions.map(item => (
+                <NextLink key={item.tokenAddress} href={`/nft/${item.tokenAddress}/auction`}>
+                  <NFTAuctionItem
+                    item={item}
+                    name={item.name}
+                    amount={parseInt(item.amount)}
+                    price={item.price}
+                    imageURL={item.imageURL}
+                    endTime={item.endTime}
+                    showProgress={true}
+                  />
+                </NextLink>
+              ))}
+          </Grid>
+        </div>
+      )}
+      {!loading && auctions==null && (
+        <Center height="104px" width="100%" borderRadius="24" bgColor="#F9F9F9">
+          <Text>
+            You do not have any auction to be claimed.
+          </Text>
         </Center>
       )}
       <Box width="100%" paddingTop="64px">
