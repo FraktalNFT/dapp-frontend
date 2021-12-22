@@ -48,7 +48,7 @@ export default function AuctionNFTView() {
   const exampleNFT = {
     id: 0,
     name: "Golden Fries Cascade",
-    imageURL: "/filler-image-1.png",
+    imageURL: "filler-image-1.png",
     artistAddress: "0x1234...5678",
     contributions: BigNumber.from(5).div(100),
     createdAt: new Date().toISOString(),
@@ -135,10 +135,10 @@ export default function AuctionNFTView() {
               </div>
             </div>
           </div>
-          <div className={styles.auctionCard}>
+          {nftObject&&<div className={styles.auctionCard}>
             <div style={{ marginRight: "52px" }}>
-            {nftObject&&<Countdown renderer={renderer} date={Number(nftObject.endTime)*1000} autoStart
-                />}
+            <Countdown renderer={renderer} date={Number(nftObject.endTime)*1000} autoStart
+                />
                 </div>
             <div className={styles.auctionCardDivider} />
             <div style={{ marginRight: "24px" }}>
@@ -166,7 +166,7 @@ export default function AuctionNFTView() {
               <button className={styles.contributeCTA} onClick={handleContribute}
               >Contribute</button>
             </div>
-          </div>
+          </div>}
         </VStack>
 
       </div>
