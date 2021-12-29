@@ -192,3 +192,26 @@ export async function createListed(data){
     return {error: `Error: ${err}`};
   }
 };
+
+export async function createListedAuction(data){
+  try{
+    let nftMetadata = await fetchNftMetadata(data.hash)
+    if(nftMetadata){
+      return {
+        amountOfShare: data.amountOfShare,
+        endTime: data.endTime,
+        hash: data.hash,
+        reservePrice: data.reservePrice,
+        seller: data.seller,
+        sellerNonce: data.sellerNonce,
+        tokenAddress: data.tokenAddress,
+        name: nftMetadata.name,
+        description: nftMetadata.description,
+        imageURL: checkImageCID(nftMetadata.image),
+      }
+    }
+  }catch (err){
+    console.log('Error',err);
+    return {error: `Error: ${err}`};
+  }
+};

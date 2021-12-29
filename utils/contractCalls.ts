@@ -23,6 +23,11 @@ const marketAbi = [
   "function unlistItem(address tokenAddress)",
   "function maxPriceRegistered(address) view returns (uint256)",
   "function exportFraktal(address tokenAddress)",
+  "function redeemAuctionSeller(address _tokenAddress,address _seller,uint256 _sellerNonce) external",
+  "function redeemAuctionParticipant(address _tokenAddress,address _seller,uint256 _sellerNonce) external",
+  "function participateAuction(address tokenAddress,address seller,uint256 sellerNonce) external payable",
+  "function listItemAuction(address _tokenAddress,uint256 _reservePrice,uint256 _numberOfShares) external returns (uint256)",
+  "function unlistAuctionItem(address tokenAddress,uint256 sellerNonce) external",
 ];
 const tokenAbi = [
   "function isApprovedForAll(address account,address operator) external view returns (bool)",
@@ -144,6 +149,11 @@ export async function getLockedTo(account, tokenAddress, provider) {
   let index = await customContract.getFraktionsIndex();
   let lockedShares = await customContract.getLockedToTotal(index, account);
   return lockedShares.toNumber();
+}
+export async function getSellerNonce(sellerAddress, provider, marketContract) {
+  const customContract = new Contract(marketContract, marketAbi, provider);
+  let nonce = await customContract.auctionNonce(sellerAddress);
+  return nonce;
 }
 
 // State functions
@@ -384,6 +394,47 @@ export async function makeOffer(value, tokenAddress, provider, marketAddress) {
   const override = { gasLimit: 2000000, value: value };
   const customContract = new Contract(marketAddress, marketAbi, signer);
   let tx = await customContract.makeOffer(tokenAddress, value, override);
+  let receipt = processTx(tx);
+  return receipt;
+}
+
+export async function redeemAuctionSeller( tokenAddress, seller, sellerNonce, provider, marketAddress) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
+  let tx = await customContract.redeemAuctionSeller( tokenAddress, seller, sellerNonce);
+  let receipt = processTx(tx);
+  return receipt;
+}
+export async function redeemAuctionParticipant( tokenAddress, seller, sellerNonce, provider, marketAddress) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
+  let tx = await customContract.redeemAuctionParticipant( tokenAddress, seller, sellerNonce);
+  let receipt = processTx(tx);
+  return receipt;
+}
+export async function participateAuction( tokenAddress, seller, sellerNonce, value, provider, marketAddress) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
+
+  let override = { };
+  if(value!=0){
+    override = { value: value};
+  }
+  let tx = await customContract.participateAuction( tokenAddress, seller, sellerNonce,override);
+  let receipt = processTx(tx);
+  return receipt;
+}
+export async function listItemAuction( tokenAddress, reservePrice, numberOfShares, provider, marketAddress) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
+  let tx = await customContract.listItemAuction( tokenAddress, reservePrice, numberOfShares);
+  let receipt = processTx(tx);
+  return receipt;
+}
+export async function unlistAuctionItem( tokenAddress, sellerNonce, provider, marketAddress) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
+  let tx = await customContract.unlistAuctionItem( tokenAddress, sellerNonce);
   let receipt = processTx(tx);
   return receipt;
 }

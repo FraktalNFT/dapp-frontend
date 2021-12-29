@@ -25,13 +25,14 @@ import { useUserContext } from "@/contexts/userContext";
 import Countdown,{zeroPad} from 'react-countdown';
 
 interface NFTItemProps extends StackProps {
-  item: FrakCard;
+  // item: FrakCard;
   name: String;
   amount: Number;
-  price: Number;
+  // price: Number;
   imageURL: String;
-  CTAText?: string;
-  wait: number;
+  // CTAText?: string;
+  // wait: number;
+  endTime: number;
 }
 
 const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(

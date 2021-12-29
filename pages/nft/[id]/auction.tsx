@@ -1,4 +1,5 @@
 import { HStack, VStack } from "@chakra-ui/layout";
+import { useToast } from '@chakra-ui/react'
 import React, {useEffect, useState} from "react";
 import Head from "next/head";
 import Link from "next/link";
@@ -6,22 +7,86 @@ import { BigNumber } from "ethers";
 import { Image } from "@chakra-ui/image";
 import styles from "./auction.module.css";
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
-import {getSubgraphData} from '../../../utils/graphQueries';
+import {getSubgraphData, getSubgraphAuction } from '../../../utils/graphQueries';
 import { createObject } from "utils/nftHelpers";
 import Countdown,{zeroPad} from 'react-countdown';
+import { utils } from "ethers";
+import { participateAuction } from "utils/contractCalls";
+import { useWeb3Context } from "@/contexts/Web3Context";
+import { createListedAuction } from "utils/nftHelpers";
+import { introspectionFromSchema } from "graphql";
+import Custom404 from "../../404";
 export default function AuctionNFTView() {
+
+  const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
   const [index, setIndex] = useState();
-  const [nftObject, setNftObject] = useState();
-  const handleContribute = () => {
+  const [nftObject, setNftObject] = useState(null);
+  const [contribute,setContribute] = useState(0);
+  const [error,setError] = useState(false);
+  const toast = useToast();
+
+
+  const handleContribute = async () => {
+    if(contribute==0){
+      toast({
+        title: 'No ETH contributed',
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+      });
+      return;
+    }
+    const {tokenAddress,seller,sellerNonce} = nftObject;
+    const weiVal = utils.parseUnits(contribute.toString());
+    const tx = await participateAuction(tokenAddress,seller,sellerNonce,weiVal,provider,marketAddress)
+    .then((e)=>console.log(e)
+    );
+    toast({
+      title: `Contributed ${contribute.toString()} ETH` ,
+      status: 'success',
+      duration: 2000,
+      isClosable: true,
+    })
+    
+
+  }
+
+  const handleContributeChange = (e)=>{
+    const val = e.target.value;
+    setContribute(val);
   }
 
   useEffect(async ()=>{
       const address = getParams('nft');
-      const index = parseFloat(address.split('/auction')[0])
+      const index = address.split('/auction')[0]
+      console.log(account,provider);
+      
       if(index){
         setIndex(index)
       }
-      let obj = await getSubgraphData('marketid_fraktal',index)
+      let obj = await getSubgraphAuction('singleAuction',index);
+      console.log(obj);
+      if(obj?.auction==null){
+        setError(true);
+        return;
+      }
+      
+      let _hash = await getSubgraphAuction("auctionsNFT",obj.auction.tokenAddress);
+      console.log(_hash);
+      Object.assign(obj,{
+        "hash":_hash.fraktalNFT.hash,
+      });
+      const item = await createListedAuction(obj);
+      console.log(index,item);
+      Object.assign(obj.auction,{
+        "hash":_hash.fraktalNFT.hash,
+        "name":item.name,
+        "imageURL":item.imageURL
+      });
+      
+      console.log("ong",obj);
+      
+      
       // let nftObjects = await createObject(obj.fraktalNFTs[0])
       const sampleEndtime = String((Date.now()/1000)+(60*60));
       const sampleAuctionItem = {
@@ -41,8 +106,11 @@ export default function AuctionNFTView() {
         "imageURL": "/sample-item.png",
         "wait":"2000",
       };
+      Object.assign(sampleAuctionItem,obj.auction);
+      console.log(sampleAuctionItem);
+      
       if(sampleAuctionItem){
-        setNftObject(sampleAuctionItem)
+        setNftObject(sampleAuctionItem);
       }
   },[])
   const exampleNFT = {
@@ -103,6 +171,11 @@ export default function AuctionNFTView() {
       }
     }
   }
+
+  if(error==true){
+    return <Custom404/>
+  }else{
+
   return (
     <VStack spacing="0" mb="12.8rem">
       <Head>
@@ -133,6 +206,18 @@ export default function AuctionNFTView() {
               <div className={styles.cardText}>
                 {nftObject?timezone(nftObject.createdAt):'loading'}
               </div>
+              <div style={{ marginTop: "8px" }} className={styles.cardHeader}>
+                RESERVE PRICE
+              </div>
+              <div className={styles.cardText}>
+                {nftObject?`${utils.formatUnits(nftObject.reservePrice)} ETH`:'loading'}
+              </div>
+              <div style={{ marginTop: "8px" }} className={styles.cardHeader}>
+                Fraktion Amount
+              </div>
+              <div className={styles.cardText}>
+                {nftObject?`${utils.formatUnits(nftObject.amountOfShare)}/10000 FRAK`:'loading'}
+              </div>
             </div>
           </div>
           {nftObject&&<div className={styles.auctionCard}>
@@ -161,6 +246,7 @@ export default function AuctionNFTView() {
                   className={styles.contributeInput}
                   type="number"
                   placeholder={"0.01"}
+                  onChange={handleContributeChange}
                 />
               </div>
               <button className={styles.contributeCTA} onClick={handleContribute}
@@ -172,4 +258,5 @@ export default function AuctionNFTView() {
       </div>
     </VStack>
   );
+  }
 }
