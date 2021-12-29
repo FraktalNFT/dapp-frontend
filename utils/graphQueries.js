@@ -3,6 +3,7 @@ import { utils } from "ethers";
 const { CID } = require("ipfs-http-client");
 
 const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.18';
+const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/fraktalauction/0.7';
 // https://api.thegraph.com/subgraphs/name/drhongos/fraktalrinkeby // hosted
 
 const creator_query = gql`
@@ -402,12 +403,68 @@ const calls = [
   { name: "fraktal_owners", call: fraktalOwners },
 ];
 
+
+const listedAuctions = gql`
+  query {
+    auctions{
+      seller
+      tokenAddress
+      reservePrice
+      amountOfShare
+      endTime
+      sellerNonce
+      }
+  }
+`;
+
+const auctionFraktalNFT = gql`
+  query($id: ID!) {
+    fraktalNFT(id:$id) {
+      hash
+  }
+  }
+`;
+
+const getSingleAuction = gql`
+query($id: ID!) {
+  auction(id:$id) {
+    id
+    seller
+    tokenAddress
+    reservePrice
+    amountOfShare
+    endTime
+    sellerNonce
+}
+}
+`;
+
+const auctionCalls = [
+  { name: "auctions", call: listedAuctions },
+  {name:"auctionsNFT", call:auctionFraktalNFT},
+  { name:"singleAuction", call: getSingleAuction}
+]
+
 export const getSubgraphData = async (call, id) => {
   let callGql = calls.find(x => {
     return x.name == call;
   });
   try {
     const data = await request(APIURL, callGql.call, { id });
+    // console.log('data for:',id,' found',data)
+    return data;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("error", err);
+    return err;
+  }
+};
+export const getSubgraphAuction = async (call, id) => {
+  let callGql = auctionCalls.find(x => {
+    return x.name == call;
+  });
+  try {
+    const data = await request(AUCTIONAPI, callGql.call, { id });
     // console.log('data for:',id,' found',data)
     return data;
   } catch (err) {

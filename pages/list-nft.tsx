@@ -27,6 +27,7 @@ import {
   importFraktal,
   getIndexUsed,
   listItem,
+  listItemAuction,
   getApproved,
   importERC721,
   importERC1155,
@@ -61,6 +62,7 @@ export default function MintPage() {
   const [tokenMintedAddress, setTokenMintedAddress] = useState();
   const [tokenToImport, setTokenToImport] = useState();
   const [nftApproved, setNftApproved] = useState(false);
+  const [isAuction,setIsAuction] = useState(false);
 
   // detect states (where is NFT and if its ready to list so send it here for listing!)
 
@@ -226,6 +228,18 @@ export default function MintPage() {
       router.push("/");
     });
   }
+  async function listNewAuctionItem() {
+    listItemAuction(
+      tokenMintedAddress,
+      utils.parseUnits(totalPrice),
+      utils.parseUnits(totalAmount),
+      provider,
+      marketAddress
+    ).then(() => {
+      router.push("/");
+    });
+  }
+
 
   let msg = () => {
     if (!minted) {
@@ -381,6 +395,7 @@ export default function MintPage() {
             <div>
               {listItemCheck && (
                 <Tabs isFitted variant='enclosed'
+                onChange={(e)=>setIsAuction(!isAuction)}
                 >
                   <TabList mb='1em'>
                     <Tab
@@ -443,9 +458,16 @@ export default function MintPage() {
                 <FrakButton4
                   status={!listed ? "open" : "done"}
                   disabled={!fraktalReady}
-                  onClick={() => listNewItem()}
+                  onClick={() => {
+                    if(isAuction){
+                      listNewAuctionItem();
+                    }else{
+                      listNewItem()
+                    }
+                  }
+                  }
                 >
-                  4. List
+                  4. {isAuction?"List Auction":"List"}
                 </FrakButton4>
               </>
             )}

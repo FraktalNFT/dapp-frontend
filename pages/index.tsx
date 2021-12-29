@@ -15,8 +15,8 @@ import { useState, useEffect } from "react";
 import FrakButton from "../components/button";
 import NFTItem from "../components/nft-item";
 import { FrakCard } from "../types";
-import { getSubgraphData } from "../utils/graphQueries";
-import { createListed } from "../utils/nftHelpers";
+import { getSubgraphData, getSubgraphAuction } from "../utils/graphQueries";
+import { createListed,createListedAuction } from "../utils/nftHelpers";
 import { FiChevronDown } from "react-icons/fi";
 import InfiniteScroll from "react-infinite-scroll-component";
 import NFTAuctionItem from "@/components/nft-auction-item";
@@ -83,6 +83,7 @@ const Home: React.FC = () => {
       const unstringedNFTItems = JSON.parse(stringedNFTItems);
       setNftItems(unstringedNFTItems);
       setNftData(unstringedNFTItems);
+      getData();
     } else {
       // touch API iff no local version
       getData();
@@ -97,6 +98,41 @@ const Home: React.FC = () => {
 
   const getMoreListedItems = async () => {
     const data = await getSubgraphData("listed_items", "");
+    let auctionData = await getSubgraphAuction("auctions","");
+    auctionData = auctionData?.auctions.filter(x=>x.reservePrice!=0);
+    
+    let auctionDataHash = [];
+    await Promise.all(auctionData?.map(async x=>{
+      let _hash = await getSubgraphAuction("auctionsNFT",x.tokenAddress);
+
+      const itm = {
+        "id":`${x.tokenAddress}-${x.sellerNonce}`,
+        "hash":_hash.fraktalNFT.hash
+    };
+      
+      auctionDataHash.push(itm);
+    }))
+    
+
+    let auctionItems = [];
+    await Promise.all(auctionData?.map(async (auction,idx)=>{
+      console.log("map",auction,auctionDataHash);
+
+      
+      
+      let hash = auctionDataHash.filter(e=>e.id==`${auction.tokenAddress}-${auction.sellerNonce}`);
+      console.log("hash",hash[0].hash);
+      
+      
+      Object.assign(auction,{"hash":hash[0].hash});
+      const item = await createListedAuction(auction);
+      console.log("item",item);
+      
+      auctionItems.push(item);
+      }
+    ));
+    
+
     let dataOnSale;
     if (data?.listItems?.length > 1) {
       dataOnSale = data?.listItems?.filter(x => {
@@ -123,30 +159,10 @@ const Home: React.FC = () => {
         setHasMore(false);
       } else {
         const newArray = [...nftItems, ...deduplicatedObjects];
-        const sampleEndtime = String((Date.now()/1000)+(60*60));
-        const sampleAuctionItem = {
-          "creator": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
-          "marketId": "38",
-          "createdAt": "1638534229",
-          "endTime": sampleEndtime,
-          // "endTime": "1640893165",
-          "tokenAddress": "0xb02c6cf605e871d7ad975147372ab1227425cb61",
-          "holders": 3,
-          "raised": "0",
-          "id": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa-0xb02c6cf605e871d7ad975147372ab1227425cb612",
-          "price": "700.0",
-          "amount": "1",
-          "seller": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
-          "name": "Auction Test Item",
-          "imageURL": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png",
-          "wait":"2000",
-        };
-        if(newArray[0].endTime!=sampleAuctionItem.endTime){
-          newArray.unshift(sampleAuctionItem);
-        }
-        
-
         // setNftItems(newItemList);
+        auctionItems.map(i=>newArray.unshift(i));
+        console.log(newArray);
+        
         setNftData(newArray);
         setNftItems(newArray);
       }
@@ -271,19 +287,18 @@ const Home: React.FC = () => {
                     gap="3.2rem"
                   >
                     {nftItems.map((item, index) => {
+                      
                       if(item.endTime){//for auction
+                        console.log("info",item.name,item.sellerNonce);
                         return (
                           <NextLink
                             key={item.id}
-                            href={`/nft/${item.tokenAddress}/auction`}
+                            href={`/nft/${item.seller}-${item.sellerNonce}/auction`}
                           >
                             <NFTAuctionItem
                               name={item.name}
                               amount={item.amount}
-                              price={item.price}
                               imageURL={item.imageURL}
-                              wait={250 * (index + 1)}
-                              item={null}
                               endTime={item.endTime}
                             />
                           </NextLink>

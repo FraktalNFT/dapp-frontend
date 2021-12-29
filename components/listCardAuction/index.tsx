@@ -1,7 +1,7 @@
 import { HStack, VStack } from "@chakra-ui/layout";
 
 
-const ListCardAuction = (({ totalPrice, setTotalPrice, setTotalAmount, textInput }) => {
+const ListCardAuction = (({ totalPrice, setTotalPrice, setTotalAmount }) => {
 
   return (
     <HStack>
@@ -15,7 +15,7 @@ const ListCardAuction = (({ totalPrice, setTotalPrice, setTotalAmount, textInput
         }}>RESERVE PRICE</div>
         <input
           onChange = {(e)=>{setTotalPrice(e.target.value)}}
-          ref={textInput}
+          type="number"
           style={{
             margin: '8px',
             border: '2px solid #E0E0E0',
