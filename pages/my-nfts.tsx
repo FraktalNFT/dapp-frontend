@@ -8,6 +8,7 @@ import {
   Text,
   VStack,
   Spinner,
+  useToast,
 } from "@chakra-ui/react";
 import { Image } from "@chakra-ui/react";
 import Head from "next/head";
@@ -30,55 +31,156 @@ import {
   getApproved,
 } from "../utils/contractCalls";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
+import { getSubgraphAuction } from "utils/graphQueries";
+import { createListedAuction } from "utils/nftHelpers";
+import { utils } from "ethers";
+import { unlistAuctionItem, redeemAuctionSeller, redeemAuctionParticipant, } from "../utils/contractCalls";
 
 export default function MyNFTsView() {
   const router = useRouter();
+  const toast = useToast()
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
   const { fraktals, fraktions, nfts, balance, loading } = useUserContext();
+  const [auctions,setAuctions] = useState(null);
+  const [userAccount,setUserAccount] = useState(null);
 
 
-
-  const sampleEndtime = String((Date.now()/1000)+(60*45));
-  const sampleAuctionItem = {
-    "creator": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
-    "marketId": "38",
-    "createdAt": "1638534229",
-    "endTime": sampleEndtime,
-    // "endTime": "1640893165",
-    "tokenAddress": "0xb02c6cf605e871d7ad975147372ab1227425cb61",
-    "holders": 3,
-    "raised": "0",
-    "id": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa-0xb02c6cf605e871d7ad975147372ab1227425cb612",
-    "price": "700.0",
-    "amount": "1",
-    "seller": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
-    "name": "Auction Test Item(in progress)",
-    "imageURL": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png",
-    "wait":"2000",
-  };
-  const sampleEndtime2 = String((Date.now()/1000)+(5));
-  const sampleAuctionItem2 = {
-    "creator": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
-    "marketId": "38",
-    "createdAt": "1638534229",
-    "endTime": sampleEndtime2,
-    // "endTime": "1640893165",
-    "tokenAddress": "0xb02c6cf605e871d7ad975147372ab1227425cb61",
-    "holders": 3,
-    "raised": "0",
-    "id": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa-0xb02c6cf605e871d7ad975147372ab1227425cb612",
-    "price": "700.0",
-    "amount": "1",
-    "seller": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
-    "name": "Auction Test Item(promply ending)",
-    "imageURL": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png",
-    "wait":"2000",
-  };
-  // const auction = [];
-  const auctions = [sampleAuctionItem,sampleAuctionItem2];
 
   const { isMinting, setIsMinting } = useMintingContext();
+
+  const sellerEndAuction = async (tokenAddress,sellerNonce) =>{
+    unlistAuctionItem(
+      tokenAddress,
+      sellerNonce,
+      provider,
+      marketAddress
+      ).then(()=>{
+        toast({
+          title: 'Auction unlisted',
+          status: 'success',
+          duration: 2000,
+          isClosable: true,
+        })
+      })
+      .catch((e)=>{
+        toast({
+          title: e.message,
+          status: 'error',
+          duration: 2000,
+          isClosable: true,
+        })
+        console.log(e);
+      });
+  }
+
+  const userClaimFrak = async (tokenAddress,seller,sellerNonce) => {
+    redeemAuctionParticipant(
+      tokenAddress,
+      seller,
+      sellerNonce,
+      provider,
+      marketAddress
+    ).then(()=>{
+      toast({
+        title: 'Redeemed Fraktions successfully',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      })
+    })
+    .catch((e)=>{
+      toast({
+        title: e.message,
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+      })
+    })
+    console.log(e);
+  }
+
+  const sellerClaimEth = async (tokenAddress,seller,sellerNonce) => {
+    redeemAuctionSeller(
+      tokenAddress,
+      seller,
+      sellerNonce,
+      provider,
+      marketAddress
+    ).then(()=>{
+      toast({
+        title: 'Redeemed ETH successfully',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      })
+    })
+    .catch((e)=>{
+      toast({
+        title: e.message,
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+      })
+      console.log(e);
+      
+    })
+  }
+
+  useEffect(()=>{
+    if(account!=userAccount){
+      setUserAccount(account);
+    }
+  })
+
+  useEffect(()=>{
+    const getAuctions = async ()=>{
+      let auctionData = await getSubgraphAuction("auctions","");
+      auctionData = auctionData?.auctions?.filter(x=>x.seller==account?.toLocaleLowerCase());
+
+      let auctionDataHash = [];
+      await Promise.all(auctionData?.map(async x=>{
+        let _hash = await getSubgraphAuction("auctionsNFT",x.tokenAddress);
+
+        if(_hash.fraktalNFT != null){
+          const itm = {
+            "id":`${x.tokenAddress}-${x.sellerNonce}`,
+            "hash":_hash.fraktalNFT.hash
+          };
+          console.log(_hash);
+          auctionDataHash.push(itm);
+        }
+        
+        
+      }))
+      
+
+      let auctionItems = [];
+      await Promise.all(auctionData?.map(async (auction,idx)=>{
+        let hash = auctionDataHash.filter(e=>e.id==`${auction.tokenAddress}-${auction.sellerNonce}`);
+        
+        if(hash[0]!=undefined){
+          console.log("hash",hash[0].hash);
+          Object.assign(auction,{"hash":hash[0].hash});
+          const item = await createListedAuction(auction);
+          console.log("item",item);
+          auctionItems.push(item);
+        }
+        
+        }
+      ));
+      console.log("before",auctionItems);
+      auctionItems = auctionItems.sort((a,b)=>b.endTime - a.endTime);
+      console.log("after",auctionItems);
+      
+      setAuctions(auctionItems);
+      
+      
+
+    }
+    getAuctions();
+
+  },[userAccount]);
 
   useEffect(() => {
     let nftLocalDataString = window?.localStorage.getItem("mintingNFTs");
@@ -327,6 +429,12 @@ export default function MyNFTsView() {
       <Flex w="100%" paddingTop="64px">
         <div className={styles.header} id="auctions">Auctions</div>
       </Flex>
+      <Flex w="100%" >
+        <div className={styles.header2} id="auctions">Contributed</div>
+      </Flex>
+      <Flex w="100%" >
+        <div className={styles.header2} id="auctions">My Auction</div>
+      </Flex>
       {auctions?.length >= 1 && (
         <div style={{ marginTop: "16px" }}>
           <Grid
@@ -340,22 +448,27 @@ export default function MyNFTsView() {
           >
             {auctions &&
               auctions.map(item => (
-                <NextLink key={item.tokenAddress} href={`/nft/${item.tokenAddress}/auction`}>
+                <NextLink 
+                key={`${item.seller}-${item.sellerNonce}`} 
+                href={`/nft/${item.seller}-${item.sellerNonce}/auction`}>
                   <NFTAuctionItem
                     item={item}
                     name={item.name}
-                    amount={parseInt(item.amount)}
+                    amount={utils.formatEther(item.amountOfShare)}
                     price={item.price}
                     imageURL={item.imageURL}
                     endTime={item.endTime}
                     showProgress={true}
+                    claimType={"seller"}
+                    claimFunction={sellerClaimEth}
+                    unlistFunction={sellerEndAuction}
                   />
                 </NextLink>
               ))}
           </Grid>
         </div>
       )}
-      {!loading && auctions==null && (
+      {!loading && auctions?.length == 0 && (
         <Center height="104px" width="100%" borderRadius="24" bgColor="#F9F9F9">
           <Text>
             You do not have any auction to be claimed.

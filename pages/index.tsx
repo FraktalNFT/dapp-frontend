@@ -8,7 +8,7 @@ import {
   Box,
   Spinner,
 } from "@chakra-ui/react";
-import { BigNumber } from "ethers";
+import { BigNumber, utils } from "ethers";
 import Head from "next/head";
 import NextLink from "next/link";
 import { useState, useEffect } from "react";
@@ -292,14 +292,15 @@ const Home: React.FC = () => {
                         console.log("info",item.name,item.sellerNonce);
                         return (
                           <NextLink
-                            key={item.id}
+                            key={`${item.seller}-${item.sellerNonce}`}
                             href={`/nft/${item.seller}-${item.sellerNonce}/auction`}
                           >
                             <NFTAuctionItem
                               name={item.name}
-                              amount={item.amount}
+                              amount={utils.formatEther(item.amountOfShare)}
                               imageURL={item.imageURL}
                               endTime={item.endTime}
+                              item={item}
                             />
                           </NextLink>
                           )

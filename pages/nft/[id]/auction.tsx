@@ -1,6 +1,7 @@
 import { HStack, VStack } from "@chakra-ui/layout";
 import { useToast } from '@chakra-ui/react'
 import React, {useEffect, useState} from "react";
+import {withRouter} from 'next/router';
 import Head from "next/head";
 import Link from "next/link";
 import { BigNumber } from "ethers";
@@ -16,7 +17,7 @@ import { useWeb3Context } from "@/contexts/Web3Context";
 import { createListedAuction } from "utils/nftHelpers";
 import { introspectionFromSchema } from "graphql";
 import Custom404 from "../../404";
-export default function AuctionNFTView() {
+function AuctionNFTView({router}) {
 
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
   const [index, setIndex] = useState();
@@ -38,15 +39,22 @@ export default function AuctionNFTView() {
     }
     const {tokenAddress,seller,sellerNonce} = nftObject;
     const weiVal = utils.parseUnits(contribute.toString());
-    const tx = await participateAuction(tokenAddress,seller,sellerNonce,weiVal,provider,marketAddress)
-    .then((e)=>console.log(e)
-    );
-    toast({
-      title: `Contributed ${contribute.toString()} ETH` ,
-      status: 'success',
-      duration: 2000,
-      isClosable: true,
-    })
+    try {
+      const tx = await participateAuction(tokenAddress,seller,sellerNonce,weiVal,provider,marketAddress)
+      .then((e)=>console.log(e)
+      );
+      toast({
+        title: `Contributed ${contribute.toString()} ETH` ,
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      })
+    } catch (error) {
+      console.log(error);
+      
+    }
+    
+    
     
 
   }
@@ -56,63 +64,41 @@ export default function AuctionNFTView() {
     setContribute(val);
   }
 
+  useEffect(() => {
+  }, )
+
   useEffect(async ()=>{
-      const address = getParams('nft');
-      const index = address.split('/auction')[0]
-      console.log(account,provider);
+      if(!router.isReady) return;
+      
+      // const address = getParams('nft');
+      // const index = address.split('/auction')[0]
+      const index = router.query.id;
       
       if(index){
         setIndex(index)
       }
       let obj = await getSubgraphAuction('singleAuction',index);
-      console.log(obj);
       if(obj?.auction==null){
         setError(true);
         return;
       }
       
       let _hash = await getSubgraphAuction("auctionsNFT",obj.auction.tokenAddress);
-      console.log(_hash);
       Object.assign(obj,{
         "hash":_hash.fraktalNFT.hash,
       });
       const item = await createListedAuction(obj);
-      console.log(index,item);
       Object.assign(obj.auction,{
         "hash":_hash.fraktalNFT.hash,
         "name":item.name,
         "imageURL":item.imageURL
       });
       
-      console.log("ong",obj);
       
-      
-      // let nftObjects = await createObject(obj.fraktalNFTs[0])
-      const sampleEndtime = String((Date.now()/1000)+(60*60));
-      const sampleAuctionItem = {
-        "creator": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
-        "marketId": "38",
-        "createdAt": "1638534229",
-        "endTime": sampleEndtime,
-        // "endTime": "1640893165",
-        "tokenAddress": "0xb02c6cf605e871d7ad975147372ab1227425cb61",
-        "holders": 3,
-        "raised": "0",
-        "id": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa-0xb02c6cf605e871d7ad975147372ab1227425cb612",
-        "price": "700.0",
-        "amount": "1",
-        "seller": "0x06b53e2289d903ba0e23733af8fbd26ad3b6c9fa",
-        "name": "Auction Test Item",
-        "imageURL": "/sample-item.png",
-        "wait":"2000",
-      };
-      Object.assign(sampleAuctionItem,obj.auction);
-      console.log(sampleAuctionItem);
-      
-      if(sampleAuctionItem){
-        setNftObject(sampleAuctionItem);
+      if(obj){
+        setNftObject(obj.auction);
       }
-  },[])
+  },[router.isReady])
   const exampleNFT = {
     id: 0,
     name: "Golden Fries Cascade",
@@ -260,3 +246,5 @@ export default function AuctionNFTView() {
   );
   }
 }
+
+export default withRouter(AuctionNFTView)

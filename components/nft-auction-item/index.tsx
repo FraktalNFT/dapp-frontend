@@ -36,7 +36,7 @@ interface NFTItemProps extends StackProps {
 }
 
 const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
-  ({ item, amount, price, imageURL, name, onClick, CTAText, wait, endTime, showProgress }, ref) => {
+  ({ item, amount, price, imageURL, name, onClick, CTAText, wait, endTime, showProgress, claimType,claimFunction, unlistFunction }, ref) => {
     const [isVisible, setIsVisible] = useState(false);
     const [timerOpacity,setTimerOpacity] = useState(0);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
@@ -92,7 +92,6 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
             rounded="md"
             borderWidth="1px"
             boxShadow="md"
-            onClick={onClick}
             _hover={{
               boxShadow: "xl",
             }}
@@ -123,6 +122,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                   }}
                   style={{ verticalAlign: "middle" }}
                   onLoad={() => onImageLoad(2000)}
+                  onClick={onClick}
                 />
               </Box>
               {!isImageLoaded && (
@@ -155,7 +155,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
               </Text>
               <Flex>
                 {amount && (
-                  <Text className="medium-12">{amount / 100}% Available</Text>
+                  <Text className="medium-12">{amount==0?"Not":`${amount / 100}%`} Available</Text>
                 )}
 
                 <Spacer />
@@ -171,18 +171,23 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 />
               </Flex>
 
-              { showProgress && ended &&(
+              { showProgress && ended && claimType=="seller" &&(
                 <Box textAlign="center" marginTop={5}>
-                  <NextLink href={"#"}>
-                    <FrakButton >Claim Fraktions</FrakButton>
-                  </NextLink>
+                    <FrakButton onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)}
+                    >Claim ETH</FrakButton>
+                </Box>
+              )}
+              { showProgress && ended && claimType=="participant" &&(
+                <Box textAlign="center" marginTop={5}>
+                  <FrakButton >Claim Fraktions</FrakButton>
                 </Box>
               )}
               { showProgress && !ended && (
                 <Box textAlign="center" marginTop={5}>
-                  <NextLink href={`nft/${item.tokenAddress}/list-item`}>
-                    <Button disabled size="lg">In Progress</Button>
-                  </NextLink>
+                  <Button disabled >In Progress</Button>
+                  <Button size={'lg'} onClick={()=>unlistFunction(item.tokenAddress,item.sellerNonce)} >
+                    Unlist
+                  </Button>
                 </Box>
               )}
             </Box>
