@@ -26,6 +26,7 @@ function AuctionNFTView({router}) {
   const [error,setError] = useState(false);
   const [currentReserve,setCurrentReserve] = useState(-1);
   const [refresh,setRefresh] = useState(true);
+  const [completed,setCompleted] = useState(false);
   const toast = useToast();
 
   const auctionReserve = async (seller,sellerNonce) =>{
@@ -139,6 +140,7 @@ function AuctionNFTView({router}) {
   
   const renderer = ({ days, hours, minutes, seconds, completed })=>{
     if (completed) {
+      setCompleted(true);
       // Render a completed state
       return <div>Ended</div>;
     } else {
@@ -256,7 +258,7 @@ function AuctionNFTView({router}) {
               
             
             
-            <div className={styles.contributeContainer}>
+            {!completed && (<div className={styles.contributeContainer}>
               <div style={{ marginLeft: "24px" }}>
                 <div className={styles.contributeHeader}>ETH</div>
                 <input
@@ -268,7 +270,7 @@ function AuctionNFTView({router}) {
               </div>
               <button className={styles.contributeCTA} onClick={handleContribute}
               >Contribute</button>
-            </div>
+            </div>)}
           </div>}
         </VStack>
 
