@@ -28,6 +28,8 @@ const marketAbi = [
   "function participateAuction(address tokenAddress,address seller,uint256 sellerNonce) external payable",
   "function listItemAuction(address _tokenAddress,uint256 _reservePrice,uint256 _numberOfShares) external returns (uint256)",
   "function unlistAuctionItem(address tokenAddress,uint256 sellerNonce) external",
+  "function auctionReserve(address, uint256) public view returns (uint256)",
+  "function participantContribution(address, uint256, address) public view returns (uint256)",
 ];
 const tokenAbi = [
   "function isApprovedForAll(address account,address operator) external view returns (bool)",
@@ -155,6 +157,16 @@ export async function getSellerNonce(sellerAddress, provider, marketContract) {
   let nonce = await customContract.auctionNonce(sellerAddress);
   return nonce;
 }
+export async function getAuctionReserve(sellerAddress, sellerNonce, provider, marketContract) {
+  const customContract = new Contract(marketContract, marketAbi, provider);
+  let nonce = await customContract.auctionReserve(sellerAddress,sellerNonce);
+  return nonce;
+}
+export async function getParticipantContribution(sellerAddress, sellerNonce, participantAddress, provider, marketContract) {
+  const customContract = new Contract(marketContract, marketAbi, provider);
+  let nonce = await customContract.participantContribution(sellerAddress,sellerNonce,participantAddress);
+  return nonce;
+}
 
 // State functions
 ///////////////////////////////////////////////////////////
@@ -246,7 +258,7 @@ export async function importFraktal(
   marketAddress
 ) {
   const signer = await loadSigner(provider);
-  const override = { gasLimit: 2000000 };
+  const override = { gasLimit: 500000 };
   const customContract = new Contract(marketAddress, marketAbi, signer);
   let tx = await customContract.importFraktal(
     tokenAddress,
@@ -405,6 +417,15 @@ export async function redeemAuctionSeller( tokenAddress, seller, sellerNonce, pr
   let receipt = processTx(tx);
   return receipt;
 }
+
+export async function estimateRedeemAuctionSeller( tokenAddress, seller, sellerNonce, provider, marketAddress) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
+  let tx = await customContract.estimateGas.redeemAuctionSeller( tokenAddress, seller, sellerNonce);
+  return tx;
+}
+
+
 export async function redeemAuctionParticipant( tokenAddress, seller, sellerNonce, provider, marketAddress) {
   const signer = await loadSigner(provider);
   const customContract = new Contract(marketAddress, marketAbi, signer);

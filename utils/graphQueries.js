@@ -3,7 +3,7 @@ import { utils } from "ethers";
 const { CID } = require("ipfs-http-client");
 
 const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.18';
-const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/fraktalauction/0.7';
+const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/testnetfraktalauction/0.4';
 // https://api.thegraph.com/subgraphs/name/drhongos/fraktalrinkeby // hosted
 
 const creator_query = gql`
@@ -413,6 +413,7 @@ const listedAuctions = gql`
       amountOfShare
       endTime
       sellerNonce
+      participants
       }
   }
 `;

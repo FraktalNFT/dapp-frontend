@@ -143,7 +143,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                   width="5"
                   height="8"
                   marginEnd="3px"
-                  src="https://ethereum.org/static/6b935ac0e6194247347855dc3d328e83/31987/eth-diamond-black.png"
+                  src="eth.svg"
                 />
                 {price && (
                   <Text textAlign="end" className="medium-12">

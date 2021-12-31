@@ -1,0 +1,21 @@
+type Auction @entity {
+  id: ID!
+  seller: String!
+  tokenAddress: String!
+  reservePrice: BigInt!
+  amountOfShare: BigInt!
+  endTime: BigInt!
+  sellerNonce: BigInt!
+  auctionReserve: BigInt!
+  participants: [String!]!
+}
+
+type FraktalNFT @entity{
+  id:ID!
+  hash: String!
+}
+
+type FactoryContract @entity{
+  id:ID!
+  address: String!
+}

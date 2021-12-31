@@ -30,6 +30,7 @@ const Home: React.FC = () => {
   const [listType, setListType] = useState("All Listings");
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [auctions,setAuctions] = useState({});
   const handleSortSelect = (item: string) => {
     setSelectionMode(false);
     setSortType(item);
@@ -73,20 +74,29 @@ const Home: React.FC = () => {
 
   async function getData() {
     setLoading(true);
-    await getMoreListedItems();
+    await getMoreListedItems(auctions);
     setLoading(false);
   }
+
+  useEffect(()=>{
+    getMoreListedItems(auctions);
+    
+  },[auctions])
 
   useEffect(() => {
     if (window?.sessionStorage.getItem("nftitems")) {
       const stringedNFTItems = window?.sessionStorage.getItem("nftitems");
       const unstringedNFTItems = JSON.parse(stringedNFTItems);
+      const auctionOnly = unstringedNFTItems.filter(item=>item.endTime);
+      
+      
       setNftItems(unstringedNFTItems);
       setNftData(unstringedNFTItems);
-      getData();
+      setAuctions(auctionOnly);
+      // getData();
     } else {
       // touch API iff no local version
-      getData();
+      // getData();
     }
     // data storage handling
     // const clearStorage = () => {
@@ -96,9 +106,13 @@ const Home: React.FC = () => {
     // return () => window.removeEventListener("beforeunload", clearStorage);
   }, []);
 
-  const getMoreListedItems = async () => {
+  const getMoreListedItems = async (auctionsObject:Object) => {
     const data = await getSubgraphData("listed_items", "");
     let auctionData = await getSubgraphAuction("auctions","");
+
+    
+    
+    
     auctionData = auctionData?.auctions.filter(x=>x.reservePrice!=0);
     
     let auctionDataHash = [];
@@ -116,21 +130,19 @@ const Home: React.FC = () => {
 
     let auctionItems = [];
     await Promise.all(auctionData?.map(async (auction,idx)=>{
-      console.log("map",auction,auctionDataHash);
-
-      
-      
       let hash = auctionDataHash.filter(e=>e.id==`${auction.tokenAddress}-${auction.sellerNonce}`);
-      console.log("hash",hash[0].hash);
       
       
       Object.assign(auction,{"hash":hash[0].hash});
       const item = await createListedAuction(auction);
-      console.log("item",item);
       
       auctionItems.push(item);
       }
     ));
+
+    if(JSON.stringify(auctionItems)==JSON.stringify(auctionsObject)){
+      return;
+    }
     
 
     let dataOnSale;
@@ -140,7 +152,6 @@ const Home: React.FC = () => {
       }); // this goes in the graphql query
     }
     if (dataOnSale?.length > 1) {
-      // console.log('dataOnSale', dataOnSale)
       let objects = await Promise.all(
         dataOnSale.map(x => {
           let res = createListed(x);
@@ -161,7 +172,6 @@ const Home: React.FC = () => {
         const newArray = [...nftItems, ...deduplicatedObjects];
         // setNftItems(newItemList);
         auctionItems.map(i=>newArray.unshift(i));
-        console.log(newArray);
         
         setNftData(newArray);
         setNftItems(newArray);
@@ -172,8 +182,11 @@ const Home: React.FC = () => {
   // Store NFT Items in Session Storage
   useEffect(() => {
     const stringedNFTItems = JSON.stringify(nftData);
-    window?.sessionStorage?.setItem("nftitems", stringedNFTItems);
-  }, [nftItems]);
+    if(stringedNFTItems.length>0){
+      window?.sessionStorage?.setItem("nftitems", stringedNFTItems);
+    }
+    
+  }, [nftItems,nftData]);
 
   const demoNFTItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
     (_, index) => ({
@@ -289,7 +302,6 @@ const Home: React.FC = () => {
                     {nftItems.map((item, index) => {
                       
                       if(item.endTime){//for auction
-                        console.log("info",item.name,item.sellerNonce);
                         return (
                           <NextLink
                             key={`${item.seller}-${item.sellerNonce}`}

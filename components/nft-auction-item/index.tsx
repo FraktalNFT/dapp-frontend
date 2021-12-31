@@ -173,21 +173,42 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
 
               { showProgress && ended && claimType=="seller" &&(
                 <Box textAlign="center" marginTop={5}>
-                    <FrakButton onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)}
-                    >Claim ETH</FrakButton>
+                    {item.currentReserve==0 &&(
+                      <FrakButton disabled onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)}
+                      >Nothing to claim</FrakButton>
+                    )
+                    }
+                    {item.currentReserve!=0 &&(
+                      <FrakButton onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)}
+                      >Claim {item.currentReserve} ETH</FrakButton>
+                    )
+                    }
+
                 </Box>
               )}
               { showProgress && ended && claimType=="participant" &&(
                 <Box textAlign="center" marginTop={5}>
-                  <FrakButton >Claim Fraktions</FrakButton>
+                {item.contributed != 0 &&(
+                  <FrakButton  onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)} 
+                  >Claim Fraktions</FrakButton>
+                )}
+                {item.contributed == 0 &&(
+                  <FrakButton disabled onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)} 
+                  >Claimed</FrakButton>
+                )}
                 </Box>
               )}
-              { showProgress && !ended && (
+              { showProgress && !ended && claimType=="seller" && (
                 <Box textAlign="center" marginTop={5}>
                   <Button disabled >In Progress</Button>
                   <Button size={'lg'} onClick={()=>unlistFunction(item.tokenAddress,item.sellerNonce)} >
-                    Unlist
+                    End Auction
                   </Button>
+                </Box>
+              )}
+              { showProgress && !ended && claimType=="participant" && (
+                <Box textAlign="center" marginTop={5}>
+                  <Button disabled >In Progress</Button>
                 </Box>
               )}
             </Box>

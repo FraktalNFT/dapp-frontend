@@ -156,7 +156,8 @@ export default function MintPage() {
     totalAmount > 0 &&
     totalAmount <= 10000 &&
     totalPrice > 0 &&
-    isApproved;
+    isApproved &&
+    fraktionalized;
 
   async function approveToken() {
     await approveMarket(marketAddress, provider, tokenMintedAddress).then(
@@ -450,7 +451,7 @@ export default function MintPage() {
                 </FrakButton4>
                 <FrakButton4
                   status={!fraktionalized ? "open" : "done"}
-                  disabled={!isApproved || !tokenMintedAddress}
+                  disabled={!isApproved || !tokenMintedAddress }
                   onClick={() => importFraktalToMarket()}
                 >
                   3. Transfer

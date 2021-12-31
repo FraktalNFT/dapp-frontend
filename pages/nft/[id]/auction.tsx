@@ -12,7 +12,7 @@ import {getSubgraphData, getSubgraphAuction } from '../../../utils/graphQueries'
 import { createObject } from "utils/nftHelpers";
 import Countdown,{zeroPad} from 'react-countdown';
 import { utils } from "ethers";
-import { participateAuction } from "utils/contractCalls";
+import { participateAuction, getAuctionReserve } from "utils/contractCalls";
 import { useWeb3Context } from "@/contexts/Web3Context";
 import { createListedAuction } from "utils/nftHelpers";
 import { introspectionFromSchema } from "graphql";
@@ -24,8 +24,21 @@ function AuctionNFTView({router}) {
   const [nftObject, setNftObject] = useState(null);
   const [contribute,setContribute] = useState(0);
   const [error,setError] = useState(false);
+  const [currentReserve,setCurrentReserve] = useState(-1);
+  const [refresh,setRefresh] = useState(true);
   const toast = useToast();
 
+  const auctionReserve = async (seller,sellerNonce) =>{
+    if(provider){
+      const reserve = await getAuctionReserve(seller,sellerNonce,provider,marketAddress);
+      return reserve;
+    }
+    return -1;
+  }
+
+  const refreshPage = () =>{
+    setRefresh(!refresh);
+  }
 
   const handleContribute = async () => {
     if(contribute==0){
@@ -38,7 +51,9 @@ function AuctionNFTView({router}) {
       return;
     }
     const {tokenAddress,seller,sellerNonce} = nftObject;
+    
     const weiVal = utils.parseUnits(contribute.toString());
+    
     try {
       const tx = await participateAuction(tokenAddress,seller,sellerNonce,weiVal,provider,marketAddress)
       .then((e)=>console.log(e)
@@ -49,7 +64,14 @@ function AuctionNFTView({router}) {
         duration: 2000,
         isClosable: true,
       })
+      refreshPage();
     } catch (error) {
+      toast({
+        title: error ,
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+      })
       console.log(error);
       
     }
@@ -93,12 +115,18 @@ function AuctionNFTView({router}) {
         "name":item.name,
         "imageURL":item.imageURL
       });
+
+
       
       
       if(obj){
         setNftObject(obj.auction);
+        const objReserve = await auctionReserve(obj.auction.seller,obj.auction.sellerNonce);
+        setCurrentReserve(Number(utils.formatEther(objReserve)));
+        console.log(utils.formatEther(objReserve));
+        
       }
-  },[router.isReady])
+  },[router.isReady,refresh])
   const exampleNFT = {
     id: 0,
     name: "Golden Fries Cascade",
@@ -177,20 +205,20 @@ function AuctionNFTView({router}) {
           <div>
               <Image
               src={nftObject?nftObject.imageURL:exampleNFT.imageURL}
-              w="100%"
-              h="100%"
+              
+              h="50%"
               style={{ borderRadius: "4px 4px 0px 0px" }}
               />
             <div className={styles.NFTCard}>
-              <div className={styles.cardHeader}>ARTIST</div>
+              <div className={styles.cardHeader}>Auctioneer</div>
               <div className={styles.cardText} style={{ color: "#985cff" }}>
-                {nftObject? shortenHash(nftObject.creator) : 'loading'}
+                {nftObject? shortenHash(nftObject.seller) : 'loading'}
               </div>
               <div style={{ marginTop: "8px" }} className={styles.cardHeader}>
-                DATE OF CREATION
+                TOKEN ADDRESS
               </div>
               <div className={styles.cardText}>
-                {nftObject?timezone(nftObject.createdAt):'loading'}
+                {nftObject?nftObject.tokenAddress:'loading'}
               </div>
               <div style={{ marginTop: "8px" }} className={styles.cardHeader}>
                 RESERVE PRICE
@@ -202,7 +230,7 @@ function AuctionNFTView({router}) {
                 Fraktion Amount
               </div>
               <div className={styles.cardText}>
-                {nftObject?`${utils.formatUnits(nftObject.amountOfShare)}/10000 FRAK`:'loading'}
+                {nftObject?`${utils.formatUnits(nftObject.amountOfShare)}/10000 FRAK (${Number(utils.formatUnits(nftObject.amountOfShare))/100}% of max. supply)`:'loading'}
               </div>
             </div>
           </div>
@@ -210,21 +238,24 @@ function AuctionNFTView({router}) {
             <div style={{ marginRight: "52px" }}>
             <Countdown renderer={renderer} date={Number(nftObject.endTime)*1000} autoStart
                 />
-                </div>
-            <div className={styles.auctionCardDivider} />
-            <div style={{ marginRight: "24px" }}>
-              <div className={styles.auctionCardHeader}>Contributed</div>
-              <div className={styles.auctionCardDetailsContainer}>
-                <div style={{ marginRight: "60px" }}>
-                  <div className={styles.auctionCardDetailsNumber}>125.25</div>
-                  <div className={styles.auctionCardDetailsText}>ETH</div>
-                </div>
-                <div>
-                  <div className={styles.auctionCardDetailsNumber}>45</div>
-                  <div className={styles.auctionCardDetailsText}>People</div>
+            </div>
+            {currentReserve!=-1&&(
+              <div className={styles.auctionCardDivider} />
+            )}
+            {currentReserve!=-1&&(
+              <div>
+                <div className={styles.auctionCardHeader}>Current Auction Reserve</div>
+                <div className={styles.auctionCardDetailsContainer}>
+                  <div style={{ marginRight: "60px" }}>
+                    <div className={styles.auctionCardDetailsNumber}>{currentReserve}</div>
+                    <div className={styles.auctionCardDetailsText}>ETH</div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+              
+            
+            
             <div className={styles.contributeContainer}>
               <div style={{ marginLeft: "24px" }}>
                 <div className={styles.contributeHeader}>ETH</div>
