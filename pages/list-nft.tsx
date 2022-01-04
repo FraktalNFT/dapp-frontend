@@ -163,6 +163,7 @@ export default function MintPage() {
     await approveMarket(marketAddress, provider, tokenMintedAddress).then(
       () => {
         setIsApproved(true);
+        importFraktalToMarket();
       }
     );
   }
@@ -182,6 +183,7 @@ export default function MintPage() {
         marketAddress
       ).then(() => {
         setFraktionalized(true);
+        listNewItem();
       });
     }
   }
@@ -241,6 +243,12 @@ export default function MintPage() {
     });
   }
 
+
+  useEffect(() => {
+    if (listItemCheck && tokenMintedAddress) {
+      approveToken();
+    }
+  }, [tokenMintedAddress]);
 
   let msg = () => {
     if (!minted) {
