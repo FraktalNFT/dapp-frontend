@@ -8,6 +8,7 @@ import {
   VStack,
   BoxProps,
   Spinner,
+  Badge,
 } from "@chakra-ui/react";
 import React, { forwardRef } from "react";
 import {
@@ -25,7 +26,7 @@ import { useUserContext } from "@/contexts/userContext";
 import Countdown,{zeroPad} from 'react-countdown';
 
 interface NFTItemProps extends StackProps {
-  // item: FrakCard;
+  item: any;
   name: String;
   amount: Number;
   // price: Number;
@@ -33,16 +34,17 @@ interface NFTItemProps extends StackProps {
   // CTAText?: string;
   // wait: number;
   endTime: number;
+  reservePriceReached: any;
 }
 
 const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
-  ({ item, amount, price, imageURL, name, onClick, CTAText, wait, endTime, showProgress, claimType,claimFunction, unlistFunction }, ref) => {
+  ({ item, amount, price, imageURL, name, onClick, CTAText, wait, endTime, showProgress, claimType,claimFunction, unlistFunction, reservePriceReached }, ref) => {
     const [isVisible, setIsVisible] = useState(false);
     const [timerOpacity,setTimerOpacity] = useState(0);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const { fraktions } = useUserContext();
     const [ended,setEnded] = useState(false);
-
+    
     // const canList = item && !! (fraktions || []).find(fraktion => fraktion.id === item.id);
 
     // useEffect(() => {
@@ -154,7 +156,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 {name}
               </Text>
               <Flex>
-                {amount && (
+                {(amount!=0) && (
                   <Text className="medium-12">{amount==0?"Not":`${amount / 100}%`} Available</Text>
                 )}
 
@@ -171,6 +173,16 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 />
               </Flex>
 
+              {showProgress && item.isAuctionSuccess && (
+                <Badge fontSize='md' colorScheme='green'>Success</Badge>
+              )}
+              {showProgress && !item.isAuctionSuccess && (
+                <Badge fontSize='md' colorScheme='red'>Failed</Badge>
+              )}
+
+
+
+
               { showProgress && ended && claimType=="seller" &&(
                 <Box textAlign="center" marginTop={5}>
                     {item.currentReserve==0 &&(
@@ -178,9 +190,14 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                       >Nothing to claim</FrakButton>
                     )
                     }
-                    {item.currentReserve!=0 &&(
+                    {item.currentReserve!=0 && item.isAuctionSuccess && (
                       <FrakButton onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)}
                       >Claim {item.currentReserve} ETH</FrakButton>
+                    )
+                    }
+                    {item.currentReserve!=0 && !item.isAuctionSuccess && (
+                      <FrakButton onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)}
+                      >Claim Deposited Fraktions</FrakButton>
                     )
                     }
 
@@ -188,9 +205,13 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
               )}
               { showProgress && ended && claimType=="participant" &&(
                 <Box textAlign="center" marginTop={5}>
-                {item.contributed != 0 &&(
+                {item.contributed != 0 && item.isAuctionSuccess && (
                   <FrakButton  onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)} 
                   >Claim Fraktions</FrakButton>
+                )}
+                {item.contributed != 0 && !item.isAuctionSuccess &&(
+                  <FrakButton  onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)} 
+                  >Claim Contributed ETH</FrakButton>
                 )}
                 {item.contributed == 0 &&(
                   <FrakButton disabled onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)} 

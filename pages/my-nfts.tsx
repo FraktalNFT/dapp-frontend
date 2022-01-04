@@ -29,14 +29,21 @@ import {
   importERC721,
   importERC1155,
   getApproved,
-  estimateRedeemAuctionSeller
+  estimateRedeemAuctionSeller,
 } from "../utils/contractCalls";
 import { useRouter } from "next/router";
 import { useEffect,useState } from "react";
 import { getSubgraphAuction } from "utils/graphQueries";
 import { createListedAuction } from "utils/nftHelpers";
 import { utils } from "ethers";
-import { unlistAuctionItem, redeemAuctionSeller, redeemAuctionParticipant, getAuctionReserve, getParticipantContribution} from "../utils/contractCalls";
+import { 
+  unlistAuctionItem, 
+  redeemAuctionSeller, 
+  redeemAuctionParticipant, 
+  getAuctionReserve, 
+  getParticipantContribution,
+  getAuctionListings,
+} from "../utils/contractCalls";
 
 export default function MyNFTsView() {
   const router = useRouter();
@@ -112,6 +119,21 @@ export default function MyNFTsView() {
     const reserve = await getAuctionReserve(seller,sellerNonce,provider,marketAddress);
     return reserve;
   }
+  const auctionSuccess = async (tokenAddress, seller, sellerNonce, auctionReserve) =>{
+    const auction = await getAuctionListings(tokenAddress,seller,sellerNonce,provider,marketAddress);
+    let success;
+    
+    if(auctionReserve.gt(auction[1])){
+      success = true;
+    }else{
+      success = false;
+    }
+
+    console.log(auctionReserve.toString(),">",auction[1].toString()," is ", success);
+    
+
+    return success;
+  }
   
   const participantContribution = async (seller,sellerNonce,participant) =>{
     const reserve = await getParticipantContribution(seller,sellerNonce,participant,provider,marketAddress);
@@ -159,19 +181,14 @@ export default function MyNFTsView() {
       let auctionData = await getSubgraphAuction("auctions","");
       let auctionDataParticipated = {...auctionData};
       auctionDataParticipated = auctionDataParticipated?.auctions?.filter(x=>{
-        console.log("x",x);
-        
         let contained = false;
         x.participants.map(participant => {
-          console.log("parti",participant);
           if(participant==account?.toLocaleLowerCase()){
             contained=true;
           }
         });
         return contained;
       })
-      console.log("adp",auctionDataParticipated);
-      
       auctionData = auctionData?.auctions?.filter(x=>x.seller==account?.toLocaleLowerCase());
 
       let auctionDataHash = [];
@@ -217,31 +234,35 @@ export default function MyNFTsView() {
       let participatedAuctionItems = [];
       await Promise.all(auctionDataParticipated?.map(async (auction,idx)=>{
         let hash = auctionDataParticipatedHash.filter(e=>e.id==`${auction.tokenAddress}-${auction.sellerNonce}`);
-        console.log("ahsh",auction,hash);
         
         
         if(hash[0]!=undefined){
           Object.assign(auction,{"hash":hash[0].hash});
           const item = await createListedAuction(auction);
           const contributed = await participantContribution(auction.seller,auction.sellerNonce,account);
+          const itemReserve = await auctionReserve(auction.seller,auction.sellerNonce);
+          const success = await auctionSuccess(auction.tokenAddress,auction.seller,auction.sellerNonce,itemReserve)
 
-          Object.assign(item,{"contributed":utils.formatEther(contributed)});
+          Object.assign(item,{"contributed":utils.formatEther(contributed),"isAuctionSuccess":success});
+          auction["assigned"] = "lol";
           participatedAuctionItems.push(item);
-          console.log(item);
         }
         
         }
       ));
 
-      console.log("userPartici",participatedAuctionItems);
       setParticipatedAuctions(participatedAuctionItems);
       
 
       let withReserve = [];
       await Promise.all(auctionItems.map(async (i)=>{
         const itemReserve = await auctionReserve(i.seller,i.sellerNonce);
+        // const auctionSuccess = (itemReserve>i.reservePrice?true:false);
+        const success = await auctionSuccess(i.tokenAddress,i.seller,i.sellerNonce,itemReserve)
+        
         i["currentReserve"] = utils.formatEther(itemReserve);
-        withReserve.push(i);
+        i["isAuctionSuccess"] = success;
+        // withReserve.push(i);
       }))
       
 
@@ -257,11 +278,16 @@ export default function MyNFTsView() {
       }))
       
       setAuctions(auctionItems);
+      console.log("participated",participatedAuctionItems);
+      console.log("auctions",auctionItems);
       
       
 
     }
     getAuctions();
+
+    
+    
 
   },[userAccount,refresh]);
 
@@ -534,7 +560,7 @@ export default function MyNFTsView() {
                   <NFTAuctionItem
                     item={item}
                     name={item.name}
-                    amount={utils.formatEther(item?.amountOfShare)}
+                    amount={Number(utils.formatEther(item?.amountOfShare))}
                     price={item.price}
                     imageURL={item.imageURL}
                     endTime={item.endTime}
@@ -542,7 +568,6 @@ export default function MyNFTsView() {
                     claimType={"participant"}
                     claimFunction={userClaimFrak}
                     unlistFunction={sellerEndAuction}
-
                   />
                 </NextLink>
               ))}
@@ -586,7 +611,6 @@ export default function MyNFTsView() {
                     claimType={"seller"}
                     claimFunction={sellerClaimEth}
                     unlistFunction={sellerEndAuction}
-
                   />
                 </NextLink>
               ))}

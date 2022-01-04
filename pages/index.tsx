@@ -166,6 +166,10 @@ const Home: React.FC = () => {
           return true;
         } else return false;
       });
+
+      console.log("before",auctionItems);
+      
+
       if (typeof deduplicatedObjects[0] === "undefined") {
         setHasMore(false);
       } else {

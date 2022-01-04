@@ -30,6 +30,7 @@ const marketAbi = [
   "function unlistAuctionItem(address tokenAddress,uint256 sellerNonce) external",
   "function auctionReserve(address, uint256) public view returns (uint256)",
   "function participantContribution(address, uint256, address) public view returns (uint256)",
+  "function auctionListings(address, address, uint256) public view returns (address, uint256, uint256, uint256)",
 ];
 const tokenAbi = [
   "function isApprovedForAll(address account,address operator) external view returns (bool)",
@@ -160,6 +161,11 @@ export async function getSellerNonce(sellerAddress, provider, marketContract) {
 export async function getAuctionReserve(sellerAddress, sellerNonce, provider, marketContract) {
   const customContract = new Contract(marketContract, marketAbi, provider);
   let nonce = await customContract.auctionReserve(sellerAddress,sellerNonce);
+  return nonce;
+}
+export async function getAuctionListings(tokenAddress, sellerAddress, sellerNonce, provider, marketContract) {
+  const customContract = new Contract(marketContract, marketAbi, provider);
+  let nonce = await customContract.auctionListings(tokenAddress, sellerAddress,sellerNonce);
   return nonce;
 }
 export async function getParticipantContribution(sellerAddress, sellerNonce, participantAddress, provider, marketContract) {
