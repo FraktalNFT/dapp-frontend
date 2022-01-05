@@ -10,6 +10,11 @@ import {
   NumberInput,
   NumberInputField,
   Checkbox,
+  TabPanel,
+  TabPanels,
+  TabList,
+  Tab,
+  Tabs,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useWeb3Context } from "../contexts/Web3Context";
@@ -25,9 +30,12 @@ import {
   getApproved,
   importERC721,
   importERC1155,
+  listItemAuction,
 } from "../utils/contractCalls";
 import { utils } from "ethers";
 import FrakButton4 from "@/components/button4";
+import ListCardAuction from "@/components/listCardAuction";
+import toast from "react-hot-toast";
 
 const { create } = require("ipfs-http-client");
 
@@ -60,6 +68,8 @@ export default function ImportNFTPage() {
 
   const [tokenToImport, setTokenToImport] = useState<object>({});
 
+  const [isAuction,setIsAuction] = useState(false);
+
   async function approveForFactory() {
     if (tokenToImport && tokenToImport.id) {
       let res = await approveMarket(factoryAddress, provider, tokenToImport.id);
@@ -71,6 +81,7 @@ export default function ImportNFTPage() {
       }
       if (!res?.error) {
         setIsFactoryApproved(true);
+        importNFT();
       }
     }
   }
@@ -89,6 +100,7 @@ export default function ImportNFTPage() {
     }
     if (!response?.error) {
       setIsMarketApproved(true);
+      importFraktalToMarket();
     }
   }
 
@@ -124,6 +136,12 @@ export default function ImportNFTPage() {
 
   }
 
+  useEffect(()=>{
+    if(isNFTImported){
+      approveForMarket();
+    }
+  },[isNFTImported,tokenMintedAddress])
+
   async function importFraktalToMarket() {
     let tokenID = 0;
     let isUsed = true;
@@ -149,6 +167,7 @@ export default function ImportNFTPage() {
       }
       if (!response?.error) {
         setIsFraktionsAllowed(true);
+        listFraktions();
       }
     }
   }
@@ -172,6 +191,40 @@ export default function ImportNFTPage() {
       router.push("/my-nfts");
     }
   }
+
+  async function listNewAuctionItem() {
+    const response = await listItemAuction(
+      tokenMintedAddress,
+      utils.parseUnits(totalPrice), 
+      utils.parseUnits(totalAmount),
+      provider,
+      marketAddress
+    );
+    if (response?.error) {
+      alert(
+        "NFT did not list. Sad! Many Such Cases! Contact the development team immediately"
+      );
+      return null;
+    }
+    if (!response?.error) {
+      setIsNFTListed(true);
+      router.push("/my-nfts");
+    }
+  }
+
+  const listFraktions = async () => {
+    if(totalPrice == "" || totalAmount == ""){
+      toast.error("Please input price and amount of fraktions");
+    }else{
+      if(isAuction){
+        listNewAuctionItem();
+      }else{
+        listNewItem();
+      }
+    }
+  }
+
+
 
   // Show Loading State
   useEffect(() => {
@@ -357,66 +410,142 @@ export default function ImportNFTPage() {
                   sx={{ fontSize: `14px` }}
                 />
               </Box>
-              <Box my={8}>
+              {isIntendedForListing && <Box my={8}>
                 <Text sx={{ fontWeight: `700` }}>Fraktionalize</Text>
-                <Box sx={{ display: `flex` }}>
-                  <Box>
-                    <Text>Total Price</Text>
-                    <Text sx={{ opacity: `0.75`, fontSize: `13px` }}>
-                      Sum Price of ALL Fraktions
-                    </Text>
-                    <NumberInput
-                      placeholder={"5 ETH"}
-                      value={totalPrice}
-                      onChange={d => setTotalPrice(d) /* d for data */}
-                      max={59000000}
-                      mt={8}
+
+                <Tabs isFitted variant='enclosed'
+                    onChange={(e)=>setIsAuction(!isAuction)}
                     >
-                      <NumberInputField
-                        sx={{
-                          borderRadius: `12px`,
-                          fontSize: `14px`,
-                          padding: `1ex 1em`,
-                          textAlign: `right`,
-                          height: `auto`,
-                        }}
-                      />
-                    </NumberInput>
-                    <Text sx={{ opacity: `0.75`, fontSize: `12px` }}>
-                      Price: {parseInt(totalPrice) / 10000} ETH per fraktion
-                    </Text>
-                  </Box>
-                  <Box sx={{ width: `1ch` }}></Box>
-                  <Box>
-                    <Text>Fraktions to List</Text>
-                    <Text sx={{ opacity: `0.75`, fontSize: `13px` }}>
-                      Declare how many Fraktions are for sale
-                    </Text>
-                    <NumberInput
-                      placeholder={"5000"}
-                      value={totalAmount}
-                      onChange={
-                        d => setTotalAmount(d) /* needs regex control */
-                      }
-                      max={10000}
-                      mt={8}
-                    >
-                      <NumberInputField
-                        sx={{
-                          borderRadius: `12px`,
-                          fontSize: `14px`,
-                          padding: `1ex 1em`,
-                          textAlign: `right`,
-                          height: `auto`,
-                        }}
-                      />
-                    </NumberInput>
-                    <Text sx={{ opacity: `0.75`, fontSize: `12px` }}>
-                      Out of 10,000 Fraktions
-                    </Text>
-                  </Box>
-                </Box>
-              </Box>
+                      <TabList mb='1em'>
+                        <Tab
+                        >Fixed Price</Tab>
+                        <Tab
+                        >Auction</Tab>
+                      </TabList>
+                      <TabPanels>
+                        <TabPanel>
+                      {/* for fixed price  */}
+                          <Box sx={{ display: `flex` }}>
+                              <Box>
+                                <Text>Total Price</Text>
+                                <Text sx={{ opacity: `0.75`, fontSize: `13px` }}>
+                                  Sum Price of ALL Fraktions
+                                </Text>
+                                <NumberInput
+                                  placeholder={"5 ETH"}
+                                  value={totalPrice}
+                                  onChange={d => setTotalPrice(d) /* d for data */}
+                                  max={59000000}
+                                  mt={8}
+                                >
+                                  <NumberInputField
+                                    sx={{
+                                      borderRadius: `12px`,
+                                      fontSize: `14px`,
+                                      padding: `1ex 1em`,
+                                      textAlign: `right`,
+                                      height: `auto`,
+                                    }}
+                                  />
+                                </NumberInput>
+                                <Text sx={{ opacity: `0.75`, fontSize: `12px` }}>
+                                  Price: {(totalPrice!="")&&parseInt(totalPrice) / 10000} ETH per fraktion
+                                </Text>
+                              </Box>
+                              <Box sx={{ width: `1ch` }}></Box>
+                              <Box>
+                                <Text>Fraktions to List</Text>
+                                <Text sx={{ opacity: `0.75`, fontSize: `13px` }}>
+                                  Declare how many Fraktions are for sale
+                                </Text>
+                                <NumberInput
+                                  placeholder={"5000"}
+                                  value={totalAmount}
+                                  onChange={
+                                    d => setTotalAmount(d) /* needs regex control */
+                                  }
+                                  max={10000}
+                                  mt={8}
+                                >
+                                  <NumberInputField
+                                    sx={{
+                                      borderRadius: `12px`,
+                                      fontSize: `14px`,
+                                      padding: `1ex 1em`,
+                                      textAlign: `right`,
+                                      height: `auto`,
+                                    }}
+                                  />
+                                </NumberInput>
+                                <Text sx={{ opacity: `0.75`, fontSize: `12px` }}>
+                                  Out of 10,000 Fraktions
+                                </Text>
+                              </Box>
+                          </Box>
+                        </TabPanel>
+                    <TabPanel>
+                      {/* for auction  */}
+                    <Box sx={{ display: `flex` }}>
+                              <Box>
+                                <Text>Reserve Price</Text>
+                                <Text sx={{ opacity: `0.75`, fontSize: `13px` }}>
+                                  Sum Price of ALL Fraktions
+                                </Text>
+                                <NumberInput
+                                  placeholder={"5 ETH"}
+                                  value={totalPrice}
+                                  onChange={d => setTotalPrice(d) /* d for data */}
+                                  max={59000000}
+                                  mt={8}
+                                >
+                                  <NumberInputField
+                                    sx={{
+                                      borderRadius: `12px`,
+                                      fontSize: `14px`,
+                                      padding: `1ex 1em`,
+                                      textAlign: `right`,
+                                      height: `auto`,
+                                    }}
+                                  />
+                                </NumberInput>
+                                <Text sx={{ opacity: `0.75`, fontSize: `12px` }}>
+                                  Price: {(totalPrice!="")&&parseInt(totalPrice) / 10000} ETH per fraktion
+                                </Text>
+                              </Box>
+                              <Box sx={{ width: `1ch` }}></Box>
+                              <Box>
+                                <Text>Fraktions to List</Text>
+                                <Text sx={{ opacity: `0.75`, fontSize: `13px` }}>
+                                  Declare how many Fraktions are for sale
+                                </Text>
+                                <NumberInput
+                                  placeholder={"5000"}
+                                  value={totalAmount}
+                                  onChange={
+                                    d => setTotalAmount(d) /* needs regex control */
+                                  }
+                                  max={10000}
+                                  mt={8}
+                                >
+                                  <NumberInputField
+                                    sx={{
+                                      borderRadius: `12px`,
+                                      fontSize: `14px`,
+                                      padding: `1ex 1em`,
+                                      textAlign: `right`,
+                                      height: `auto`,
+                                    }}
+                                  />
+                                </NumberInput>
+                                <Text sx={{ opacity: `0.75`, fontSize: `12px` }}>
+                                  Out of 10,000 Fraktions
+                                </Text>
+                              </Box>
+                          </Box>
+                    </TabPanel>
+                  </TabPanels>
+                </Tabs>
+              </Box>}
               <Checkbox
                 isChecked={isIntendedForListing}
                 onChange={() => setIsIntentedForListing(v => !v)}
@@ -468,7 +597,7 @@ export default function ImportNFTPage() {
                 <FrakButton4
                   status={!isNFTListed ? "open" : "done"}
                   onClick={() => {
-                    listNewItem();
+                    listFraktions();
                   }}
                 >
                   5. List Fraktions for Sale
