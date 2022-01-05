@@ -96,7 +96,7 @@ const Home: React.FC = () => {
       // getData();
     } else {
       // touch API iff no local version
-      // getData();
+      getData();
     }
     // data storage handling
     // const clearStorage = () => {
@@ -174,7 +174,7 @@ const Home: React.FC = () => {
           return true;
         } else return false;
       });
-      
+
       if (typeof deduplicatedObjects[0] === "undefined") {
         setHasMore(false);
       } else {
