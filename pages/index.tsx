@@ -140,6 +140,14 @@ const Home: React.FC = () => {
       }
     ));
 
+    let uniqItems = [];//remove dupes
+    auctionItems.map((item)=>{
+      if(!uniqItems.includes(item)){
+        uniqItems.push(item);
+      }
+    });
+    auctionItems = uniqItems;
+
     if(JSON.stringify(auctionItems)==JSON.stringify(auctionsObject)){
       return;
     }
@@ -166,10 +174,7 @@ const Home: React.FC = () => {
           return true;
         } else return false;
       });
-
-      console.log("before",auctionItems);
       
-
       if (typeof deduplicatedObjects[0] === "undefined") {
         setHasMore(false);
       } else {
@@ -180,6 +185,10 @@ const Home: React.FC = () => {
         setNftData(newArray);
         setNftItems(newArray);
       }
+      handleSortSelect(sortType);
+      handleListingSelect(listType);
+
+
     }
   };
 
