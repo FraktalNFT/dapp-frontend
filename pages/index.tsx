@@ -85,6 +85,8 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     if (window?.sessionStorage.getItem("nftitems")) {
+      console.log("have session");
+      
       const stringedNFTItems = window?.sessionStorage.getItem("nftitems");
       const unstringedNFTItems = JSON.parse(stringedNFTItems);
       const auctionOnly = unstringedNFTItems.filter(item=>item.endTime);
@@ -95,6 +97,8 @@ const Home: React.FC = () => {
       setAuctions(auctionOnly);
       // getData();
     } else {
+
+      console.log("no session");
       // touch API iff no local version
       getData();
     }
@@ -109,6 +113,9 @@ const Home: React.FC = () => {
   const getMoreListedItems = async (auctionsObject:Object) => {
     const data = await getSubgraphData("listed_items", "");
     let auctionData = await getSubgraphAuction("auctions","");
+
+    console.log("getmorelisted");
+    
 
     
     
@@ -140,17 +147,23 @@ const Home: React.FC = () => {
       }
     ));
 
-    let uniqItems = [];//remove dupes
-    auctionItems.map((item)=>{
-      if(!uniqItems.includes(item)){
-        uniqItems.push(item);
-      }
-    });
-    auctionItems = uniqItems;
+    const result = auctionItems.filter((thing, index, self) =>
+      index === self.findIndex((t) => (
+        JSON.stringify(t) === JSON.stringify(thing)
+      ))
+    )
+    auctionItems = result;
+
+    console.log(JSON.stringify(auctionItems),JSON.stringify(auctionsObject));
+    
 
     if(JSON.stringify(auctionItems)==JSON.stringify(auctionsObject)){
+      console.log("same");
+      
       return;
     }
+    console.log("not same");
+    
     
 
     let dataOnSale;
@@ -175,18 +188,27 @@ const Home: React.FC = () => {
         } else return false;
       });
 
+      console.log("dedu",deduplicatedObjects);
+      console.log("nftitems",nftItems);
+      console.log("auctionitems",auctionItems);
+      
+
       if (typeof deduplicatedObjects[0] === "undefined") {
+        console.log("if");
         setHasMore(false);
       } else {
-        const newArray = [...nftItems, ...deduplicatedObjects];
+        const newArray = [...auctionItems, ...nftItems, ...deduplicatedObjects];
+        console.log("else",newArray);
         // setNftItems(newItemList);
-        auctionItems.map(i=>newArray.unshift(i));
         
         setNftData(newArray);
         setNftItems(newArray);
+        setHasMore(false);
       }
-      handleSortSelect(sortType);
-      handleListingSelect(listType);
+      console.log(sortType,listType);
+      
+      // handleSortSelect(sortType);
+      // handleListingSelect(listType);
 
 
     }
@@ -194,7 +216,17 @@ const Home: React.FC = () => {
 
   // Store NFT Items in Session Storage
   useEffect(() => {
-    const stringedNFTItems = JSON.stringify(nftData);
+
+    const result = nftData.filter((thing, index, self) =>
+      index === self.findIndex((t) => (
+        JSON.stringify(t) === JSON.stringify(thing)
+      ))
+    )
+    
+    
+
+
+    const stringedNFTItems = JSON.stringify(result);
     if(stringedNFTItems.length>0){
       window?.sessionStorage?.setItem("nftitems", stringedNFTItems);
     }
