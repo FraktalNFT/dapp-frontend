@@ -19,6 +19,8 @@ import { getSubgraphData } from "../utils/graphQueries";
 import { createListed } from "../utils/nftHelpers";
 import { FiChevronDown } from "react-icons/fi";
 import InfiniteScroll from "react-infinite-scroll-component";
+import Notification from "../components/notification";
+
 const SORT_TYPES = ["Availability", "Popular", "Newly Listed"];
 
 const Home: React.FC = () => {
@@ -128,6 +130,7 @@ const Home: React.FC = () => {
         <title>Fraktal - Marketplace</title>
       </Head>
       <VStack spacing="0" mb="12.8rem">
+        <Notification />
         <Flex w="96.4rem">
           <Text className="semi-48" marginEnd="2rem">
             Marketplace
