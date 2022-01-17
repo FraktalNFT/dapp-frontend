@@ -28,8 +28,8 @@ import Countdown,{zeroPad} from 'react-countdown';
 interface NFTItemProps extends StackProps {
   item: any;
   name: String;
-  amount: Number;
-  // price: Number;
+  amount: any;
+  price: Number;
   imageURL: String;
   // CTAText?: string;
   // wait: number;

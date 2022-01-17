@@ -113,12 +113,6 @@ const Home: React.FC = () => {
   const getMoreListedItems = async (auctionsObject:Object) => {
     const data = await getSubgraphData("listed_items", "");
     let auctionData = await getSubgraphAuction("auctions","");
-
-    console.log("getmorelisted");
-    
-
-    
-    
     
     auctionData = auctionData?.auctions.filter(x=>x.reservePrice!=0);
     
@@ -153,16 +147,12 @@ const Home: React.FC = () => {
       ))
     )
     auctionItems = result;
-
-    console.log(JSON.stringify(auctionItems),JSON.stringify(auctionsObject));
     
 
     if(JSON.stringify(auctionItems)==JSON.stringify(auctionsObject)){
-      console.log("same");
       
       return;
     }
-    console.log("not same");
     
     
 
@@ -187,25 +177,18 @@ const Home: React.FC = () => {
           return true;
         } else return false;
       });
-
-      console.log("dedu",deduplicatedObjects);
-      console.log("nftitems",nftItems);
-      console.log("auctionitems",auctionItems);
       
 
       if (typeof deduplicatedObjects[0] === "undefined") {
-        console.log("if");
         setHasMore(false);
       } else {
         const newArray = [...auctionItems, ...nftItems, ...deduplicatedObjects];
-        console.log("else",newArray);
         // setNftItems(newItemList);
         
         setNftData(newArray);
         setNftItems(newArray);
         setHasMore(false);
       }
-      console.log(sortType,listType);
       
       // handleSortSelect(sortType);
       // handleListingSelect(listType);

@@ -560,7 +560,7 @@ export default function MyNFTsView() {
                   <NFTAuctionItem
                     item={item}
                     name={item.name}
-                    amount={Number(utils.formatEther(item?.amountOfShare))}
+                    amount={Number(utils.formatEther((item.amountOfShare!=undefined)?item.amountOfShare:0))}
                     price={item.price}
                     imageURL={item.imageURL}
                     endTime={item.endTime}

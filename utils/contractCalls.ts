@@ -4,6 +4,7 @@
 import { Contract } from "@ethersproject/contracts";
 import { loadSigner, processTx, awaitTokenAddress } from "./helpers";
 import { useMintingContext } from "@/contexts/NFTIsMintingContext";
+import { BigNumber, ethers, utils } from "ethers";
 //tested
 const factoryAbi = [
   "function mint(string urlIpfs, uint16 majority)",
@@ -125,7 +126,8 @@ export async function getFraktionsIndex(provider, tokenContract) {
 export async function getBalanceFraktions(account, provider, tokenContract) {
   const customContract = new Contract(tokenContract, tokenAbi, provider);
   let index = await customContract.getFraktionsIndex();
-  let balanceOfId = await customContract.balanceOf(account, index);
+  let balanceOfId:BigNumber = await customContract.balanceOf(account, index);
+  balanceOfId = balanceOfId.div(utils.parseEther("1"));
   return balanceOfId.toNumber();
 }
 export async function isFraktalOwner(account, provider, tokenContract) {
