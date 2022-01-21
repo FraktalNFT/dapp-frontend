@@ -208,7 +208,7 @@ function AuctionNFTView({router}) {
               <Image
               src={nftObject?nftObject.imageURL:exampleNFT.imageURL}
               
-              h="50%"
+              w="100%"
               style={{ borderRadius: "4px 4px 0px 0px" }}
               />
             <div className={styles.NFTCard}>
