@@ -183,7 +183,12 @@ export default function MintPage() {
         marketAddress
       ).then(() => {
         setFraktionalized(true);
-        listNewItem();
+        if(isAuction){
+          listNewAuctionItem();
+        }
+        else{
+          listNewItem();
+        }
       });
     }
   }
