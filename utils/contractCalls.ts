@@ -146,7 +146,7 @@ export async function getLocked(account, tokenAddress, provider) {
   const customContract = new Contract(tokenAddress, tokenAbi, provider);
   let index = await customContract.getFraktionsIndex();
   let lockedShares = await customContract.getLockedShares(index, account);
-  return lockedShares.toNumber();
+  return utils.formatEther(lockedShares);
 }
 
 export async function getLockedTo(account, tokenAddress, provider) {

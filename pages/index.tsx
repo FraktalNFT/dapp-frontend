@@ -31,11 +31,22 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [auctions,setAuctions] = useState({});
+  const [refresh,setRefresh] = useState(false);
   const handleSortSelect = (item: string) => {
     setSelectionMode(false);
     setSortType(item);
     changeOrder(item);
   };
+
+  useEffect(()=>{
+
+  },[refresh])
+
+  useEffect(()=>{
+    console.log(nftItems);
+    setRefresh(!refresh);
+    
+  },[nftItems])
 
   const changeOrder = type => {
     let sortedItems;
@@ -85,20 +96,17 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     if (window?.sessionStorage.getItem("nftitems")) {
-      console.log("have session");
-      
-      const stringedNFTItems = window?.sessionStorage.getItem("nftitems");
-      const unstringedNFTItems = JSON.parse(stringedNFTItems);
-      const auctionOnly = unstringedNFTItems.filter(item=>item.endTime);
+      // const stringedNFTItems = window?.sessionStorage.getItem("nftitems");
+      // const unstringedNFTItems = JSON.parse(stringedNFTItems);
+      // const auctionOnly = unstringedNFTItems.filter(item=>item.endTime);
       
       
-      setNftItems(unstringedNFTItems);
-      setNftData(unstringedNFTItems);
-      setAuctions(auctionOnly);
-      // getData();
+      // setNftItems(unstringedNFTItems);
+      // setNftData(unstringedNFTItems);
+      // setAuctions(auctionOnly);
+      getData();
     } else {
 
-      console.log("no session");
       // touch API iff no local version
       getData();
     }
@@ -113,8 +121,19 @@ const Home: React.FC = () => {
   const getMoreListedItems = async (auctionsObject:Object) => {
     const data = await getSubgraphData("listed_items", "");
     let auctionData = await getSubgraphAuction("auctions","");
+    console.log({data,auctionData});
     
     auctionData = auctionData?.auctions.filter(x=>x.reservePrice!=0);
+    
+    auctionData = auctionData?.filter(x=>{
+      const curTimestamp = Math.round(Date.now()/1000);
+      console.log(Number(x.endTime)>curTimestamp);
+      
+      return Number(x.endTime)>curTimestamp;
+    });
+
+    console.log(auctionData);
+    
     
     let auctionDataHash = [];
     await Promise.all(auctionData?.map(async x=>{
@@ -122,7 +141,7 @@ const Home: React.FC = () => {
 
       const itm = {
         "id":`${x.tokenAddress}-${x.sellerNonce}`,
-        "hash":_hash.fraktalNFT.hash
+        "hash":_hash.fraktalNft.hash
     };
       
       auctionDataHash.push(itm);
@@ -149,20 +168,29 @@ const Home: React.FC = () => {
     auctionItems = result;
     
 
-    if(JSON.stringify(auctionItems)==JSON.stringify(auctionsObject)){
+    // if(JSON.stringify(auctionItems)==JSON.stringify(auctionsObject)){
+    //   console.log("no changes");
       
-      return;
-    }
+    //   return;
+    // }
     
     
 
     let dataOnSale;
-    if (data?.listItems?.length > 1) {
+    if (data?.listItems?.length != undefined) {
       dataOnSale = data?.listItems?.filter(x => {
         return x.fraktal.status == "open";
       }); // this goes in the graphql query
+      console.log({dataOnSale});
+      
     }
-    if (dataOnSale?.length > 1) {
+
+
+    console.log({auctionItems,data,dataOnSale});
+
+    let newArray;
+    
+    if (dataOnSale?.length >= 0) {
       let objects = await Promise.all(
         dataOnSale.map(x => {
           let res = createListed(x);
@@ -178,21 +206,27 @@ const Home: React.FC = () => {
         } else return false;
       });
       
-
+      console.log({auctionItems,nftItems,deduplicatedObjects});
+      
       if (typeof deduplicatedObjects[0] === "undefined") {
+        newArray = [...auctionItems, ...nftItems, ...deduplicatedObjects];
         setHasMore(false);
       } else {
-        const newArray = [...auctionItems, ...nftItems, ...deduplicatedObjects];
+        // const newArray = [...auctionItems, ...nftItems, ...deduplicatedObjects];
+        newArray = [...auctionItems, ...nftItems, ...deduplicatedObjects];
         // setNftItems(newItemList);
         
-        setNftData(newArray);
-        setNftItems(newArray);
-        setHasMore(false);
       }
+
+      setNftData(newArray);
+      setNftItems(newArray);
+      setHasMore(false);
       
       // handleSortSelect(sortType);
       // handleListingSelect(listType);
 
+
+    }else{
 
     }
   };

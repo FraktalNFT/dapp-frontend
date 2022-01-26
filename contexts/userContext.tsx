@@ -63,8 +63,8 @@ export const UserContextProviderFC = ({ children }) => {
     if (window && fraktals?.length > 0) {
       const mintingNFTsString = window?.localStorage.getItem('mintingNFTs');
       fraktals?.forEach((fraktal) => {
-        console.log('id: ', fraktal?.id);
-        console.log('minting string: ', mintingNFTsString);
+        // console.log('id: ', fraktal?.id);
+        // console.log('minting string: ', mintingNFTsString);
         if (fraktal?.id === mintingNFTsString) {
           window?.localStorage.removeItem('mintingNFTs');
         }
@@ -93,6 +93,7 @@ export const UserContextProviderFC = ({ children }) => {
           account.toLocaleLowerCase()
         );
 
+
         if (fobjects && fobjects.users.length) {
           // balance retrieval
           let userBalance = fobjects.users[0].balance;
@@ -106,6 +107,7 @@ export const UserContextProviderFC = ({ children }) => {
               return createObject(x);
             })
           );
+
           if (fraktionsObjects) {
             fraktionsObjectsClean = fraktionsObjects.filter(x => {
               return x != null;
@@ -126,7 +128,7 @@ export const UserContextProviderFC = ({ children }) => {
           let userFraktalAddresses = fraktalsClean.map(x => {
             return x.id;
           });
-          let userFraktionsAddreses = fraktionsObjects.map(x => {
+          let userFraktionsAddreses = fraktionsObjectsClean.map(x => {
             return x.id;
           });
           totalAddresses = userFraktalAddresses.concat(userFraktionsAddreses);
@@ -168,7 +170,9 @@ export const UserContextProviderFC = ({ children }) => {
             nftObjectsClean = nftObjects;
           }
           setFraktals(fraktalsClean);
+          
           setFraktions(fraktionsObjectsClean);
+          
           setNFTs(nftObjectsClean);
           setBalance(userBalanceFormatted);
           // setUserState(userState => ({

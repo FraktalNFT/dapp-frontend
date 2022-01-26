@@ -108,11 +108,11 @@ function AuctionNFTView({router}) {
       
       let _hash = await getSubgraphAuction("auctionsNFT",obj.auction.tokenAddress);
       Object.assign(obj,{
-        "hash":_hash.fraktalNFT.hash,
+        "hash":_hash.fraktalNft.hash,
       });
       const item = await createListedAuction(obj);
       Object.assign(obj.auction,{
-        "hash":_hash.fraktalNFT.hash,
+        "hash":_hash.fraktalNft.hash,
         "name":item.name,
         "imageURL":item.imageURL
       });

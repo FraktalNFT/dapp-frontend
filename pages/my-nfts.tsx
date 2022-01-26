@@ -63,6 +63,9 @@ export default function MyNFTsView() {
 
   const { isMinting, setIsMinting } = useMintingContext();
 
+  console.log({fraktions});
+  
+
   const sellerEndAuction = async (tokenAddress,sellerNonce) =>{
     unlistAuctionItem(
       tokenAddress,
@@ -129,7 +132,7 @@ export default function MyNFTsView() {
       success = false;
     }
 
-    console.log(auctionReserve.toString(),">",auction[1].toString()," is ", success);
+    // console.log(auctionReserve.toString(),">",auction[1].toString()," is ", success);
     
 
     return success;
@@ -195,10 +198,10 @@ export default function MyNFTsView() {
       await Promise.all(auctionData?.map(async x=>{
         let _hash = await getSubgraphAuction("auctionsNFT",x.tokenAddress);
 
-        if(_hash.fraktalNFT != null){
+        if(_hash.fraktalNft != null){
           const itm = {
             "id":`${x.tokenAddress}-${x.sellerNonce}`,
-            "hash":_hash.fraktalNFT.hash
+            "hash":_hash.fraktalNft.hash
           };
           auctionDataHash.push(itm);
         }
@@ -222,10 +225,10 @@ export default function MyNFTsView() {
       await Promise.all(auctionDataParticipated?.map(async x=>{
         let _hash = await getSubgraphAuction("auctionsNFT",x.tokenAddress);
 
-        if(_hash.fraktalNFT != null){
+        if(_hash.fraktalNft != null){
           const itm = {
             "id":`${x.tokenAddress}-${x.sellerNonce}`,
-            "hash":_hash.fraktalNFT.hash
+            "hash":_hash.fraktalNft.hash
           };
           auctionDataParticipatedHash.push(itm);
         }
@@ -278,11 +281,6 @@ export default function MyNFTsView() {
       }))
       
       setAuctions(auctionItems);
-      console.log("participated",participatedAuctionItems);
-      console.log("auctions",auctionItems);
-      
-      
-
     }
     getAuctions();
 
@@ -435,6 +433,7 @@ export default function MyNFTsView() {
                   amount={null}
                   price={null}
                   imageURL={item.imageURL}
+                  
                 />
               </NextLink>
             </div>
@@ -491,7 +490,7 @@ export default function MyNFTsView() {
                   <NFTItem
                     item={item}
                     name={item.name}
-                    amount={parseInt(item.userBalance)}
+                    amount={item.userBalance}
                     price={null}
                     imageURL={item.imageURL}
                   />

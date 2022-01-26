@@ -57,6 +57,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
       }, ms);
     };
 
+
     setTimeout(() => {
       setIsVisible(true);
     }, 0);

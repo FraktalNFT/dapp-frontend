@@ -17,8 +17,8 @@ export default function ClosedNFTView() {
     const address = getParams('nft');
     const index = parseFloat(address.split('/closed')[0])
     let obj = await getSubgraphData('marketid_fraktal',index)
-    if(obj && obj.fraktalNFTs){
-      let nftObjects = await createObject(obj.fraktalNFTs[0])
+    if(obj && obj.fraktalNfts){
+      let nftObjects = await createObject(obj.fraktalNfts[0])
       if(nftObjects){
         setNftObject(nftObjects)
       }

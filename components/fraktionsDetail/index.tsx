@@ -1,8 +1,10 @@
 import { VStack, HStack } from "@chakra-ui/layout";
-import { utils } from "ethers";
+import { Text } from '@chakra-ui/react'
+import { BigNumber, utils } from "ethers";
 import React, { forwardRef, useState } from "react";
 import FrakButton2 from "../button2";
 import { buyFraktions } from "../../utils/contractCalls";
+import { parseUnits } from "ethers/lib/utils";
 interface listedItemProps {
   amount: Number;
   price: Number;
@@ -15,16 +17,44 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
     const [amountToBuy, setAmountToBuy] = useState(0);
     const [buying, setBuying] = useState(false);
 
-    const toPay = () =>
-      utils.parseEther(
-        (
-          amountToBuy * utils.formatEther(price) +
-          0.00000000000000001
-        ).toString()
-      );
+    const toPay = () =>{
+      console.log(`amount ${amountToBuy.toString()}, price ${price.toString()}`);
+      const fei = utils.parseEther(amountToBuy.toString());
+      const weiPerFrak = utils.parseUnits(price.toString(),0)
+      
+      let toPaid = (fei.mul(weiPerFrak)).div(utils.parseEther("1.0"));
+      // toPaid = toPaid.mul(utils.parseEther(price.toString()));
+      toPaid = toPaid.add(utils.parseEther("0.00000000000000001"));
+      // console.log(toPaid.toString());
+      return toPaid;
+      // const _price = utils.parseEther(
+      //   (
+      //     ((BigNumber.from(amountToBuy).mul(utils.formatEther(price.toString()))).add(BigNumber.from("0.00000000000000001"))).toString()
+      //   )
+      // );
+      // return "1";
+    }
+      
+
     const priceParsed = price => {
-      return Math.round(utils.formatEther(price) * 100000) / 100000;
+      // console.log(price);
+      return utils.formatEther(price) * 100000 / 100000;
+      // return Math.round(utils.formatEther(price) * 100000) / 100000;
     };
+
+   let amountString = "";
+  //  console.log(BigNumber.from(amount).lt(utils.parseEther("0.01")));
+
+   let feiString = "";
+   amountString = utils.formatEther(parseUnits(amount.toString(),"wei"));
+   
+  //  if(BigNumber.from(amount).lt(utils.parseEther("0.01"))){
+  //   amountString = utils.formatEther(parseUnits(amount.toString(),"wei"));
+  //   // amountString = "<0.01";
+  //    feiString = amount.toString();
+  //  }else{
+  //    amountString = utils.formatEther(parseUnits(amount.toString(),"wei"));
+  //  }
 
     async function onBuy() {
       setBuying(true);
@@ -32,7 +62,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
         let tx = buyFraktions(
           seller,
           tokenAddress,
-          amountToBuy,
+          utils.parseEther(amountToBuy.toString()),
           toPay(),
           provider,
           marketAddress
@@ -87,8 +117,11 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
               color: "#000000",
             }}
           >
-            {amount.toLocaleString()}
+          {/* {utils.formatEther(amount)} */}
+          {amountString}
+            {/* {amount.toLocaleString()} */}
           </div>
+          
           <div
             style={{
               fontFamily: "Inter",

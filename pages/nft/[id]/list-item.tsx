@@ -133,10 +133,16 @@ export default function ListNFTView() {
     }
   }
   async function listNewItem(){
+
+    console.log(`Total price: ${totalPrice}, totalAmout: ${totalAmount}`);
+    const fei = utils.parseEther(totalAmount);
+    const wei = utils.parseEther(totalPrice);
+    const weiPerFrak = (wei.mul(utils.parseEther("1.0"))).div(fei);
+    console.log(`Total price: ${weiPerFrak.toString()}, fei: ${fei.toString()}`);
     listItem(
       nftObject.id,
-      totalAmount,
-      utils.parseUnits(totalPrice).div(totalAmount),
+      fei,//shares
+      weiPerFrak,//price
       provider,
       marketAddress).then(()=>{
         router.push('/');
@@ -217,7 +223,9 @@ export default function ListNFTView() {
                       disabled={!nftObject}
                       type="number"
                       placeholder={totalPrice}
-                      onChange={(e)=>{setTotalPrice(e.target.value)}}
+                      onChange={(e)=>{
+                        setTotalPrice(e.target.value)
+                      }}
                     />
                   </div>
                 </div>
@@ -229,7 +237,9 @@ export default function ListNFTView() {
                       disabled={!nftObject || fraktions === 0}
                       type="number"
                       placeholder={fraktions}
-                      onChange={(e)=>{setTotalAmount(e.target.value)}}
+                      onChange={(e)=>{
+                        setTotalAmount(e.target.value);
+                      }}
                     />
                     <div className={styles.contributeHeader}>Max: {fraktions}</div>
                   </div>

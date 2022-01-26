@@ -225,11 +225,24 @@ export default function MintPage() {
     }
   }
 
+  useEffect(()=>{
+    // const pricePerFei = utils.parseUnits(totalPrice).div(utils.parseUnits(totalAmount));
+    console.log(`price:${totalPrice},amount:${totalAmount}`);
+    
+  })
+
   async function listNewItem() {
+    const wei = utils.parseEther(totalPrice.toString());
+    const fei = utils.parseEther(totalAmount.toString());
+    const weiPerFrak = (wei.mul(utils.parseEther("1.0"))).div(fei);
+    
+    // const weiPerFrak = utils.parseEther(totalPrice.toString()).div(utils.parseUnits(totalAmount.toString()));
+    console.log("price",weiPerFrak.toString());
+    
     listItem(
       tokenMintedAddress,
-      totalAmount,
-      utils.parseUnits(totalPrice).div(totalAmount),
+      fei,//shares
+      weiPerFrak,//price
       provider,
       marketAddress
     ).then(() => {
