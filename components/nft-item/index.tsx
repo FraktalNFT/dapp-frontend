@@ -50,7 +50,6 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
       }else{
         showAmount=utils.formatEther(BIamount.div(100));
       }
-      console.log(showAmount);
       
     }else{
       showAmount = "";

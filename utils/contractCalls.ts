@@ -65,7 +65,7 @@ export async function getShares(account, provider, revenueContract) {
   try {
     const customContract = new Contract(revenueContract, revenuesAbi, provider);
     let shares = await customContract.shares(account);
-    return shares.toNumber();
+    return shares;
   } catch {
     return "error getting shares";
   }

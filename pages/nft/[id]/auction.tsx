@@ -124,7 +124,7 @@ function AuctionNFTView({router}) {
         setNftObject(obj.auction);
         const objReserve = await auctionReserve(obj.auction.seller,obj.auction.sellerNonce);
         setCurrentReserve(Number(utils.formatEther(objReserve)));
-        console.log(utils.formatEther(objReserve));
+        // console.log(utils.formatEther(objReserve));
         
       }
   },[router.isReady,refresh])

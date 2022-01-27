@@ -227,7 +227,7 @@ export default function MintPage() {
 
   useEffect(()=>{
     // const pricePerFei = utils.parseUnits(totalPrice).div(utils.parseUnits(totalAmount));
-    console.log(`price:${totalPrice},amount:${totalAmount}`);
+    // console.log(`price:${totalPrice},amount:${totalAmount}`);
     
   })
 
@@ -237,7 +237,7 @@ export default function MintPage() {
     const weiPerFrak = (wei.mul(utils.parseEther("1.0"))).div(fei);
     
     // const weiPerFrak = utils.parseEther(totalPrice.toString()).div(utils.parseUnits(totalAmount.toString()));
-    console.log("price",weiPerFrak.toString());
+    // console.log("price",weiPerFrak.toString());
     
     listItem(
       tokenMintedAddress,

@@ -1,4 +1,5 @@
 import { HStack, Box, Text } from "@chakra-ui/react";
+import { BigNumber, utils } from "ethers";
 import React, { forwardRef, useState, useEffect } from "react";
 import {
   getReleased,
@@ -59,6 +60,8 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
       async function getData() {
         let userShares = await getShares(account, provider, revenueAddress);
         let userReleased = await getReleased(account, provider, revenueAddress);
+        // console.log({userShares,userReleased, revenueAddress});
+        
         if (userShares) {
           setShares(userShares);
         }
@@ -112,7 +115,7 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
           gains
         </Text>
         {/* value = total value, shares = shares the user has */}
-        <div>{(value / 10 ** 18) * (shares / 10000)} ETH</div>
+        <div>{(value / 10 ** 18) * (Number(utils.formatEther(shares)) / 10000)} ETH</div>
         {isClaimable() && (
           <div>
             {buyout && !isApproved ? (

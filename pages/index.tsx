@@ -43,7 +43,6 @@ const Home: React.FC = () => {
   },[refresh])
 
   useEffect(()=>{
-    console.log(nftItems);
     setRefresh(!refresh);
     
   },[nftItems])
@@ -121,18 +120,14 @@ const Home: React.FC = () => {
   const getMoreListedItems = async (auctionsObject:Object) => {
     const data = await getSubgraphData("listed_items", "");
     let auctionData = await getSubgraphAuction("auctions","");
-    console.log({data,auctionData});
     
     auctionData = auctionData?.auctions.filter(x=>x.reservePrice!=0);
     
     auctionData = auctionData?.filter(x=>{
       const curTimestamp = Math.round(Date.now()/1000);
-      console.log(Number(x.endTime)>curTimestamp);
       
       return Number(x.endTime)>curTimestamp;
     });
-
-    console.log(auctionData);
     
     
     let auctionDataHash = [];
@@ -181,12 +176,8 @@ const Home: React.FC = () => {
       dataOnSale = data?.listItems?.filter(x => {
         return x.fraktal.status == "open";
       }); // this goes in the graphql query
-      console.log({dataOnSale});
       
     }
-
-
-    console.log({auctionItems,data,dataOnSale});
 
     let newArray;
     
@@ -205,8 +196,6 @@ const Home: React.FC = () => {
           return true;
         } else return false;
       });
-      
-      console.log({auctionItems,nftItems,deduplicatedObjects});
       
       if (typeof deduplicatedObjects[0] === "undefined") {
         newArray = [...auctionItems, ...nftItems, ...deduplicatedObjects];

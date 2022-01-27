@@ -25,11 +25,9 @@ export default function FraktionOwners(props) {
   useEffect(() => {
     async function getOwners(id) {
       let filteredData = props.data.filter(x=>{return x.owner && x.owner.id && x.amount > 0})
-      // console.log('filtered Data ', filteredData);
       setInternalData(filteredData);
     }
     if (nftObject.id) {
-      // console.log('nftObject.id in fraktionsOwners',nftObject.id);
       getOwners(nftObject.id);
     }
   }, [nftObject, props]);

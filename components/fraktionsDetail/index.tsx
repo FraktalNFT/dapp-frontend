@@ -18,14 +18,11 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
     const [buying, setBuying] = useState(false);
 
     const toPay = () =>{
-      console.log(`amount ${amountToBuy.toString()}, price ${price.toString()}`);
       const fei = utils.parseEther(amountToBuy.toString());
       const weiPerFrak = utils.parseUnits(price.toString(),0)
       
       let toPaid = (fei.mul(weiPerFrak)).div(utils.parseEther("1.0"));
-      // toPaid = toPaid.mul(utils.parseEther(price.toString()));
       toPaid = toPaid.add(utils.parseEther("0.00000000000000001"));
-      // console.log(toPaid.toString());
       return toPaid;
       // const _price = utils.parseEther(
       //   (
@@ -37,13 +34,11 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
       
 
     const priceParsed = price => {
-      // console.log(price);
       return utils.formatEther(price) * 100000 / 100000;
       // return Math.round(utils.formatEther(price) * 100000) / 100000;
     };
 
    let amountString = "";
-  //  console.log(BigNumber.from(amount).lt(utils.parseEther("0.01")));
 
    let feiString = "";
    amountString = utils.formatEther(parseUnits(amount.toString(),"wei"));

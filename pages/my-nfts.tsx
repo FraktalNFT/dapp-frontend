@@ -62,8 +62,6 @@ export default function MyNFTsView() {
 
 
   const { isMinting, setIsMinting } = useMintingContext();
-
-  console.log({fraktions});
   
 
   const sellerEndAuction = async (tokenAddress,sellerNonce) =>{
