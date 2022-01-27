@@ -205,7 +205,7 @@ export default function OfferDetail({
             {fraktionsBalance > 0 &&
             !isCanceledOffer() && 
               fraktionsApproved &&
-              !!fraktionsLocked &&
+              !fraktionsLocked &&
               !offerItem?.winner && (
                 <Box
                   sx={{
