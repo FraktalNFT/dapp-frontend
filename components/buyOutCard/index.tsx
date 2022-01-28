@@ -184,11 +184,7 @@ const BuyOutCard = ({
                   color: "#000000",
                 }}
               >
-                {minPrice
-                  ? minPrice.length > 7
-                    ? minPrice.substring(0, 7)
-                    : minPrice
-                  : 0}
+                {minPrice}
               </div>
             </HStack>
           </VStack>

@@ -163,6 +163,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
                 fontSize: "32px",
                 lineHeight: "40px",
                 color: "#000000",
+                maxWidth: "200px"
               }}
             >
               {priceParsed(price)}
