@@ -7,7 +7,7 @@ import { utils } from "ethers";
 import { useWeb3Context } from "../../contexts/Web3Context";
 
 const RevenuesList = ({ revenuesCreated, tokenAddress }) => {
-  const { account, provider } = useWeb3Context();
+  const { account, provider, marketAddress } = useWeb3Context();
   const [revenueValue, setRevenueValue] = useState(0);
   const [isCreating, setIsCreating] = useState(false);
   const [valueSetter, setValueSetter] = useState(false);
@@ -17,7 +17,7 @@ const RevenuesList = ({ revenuesCreated, tokenAddress }) => {
     setIsCreating(true);
     let valueIn = utils.parseEther(revenueValue.toString()); //+0.000000000001
     try {
-      await createRevenuePayment(valueIn, provider, tokenAddress);
+      await createRevenuePayment(valueIn, provider, tokenAddress, marketAddress);
     } catch (error) {
       console.error("creating revenue failed, reason: ", error);
     }

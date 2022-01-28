@@ -107,6 +107,8 @@ export default function DetailsView() {
       });
       if (revenuesValid) {
         setRevenues(revenuesValid);
+        console.log({revenuesValid});
+        
       }
     }
   }

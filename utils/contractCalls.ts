@@ -44,7 +44,7 @@ const tokenAbi = [
   "function setApprovalForAll(address operator, bool approved)",
   "function unlockSharesTransfer(address from, address _to)",
   "function lockSharesTransfer(address from, uint numShares, address _to)",
-  "function createRevenuePayment() payable",
+  "function createRevenuePayment(address _marketAddress) payable",
   "function balanceOf(address account, uint256 id) external view returns (uint256)",
   "function majority() public view returns (uint)",
   "function fraktionsIndex() public view returns (uint256)",
@@ -54,6 +54,7 @@ const revenuesAbi = [
   "function shares(address account) external view returns (uint256)",
   "function released(address account) public view returns (uint256)",
   "function release() public",
+  "function totalShares() external view returns (uint256)",
 ];
 
 // TODO
@@ -65,6 +66,16 @@ export async function getShares(account, provider, revenueContract) {
   try {
     const customContract = new Contract(revenueContract, revenuesAbi, provider);
     let shares = await customContract.shares(account);
+    return shares;
+  } catch {
+    return "error getting shares";
+  }
+}
+
+export async function getTotalShares(provider, revenueContract) {
+  try {
+    const customContract = new Contract(revenueContract, revenuesAbi, provider);
+    let shares = await customContract.totalShares();
     return shares;
   } catch {
     return "error getting shares";
@@ -379,11 +390,11 @@ export async function buyFraktions(
   return receipt;
 }
 
-export async function createRevenuePayment(value, provider, fraktalAddress) {
+export async function createRevenuePayment(value, provider, fraktalAddress, marketAddress) {
   const signer = await loadSigner(provider);
   const override = { value: value, gasLimit: 700000 };
   const customContract = new Contract(fraktalAddress, tokenAbi, signer);
-  let tx = await customContract.createRevenuePayment(override);
+  let tx = await customContract.createRevenuePayment(marketAddress,override);
   let receipt = processTx(tx);
   return receipt;
 }

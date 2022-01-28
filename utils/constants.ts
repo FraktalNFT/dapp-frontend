@@ -12,14 +12,14 @@ export const contracts = [ // old ones
 ]
 export const marketContracts = [
   {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
-  {providerChainId:4, address:'0x47b724E8F39d41b9c79ee3632b2eCABB4C6DcFA8'}, // proxy
+  {providerChainId:4, address:'0xD8c8AF0eE499D4AaE83f37B74D521701062c6b05'}, // proxy
   // {providerChainId:4, address:'0x2EaA5E7A501eFA561B775aEE95eeF6a113bDd0e4'}, // 
   // {providerChainId:4, address:'0xD71CB14bB50C39D090083C6c3be934AF2b435fEB'}, // proxy
   // {providerChainId:4, address:'0xDD301042351A08512b5E728154B1B3E81908A628'}, logic
 ]
 export const factoryContracts = [
   {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
-  {providerChainId:4, address:'0xd27309061D960342285B942055FBa6556A287543'},
+  {providerChainId:4, address:'0xCbd7B67d5987e6F4C25d1A61269e8DF09CE61691'},
   // {providerChainId:4, address:'0xd8646ea0064538ec100881893d98537f611c53bc'},
   // {providerChainId:4, address:'0xA64E2EF06B06FFd77Abec0FCb375Fb368ABEF06e'},
   // {providerChainId:4, address:'0x7edb6a54D10B4e3039Fd11D1A59582a6294a6ffE'},
