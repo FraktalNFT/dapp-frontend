@@ -416,7 +416,7 @@ export default function MintPage() {
                 }}
                 onClick={() => setListItemCheck(!listItemCheck)}
               >
-                List your Fraktion NFT for sale
+                Sell Fraktions
               </Text>
             </Box>
             <div>
