@@ -115,7 +115,7 @@ export default function ArtistsView() {
         <title>Fraktal - Artists</title>
       </Head>
       <HStack w="96.4rem" spacing="0" justifyContent="space-between" mb="4rem">
-        <Box position="relative" w={"280px"}>
+  {/*     <Box position="relative" w={"280px"}>
           {!selectionMode ? (
             <FrakButton
               style={{ minWidth: "200px" }}
@@ -133,7 +133,7 @@ export default function ArtistsView() {
               zIndex="1"
             />
           )}
-        </Box>
+        </Box> */}
         <Text className="semi-48">Artists</Text>
     {/*   <div className={styles.searchContainer}>
           <input
