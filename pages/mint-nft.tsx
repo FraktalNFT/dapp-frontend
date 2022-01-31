@@ -125,7 +125,7 @@ export default function MintNFTView() {
             {!imageData ? (
               <div>
                 <div style={{ textAlign: "center", fontWeight: 500 }}>
-                  PNG, GIF, WEBP, MP4 or MP3. Max 30mb.
+                  PNG, JPG, or GIF. Max 30mb.
                 </div>
                 <div
                   style={{
