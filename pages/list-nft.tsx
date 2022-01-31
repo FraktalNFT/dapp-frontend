@@ -10,10 +10,10 @@ import {
   Text,
   Link,
   Checkbox,
-  Tabs, 
-  TabList, 
-  TabPanels, 
-  Tab, 
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
   TabPanel
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
@@ -228,17 +228,17 @@ export default function MintPage() {
   useEffect(()=>{
     // const pricePerFei = utils.parseUnits(totalPrice).div(utils.parseUnits(totalAmount));
     // console.log(`price:${totalPrice},amount:${totalAmount}`);
-    
+
   })
 
   async function listNewItem() {
     const wei = utils.parseEther(totalPrice.toString());
     const fei = utils.parseEther(totalAmount.toString());
     const weiPerFrak = (wei.mul(utils.parseEther("1.0"))).div(fei);
-    
+
     // const weiPerFrak = utils.parseEther(totalPrice.toString()).div(utils.parseUnits(totalAmount.toString()));
     // console.log("price",weiPerFrak.toString());
-    
+
     listItem(
       tokenMintedAddress,
       fei,//shares
@@ -270,13 +270,13 @@ export default function MintPage() {
 
   let msg = () => {
     if (!minted) {
-      return "Mint your new token to start the process of Fraktionalization and Listing.";
+      return "";
     } else if (minted && !isApproved) {
-      return "NFT succesfully minted! Approve the transfer of your Fraktal NFT and future Fraktions transfers.";
+      return "";
     } else if (minted && isApproved && !fraktionalized) {
-      return "Transfer rights granted! Now transfer your Fraktal NFT to the Marketplace. The Fraktions will remain in your wallet.";
+      return "";
     } else {
-      return "Fraktal NFT received! List your Fraktions on the Marketplace. If someone buys your Fraktions the Marketplace contract will transfer them";
+      return "";
     }
   };
 
@@ -443,7 +443,7 @@ export default function MintPage() {
                     totalPrice={totalPrice}
                     setTotalPrice={setTotalPrice}
                     setTotalAmount={setTotalAmount}
-                    
+
                   />
                 </TabPanel>
               </TabPanels>
