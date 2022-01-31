@@ -135,13 +135,13 @@ export default function ArtistsView() {
           )}
         </Box>
         <Text className="semi-48">Artists</Text>
-        <div className={styles.searchContainer}>
+    {/*   <div className={styles.searchContainer}>
           <input
             placeholder={"Search ENS or ETH address "}
             className={styles.searchInput}
           />
           <Image src="/search.svg" />
-        </div>
+        </div> */}
       </HStack>
       {!loading && artistsItems.length > 0 && (
         <>
