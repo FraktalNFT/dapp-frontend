@@ -2,7 +2,11 @@ import { gql, request } from "graphql-request";
 import { utils } from "ethers";
 const { CID } = require("ipfs-http-client");
 
-const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.18';
+// const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.18';
+const APIURL = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9'
+// const APIURL = 'https://gateway.testnet.thegraph.com/api/a2ae030e27fc11191339a53e73cea9c2/subgraphs/id/0x98e7910e754abd41ace110c23d679333779c2ff9-1'
+const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9';
+// const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/testnetfraktalauction/0.4';
 // https://api.thegraph.com/subgraphs/name/drhongos/fraktalrinkeby // hosted
 
 const creator_query = gql`
@@ -402,12 +406,69 @@ const calls = [
   { name: "fraktal_owners", call: fraktalOwners },
 ];
 
+
+const listedAuctions = gql`
+  query {
+    auctions{
+      seller
+      tokenAddress
+      reservePrice
+      amountOfShare
+      endTime
+      sellerNonce
+      participants
+      }
+  }
+`;
+
+const auctionFraktalNFT = gql`
+  query($id: ID!) {
+    fraktalNft(id:$id) {
+      hash
+  }
+  }
+`;
+
+const getSingleAuction = gql`
+query($id: ID!) {
+  auction(id:$id) {
+    id
+    seller
+    tokenAddress
+    reservePrice
+    amountOfShare
+    endTime
+    sellerNonce
+}
+}
+`;
+
+const auctionCalls = [
+  { name: "auctions", call: listedAuctions },
+  {name:"auctionsNFT", call:auctionFraktalNFT},
+  { name:"singleAuction", call: getSingleAuction}
+]
+
 export const getSubgraphData = async (call, id) => {
   let callGql = calls.find(x => {
     return x.name == call;
   });
   try {
     const data = await request(APIURL, callGql.call, { id });
+    // console.log('data for:',id,' found',data)
+    return data;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("error", err);
+    return err;
+  }
+};
+export const getSubgraphAuction = async (call, id) => {
+  let callGql = auctionCalls.find(x => {
+    return x.name == call;
+  });
+  try {
+    const data = await request(AUCTIONAPI, callGql.call, { id });
     // console.log('data for:',id,' found',data)
     return data;
   } catch (err) {

@@ -1,5 +1,6 @@
 import FrakButton4 from "../components/button4";
 import MintCard from "../components/mintCard";
+import ListCardAuction from "../components/listCardAuction";
 import ListCard from "../components/listCard";
 import {
   VStack,
@@ -9,6 +10,11 @@ import {
   Text,
   Link,
   Checkbox,
+  Tabs, 
+  TabList, 
+  TabPanels, 
+  Tab, 
+  TabPanel
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Image as ImageComponent } from "@chakra-ui/image";
@@ -21,6 +27,7 @@ import {
   importFraktal,
   getIndexUsed,
   listItem,
+  listItemAuction,
   getApproved,
   importERC721,
   importERC1155,
@@ -55,6 +62,7 @@ export default function MintPage() {
   const [tokenMintedAddress, setTokenMintedAddress] = useState();
   const [tokenToImport, setTokenToImport] = useState();
   const [nftApproved, setNftApproved] = useState(false);
+  const [isAuction,setIsAuction] = useState(false);
 
   // detect states (where is NFT and if its ready to list so send it here for listing!)
 
@@ -148,7 +156,8 @@ export default function MintPage() {
     totalAmount > 0 &&
     totalAmount <= 10000 &&
     totalPrice > 0 &&
-    isApproved;
+    isApproved &&
+    fraktionalized;
 
   async function approveToken() {
     await approveMarket(marketAddress, provider, tokenMintedAddress).then(
@@ -174,7 +183,12 @@ export default function MintPage() {
         marketAddress
       ).then(() => {
         setFraktionalized(true);
-        listNewItem();
+        if(isAuction){
+          listNewAuctionItem();
+        }
+        else{
+          listNewItem();
+        }
       });
     }
   }
@@ -211,17 +225,42 @@ export default function MintPage() {
     }
   }
 
+  useEffect(()=>{
+    // const pricePerFei = utils.parseUnits(totalPrice).div(utils.parseUnits(totalAmount));
+    // console.log(`price:${totalPrice},amount:${totalAmount}`);
+    
+  })
+
   async function listNewItem() {
+    const wei = utils.parseEther(totalPrice.toString());
+    const fei = utils.parseEther(totalAmount.toString());
+    const weiPerFrak = (wei.mul(utils.parseEther("1.0"))).div(fei);
+    
+    // const weiPerFrak = utils.parseEther(totalPrice.toString()).div(utils.parseUnits(totalAmount.toString()));
+    // console.log("price",weiPerFrak.toString());
+    
     listItem(
       tokenMintedAddress,
-      totalAmount,
-      utils.parseUnits(totalPrice).div(totalAmount),
+      fei,//shares
+      weiPerFrak,//price
       provider,
       marketAddress
     ).then(() => {
       router.push("/");
     });
   }
+  async function listNewAuctionItem() {
+    listItemAuction(
+      tokenMintedAddress,
+      utils.parseUnits(totalPrice),
+      utils.parseUnits(totalAmount),
+      provider,
+      marketAddress
+    ).then(() => {
+      router.push("/");
+    });
+  }
+
 
   useEffect(() => {
     if (listItemCheck && tokenMintedAddress) {
@@ -382,11 +421,33 @@ export default function MintPage() {
             </Box>
             <div>
               {listItemCheck && (
+                <Tabs isFitted variant='enclosed'
+                onChange={(e)=>setIsAuction(!isAuction)}
+                >
+                  <TabList mb='1em'>
+                    <Tab
+                    >Fixed Price</Tab>
+                    <Tab
+                    >Auction</Tab>
+                  </TabList>
+                  <TabPanels>
+                    <TabPanel>
                 <ListCard
                   totalPrice={totalPrice}
                   setTotalPrice={setTotalPrice}
                   setTotalAmount={setTotalAmount}
                 />
+                </TabPanel>
+                <TabPanel>
+                <ListCardAuction
+                    totalPrice={totalPrice}
+                    setTotalPrice={setTotalPrice}
+                    setTotalAmount={setTotalAmount}
+                    
+                  />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
               )}
             </div>
           </div>
@@ -416,7 +477,7 @@ export default function MintPage() {
                 </FrakButton4>
                 <FrakButton4
                   status={!fraktionalized ? "open" : "done"}
-                  disabled={!isApproved || !tokenMintedAddress}
+                  disabled={!isApproved || !tokenMintedAddress }
                   onClick={() => importFraktalToMarket()}
                 >
                   3. Transfer
@@ -424,9 +485,16 @@ export default function MintPage() {
                 <FrakButton4
                   status={!listed ? "open" : "done"}
                   disabled={!fraktalReady}
-                  onClick={() => listNewItem()}
+                  onClick={() => {
+                    if(isAuction){
+                      listNewAuctionItem();
+                    }else{
+                      listNewItem()
+                    }
+                  }
+                  }
                 >
-                  4. List
+                  4. {isAuction?"List Auction":"List"}
                 </FrakButton4>
               </>
             )}

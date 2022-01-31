@@ -36,6 +36,7 @@ const FrakButton2 = forwardRef<
           border: `none`,
           borderRadius: `15px 0px 0px 15px`,
           height: `40px`,
+          minWidth: "20%",
           marginRight: `0px`,
         }}
       />

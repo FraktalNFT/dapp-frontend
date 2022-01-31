@@ -7,16 +7,21 @@ export const LARGEST_UINT256 = BigNumber.from(
 export const contracts = [ // old ones
   {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
   {providerChainId:4, address:'0xFf3532447a93497471279150602B6ec24ae1170f'},
+  // {providerChainId:4, address:'0xFf3532447a93497471279150602B6ec24ae1170f'},
   {providerChainId:5, address:'0xA916BbdB90bA3BA7DCca09F2D3B249180f7fE0D2'}
 ]
 export const marketContracts = [
   {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
-  {providerChainId:4, address:'0xD71CB14bB50C39D090083C6c3be934AF2b435fEB'}, // proxy
+  {providerChainId:4, address:'0x392EC06440a8107fA417fBA89DacE8ce005Ed318'}, // proxy
+  // {providerChainId:4, address:'0x2EaA5E7A501eFA561B775aEE95eeF6a113bDd0e4'}, // 
+  // {providerChainId:4, address:'0xD71CB14bB50C39D090083C6c3be934AF2b435fEB'}, // proxy
   // {providerChainId:4, address:'0xDD301042351A08512b5E728154B1B3E81908A628'}, logic
 ]
 export const factoryContracts = [
   {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
-  {providerChainId:4, address:'0xA64E2EF06B06FFd77Abec0FCb375Fb368ABEF06e'},
+  {providerChainId:4, address:'0x0dED49EF05204386dE234055Cf628e57fCcf40a8'},
+  // {providerChainId:4, address:'0xd8646ea0064538ec100881893d98537f611c53bc'},
+  // {providerChainId:4, address:'0xA64E2EF06B06FFd77Abec0FCb375Fb368ABEF06e'},
   // {providerChainId:4, address:'0x7edb6a54D10B4e3039Fd11D1A59582a6294a6ffE'},
 ]
 

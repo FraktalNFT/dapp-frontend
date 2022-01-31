@@ -34,11 +34,17 @@ export default function OfferDetail({
 }) {
   const [fraktionsLocked, setFraktionsLocked] = useState(false);
   const [isOfferer, setIsOfferer] = useState<boolean>(false);
+  console.log({offerItem,tokenAddress});
+  
 
   useEffect(() => {
     async function getData() {
       if (account && tokenAddress && offerItem.status != "sold") {
-        let locked = await getLocked(account, tokenAddress, provider);
+        let lockedStr = await getLocked(account, tokenAddress, provider);
+        let lockedNum = Number(lockedStr);
+        let locked = !!lockedNum; //change truty to boolean
+        console.log(lockedStr,lockedNum,locked);
+        
         setFraktionsLocked(locked);
       }
     }
@@ -199,7 +205,7 @@ export default function OfferDetail({
             {fraktionsBalance > 0 &&
             !isCanceledOffer() && 
               fraktionsApproved &&
-              !!fraktionsLocked &&
+              !fraktionsLocked &&
               !offerItem?.winner && (
                 <Box
                   sx={{

@@ -1,0 +1,76 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Contract
+    network: rinkeby
+    source:
+      address: "0x2EaA5E7A501eFA561B775aEE95eeF6a113bDd0e4"
+      abi: Contract
+      startBlock: 9908990
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - AdminWithdrawFees
+        - AuctionContribute
+        - AuctionItemListed
+        - Bought
+        - Deployed
+        - FeeUpdated
+        - FraktalClaimed
+        - ItemListed
+        - OfferMade
+        - OfferVoted
+        - OwnershipTransferred
+        - SellerPaymentPull
+      abis:
+        - name: Contract
+          file: ./abis/Contract.json
+      eventHandlers:
+        - event: AdminWithdrawFees(uint256)
+          handler: handleAdminWithdrawFees
+        - event: AuctionContribute(address,address,address,uint256,uint256)
+          handler: handleAuctionContribute
+        - event: AuctionItemListed(address,address,uint256,uint256,uint256,uint256)
+          handler: handleAuctionItemListed
+        - event: Bought(address,address,address,uint256)
+          handler: handleBought
+        - event: Deployed()
+          handler: handleDeployed
+        - event: FeeUpdated(uint16)
+          handler: handleFeeUpdated
+        - event: FraktalClaimed(address,address)
+          handler: handleFraktalClaimed
+        - event: ItemListed(address,address,uint256,uint256)
+          handler: handleItemListed
+        - event: OfferMade(address,address,uint256)
+          handler: handleOfferMade
+        - event: OfferVoted(address,address,address,bool)
+          handler: handleOfferVoted
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: SellerPaymentPull(address,uint256)
+          handler: handleSellerPaymentPull
+      file: ./src/mapping.ts
+templates:
+  - name: Factory
+    kind: ethereum/contract
+    network: rinkeby
+    source:
+      abi: Factory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/factory.ts
+      entities:
+        - Factory
+      abis:
+        - name: Factory
+          file: ./abis/Factory.json
+      eventHandlers:
+        - event: Minted(address,string,address,uint256)
+          handler: handleMinted

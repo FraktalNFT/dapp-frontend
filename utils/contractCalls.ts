@@ -4,6 +4,7 @@
 import { Contract } from "@ethersproject/contracts";
 import { loadSigner, processTx, awaitTokenAddress } from "./helpers";
 import { useMintingContext } from "@/contexts/NFTIsMintingContext";
+import { BigNumber, ethers, utils } from "ethers";
 //tested
 const factoryAbi = [
   "function mint(string urlIpfs, uint16 majority)",
@@ -23,6 +24,14 @@ const marketAbi = [
   "function unlistItem(address tokenAddress)",
   "function maxPriceRegistered(address) view returns (uint256)",
   "function exportFraktal(address tokenAddress)",
+  "function redeemAuctionSeller(address _tokenAddress,address _seller,uint256 _sellerNonce) external",
+  "function redeemAuctionParticipant(address _tokenAddress,address _seller,uint256 _sellerNonce) external",
+  "function participateAuction(address tokenAddress,address seller,uint256 sellerNonce) external payable",
+  "function listItemAuction(address _tokenAddress,uint256 _reservePrice,uint256 _numberOfShares) external returns (uint256)",
+  "function unlistAuctionItem(address tokenAddress,uint256 sellerNonce) external",
+  "function auctionReserve(address, uint256) public view returns (uint256)",
+  "function participantContribution(address, uint256, address) public view returns (uint256)",
+  "function auctionListings(address, address, uint256) public view returns (address, uint256, uint256, uint256)",
 ];
 const tokenAbi = [
   "function isApprovedForAll(address account,address operator) external view returns (bool)",
@@ -35,7 +44,7 @@ const tokenAbi = [
   "function setApprovalForAll(address operator, bool approved)",
   "function unlockSharesTransfer(address from, address _to)",
   "function lockSharesTransfer(address from, uint numShares, address _to)",
-  "function createRevenuePayment() payable",
+  "function createRevenuePayment(address _marketAddress) payable",
   "function balanceOf(address account, uint256 id) external view returns (uint256)",
   "function majority() public view returns (uint)",
   "function fraktionsIndex() public view returns (uint256)",
@@ -45,6 +54,7 @@ const revenuesAbi = [
   "function shares(address account) external view returns (uint256)",
   "function released(address account) public view returns (uint256)",
   "function release() public",
+  "function totalShares() external view returns (uint256)",
 ];
 
 // TODO
@@ -56,7 +66,17 @@ export async function getShares(account, provider, revenueContract) {
   try {
     const customContract = new Contract(revenueContract, revenuesAbi, provider);
     let shares = await customContract.shares(account);
-    return shares.toNumber();
+    return shares;
+  } catch {
+    return "error getting shares";
+  }
+}
+
+export async function getTotalShares(provider, revenueContract) {
+  try {
+    const customContract = new Contract(revenueContract, revenuesAbi, provider);
+    let shares = await customContract.totalShares();
+    return shares;
   } catch {
     return "error getting shares";
   }
@@ -117,7 +137,8 @@ export async function getFraktionsIndex(provider, tokenContract) {
 export async function getBalanceFraktions(account, provider, tokenContract) {
   const customContract = new Contract(tokenContract, tokenAbi, provider);
   let index = await customContract.getFraktionsIndex();
-  let balanceOfId = await customContract.balanceOf(account, index);
+  let balanceOfId:BigNumber = await customContract.balanceOf(account, index);
+  balanceOfId = balanceOfId.div(utils.parseEther("1"));
   return balanceOfId.toNumber();
 }
 export async function isFraktalOwner(account, provider, tokenContract) {
@@ -136,7 +157,7 @@ export async function getLocked(account, tokenAddress, provider) {
   const customContract = new Contract(tokenAddress, tokenAbi, provider);
   let index = await customContract.getFraktionsIndex();
   let lockedShares = await customContract.getLockedShares(index, account);
-  return lockedShares.toNumber();
+  return utils.formatEther(lockedShares);
 }
 
 export async function getLockedTo(account, tokenAddress, provider) {
@@ -144,6 +165,26 @@ export async function getLockedTo(account, tokenAddress, provider) {
   let index = await customContract.getFraktionsIndex();
   let lockedShares = await customContract.getLockedToTotal(index, account);
   return lockedShares.toNumber();
+}
+export async function getSellerNonce(sellerAddress, provider, marketContract) {
+  const customContract = new Contract(marketContract, marketAbi, provider);
+  let nonce = await customContract.auctionNonce(sellerAddress);
+  return nonce;
+}
+export async function getAuctionReserve(sellerAddress, sellerNonce, provider, marketContract) {
+  const customContract = new Contract(marketContract, marketAbi, provider);
+  let nonce = await customContract.auctionReserve(sellerAddress,sellerNonce);
+  return nonce;
+}
+export async function getAuctionListings(tokenAddress, sellerAddress, sellerNonce, provider, marketContract) {
+  const customContract = new Contract(marketContract, marketAbi, provider);
+  let nonce = await customContract.auctionListings(tokenAddress, sellerAddress,sellerNonce);
+  return nonce;
+}
+export async function getParticipantContribution(sellerAddress, sellerNonce, participantAddress, provider, marketContract) {
+  const customContract = new Contract(marketContract, marketAbi, provider);
+  let nonce = await customContract.participantContribution(sellerAddress,sellerNonce,participantAddress);
+  return nonce;
 }
 
 // State functions
@@ -236,7 +277,7 @@ export async function importFraktal(
   marketAddress
 ) {
   const signer = await loadSigner(provider);
-  const override = { gasLimit: 2000000 };
+  const override = { gasLimit: 500000 };
   const customContract = new Contract(marketAddress, marketAbi, signer);
   let tx = await customContract.importFraktal(
     tokenAddress,
@@ -349,11 +390,11 @@ export async function buyFraktions(
   return receipt;
 }
 
-export async function createRevenuePayment(value, provider, fraktalAddress) {
+export async function createRevenuePayment(value, provider, fraktalAddress, marketAddress) {
   const signer = await loadSigner(provider);
   const override = { value: value, gasLimit: 700000 };
   const customContract = new Contract(fraktalAddress, tokenAbi, signer);
-  let tx = await customContract.createRevenuePayment(override);
+  let tx = await customContract.createRevenuePayment(marketAddress,override);
   let receipt = processTx(tx);
   return receipt;
 }
@@ -384,6 +425,56 @@ export async function makeOffer(value, tokenAddress, provider, marketAddress) {
   const override = { gasLimit: 2000000, value: value };
   const customContract = new Contract(marketAddress, marketAbi, signer);
   let tx = await customContract.makeOffer(tokenAddress, value, override);
+  let receipt = processTx(tx);
+  return receipt;
+}
+
+export async function redeemAuctionSeller( tokenAddress, seller, sellerNonce, provider, marketAddress) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
+  let tx = await customContract.redeemAuctionSeller( tokenAddress, seller, sellerNonce);
+  let receipt = processTx(tx);
+  return receipt;
+}
+
+export async function estimateRedeemAuctionSeller( tokenAddress, seller, sellerNonce, provider, marketAddress) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
+  let tx = await customContract.estimateGas.redeemAuctionSeller( tokenAddress, seller, sellerNonce);
+  return tx;
+}
+
+
+export async function redeemAuctionParticipant( tokenAddress, seller, sellerNonce, provider, marketAddress) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
+  let tx = await customContract.redeemAuctionParticipant( tokenAddress, seller, sellerNonce);
+  let receipt = processTx(tx);
+  return receipt;
+}
+export async function participateAuction( tokenAddress, seller, sellerNonce, value, provider, marketAddress) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
+
+  let override = { };
+  if(value!=0){
+    override = { value: value};
+  }
+  let tx = await customContract.participateAuction( tokenAddress, seller, sellerNonce,override);
+  let receipt = processTx(tx);
+  return receipt;
+}
+export async function listItemAuction( tokenAddress, reservePrice, numberOfShares, provider, marketAddress) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
+  let tx = await customContract.listItemAuction( tokenAddress, reservePrice, numberOfShares);
+  let receipt = processTx(tx);
+  return receipt;
+}
+export async function unlistAuctionItem( tokenAddress, sellerNonce, provider, marketAddress) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
+  let tx = await customContract.unlistAuctionItem( tokenAddress, sellerNonce);
   let receipt = processTx(tx);
   return receipt;
 }

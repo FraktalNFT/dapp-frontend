@@ -3,7 +3,7 @@ import { HStack, VStack } from "@chakra-ui/layout";
 
 const ListCard = (({ totalPrice, setTotalPrice, setTotalAmount }) => {
 
-  return (
+  return (  
     <HStack>
       <VStack>
         <div style={{
@@ -15,6 +15,7 @@ const ListCard = (({ totalPrice, setTotalPrice, setTotalAmount }) => {
         }}>TOTAL PRICE</div>
         <input
           onChange = {(e)=>{setTotalPrice(e.target.value)}}
+          type="number"
           style={{
             margin: '8px',
             border: '2px solid #E0E0E0',

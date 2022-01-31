@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Text } from "@chakra-ui/react";
-import { utils } from "ethers";
+import { BigNumber, utils } from "ethers";
 import FrakButton from "../../../components/button";
 import styles from "./auction.module.css";
 import { HStack, VStack, Box, Stack, Spinner } from "@chakra-ui/react";
@@ -107,6 +107,8 @@ export default function DetailsView() {
       });
       if (revenuesValid) {
         setRevenues(revenuesValid);
+        console.log({revenuesValid});
+        
       }
     }
   }
@@ -160,12 +162,12 @@ export default function DetailsView() {
     if (tokenAddress && marketAddress) {
       let minPriceParsed;
       try {
-        let minPrice = await getMinimumOffer(
+        let minPrice:BigNumber = await getMinimumOffer(
           tokenAddress,
           provider,
           marketAddress
         );
-        minPriceParsed = utils.formatEther(minPrice);
+        minPriceParsed = utils.formatEther(minPrice.div(utils.parseEther("1.0")));
       } catch {
         minPriceParsed = 0;
       }

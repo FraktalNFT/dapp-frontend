@@ -28,6 +28,8 @@ const BuyOutCard = ({
 
   // functions for the offers!
   //claim Fraktal
+  // console.log({offers});
+  
 
   useEffect(() => {
     if (account && offers && offers.length) {
@@ -182,11 +184,7 @@ const BuyOutCard = ({
                   color: "#000000",
                 }}
               >
-                {minPrice
-                  ? minPrice.length > 7
-                    ? minPrice.substring(0, 7)
-                    : minPrice
-                  : 0}
+                {minPrice}
               </div>
             </HStack>
           </VStack>

@@ -99,7 +99,7 @@ const UserOwnership=(({
               letterSpacing:'1px',
               color:'#A7A7A7'
             }}>
-              PERCENTEAGE
+              PERCENTAGE
             </div>
             <div style={{
               fontFamily:'Inter',

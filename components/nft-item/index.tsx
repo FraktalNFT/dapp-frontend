@@ -21,15 +21,16 @@ import { FrakCard } from "../../types";
 import { motion, isValidMotionProp, HTMLMotionProps } from "framer-motion";
 import FrakButton from "../../components/button";
 import { useUserContext } from "@/contexts/userContext";
+import { utils } from "ethers";
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
   name: String;
-  amount: Number;
+  amount: String;
   price: Number;
   imageURL: String;
   CTAText?: string;
-  wait: number;
+  wait?: number;
 }
 
 const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
@@ -40,6 +41,19 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
 
     const canFrak = item && !! (fraktals || []).find(fraktion => fraktion.id === item.id);
     const canList = item && !! (fraktions || []).find(fraktion => fraktion.id === item.id);
+
+    let showAmount = "";
+    if(amount!=undefined){
+      const BIamount = utils.parseUnits(String(amount),"wei");
+      if(BIamount.lt(utils.parseEther("1.0"))){
+        showAmount="<0.01";
+      }else{
+        showAmount=utils.formatEther(BIamount.div(100));
+      }
+      
+    }else{
+      showAmount = "";
+    }
 
     // useEffect(() => {
     //   setIsImageLoaded(false);
@@ -134,7 +148,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
               </Text>
               <Flex>
                 {amount && (
-                  <Text className="medium-12">{amount / 100}% Available</Text>
+                  <Text className="medium-12">{showAmount}% Available</Text>
                 )}
 
                 <Spacer />
@@ -143,11 +157,12 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                   width="5"
                   height="8"
                   marginEnd="3px"
-                  src="https://ethereum.org/static/6b935ac0e6194247347855dc3d328e83/31987/eth-diamond-black.png"
+                  src="eth.svg"
                 />
                 {price && (
                   <Text textAlign="end" className="medium-12">
-                    {Math.round(price * 100000) / 100000}
+                    {price}
+                    {/* {Math.round(price * 100000) / 100000} */}
                   </Text>
                 )}
               </Flex>
@@ -162,7 +177,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
 
               { canList && (
                 <Box textAlign="center" marginTop={5}>
-                  <NextLink href={`nft/${item.id}/list-item`}>
+                  <NextLink href={`nft/${item.marketId}/list-item`}>
                     <FrakButton size="sm">Sell Fraktions</FrakButton>
                   </NextLink>
                 </Box>

@@ -25,11 +25,9 @@ export default function FraktionOwners(props) {
   useEffect(() => {
     async function getOwners(id) {
       let filteredData = props.data.filter(x=>{return x.owner && x.owner.id && x.amount > 0})
-      // console.log('filtered Data ', filteredData);
       setInternalData(filteredData);
     }
     if (nftObject.id) {
-      // console.log('nftObject.id in fraktionsOwners',nftObject.id);
       getOwners(nftObject.id);
     }
   }, [nftObject, props]);
@@ -89,7 +87,14 @@ export default function FraktionOwners(props) {
                   user.owner.id.length
                 );
                 let shortAddress = `${first4}...${last4}`;
-                let percentOwned = (parseInt(user.amount) / 10000) * 100;
+                let ownedAmount = utils.parseUnits(user.amount,"wei");//in fei
+                let percentOwned = "";
+                if(ownedAmount < utils.parseEther("1.0")){
+                  percentOwned = "<0.01"
+                }else{
+                  percentOwned = utils.formatEther(ownedAmount.div(100));
+                }
+                // let percentOwned = (parseInt(user.amount) / 10000) * 100;
                 return (
                   <Box
                     sx={{
