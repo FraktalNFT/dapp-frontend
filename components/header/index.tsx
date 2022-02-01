@@ -93,6 +93,28 @@ const Header = () => {
                 </Link>
               )}
             </NextLink>
+            <NextLink href="https://docs.fraktal.io/marketplace/get-started" target="_blank">
+              {router.pathname === "/" ? (
+                <Link
+                  className="semi-16"
+                  borderRadius="25"
+                  padding="3"
+                  sx={{ backgroundColor: `black`, color: `white` }}
+                  _hover={{ backgroundColor: "black", textColor: "white" }}
+                >
+                  How it Works
+                </Link>
+              ) : (
+                <Link
+                  className="semi-16"
+                  borderRadius="25"
+                  padding="3"
+                  _hover={{ backgroundColor: "black", textColor: "white" }}
+                >
+                  How it Works
+                </Link>
+              )}
+            </NextLink>
 
   {/*          <Link
               href="https://app.daohaus.club/dao/0xa4b1/0x751eda5aa0a1c026f51942e266ed82795428ae34/"
@@ -106,7 +128,7 @@ const Header = () => {
             </Link> */}
 
             {/*_hover={{backgroundColor: `black`}}*/}
-            <Link
+        {/*  <Link
               href="https://www.instagram.com/fraktal.io/"
               target="_blank"
               rel="noreferrer noopener"
@@ -152,6 +174,7 @@ const Header = () => {
                 <Image src="/footer/icons8-discord.svg" />
               </Box>
             </Link>
+            */}
 
           </HStack>
           {!account ? (
