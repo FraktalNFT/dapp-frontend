@@ -93,7 +93,7 @@ const Header = () => {
                 </Link>
               )}
             </NextLink>
-            <NextLink href="https://docs.fraktal.io/marketplace/get-started" target="_blank">
+            <a href="https://docs.fraktal.io/marketplace/get-started" target="_blank">
               {router.pathname === "/" ? (
                 <Link
                   className="semi-16"
@@ -114,7 +114,7 @@ const Header = () => {
                   How it Works
                 </Link>
               )}
-            </NextLink>
+            </a>
 
   {/*          <Link
               href="https://app.daohaus.club/dao/0xa4b1/0x751eda5aa0a1c026f51942e266ed82795428ae34/"
