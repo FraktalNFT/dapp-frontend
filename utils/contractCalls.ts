@@ -24,6 +24,7 @@ const marketAbi = [
   "function unlistItem(address tokenAddress)",
   "function maxPriceRegistered(address) view returns (uint256)",
   "function exportFraktal(address tokenAddress)",
+  "function rejectOffer(address from, address to, address tokenAddress) external",
   "function redeemAuctionSeller(address _tokenAddress,address _seller,uint256 _sellerNonce) external",
   "function redeemAuctionParticipant(address _tokenAddress,address _seller,uint256 _sellerNonce) external",
   "function participateAuction(address tokenAddress,address seller,uint256 sellerNonce) external payable",
@@ -32,6 +33,7 @@ const marketAbi = [
   "function auctionReserve(address, uint256) public view returns (uint256)",
   "function participantContribution(address, uint256, address) public view returns (uint256)",
   "function auctionListings(address, address, uint256) public view returns (address, uint256, uint256, uint256)",
+  "function getListingAmount(address _listOwner, address tokenAddress) external view returns (uint256)"
 ];
 const tokenAbi = [
   "function isApprovedForAll(address account,address operator) external view returns (bool)",
@@ -165,6 +167,11 @@ export async function getLockedTo(account, tokenAddress, provider) {
   let index = await customContract.getFraktionsIndex();
   let lockedShares = await customContract.getLockedToTotal(index, account);
   return lockedShares.toNumber();
+}
+export async function getListingAmount(sellerAddress, tokenAddress,provider, marketContract) {
+  const customContract = new Contract(marketContract, marketAbi, provider);
+  let listingAmount = await customContract.getListingAmount(sellerAddress, tokenAddress);
+  return listingAmount;
 }
 export async function getSellerNonce(sellerAddress, provider, marketContract) {
   const customContract = new Contract(marketContract, marketAbi, provider);
@@ -403,6 +410,20 @@ export async function claimFraktalSold(tokenId, provider, marketAddress) {
   const signer = await loadSigner(provider);
   const customContract = new Contract(marketAddress, marketAbi, signer);
   let tx = await customContract.claimFraktal(tokenId);
+  let receipt = processTx(tx);
+  return receipt;
+}
+
+export async function rejectOffer(
+  from,
+  to,
+  tokenAddress,
+  provider,
+  marketAddress
+){
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(marketAddress, marketAbi, signer);
+  let tx = await customContract.rejectOffer(from, to, tokenAddress);
   let receipt = processTx(tx);
   return receipt;
 }
