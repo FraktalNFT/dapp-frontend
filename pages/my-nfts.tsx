@@ -37,11 +37,11 @@ import { useEffect,useState } from "react";
 import { getSubgraphAuction } from "utils/graphQueries";
 import { createListedAuction } from "utils/nftHelpers";
 import { utils } from "ethers";
-import { 
-  unlistAuctionItem, 
-  redeemAuctionSeller, 
-  redeemAuctionParticipant, 
-  getAuctionReserve, 
+import {
+  unlistAuctionItem,
+  redeemAuctionSeller,
+  redeemAuctionParticipant,
+  getAuctionReserve,
   getParticipantContribution,
   getAuctionListings,
 } from "../utils/contractCalls";
@@ -64,7 +64,7 @@ export default function MyNFTsView() {
 
 
   const { isMinting, setIsMinting } = useMintingContext();
-  
+
 
   const sellerEndAuction = async (tokenAddress,sellerNonce) =>{
     unlistAuctionItem(
@@ -125,7 +125,7 @@ export default function MyNFTsView() {
   const auctionSuccess = async (tokenAddress, seller, sellerNonce, auctionReserve) =>{
     const auction = await getAuctionListings(tokenAddress,seller,sellerNonce,provider,marketAddress);
     let success;
-    
+
     if(auctionReserve.gt(auction[1])){
       success = true;
     }else{
@@ -133,11 +133,11 @@ export default function MyNFTsView() {
     }
 
     // console.log(auctionReserve.toString(),">",auction[1].toString()," is ", success);
-    
+
 
     return success;
   }
-  
+
   const participantContribution = async (seller,sellerNonce,participant) =>{
     const reserve = await getParticipantContribution(seller,sellerNonce,participant,provider,marketAddress);
     return reserve;
@@ -169,7 +169,7 @@ export default function MyNFTsView() {
         isClosable: true,
       })
       console.log(e);
-      
+
     })
   }
 
@@ -206,18 +206,18 @@ export default function MyNFTsView() {
           auctionDataHash.push(itm);
         }
       }))
-      
+
 
       let auctionItems = [];
       await Promise.all(auctionData?.map(async (auction,idx)=>{
         let hash = auctionDataHash.filter(e=>e.id==`${auction.tokenAddress}-${auction.sellerNonce}`);
-        
+
         if(hash[0]!=undefined){
           Object.assign(auction,{"hash":hash[0].hash});
           const item = await createListedAuction(auction);
           auctionItems.push(item);
         }
-        
+
         }
       ));
 
@@ -237,8 +237,8 @@ export default function MyNFTsView() {
       let participatedAuctionItems = [];
       await Promise.all(auctionDataParticipated?.map(async (auction,idx)=>{
         let hash = auctionDataParticipatedHash.filter(e=>e.id==`${auction.tokenAddress}-${auction.sellerNonce}`);
-        
-        
+
+
         if(hash[0]!=undefined){
           Object.assign(auction,{"hash":hash[0].hash});
           const item = await createListedAuction(auction);
@@ -250,24 +250,24 @@ export default function MyNFTsView() {
           auction["assigned"] = "lol";
           participatedAuctionItems.push(item);
         }
-        
+
         }
       ));
 
       setParticipatedAuctions(participatedAuctionItems);
-      
+
 
       let withReserve = [];
       await Promise.all(auctionItems.map(async (i)=>{
         const itemReserve = await auctionReserve(i.seller,i.sellerNonce);
         // const auctionSuccess = (itemReserve>i.reservePrice?true:false);
         const success = await auctionSuccess(i.tokenAddress,i.seller,i.sellerNonce,itemReserve)
-        
+
         i["currentReserve"] = utils.formatEther(itemReserve);
         i["isAuctionSuccess"] = success;
         // withReserve.push(i);
       }))
-      
+
 
       auctionItems = auctionItems.sort((a,b)=>b.endTime - a.endTime);
 
@@ -277,15 +277,15 @@ export default function MyNFTsView() {
         } catch (error) {
           i.currentReserve=0;
         }
-        
+
       }))
-      
+
       setAuctions(auctionItems);
     }
     getAuctions();
 
-    
-    
+
+
 
   },[userAccount,refresh]);
 
@@ -404,7 +404,7 @@ export default function MyNFTsView() {
       </Head>
 
       <Flex w="100%">
-        <Box className={styles.header}>Your NFTs</Box>
+        <Box className={styles.header}>Your Fraktal NFTs</Box>
         <Spacer />
         <Box>
           <NextLink href={`/list-nft`}>
@@ -433,12 +433,12 @@ export default function MyNFTsView() {
                   amount={null}
                   price={null}
                   imageURL={item.imageURL}
-                  
+
                 />
               </NextLink>
             </div>
           ))}
-          
+
         </Grid>
       )}
       {!loading && fraktals?.length <= 0 && isMinting && (
@@ -553,8 +553,8 @@ export default function MyNFTsView() {
           >
             {participatedAuctions &&
               participatedAuctions.map(item => (
-                <NextLink 
-                key={`${item.seller}-${item.sellerNonce}`} 
+                <NextLink
+                key={`${item.seller}-${item.sellerNonce}`}
                 href={`/nft/${item.seller}-${item.sellerNonce}/auction`}>
                   <NFTAuctionItem
                     item={item}
@@ -596,8 +596,8 @@ export default function MyNFTsView() {
           >
             {auctions &&
               auctions.map(item => (
-                <NextLink 
-                key={`${item.seller}-${item.sellerNonce}`} 
+                <NextLink
+                key={`${item.seller}-${item.sellerNonce}`}
                 href={`/nft/${item.seller}-${item.sellerNonce}/auction`}>
                   <NFTAuctionItem
                     item={item}
@@ -621,7 +621,7 @@ export default function MyNFTsView() {
           <Text>
             You do not have any auction. List auction at{" "}
               <Link color="purple.500" href="/list-nft">
-                list-nft 
+                list-nft
               </Link> page
           </Text>
         </Center>
