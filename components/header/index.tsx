@@ -94,19 +94,20 @@ const Header = () => {
               )}
             </NextLink>
 
-  {/*          <Link
-              href="https://app.daohaus.club/dao/0xa4b1/0x751eda5aa0a1c026f51942e266ed82795428ae34/"
+
+           <Link
+              href="https://docs.fraktal.io/marketplace/get-started"
               target="_blank"
               className="semi-16"
               borderRadius="25"
               padding="3"
               _hover={{ backgroundColor: "black", textColor: "white" }}
             >
-              DAO
-            </Link> */}
+              How it Works
+            </Link> 
 
             {/*_hover={{backgroundColor: `black`}}*/}
-            <Link
+        {/*  <Link
               href="https://www.instagram.com/fraktal.io/"
               target="_blank"
               rel="noreferrer noopener"
@@ -152,6 +153,7 @@ const Header = () => {
                 <Image src="/footer/icons8-discord.svg" />
               </Box>
             </Link>
+            */}
 
           </HStack>
           {!account ? (
