@@ -8,6 +8,7 @@ import {
   // lockShares,
   getApproved,
   approveMarket,
+  rejectOffer,
 } from "../../utils/contractCalls";
 import { shortenHash, timezone } from "../../utils/helpers";
 import { Box, Text, HStack } from "@chakra-ui/react";
@@ -77,7 +78,7 @@ export default function OfferDetail({
   ]);
 
   async function cancelVote() {
-    unlockShares(account, offerItem.offerer.id, provider, tokenAddress);
+    rejectOffer(account,offerItem.offerer.id, tokenAddress, provider, marketAddress);
   }
 
   async function voteOnOffer() {

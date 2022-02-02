@@ -21,7 +21,10 @@ import { FrakCard } from "../../types";
 import { motion, isValidMotionProp, HTMLMotionProps } from "framer-motion";
 import FrakButton from "../../components/button";
 import { useUserContext } from "@/contexts/userContext";
-import { utils } from "ethers";
+import { BigNumber, utils } from "ethers";
+import { useWeb3Context } from "../../contexts/Web3Context";
+import { getListingAmount, unlistItem } from "../../utils/contractCalls"
+import toast from "react-hot-toast";
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
@@ -37,10 +40,37 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
   ({ item, amount, price, imageURL, name, onClick, CTAText, wait }, ref) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
+    const [isListed,setIsListed] = useState(false);
     const { fraktions, fraktals } = useUserContext();
+    const { account, provider, marketAddress} = useWeb3Context();
 
     const canFrak = item && !! (fraktals || []).find(fraktion => fraktion.id === item.id);
     const canList = item && !! (fraktions || []).find(fraktion => fraktion.id === item.id);
+
+    useEffect(()=>{
+      if(item){
+        getListingAmount(account,item.id,provider,marketAddress).then(
+          (amount: BigNumber) => {
+            if(amount.gt(0)){
+              setIsListed(true);
+            }else{
+              setIsListed(false);
+            }
+            
+          }
+        );
+      }
+    },[])
+
+    const unList = async () => {
+      toast("Unlisting...")
+      await unlistItem(item.id,provider,marketAddress).then(
+        () => {
+          toast.success("Fraktion Unlisted");
+          setIsListed(!isListed);
+        }
+      )
+    }
 
     let showAmount = "";
     if(amount!=undefined){
@@ -175,7 +205,15 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 </Box>
               )}
 
-              { canList && (
+              { canList && isListed &&  (
+                <Box textAlign="center" marginTop={5}>
+                  <NextLink href={"my-nfts"} scroll={false}>
+                    <FrakButton size="sm" onClick={unList}
+                    >Unlist Fraktions</FrakButton>
+                  </NextLink>
+                </Box>
+              )}
+              { canList && !isListed &&  (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={`nft/${item.marketId}/list-item`}>
                     <FrakButton size="sm">Sell Fraktions</FrakButton>

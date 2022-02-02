@@ -30,6 +30,7 @@ import {
   importERC1155,
   getApproved,
   estimateRedeemAuctionSeller,
+  getListingAmount
 } from "../utils/contractCalls";
 import { useRouter } from "next/router";
 import { useEffect,useState } from "react";
@@ -58,6 +59,7 @@ export default function MyNFTsView() {
   const refreshPage = () =>{
     setRefresh(!refresh);
   }
+  
 
 
 
