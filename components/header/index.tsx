@@ -93,39 +93,18 @@ const Header = () => {
                 </Link>
               )}
             </NextLink>
-            <a href="https://docs.fraktal.io/marketplace/get-started" target="_blank">
-              {router.pathname === "/" ? (
-                <Link
-                  className="semi-16"
-                  borderRadius="25"
-                  padding="3"
-                  sx={{ backgroundColor: `black`, color: `white` }}
-                  _hover={{ backgroundColor: "black", textColor: "white" }}
-                >
-                  How it Works
-                </Link>
-              ) : (
-                <Link
-                  className="semi-16"
-                  borderRadius="25"
-                  padding="3"
-                  _hover={{ backgroundColor: "black", textColor: "white" }}
-                >
-                  How it Works
-                </Link>
-              )}
-            </a>
 
-  {/*          <Link
-              href="https://app.daohaus.club/dao/0xa4b1/0x751eda5aa0a1c026f51942e266ed82795428ae34/"
+
+           <Link
+              href="https://docs.fraktal.io/marketplace/get-started"
               target="_blank"
               className="semi-16"
               borderRadius="25"
               padding="3"
               _hover={{ backgroundColor: "black", textColor: "white" }}
             >
-              DAO
-            </Link> */}
+              How it Works
+            </Link> 
 
             {/*_hover={{backgroundColor: `black`}}*/}
         {/*  <Link
