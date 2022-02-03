@@ -39,6 +39,7 @@ import { useMintingContext } from "@/contexts/NFTIsMintingContext";
 import toast from "react-hot-toast";
 
 const { create } = require("ipfs-http-client");
+const MAX_FRACTIONS = 10000;
 
 export default function MintPage() {
   const { fraktals, nfts } = useUserContext();
@@ -63,6 +64,7 @@ export default function MintPage() {
   const [tokenToImport, setTokenToImport] = useState();
   const [nftApproved, setNftApproved] = useState(false);
   const [isAuction,setIsAuction] = useState(false);
+  const [listingProcess, setListingProcess] = useState(false);
 
   // detect states (where is NFT and if its ready to list so send it here for listing!)
 
@@ -101,6 +103,7 @@ export default function MintPage() {
   async function minter(metadata) {
     let metadataCid = await uploadAndPin(JSON.stringify(metadata));
     if (metadataCid) {
+      setListingProcess(true);
       setIsMinting(true);
       const response = await createNFT(
         metadataCid.cid.toString(),
@@ -154,7 +157,7 @@ export default function MintPage() {
   const fraktalReady =
     minted &&
     totalAmount > 0 &&
-    totalAmount <= 10000 &&
+    totalAmount <= MAX_FRACTIONS &&
     totalPrice > 0 &&
     isApproved &&
     fraktionalized;
@@ -279,7 +282,6 @@ export default function MintPage() {
       return "";
     }
   };
-
   return (
     <div>
       <Box
@@ -436,6 +438,8 @@ export default function MintPage() {
                   totalPrice={totalPrice}
                   setTotalPrice={setTotalPrice}
                   setTotalAmount={setTotalAmount}
+                  listingProcess={listingProcess}
+                  maxFraktions={MAX_FRACTIONS}
                 />
                 </TabPanel>
                 <TabPanel>
@@ -443,7 +447,8 @@ export default function MintPage() {
                     totalPrice={totalPrice}
                     setTotalPrice={setTotalPrice}
                     setTotalAmount={setTotalAmount}
-
+                    listingProcess={listingProcess}
+                    maxFraktions={MAX_FRACTIONS}
                   />
                 </TabPanel>
               </TabPanels>
