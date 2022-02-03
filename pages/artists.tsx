@@ -24,6 +24,7 @@ export default function ArtistsView() {
   const [artistsItems, setArtistsItems] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const { marketAddress, factoryAddress, loading } = useWeb3Context();
+  const [artistAddress, setArtistAddress] = useState("");
   const handleSortSelect = (item: string) => {
     setSortType(item);
     setSelectionMode(false);
@@ -76,6 +77,13 @@ export default function ArtistsView() {
         const newArray = [...artistsItems, ...deduplicatedArtistObjects];
         setArtistsItems(newArray);
       }
+    }
+  }
+
+  function searchHandle(e){
+    e.preventDefault();
+    if(e.target.value !== ""){
+      setArtistAddress(e.target.value);
     }
   }
 
@@ -135,13 +143,23 @@ export default function ArtistsView() {
           )}
         </Box> */}
         <Text className="semi-48">Artists</Text>
-    {/*   <div className={styles.searchContainer}>
+      <div className={styles.searchContainer}>
           <input
             placeholder={"Search ENS or ETH address "}
             className={styles.searchInput}
+            onChange={searchHandle}
           />
-          <Image src="/search.svg" />
-        </div> */}
+          {
+            artistAddress !=="" &&
+              <NextLink
+                      href={`/artist/${artistAddress}`}
+                      key={`link--${artistAddress}`}
+                    >
+                <Image src="/search.svg" />
+              </NextLink>
+          }
+          
+        </div>
       </HStack>
       {!loading && artistsItems.length > 0 && (
         <>
