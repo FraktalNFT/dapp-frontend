@@ -2,6 +2,7 @@ import { Grid, Text, VStack, Heading, Spinner, Box } from "@chakra-ui/react";
 import Head from "next/head";
 import React, { useState, useEffect } from "react";
 import styles from "./artist.module.css";
+import styles_Search from "../../styles/artists.module.css";
 import NFTItem from "../../components/nft-item";
 import FrakButton from "../../components/button";
 import NextLink from "next/link";
@@ -10,12 +11,30 @@ import { getSubgraphData } from "../../utils/graphQueries";
 import { createObject2 } from "../../utils/nftHelpers";
 import toast from "react-hot-toast";
 import { useRouter } from "next/router";
+import { Image } from "@chakra-ui/image";
+import { useENSAddress } from 'components/useENSAddress';
+
 
 export default function ArtistView() {
   const router = useRouter();
   const [artistAddress, setArtistAddres] = useState("");
   const [nftItems, setNftItems] = useState([]);
   const [loading, setIsLoading] = useState<boolean>(false);
+  const [artist_Address, setArtist_Address] = useState("");
+  const [inputAddress, setInputAddress] = useState("");
+  
+  function searchHandle(e){
+    e.preventDefault();
+    if(e.target.value !== ""){
+      const inputVal=e.target.value;
+      let address_Artist= inputVal;
+      if(!inputVal.startsWith("0x")){
+        setInputAddress(e.target.value);
+      }
+      setArtist_Address(address_Artist);
+    }
+  }
+  const [isENSAddressValid, ethAddressFromENS] = useENSAddress(inputAddress)
 
   useEffect(() => {
     async function getData() {
@@ -43,7 +62,7 @@ export default function ArtistView() {
       }
     }
     getData();
-  }, []);
+  }, [router.asPath]);
 
   return (
     <VStack spacing="0" mb="1rem" sx={{ alignItems: `start` }}>
@@ -52,6 +71,23 @@ export default function ArtistView() {
       </Head>
       <Heading sx={{ fontSize: `36px`, marginBottom: `1rem` }}>
         {artistAddress}
+        <div className={styles_Search.searchContainer}>
+          <input
+            placeholder={"Search ENS or ETH address "}
+            className={styles_Search.searchInput}
+            onChange={searchHandle}
+          />
+          {
+            artist_Address !=="" &&
+              <NextLink
+                      href={`/artist/${artist_Address.startsWith("0x") ? artist_Address : ethAddressFromENS}`}
+                      key={`link--${artist_Address}`}
+                    >
+                <Image src="/search.svg" />
+              </NextLink>
+          }
+          
+        </div>
       </Heading>
       {!loading && nftItems.length > 0 && (
         <>
