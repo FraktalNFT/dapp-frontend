@@ -58,6 +58,7 @@ export default function FixPriceNFTView() {
 
   async function buyingFraktions() {
       try {
+        console.log('Fraktions to buy', fraktionsToBuy)
         await buyFraktions(
           nftObject.seller,
           nftObject.tokenAddress,

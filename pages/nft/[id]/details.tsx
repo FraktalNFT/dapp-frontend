@@ -25,6 +25,7 @@ import {
   isFraktalOwner,
 } from "../../../utils/contractCalls";
 import { useRouter } from "next/router";
+import LoadScreen from '../../../components/load-screens';
 // import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
 // import Modal from '../../../components/modal';
 
@@ -51,6 +52,7 @@ export default function DetailsView() {
   const [fraktionsIndex, setFraktionsIndex] = useState();
   const [args, setArgs] = useState([]);
   const [investors, setInvestors] = useState(0);
+  const [isOpenLoadScreen, setOpenLoadScreen] = useState(false);
   // use callbacks
 
   const [isLoading, setIsLoading] = useState(true);
@@ -229,10 +231,35 @@ export default function DetailsView() {
       console.error("There has been an error: ", e);
     }
   }
+/*
+  const loadScreenMessage = () => {
+        if (true) {
+            return {
+                heading: 'Depositing Revenue',
+                message: 'Congrats! Your transaction has successfully been processed on Arbitrum.',
+                button: {
+                    text: 'View Revenue'
+                },
+                state: 'COMPLETED',
+                status: true,
+                tx: false
+            }
+        }
+        return {
+            heading: 'Minting NTF',
+            message: 'Congrats! Your transaction has successfully been processed on Arbitrum.',
+            button: {
+                text: 'Try Again'
+            },
+            state: 'REJECTED',
+            status: true,
+        }
 
+  };*/
 
   return (
     <>
+      <LoadScreen />
       {isLoading && (
         <>
           <Box sx={{ display: `grid`, width: `100%`, placeItems: `center` }}>

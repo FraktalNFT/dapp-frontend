@@ -9,6 +9,8 @@ import {
   getApproved,
   approveMarket,
 } from "../../utils/contractCalls";
+import {CLAIMING_REVENUE, rejectContract} from "../../redux/actions/contractActions";
+import store from "../../redux/store";
 
 interface revenueItemProps {
   value: Number;
@@ -95,9 +97,12 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
     async function revenueClaiming() {
       setIsClaiming(true);
       try {
-        release(provider, revenueAddress);
+        release(provider, revenueAddress, tokenAddress)
+            .catch(e => {
+            store.dispatch(rejectContract(CLAIMING_REVENUE, e, revenueClaiming));
+        });
       } catch (e) {
-        console.error("There has been an error: ", e);
+          console.error("There has been an error - Claiming Revenue: ", e);
       }
       setIsClaiming(false);
     }

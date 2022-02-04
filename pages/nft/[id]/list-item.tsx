@@ -25,6 +25,11 @@ import {
   listItemAuction,
 } from '../../../utils/contractCalls';
 import { useRouter } from 'next/router';
+
+import store from '../../../redux/store';
+import {LISTING_NFT, rejectContract} from "../../../redux/actions/contractActions";
+import LoadScreen from '../../../components/load-screens';
+
 const exampleNFT = {
   id: 0,
   name: "Golden Fries Cascade",
@@ -34,6 +39,7 @@ const exampleNFT = {
   createdAt: new Date().toISOString(),
   countdown: new Date("06-25-2021"),
 };
+
 export default function ListNFTView() {
   const router = useRouter();
   const {account, provider, marketAddress} = useWeb3Context();
@@ -159,8 +165,10 @@ export default function ListNFTView() {
         weiPerFrak,//price
         provider,
         marketAddress).then(()=>{
-          router.push('/');
-        })
+         // router.push('/');
+        }).catch(e => {
+          store.dispatch(rejectContract(LISTING_NFT, e, listNewItem));
+      })
     }
   }
 
@@ -199,9 +207,9 @@ export default function ListNFTView() {
     }
   }
 
-
   return (
     <VStack spacing="0" mb="12.8rem">
+      <LoadScreen/>
       <Head>
         <title>Fraktal - NFT</title>
       </Head>
