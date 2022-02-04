@@ -14,6 +14,7 @@ import { useWeb3Context } from "../contexts/Web3Context";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ArtistCard from "@/components/artistCard/ArtistCard";
 import { useRouter } from "next/router";
+import { useENSAddress } from 'components/useENSAddress';
 
 export default function ArtistsView() {
   const router = useRouter();
@@ -25,6 +26,8 @@ export default function ArtistsView() {
   const [hasMore, setHasMore] = useState(true);
   const { marketAddress, factoryAddress, loading } = useWeb3Context();
   const [artistAddress, setArtistAddress] = useState("");
+  const [inputAddress, setInputAddress] = useState("");
+  
   const handleSortSelect = (item: string) => {
     setSortType(item);
     setSelectionMode(false);
@@ -83,9 +86,15 @@ export default function ArtistsView() {
   function searchHandle(e){
     e.preventDefault();
     if(e.target.value !== ""){
-      setArtistAddress(e.target.value);
+      const inputVal=e.target.value;
+      let address_Artist= inputVal;
+      if(!inputVal.startsWith("0x")){
+        setInputAddress(e.target.value);
+      }
+      setArtistAddress(address_Artist);
     }
   }
+  const [isENSAddressValid, ethAddressFromENS] = useENSAddress(inputAddress)
 
   useEffect(() => {
     const fetchInitialArtists = async () => {
@@ -152,14 +161,13 @@ export default function ArtistsView() {
           {
             artistAddress !=="" &&
               <NextLink
-                      href={`/artist/${artistAddress}`}
+                      href={`/artist/${artistAddress.startsWith("0x") ? artistAddress : ethAddressFromENS}`}
                       key={`link--${artistAddress}`}
                     >
                 <Image src="/search.svg" />
               </NextLink>
           }
-          
-        </div>
+        </div>       
       </HStack>
       {!loading && artistsItems.length > 0 && (
         <>
