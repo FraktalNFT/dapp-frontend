@@ -7,6 +7,7 @@ import FrakButton2 from "../button2";
 import OfferDetail from "../offerDetail";
 import { makeOffer, getMajority } from "../../utils/contractCalls";
 import { Text } from "@chakra-ui/react";
+import { roundUp } from "../../utils/math";
 
 const BuyOutCard = ({
   account,
@@ -73,6 +74,10 @@ const BuyOutCard = ({
       console.error("Error: ", err);
     }
   }
+
+  const minPriceParsed = minPrice => {
+    return (roundUp(minPrice, 3));
+  };
 
   function onSetValue(d) {
     if (parseFloat(d) && parseFloat(d) >= minPrice) {
@@ -184,7 +189,7 @@ const BuyOutCard = ({
                   color: "#000000",
                 }}
               >
-                {minPrice}
+                {minPriceParsed(minPrice)}
               </div>
             </HStack>
           </VStack>
