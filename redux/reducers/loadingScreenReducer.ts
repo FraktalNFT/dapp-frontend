@@ -93,9 +93,7 @@ const claimingFraktionsProfit = {
 
 const loadingScreenReducer = (state = initState, action) => {
     let loadingScreenObject = {};
-
-    console.log('REDUCER ACTION', action)
-
+    
     switch (action.transactionType) {
         case BUYING_FRAKTIONS:
             loadingScreenObject = buyingFraktions;

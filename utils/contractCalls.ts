@@ -6,7 +6,7 @@ import { loadSigner, processTx, awaitTokenAddress } from "./helpers";
 import { useMintingContext } from "@/contexts/NFTIsMintingContext";
 import { BigNumber, ethers, utils } from "ethers";
 import store from '../redux/store';
-import {approvedTransaction, callContract, rejectContract} from "../redux/actions/contractActions";
+import {approvedTransaction, callContract} from "../redux/actions/contractActions";
 import {
     BUYING_FRAKTIONS,
     CLAIMING_BUYOUTS,
@@ -393,7 +393,6 @@ export async function listItem(
     return receipt;
   } catch (e) {
     throw e;
-    //store.dispatch(rejectContract(LISTING_NFT, e, null));
   }
 
 }
@@ -426,7 +425,6 @@ export async function rescueEth(provider, marketAddress) {
     return receipt;
   } catch (e) {
     throw e;
-    //store.dispatch(rejectContract(CLAIMING_BUYOUTS, e, null));
   }
 }
 
@@ -457,7 +455,6 @@ export async function buyFraktions(
       return receipt;
   } catch (e) {
       throw e;
-      //store.dispatch(rejectContract(BUYING_FRAKTIONS, e, null));
   }
 
 }
@@ -539,7 +536,6 @@ export async function voteOffer(
     return receipt;
   } catch (e) {
     throw e;
-     // store.dispatch(rejectContract(VOTING_BUYOUTS, e, null));
   }
 }
 
