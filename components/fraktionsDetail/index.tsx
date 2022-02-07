@@ -5,6 +5,8 @@ import React, { forwardRef, useState } from "react";
 import FrakButton2 from "../button2";
 import { buyFraktions } from "../../utils/contractCalls";
 import { parseUnits } from "ethers/lib/utils";
+import { roundUp } from "../../utils/math";
+
 interface listedItemProps {
   amount: Number;
   price: Number;
@@ -34,7 +36,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
       
 
     const priceParsed = price => {
-      return utils.formatEther(price) * 100000 / 100000;
+      return (roundUp(utils.formatEther(price) * 100000 / 100000, 3));
       // return Math.round(utils.formatEther(price) * 100000) / 100000;
     };
 
