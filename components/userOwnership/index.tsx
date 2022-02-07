@@ -41,7 +41,6 @@ const UserOwnership=(({
     //   tx = await approveMarket(marketAddress, provider, tokenAddress)
     // }
     if(tx || isApproved){
-      console.log('export')
       await exportFraktal(tokenAddress, provider, marketAddress)
       // defraktionalize leaves the nft in the market!!!
       // can claim (etherscan) ANYONE!

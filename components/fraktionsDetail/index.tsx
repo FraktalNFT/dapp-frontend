@@ -56,7 +56,6 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
     async function onBuy() {
       setBuying(true);
       try {
-          console.log('token FRAK', tokenAddress)
         addFraktionAmount(amountToBuy);
         let tx = buyFraktions(
           seller,
@@ -69,14 +68,10 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
         tx.then(() => {
           setBuying(false);
           setAmountToBuy(0);
-       //   removeFraktionAmount();
         }).catch(error => {
-
-            console.log('catch error', error)
             buyFraktionsRejected(error, onBuy);
         });
       } catch (err) {
-        console.log('catch error', err)
         buyFraktionsRejected(err, onBuy);
         console.error("Error", err);
       }

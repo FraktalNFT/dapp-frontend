@@ -52,7 +52,6 @@ export default function DetailsView() {
   const [fraktionsIndex, setFraktionsIndex] = useState();
   const [args, setArgs] = useState([]);
   const [investors, setInvestors] = useState(0);
-  const [isOpenLoadScreen, setOpenLoadScreen] = useState(false);
   // use callbacks
 
   const [isLoading, setIsLoading] = useState(true);
@@ -79,7 +78,6 @@ export default function DetailsView() {
       "fraktions",
       tokenAddressSplitted
     );
-    // console.log(fraktionsFetch);
     if (fraktionsFetch.listItems) {
       setFraktionsListed(fraktionsFetch.listItems);
     }
@@ -231,31 +229,6 @@ export default function DetailsView() {
       console.error("There has been an error: ", e);
     }
   }
-/*
-  const loadScreenMessage = () => {
-        if (true) {
-            return {
-                heading: 'Depositing Revenue',
-                message: 'Congrats! Your transaction has successfully been processed on Arbitrum.',
-                button: {
-                    text: 'View Revenue'
-                },
-                state: 'COMPLETED',
-                status: true,
-                tx: false
-            }
-        }
-        return {
-            heading: 'Minting NTF',
-            message: 'Congrats! Your transaction has successfully been processed on Arbitrum.',
-            button: {
-                text: 'Try Again'
-            },
-            state: 'REJECTED',
-            status: true,
-        }
-
-  };*/
 
   return (
     <>
