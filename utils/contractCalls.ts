@@ -8,11 +8,13 @@ import { BigNumber, ethers, utils } from "ethers";
 import store from '../redux/store';
 import {approvedTransaction, callContract} from "../redux/actions/contractActions";
 import {
+    APPROVE_TOKEN,
     BUYING_FRAKTIONS,
     CLAIMING_BUYOUTS,
     CLAIMING_FRAKTIONS_PROFIT,
     CLAIMING_REVENUE,
     DEPOSIT_REVENUE,
+    IMPORT_FRAKTAL,
     MINT_NFT,
     LISTING_NFT,
     OFFERING_BUYOUT,
@@ -109,7 +111,6 @@ export async function getReleased(account, provider, revenueContract) {
 }
 
 export async function release(provider, revenueAddress, tokenAddress) {
-  console.log('revenueAddress', tokenAddress)
   const signer = await loadSigner(provider);
   const customContract = new Contract(revenueAddress, revenuesAbi, signer);
   try {
@@ -263,11 +264,20 @@ export async function defraktionalize(provider, contract) {
 }
 
 export async function approveMarket(to, provider, contract) {
+  console.log('Contract', contract)
   const signer = await loadSigner(provider);
   const customContract = new Contract(contract, tokenAbi, signer);
-  let tx = await customContract.setApprovalForAll(to, true);
-  let receipt = await processTx(tx);
-  return receipt;
+  try {
+    let tx = await customContract.setApprovalForAll(to, true);
+    store.dispatch(callContract(APPROVE_TOKEN, tx));
+    let receipt = await processTx(tx);
+    if (!receipt?.error) {
+      store.dispatch(approvedTransaction(APPROVE_TOKEN, tx, contract));
+    }
+    return receipt;
+    } catch (e) {
+    throw e;
+  }
 }
 
 export async function unlockShares(from, to, provider, tokenContract) {
@@ -291,7 +301,6 @@ const defaultMajority = 8000; //later give this argument to the creator (or owne
 export async function createNFT(hash, provider, contractAddress) {
   const signer = await loadSigner(provider);
   const customContract = new Contract(contractAddress, factoryAbi, signer);
-  //TODO FIX
   try {
     let tx = await customContract.mint(hash, defaultMajority);
     store.dispatch(callContract(MINT_NFT, tx));
@@ -305,7 +314,6 @@ export async function createNFT(hash, provider, contractAddress) {
   }
 }
 
-
 export async function importFraktal(
   tokenAddress,
   fraktionsIndex,
@@ -315,14 +323,23 @@ export async function importFraktal(
   const signer = await loadSigner(provider);
   const override = { gasLimit: 500000 };
   const customContract = new Contract(marketAddress, marketAbi, signer);
-  let tx = await customContract.importFraktal(
-    tokenAddress,
-    fraktionsIndex,
-    override
-  );
-  let receipt = processTx(tx);
-  return receipt;
+  try {
+    let tx = await customContract.importFraktal(
+      tokenAddress,
+      fraktionsIndex,
+      override
+    );
+    store.dispatch(callContract(IMPORT_FRAKTAL, tx));
+    let receipt = await processTx(tx);
+    if (!receipt?.error) {
+      store.dispatch(approvedTransaction(IMPORT_FRAKTAL, tx, tokenAddress));
+    }
+    return receipt;
+  } catch (e) {
+    throw e;
+  }
 }
+
 export async function exportFraktal(tokenAddress, provider, marketAddress) {
   const signer = await loadSigner(provider);
   const customContract = new Contract(marketAddress, marketAbi, signer);
@@ -346,8 +363,6 @@ export async function importERC721(
     defaultMajority,
     override
   );
-  // let receipt = processTx(tx);
-  // let receipt = processTx(tx);
   let mintedTokenAddress = awaitTokenAddress(tx);
   return mintedTokenAddress;
 }
@@ -477,7 +492,6 @@ export async function createRevenuePayment(value, provider, fraktalAddress, mark
 }
 
 export async function claimFraktalSold(tokenId, provider, marketAddress) {
-  console.log('sold', tokenId)
   const signer = await loadSigner(provider);
   const customContract = new Contract(marketAddress, marketAbi, signer);
   try {

@@ -42,12 +42,18 @@ import {awaitTokenAddress} from "../utils/helpers";/**
  * REDUX
  */
 import {connect} from 'react-redux';
-import {approvedTransaction, callContract, rejectContract, MINT_NFT} from "../redux/actions/contractActions";
+import {
+    approvedTransaction,
+    APPROVE_TOKEN,
+    MINT_NFT,
+    IMPORT_FRAKTAL,
+    rejectContract,
+} from "../redux/actions/contractActions";
 const { create } = require("ipfs-http-client");
 const MAX_FRACTIONS = 10000;
 
 const MintPage = (props) => {
-  const {mintNFTRejected, mintNFTApproved} = props;
+  const {mintNFTRejected, tokenRejected, transferRejected} = props;
   const { fraktals, nfts } = useUserContext();
   const { isMinting, setIsMinting } = useMintingContext();
   const router = useRouter();
@@ -180,12 +186,15 @@ const MintPage = (props) => {
     fraktionalized;
 
   async function approveToken() {
-    await approveMarket(marketAddress, provider, tokenMintedAddress).then(
+    await approveMarket(marketAddress, provider, tokenMintedAddress)
+        .then(
       () => {
         setIsApproved(true);
         importFraktalToMarket();
       }
-    );
+    ).catch(error => {
+       tokenRejected(error, approveToken);
+    });
   }
 
   async function importFraktalToMarket() {
@@ -209,6 +218,8 @@ const MintPage = (props) => {
         else{
           listNewItem();
         }
+      }).catch(error => {
+          transferRejected(error, importFraktalToMarket);
       });
     }
   }
@@ -551,6 +562,12 @@ const mapDispatchToProps = (dispatch) => {
     return {
         mintNFTRejected: (obj, buttonAction) => {
             dispatch(rejectContract(MINT_NFT, obj, buttonAction))
+        },
+        tokenRejected: (obj, buttonAction) => {
+            dispatch(rejectContract(APPROVE_TOKEN, obj, buttonAction))
+        },
+        transferRejected: (obj, buttonAction) => {
+            dispatch(rejectContract(IMPORT_FRAKTAL, obj, buttonAction))
         },
         mintNFTApproved: (obj, receipt ) => {
             dispatch(approvedTransaction(MINT_NFT, obj, receipt))

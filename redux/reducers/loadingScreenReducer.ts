@@ -8,11 +8,13 @@ import {
     REJECTED_STATUS,
     ADD_AMOUNT,
     REMOVE_AMOUNT,
+    APPROVE_TOKEN,
     BUYING_FRAKTIONS,
     CLAIMING_BUYOUTS,
     CLAIMING_FRAKTIONS_PROFIT,
     CLAIMING_REVENUE,
     DEPOSIT_REVENUE,
+    IMPORT_FRAKTAL,
     MINT_NFT,
     LISTING_NFT,
     OFFERING_BUYOUT,
@@ -29,6 +31,13 @@ const SUCCESSFUL_MESSAGE = 'Congrats! Your transaction has successfully been pro
 const PENDING_MESSAGE = 'Please wait a few moments while your transaction is processed by Arbitrum';
 const REJECTED_MESSAGE = 'User Denied Metamask Signature';
 
+const approveToken = {
+    heading: 'Minting NFT',
+    button: {
+        text: 'View NFT'
+    }
+};
+
 const buyingFraktions = {
     heading: 'Buying Fraktions',
     button: {
@@ -43,10 +52,29 @@ const claimingRevenue = {
     }
 };
 
+const claimingBuyout = {
+    heading: 'Claiming Buy Out',
+    button: {
+        text: 'View NFT'
+    }
+};
+const claimingFraktionsProfit = {
+    heading: 'Claiming Fraktion Profit',
+    button: {
+        text: 'View NFTs'
+    }
+};
 const depositingRevenue = {
     heading: 'Depositing Revenue',
     button: {
         text: 'View Revenue'
+    }
+};
+
+const importFraktal = {
+    heading: 'Minting NFT',
+    button: {
+        text: 'View NFT'
     }
 };
 
@@ -71,12 +99,6 @@ const offeringBuyout = {
     }
 };
 
-const claimingBuyout = {
-    heading: 'Claiming Buy Out',
-    button: {
-        text: 'View NFT'
-    }
-};
 const votingBuyout = {
     heading: 'Voting on Buy-outs',
     button: {
@@ -84,17 +106,14 @@ const votingBuyout = {
     }
 };
 
-const claimingFraktionsProfit = {
-    heading: 'Claiming Fraktion Profit',
-    button: {
-        text: 'View NFTs'
-    }
-};
 
 const loadingScreenReducer = (state = initState, action) => {
     let loadingScreenObject = {};
-    
+
     switch (action.transactionType) {
+        case APPROVE_TOKEN:
+            loadingScreenObject = approveToken;
+            break;
         case BUYING_FRAKTIONS:
             loadingScreenObject = buyingFraktions;
             break;
@@ -109,6 +128,9 @@ const loadingScreenReducer = (state = initState, action) => {
             break;
         case DEPOSIT_REVENUE:
             loadingScreenObject = depositingRevenue;
+            break;
+        case IMPORT_FRAKTAL:
+            loadingScreenObject = importFraktal;
             break;
         case MINT_NFT:
             loadingScreenObject = mintingNFT;
