@@ -75,17 +75,13 @@ export default function ImportNFTPage() {
 
   async function approveForFactory() {
     if (tokenToImport && tokenToImport.id) {
-      let res = await approveMarket(factoryAddress, provider, tokenToImport.id);
-      if (res?.error) {
-        alert(
-          "Transaction Failed! Sad! Many Such Cases! Contact the Development Team."
-        );
-        return null;
-      }
-      if (!res?.error) {
-        setIsFactoryApproved(true);
-        importNFT();
-      }
+      let res = await approveMarket(factoryAddress, provider, tokenToImport.id)
+          .then(success => {
+          setIsFactoryApproved(true);
+          importNFT();
+      }).catch(error => {
+        store.dispatch(rejectContract(APPROVE_TOKEN, error, approveForFactory));
+      });
     }
   }
 
