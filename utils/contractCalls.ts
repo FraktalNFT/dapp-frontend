@@ -15,6 +15,7 @@ import {
     CLAIMING_REVENUE,
     DEPOSIT_REVENUE,
     IMPORT_FRAKTAL,
+    IMPORT_NFT,
     MINT_NFT,
     LISTING_NFT,
     OFFERING_BUYOUT,
@@ -357,14 +358,23 @@ export async function importERC721(
   const signer = await loadSigner(provider);
   const override = { gasLimit: 1000000 };
   const customContract = new Contract(factoryAddress, factoryAbi, signer);
-  let tx = await customContract.importERC721(
-    tokenAddress,
-    tokenId,
-    defaultMajority,
-    override
-  );
-  let mintedTokenAddress = awaitTokenAddress(tx);
-  return mintedTokenAddress;
+  try {
+    let tx = await customContract.importERC721(
+      tokenAddress,
+      tokenId,
+      defaultMajority,
+      override
+    );
+    store.dispatch(callContract(IMPORT_NFT, tx));
+    let mintedTokenAddress = await awaitTokenAddress(tx);
+    if (!mintedTokenAddress?.error) {
+      store.dispatch(approvedTransaction(IMPORT_NFT, tx, mintedTokenAddress));
+    }
+    return mintedTokenAddress;
+  } catch (e) {
+    throw e;
+  }
+
 }
 
 export async function importERC1155(
@@ -376,16 +386,23 @@ export async function importERC1155(
   const signer = await loadSigner(provider);
   const override = { gasLimit: 1000000 };
   const customContract = new Contract(factoryAddress, factoryAbi, signer);
-  let tx = await customContract.importERC1155(
-    tokenAddress,
-    tokenId,
-    defaultMajority,
-    override
-  );
-  // let receipt = processTx(tx);
-  // return receipt;
-  let mintedTokenAddress = awaitTokenAddress(tx);
-  return mintedTokenAddress;
+
+  try {
+    let tx = await customContract.importERC1155(
+      tokenAddress,
+      tokenId,
+      defaultMajority,
+      override
+    );
+    store.dispatch(callContract(IMPORT_NFT, tx));
+    let mintedTokenAddress = await awaitTokenAddress(tx);
+    if (!mintedTokenAddress?.error) {
+      store.dispatch(approvedTransaction(IMPORT_NFT, tx, mintedTokenAddress));
+    }
+    return mintedTokenAddress;
+  } catch (e) {
+    throw e;
+  }
 }
 
 export async function listItem(

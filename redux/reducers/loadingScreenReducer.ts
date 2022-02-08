@@ -15,6 +15,7 @@ import {
     CLAIMING_REVENUE,
     DEPOSIT_REVENUE,
     IMPORT_FRAKTAL,
+    IMPORT_NFT,
     MINT_NFT,
     LISTING_NFT,
     OFFERING_BUYOUT,
@@ -78,6 +79,13 @@ const importFraktal = {
     }
 };
 
+const importNFT = {
+    heading: 'Importing NFT',
+    button: {
+        text: 'View NFT'
+    }
+};
+
 const mintingNFT = {
     heading: 'Minting NFT',
     button: {
@@ -128,6 +136,9 @@ const loadingScreenReducer = (state = initState, action) => {
             break;
         case DEPOSIT_REVENUE:
             loadingScreenObject = depositingRevenue;
+            break;
+        case IMPORT_NFT:
+            loadingScreenObject = importNFT;
             break;
         case IMPORT_FRAKTAL:
             loadingScreenObject = importFraktal;

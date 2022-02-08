@@ -37,7 +37,7 @@ import FrakButton4 from "@/components/button4";
 import ListCardAuction from "@/components/listCardAuction";
 import toast from "react-hot-toast";
 import store from "../redux/store";
-import {APPROVE_TOKEN, IMPORT_FRAKTAL, rejectContract} from "../redux/actions/contractActions";
+import {APPROVE_TOKEN, IMPORT_FRAKTAL, IMPORT_NFT, rejectContract} from "../redux/actions/contractActions";
 import LoadScreen from '../components/load-screens';
 
 const { create } = require("ipfs-http-client");
@@ -125,7 +125,9 @@ export default function ImportNFTPage() {
         tokenToImport?.id,
         provider,
         factoryAddress
-      );
+      ).catch(error => {
+          store.dispatch(rejectContract(IMPORT_NFT, error, importNFT));
+      });
     }
     if (tokenToImport?.token_schema === "ERC1155") {
       address = await importERC1155(
@@ -133,7 +135,9 @@ export default function ImportNFTPage() {
         tokenToImport?.id,
         provider,
         factoryAddress
-      );
+      ).catch(error => {
+          store.dispatch(rejectContract(IMPORT_NFT, error, importNFT));
+      });
     }
     if (address?.length > 0) {
       setTokenMintedAddress(address);
