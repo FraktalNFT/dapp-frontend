@@ -9,9 +9,10 @@ import { makeOffer, getMajority } from "../../utils/contractCalls";
 import { Text } from "@chakra-ui/react";
 import {connect} from "react-redux";
 import {
-    addAmount, BUYING_FRAKTIONS, callContract, DEPOSIT_REVENUE, OFFERING_BUYOUT, rejectContract,
+    addAmount, OFFERING_BUYOUT, rejectContract,
     removeAmount
 } from "../../redux/actions/contractActions";
+import { roundUp } from "../../utils/math";
 
 const BuyOutCard = ({
   account,
@@ -83,6 +84,10 @@ const BuyOutCard = ({
       console.error("Error: ", err);
     }
   }
+
+  const minPriceParsed = minPrice => {
+    return (roundUp(minPrice, 3));
+  };
 
   function onSetValue(d) {
     if (parseFloat(d) && parseFloat(d) >= minPrice) {
@@ -194,7 +199,7 @@ const BuyOutCard = ({
                   color: "#000000",
                 }}
               >
-                {minPrice}
+                {minPriceParsed(minPrice)}
               </div>
             </HStack>
           </VStack>

@@ -7,6 +7,8 @@ import { buyFraktions } from "../../utils/contractCalls";
 import { parseUnits } from "ethers/lib/utils";
 import {connect} from "react-redux";
 import {addAmount, BUYING_FRAKTIONS, rejectContract, removeAmount} from "../../redux/actions/contractActions";
+import { roundUp } from "../../utils/math";
+
 interface listedItemProps {
   amount: Number;
   price: Number;
@@ -36,7 +38,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
       
 
     const priceParsed = price => {
-      return utils.formatEther(price) * 100000 / 100000;
+      return (roundUp(utils.formatEther(price) * 100000 / 100000, 3));
       // return Math.round(utils.formatEther(price) * 100000) / 100000;
     };
 
