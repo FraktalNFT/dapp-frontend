@@ -48,23 +48,18 @@ import {
 
 export default function MyNFTsView() {
   const router = useRouter();
-  const toast = useToast()
+  const toast = useToast();
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
   const { fraktals, fraktions, nfts, balance, loading } = useUserContext();
   const [auctions,setAuctions] = useState(null);
   const [participatedAuctions,setParticipatedAuctions] = useState(null);
   const [userAccount,setUserAccount] = useState(null);
   const [refresh,setRefresh] = useState(false);
+  const { isMinting, setIsMinting } = useMintingContext();
 
   const refreshPage = () =>{
     setRefresh(!refresh);
-  }
-  
-
-
-
-  const { isMinting, setIsMinting } = useMintingContext();
-
+  };
 
   const sellerEndAuction = async (tokenAddress,sellerNonce) =>{
     unlistAuctionItem(

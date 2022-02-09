@@ -13,6 +13,8 @@ import {
 import { shortenHash, timezone } from "../../utils/helpers";
 import { Box, Text, HStack } from "@chakra-ui/react";
 import toast from "react-hot-toast";
+import store from '../../redux/store';
+import {VOTING_BUYOUTS, CLAIMING_FRAKTIONS_PROFIT, rejectContract} from "../../redux/actions/contractActions";
 
 interface offerItemProps {
   account: String;
@@ -77,23 +79,36 @@ export default function OfferDetail({
     fraktionsApproved,
   ]);
 
+    /**
+     * Reject Offer
+     * @returns {Promise<void>}
+     */
   async function cancelVote() {
     rejectOffer(account,offerItem.offerer.id, tokenAddress, provider, marketAddress);
   }
 
+    /**
+     * Vote Offer
+     * @returns {Promise<void>}
+     */
   async function voteOnOffer() {
-    toast("Voting in progress...");
+    //TODO REMOVE TOAST
+   // toast("Voting in progress...");
     let response = await voteOffer(
       offerItem.offerer.id,
       tokenAddress,
       provider,
       marketAddress
-    );
+    ).catch(e => {
+        store.dispatch(rejectContract(VOTING_BUYOUTS, e, voteOnOffer));
+    });
     if (response?.error) {
-      toast.error("Voting Failed");
+      //TODO REMOVE TOAST
+      //toast.error("Voting Failed");
     }
     if (!response?.error) {
-      toast.success("Vote cast");
+      //TODO REMOVE TOAST
+      //toast.success("Vote cast");
     }
   }
 
@@ -110,19 +125,29 @@ export default function OfferDetail({
     //   setFraktionsApproved(true);
     // }
   }
+
+    /**
+     * Claiming
+     * @returns {Promise<void>}
+     */
   async function claimFraktal() {
     // this one goes to offersCard
-    toast("Claiming...");
+    //TODO REMOVE TOAST
+   // toast("Claiming...");
     try {
       let response = await claimFraktalSold(
         tokenAddress,
         provider,
         marketAddress
-      );
-      toast.success("Claim successful.");
+      ).catch(error => {
+          store.dispatch(rejectContract(CLAIMING_FRAKTIONS_PROFIT, error, claimFraktal));
+      });
+      //TODO REMOVE TOAST
+      //toast.success("Claim successful.");
     } catch (e) {
+      //TODO REMOVE TOAST
       console.error("There has been an error: ", e);
-      toast.error("Claiming failed.");
+      //toast.error("Claiming failed.");
     }
   }
 
