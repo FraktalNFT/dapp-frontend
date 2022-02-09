@@ -4,11 +4,13 @@ import FrakButton from "../button";
 import { useWeb3Context } from "../../contexts/Web3Context";
 import { shortenHash } from "../../utils/helpers";
 import { useRouter } from "next/router";
+import useENS from "hooks/useENS";
 
 const Header = () => {
   const router = useRouter();
   // console.log('header',router.pathname);
   const { connectWeb3, account } = useWeb3Context();
+  const { ensName, ensAvatar } = useENS(account);
   return (
     <Box minH="10rem" py="2.6rem" as="header" bg={"white"}>
       <Flex maxW="96.4rem" mx="auto" as="nav" justify="space-between">
@@ -26,28 +28,28 @@ const Header = () => {
             paddingTop="2"
             display={{ base: "none", md: "flex" }}
           >
-          <NextLink href="/">
-            {router.pathname === "/" ? (
-              <Link
-                className="semi-16"
-                borderRadius="25"
-                padding="3"
-                sx={{ backgroundColor: `black`, color: `white` }}
-                _hover={{ backgroundColor: "black", textColor: "white" }}
-              >
-                Explore
-              </Link>
-            ) : (
-              <Link
-                className="semi-16"
-                borderRadius="25"
-                padding="3"
-                _hover={{ backgroundColor: "black", textColor: "white" }}
-              >
-                Explore
-              </Link>
-            )}
-          </NextLink>
+            <NextLink href="/">
+              {router.pathname === "/" ? (
+                <Link
+                  className="semi-16"
+                  borderRadius="25"
+                  padding="3"
+                  sx={{ backgroundColor: `black`, color: `white` }}
+                  _hover={{ backgroundColor: "black", textColor: "white" }}
+                >
+                  Explore
+                </Link>
+              ) : (
+                <Link
+                  className="semi-16"
+                  borderRadius="25"
+                  padding="3"
+                  _hover={{ backgroundColor: "black", textColor: "white" }}
+                >
+                  Explore
+                </Link>
+              )}
+            </NextLink>
             <NextLink href="/list-nft">
               {router.pathname === "/list-nft" ||
               router.pathname === "/import-nft" ? (
@@ -95,8 +97,7 @@ const Header = () => {
               )}
             </NextLink>
 
-
-           <Link
+            <Link
               href="https://docs.fraktal.io/marketplace/get-started"
               target="_blank"
               className="semi-16"
@@ -108,7 +109,7 @@ const Header = () => {
             </Link>
 
             {/*_hover={{backgroundColor: `black`}}*/}
-        {/*  <Link
+            {/*  <Link
               href="https://www.instagram.com/fraktal.io/"
               target="_blank"
               rel="noreferrer noopener"
@@ -155,7 +156,6 @@ const Header = () => {
               </Box>
             </Link>
             */}
-
           </HStack>
           {!account ? (
             <FrakButton onClick={connectWeb3}>Connect Wallet</FrakButton>
@@ -171,7 +171,17 @@ const Header = () => {
                     "linear(to-r, #BE6DFF, #BE6DFF, #9A31FE, #9A31FE, #7213F2)",
                 }}
               >
-                {shortenHash(account)} | View my NFTs
+                {ensAvatar && (
+                  <Image
+                    src={ensAvatar}
+                    alt={account}
+                    rounded="full"
+                    height={25}
+                    width={25}
+                    marginRight={3}
+                  />
+                )}
+                {ensName || shortenHash(account)} | View my NFTs
               </FrakButton>
             </NextLink>
           )}
