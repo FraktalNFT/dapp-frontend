@@ -37,7 +37,7 @@ import FrakButton4 from "@/components/button4";
 import ListCardAuction from "@/components/listCardAuction";
 import toast from "react-hot-toast";
 import store from "../redux/store";
-import {APPROVE_TOKEN, IMPORT_FRAKTAL, IMPORT_NFT, rejectContract} from "../redux/actions/contractActions";
+import {APPROVE_TOKEN, IMPORT_FRAKTAL, IMPORT_NFT, LISTING_NFT, rejectContract} from "../redux/actions/contractActions";
 import LoadScreen from '../components/load-screens';
 
 const { create } = require("ipfs-http-client");
@@ -139,7 +139,9 @@ export default function ImportNFTPage() {
       setTokenMintedAddress(address);
       setIsNFTImported(true);
       if (!isIntendedForListing) {
-        router.push("/my-nfts");
+        setInterval(() => {
+          router.push('/my-nfts');
+        }, 1000);
       }
     }
 
@@ -193,18 +195,12 @@ export default function ImportNFTPage() {
       marketAddress
     ).then(receipt => {
       setIsNFTListed(true);
-      router.push("/my-nfts");
+      setInterval(() => {
+        router.push('/my-nfts');
+      }, 1000);
     }).catch(error => {
-        store.dispatch(rejectContract(IMPORT_FRAKTAL, error, listNewItem));
+        store.dispatch(rejectContract(LISTING_NFT, error, listNewItem));
     });
-  /*  if (response?.error) {
-      alert(
-        "NFT did not list. Sad! Many Such Cases! Contact the development team immediately"
-      );
-      return null;
-    }
-    if (!response?.error) {
-    }*/
   }
 
   async function listNewAuctionItem() {
@@ -214,7 +210,15 @@ export default function ImportNFTPage() {
       utils.parseUnits(totalAmount),
       provider,
       marketAddress
-    );
+    ).then(receipt => {
+        setIsNFTListed(true);
+        setInterval(() => {
+            router.push('/my-nfts');
+        }, 1000);
+    }).catch(error => {
+        store.dispatch(rejectContract(LISTING_NFT, error, listItemAuction));
+    });
+    /*
     if (response?.error) {
       alert(
         "NFT did not list. Sad! Many Such Cases! Contact the development team immediately"
@@ -224,7 +228,7 @@ export default function ImportNFTPage() {
     if (!response?.error) {
       setIsNFTListed(true);
       router.push("/my-nfts");
-    }
+    }*/
   }
 
   const listFraktions = async () => {

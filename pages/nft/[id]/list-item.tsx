@@ -146,6 +146,7 @@ export default function ListNFTView() {
     const fei = utils.parseEther(totalAmount);
     const wei = utils.parseEther(totalPrice);
     if(isAuction){
+      console.log('Auction');
       //listAuctionItem(tokenAddress,amount,price,provider,marketAddress)
       listItemAuction(
         nftObject.id,
@@ -153,10 +154,16 @@ export default function ListNFTView() {
         fei,//shares
         provider,
         marketAddress).then(()=>{
-          router.push('/');
-        })
+          setInterval(() => {
+              router.push('/')
+          }, 1000);
+
+        }).catch(e => {
+          store.dispatch(rejectContract(LISTING_NFT, e, listNewItem));
+      })
     }
     else{
+        console.log('List item');
       const weiPerFrak = (wei.mul(utils.parseEther("1.0"))).div(fei);
       // console.log(`Total price: ${weiPerFrak.toString()}, fei: ${fei.toString()}`);
       listItem(
@@ -165,7 +172,9 @@ export default function ListNFTView() {
         weiPerFrak,//price
         provider,
         marketAddress).then(()=>{
-         // router.push('/');
+          setInterval(() => {
+              router.push('/')
+          }, 1000);
         }).catch(e => {
           store.dispatch(rejectContract(LISTING_NFT, e, listNewItem));
       })

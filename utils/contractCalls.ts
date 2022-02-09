@@ -635,9 +635,17 @@ export async function participateAuction( tokenAddress, seller, sellerNonce, val
 export async function listItemAuction( tokenAddress, reservePrice, numberOfShares, provider, marketAddress) {
   const signer = await loadSigner(provider);
   const customContract = new Contract(marketAddress, marketAbi, signer);
-  let tx = await customContract.listItemAuction( tokenAddress, reservePrice, numberOfShares);
-  let receipt = processTx(tx);
-  return receipt;
+  try {
+    let tx = await customContract.listItemAuction(tokenAddress, reservePrice, numberOfShares);
+    store.dispatch(callContract(LISTING_NFT, tx));
+    let receipt = await processTx(tx);
+    if (!receipt?.error) {
+      store.dispatch(approvedTransaction(LISTING_NFT, tx, tokenAddress));
+    }
+    return receipt;
+  } catch (e) {
+        throw e;
+  }
 }
 export async function unlistAuctionItem( tokenAddress, sellerNonce, provider, marketAddress) {
   const signer = await loadSigner(provider);

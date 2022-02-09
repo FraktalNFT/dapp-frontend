@@ -268,7 +268,8 @@ const MintPage = (props) => {
 
     // const weiPerFrak = utils.parseEther(totalPrice.toString()).div(utils.parseUnits(totalAmount.toString()));
     // console.log("price",weiPerFrak.toString());
-
+    //TODO - REMOVE CONSOLE LOG
+    console.log('listItem');
     listItem(
       tokenMintedAddress,
       fei,//shares
@@ -276,12 +277,17 @@ const MintPage = (props) => {
       provider,
       marketAddress
     ).then(() => {
-      router.push("/");
+        setInterval(() => {
+            router.push('/');
+        }, 1000);
     }).catch(error => {
-      mintNFTRejected();
+      mintNFTRejected(error, listNewItem);
     });
   }
   async function listNewAuctionItem() {
+    //TODO - REMOVE CONSOLE LOG
+    console.log('Auction');
+
     listItemAuction(
       tokenMintedAddress,
       utils.parseUnits(totalPrice),
@@ -289,8 +295,12 @@ const MintPage = (props) => {
       provider,
       marketAddress
     ).then(() => {
-      router.push("/");
-    });
+        setInterval(() => {
+            router.push('/');
+        }, 1000);
+    }).catch(error => {
+        mintNFTRejected(error, listNewAuctionItem);
+    });;
   }
 
 
