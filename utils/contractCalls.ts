@@ -7,7 +7,7 @@ import { useMintingContext } from "@/contexts/NFTIsMintingContext";
 import { BigNumber, ethers, utils } from "ethers";
 //tested
 const factoryAbi = [
-  "function mint(string urlIpfs, uint16 majority)",
+  "function mint(string urlIpfs, uint16 majority, string memory _name, string memory _symbol)",
   "function importERC721(address _tokenAddress, uint256 _tokenId, uint16 majority)",
   "function importERC1155(address _tokenAddress, uint256 _tokenId, uint16 majority)",
   "function claimERC721(uint256 _tokenId)",
@@ -57,6 +57,17 @@ const revenuesAbi = [
   "function released(address account) public view returns (uint256)",
   "function release() public",
   "function totalShares() external view returns (uint256)",
+];
+
+const erc165Abi = [
+  "function supportsInterface(bytes4 interfaceID) external view returns (bool)"
+]
+
+const erc721Abi = [
+  "function tokenURI(uint256 _tokenId) external view returns (string)",
+];
+const erc1155Abi = [
+  "function uri(uint256 _id) external view returns (string memory)"
 ];
 
 // TODO
@@ -193,6 +204,39 @@ export async function getParticipantContribution(sellerAddress, sellerNonce, par
   let nonce = await customContract.participantContribution(sellerAddress,sellerNonce,participantAddress);
   return nonce;
 }
+export async function getERC721URI(tokenAddress, id, provider) {
+  console.log({tokenAddress, id, provider});
+  
+  const customContract = new Contract(tokenAddress, erc721Abi, provider);
+  let uri = await customContract.tokenURI(id);
+  return uri;
+}
+export async function getERC1155URI(tokenAddress, id, provider) {
+  console.log({tokenAddress, id, provider});
+  
+  const customContract = new Contract(tokenAddress, erc1155Abi, provider);
+  let uri = await customContract.uri(id);
+  return uri;
+}
+export async function getNftContractType(tokenAddress,provider){
+  const customContract = new Contract(tokenAddress, erc165Abi, provider);
+  const ERC1155InterfaceId = "0xd9b67a26";
+  const ERC721InterfaceId = "0x80ac58cd";
+
+  const isErc721 = await customContract.supportsInterface(ERC721InterfaceId);
+  if(isErc721){
+    return "ERC721";
+  }
+  const isErc1155 = await customContract.supportsInterface(ERC1155InterfaceId);
+  if(isErc1155){
+    return "ERC1155";
+  }
+
+  console.log({isErc721,isErc1155});
+  
+
+  return "Unknown Contract Type";
+}
 
 // State functions
 ///////////////////////////////////////////////////////////
@@ -309,7 +353,7 @@ export async function importERC721(
   factoryAddress
 ) {
   const signer = await loadSigner(provider);
-  const override = { gasLimit: 1000000 };
+  const override = { gasLimit: 5000000 };
   const customContract = new Contract(factoryAddress, factoryAbi, signer);
   let tx = await customContract.importERC721(
     tokenAddress,
