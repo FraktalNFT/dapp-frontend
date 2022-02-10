@@ -7,6 +7,12 @@ import FrakButton2 from "../button2";
 import OfferDetail from "../offerDetail";
 import { makeOffer, getMajority } from "../../utils/contractCalls";
 import { Text } from "@chakra-ui/react";
+import {connect} from "react-redux";
+import {
+    addAmount, OFFERING_BUYOUT, rejectContract,
+    removeAmount
+} from "../../redux/actions/contractActions";
+import { roundUp } from "../../utils/math";
 
 const BuyOutCard = ({
   account,
@@ -19,6 +25,9 @@ const BuyOutCard = ({
   marketAddress,
   fraktionsApproved,
   itemStatus,
+  addEthAmount,
+  removeEthAmount,
+  buyOutRejected
 }) => {
   const [isReady, setIsReady] = useState(false);
   const [valueToOffer, setValueToOffer] = useState("0");
@@ -59,20 +68,26 @@ const BuyOutCard = ({
   async function onOffer() {
     setOffering(true);
     try {
+      addEthAmount(valueToOffer);
       let tx = await makeOffer(
         utils.parseEther(valueToOffer),
         tokenAddress,
         provider,
         marketAddress
-      );
-      tx.then(() => {
+      ).then((receipt) => {
         setOffering(false);
         setValueToOffer("0");
+      }).catch(error => {
+        buyOutRejected(error, onOffer);
       });
     } catch (err) {
       console.error("Error: ", err);
     }
   }
+
+  const minPriceParsed = minPrice => {
+    return (roundUp(minPrice, 3));
+  };
 
   function onSetValue(d) {
     if (parseFloat(d) && parseFloat(d) >= minPrice) {
@@ -184,7 +199,7 @@ const BuyOutCard = ({
                   color: "#000000",
                 }}
               >
-                {minPrice}
+                {minPriceParsed(minPrice)}
               </div>
             </HStack>
           </VStack>
@@ -324,4 +339,24 @@ const BuyOutCard = ({
     </div>
   );
 };
-export default BuyOutCard;
+
+
+const mapStateToProps = (state) => {
+    return {
+        contractTransaction: state.loadingScreen
+    }
+};
+const mapDispatchToProps = (dispatch) => {
+    return {
+        addEthAmount: (amount) => {
+            dispatch(addAmount(amount))
+        },
+        removeEthAmount: () => {
+            dispatch(removeAmount())
+        },
+        buyOutRejected: (obj, buttonAction) => {
+            dispatch(rejectContract(OFFERING_BUYOUT, obj, buttonAction))
+        }
+    }
+};
+export default connect(mapStateToProps, mapDispatchToProps)(BuyOutCard);

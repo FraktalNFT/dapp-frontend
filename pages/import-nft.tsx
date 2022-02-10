@@ -36,6 +36,9 @@ import { utils } from "ethers";
 import FrakButton4 from "@/components/button4";
 import ListCardAuction from "@/components/listCardAuction";
 import toast from "react-hot-toast";
+import store from "../redux/store";
+import {APPROVE_TOKEN, IMPORT_FRAKTAL, IMPORT_NFT, LISTING_NFT, rejectContract} from "../redux/actions/contractActions";
+import LoadScreen from '../components/load-screens';
 
 const { create } = require("ipfs-http-client");
 
@@ -72,17 +75,13 @@ export default function ImportNFTPage() {
 
   async function approveForFactory() {
     if (tokenToImport && tokenToImport.id) {
-      let res = await approveMarket(factoryAddress, provider, tokenToImport.id);
-      if (res?.error) {
-        alert(
-          "Transaction Failed! Sad! Many Such Cases! Contact the Development Team."
-        );
-        return null;
-      }
-      if (!res?.error) {
-        setIsFactoryApproved(true);
-        importNFT();
-      }
+      let res = await approveMarket(factoryAddress, provider, tokenToImport.id)
+          .then(success => {
+          setIsFactoryApproved(true);
+          importNFT();
+      }).catch(error => {
+        store.dispatch(rejectContract(APPROVE_TOKEN, error, approveForFactory));
+      });
     }
   }
 
@@ -91,8 +90,14 @@ export default function ImportNFTPage() {
       marketAddress,
       provider,
       tokenMintedAddress
-    );
-    if (response.error) {
+    ).then(receipt => {
+        setIsMarketApproved(true);
+        importFraktalToMarket();
+    }).
+    catch(error => {
+        store.dispatch(rejectContract(APPROVE_TOKEN, error, approveForMarket));
+    });
+ /*   if (response.error) {
       alert(
         "Transaction Failed! Sad! Many Such Cases! Contact the Development Team."
       );
@@ -101,7 +106,7 @@ export default function ImportNFTPage() {
     if (!response?.error) {
       setIsMarketApproved(true);
       importFraktalToMarket();
-    }
+    }*/
   }
 
   async function importNFT() {
@@ -116,7 +121,9 @@ export default function ImportNFTPage() {
         tokenToImport?.id,
         provider,
         factoryAddress
-      );
+      ).catch(error => {
+          store.dispatch(rejectContract(IMPORT_NFT, error, importNFT));
+      });
     }
     if (tokenToImport?.token_schema === "ERC1155") {
       address = await importERC1155(
@@ -124,13 +131,17 @@ export default function ImportNFTPage() {
         tokenToImport?.id,
         provider,
         factoryAddress
-      );
+      ).catch(error => {
+          store.dispatch(rejectContract(IMPORT_NFT, error, importNFT));
+      });
     }
     if (address?.length > 0) {
       setTokenMintedAddress(address);
       setIsNFTImported(true);
       if (!isIntendedForListing) {
-        router.push("/my-nfts");
+        setInterval(() => {
+          router.push('/my-nfts');
+        }, 1000);
       }
     }
 
@@ -158,17 +169,20 @@ export default function ImportNFTPage() {
         tokenID,
         provider,
         marketAddress
-      );
-      if (response?.error) {
+      ).then(receipt => {
+          setIsFraktionsAllowed(true);
+          listFraktions();
+      }).catch(error => {
+          store.dispatch(rejectContract(IMPORT_FRAKTAL, error, importFraktalToMarket));
+      });
+    /*  if (response?.error) {
         alert(
           "Transaction Failed! Sad! Many Such Cases! Contact the Development Team."
         );
         return null;
       }
       if (!response?.error) {
-        setIsFraktionsAllowed(true);
-        listFraktions();
-      }
+      }*/
     }
   }
 
@@ -183,17 +197,14 @@ export default function ImportNFTPage() {
       weiPerFrak, // totalPrice is price for all fraktions sum
       provider,
       marketAddress
-    );
-    if (response?.error) {
-      alert(
-        "NFT did not list. Sad! Many Such Cases! Contact the development team immediately"
-      );
-      return null;
-    }
-    if (!response?.error) {
+    ).then(receipt => {
       setIsNFTListed(true);
-      router.push("/my-nfts");
-    }
+      setInterval(() => {
+        router.push('/my-nfts');
+      }, 1000);
+    }).catch(error => {
+        store.dispatch(rejectContract(LISTING_NFT, error, listNewItem));
+    });
   }
 
   async function listNewAuctionItem() {
@@ -203,7 +214,15 @@ export default function ImportNFTPage() {
       utils.parseUnits(totalAmount),
       provider,
       marketAddress
-    );
+    ).then(receipt => {
+        setIsNFTListed(true);
+        setInterval(() => {
+            router.push('/my-nfts');
+        }, 1000);
+    }).catch(error => {
+        store.dispatch(rejectContract(LISTING_NFT, error, listItemAuction));
+    });
+    /*
     if (response?.error) {
       alert(
         "NFT did not list. Sad! Many Such Cases! Contact the development team immediately"
@@ -213,7 +232,7 @@ export default function ImportNFTPage() {
     if (!response?.error) {
       setIsNFTListed(true);
       router.push("/my-nfts");
-    }
+    }*/
   }
 
   const listFraktions = async () => {
@@ -253,6 +272,7 @@ export default function ImportNFTPage() {
 
   return (
     <>
+      <LoadScreen/>
       {isLoading && <Spinner size="xl" />}
       {!isLoading && (
         <>

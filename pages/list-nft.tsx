@@ -37,10 +37,23 @@ import { useRouter } from "next/router";
 import NFTItem from "../components/nft-item";
 import { useMintingContext } from "@/contexts/NFTIsMintingContext";
 import toast from "react-hot-toast";
-
+import LoadScreen from '../components/load-screens';
+import {awaitTokenAddress} from "../utils/helpers";/**
+ * REDUX
+ */
+import {connect} from 'react-redux';
+import {
+    approvedTransaction,
+    APPROVE_TOKEN,
+    MINT_NFT,
+    IMPORT_FRAKTAL,
+    rejectContract,
+} from "../redux/actions/contractActions";
 const { create } = require("ipfs-http-client");
+const MAX_FRACTIONS = 10000;
 
-export default function MintPage() {
+const MintPage = (props) => {
+  const {mintNFTRejected, tokenRejected, transferRejected} = props;
   const { fraktals, nfts } = useUserContext();
   const { isMinting, setIsMinting } = useMintingContext();
   const router = useRouter();
@@ -63,6 +76,9 @@ export default function MintPage() {
   const [tokenToImport, setTokenToImport] = useState();
   const [nftApproved, setNftApproved] = useState(false);
   const [isAuction,setIsAuction] = useState(false);
+  const [listingProcess, setListingProcess] = useState(false);
+  const [isMintingFailed, setMitingFailed] = useState(false);
+  const [txResponse, setTxResponse] = useState({});
 
   // detect states (where is NFT and if its ready to list so send it here for listing!)
 
@@ -101,33 +117,43 @@ export default function MintPage() {
   async function minter(metadata) {
     let metadataCid = await uploadAndPin(JSON.stringify(metadata));
     if (metadataCid) {
+      setListingProcess(true);
       setIsMinting(true);
-      const response = await createNFT(
+      let response = await createNFT(
         metadataCid.cid.toString(),
         provider,
         factoryAddress
-      );
-      if (response?.error) {
-        toast.error("Transaction failed.");
-        setIsMinting(false);
-      }
-      if (!response?.error) {
-        toast.success("Mint completed.");
-        setIsMinting(false);
-        setTokenMintedAddress(response);
-
-        let mintingArray = [];
-        if (window?.localStorage.getItem("mintingNFTS")) {
-          let mintingNFTSString = window?.localStorage.getItem("mintingNFTS");
-          let mintingNFTS = JSON.parse(mintingNFTSString);
-          mintingArray = [...mintingNFTS, response];
-        } else {
-          mintingArray = [response];
+      ).then(response => {
+          if (!response?.error) {
+              //TODO REMOVE TOAST
+              // toast.success("Mint completed.");
+              setIsMinting(false);
+              setTokenMintedAddress(response);
+              console.log('Approved');
+              let mintingArray = [];
+              if (window?.localStorage.getItem("mintingNFTS")) {
+                  let mintingNFTSString = window?.localStorage.getItem("mintingNFTS");
+                  let mintingNFTS = JSON.parse(mintingNFTSString);
+                  mintingArray = [...mintingNFTS, response];
+              } else {
+                  mintingArray = [response];
+              }
+              let mintingArrayString = JSON.stringify(mintingArray);
+              window?.localStorage.setItem("mintingNFTs", mintingArrayString);
+              setMinted(true);
+          }
         }
-        let mintingArrayString = JSON.stringify(mintingArray);
-        window?.localStorage.setItem("mintingNFTs", mintingArrayString);
-        setMinted(true);
+      ).catch(e => {
+          setIsMinting(false);
+          mintNFTRejected(e, prepareNftData);
+      });
+      if (response?.error) {
+        mintNFTRejected(response?.error, prepareNftData);
+        //TODO REMOVE TOAST
+      //  toast.error("Transaction failed.");
+        setIsMinting(false);
       }
+
     }
   }
 
@@ -154,18 +180,21 @@ export default function MintPage() {
   const fraktalReady =
     minted &&
     totalAmount > 0 &&
-    totalAmount <= 10000 &&
+    totalAmount <= MAX_FRACTIONS &&
     totalPrice > 0 &&
     isApproved &&
     fraktionalized;
 
   async function approveToken() {
-    await approveMarket(marketAddress, provider, tokenMintedAddress).then(
+    await approveMarket(marketAddress, provider, tokenMintedAddress)
+        .then(
       () => {
         setIsApproved(true);
         importFraktalToMarket();
       }
-    );
+    ).catch(error => {
+       tokenRejected(error, approveToken);
+    });
   }
 
   async function importFraktalToMarket() {
@@ -189,6 +218,8 @@ export default function MintPage() {
         else{
           listNewItem();
         }
+      }).catch(error => {
+          transferRejected(error, importFraktalToMarket);
       });
     }
   }
@@ -228,7 +259,6 @@ export default function MintPage() {
   useEffect(()=>{
     // const pricePerFei = utils.parseUnits(totalPrice).div(utils.parseUnits(totalAmount));
     // console.log(`price:${totalPrice},amount:${totalAmount}`);
-
   })
 
   async function listNewItem() {
@@ -238,7 +268,8 @@ export default function MintPage() {
 
     // const weiPerFrak = utils.parseEther(totalPrice.toString()).div(utils.parseUnits(totalAmount.toString()));
     // console.log("price",weiPerFrak.toString());
-
+    //TODO - REMOVE CONSOLE LOG
+    console.log('listItem');
     listItem(
       tokenMintedAddress,
       fei,//shares
@@ -246,10 +277,17 @@ export default function MintPage() {
       provider,
       marketAddress
     ).then(() => {
-      router.push("/");
+        setInterval(() => {
+            router.push('/');
+        }, 1000);
+    }).catch(error => {
+      mintNFTRejected(error, listNewItem);
     });
   }
   async function listNewAuctionItem() {
+    //TODO - REMOVE CONSOLE LOG
+    console.log('Auction');
+
     listItemAuction(
       tokenMintedAddress,
       utils.parseUnits(totalPrice),
@@ -257,8 +295,12 @@ export default function MintPage() {
       provider,
       marketAddress
     ).then(() => {
-      router.push("/");
-    });
+        setInterval(() => {
+            router.push('/');
+        }, 1000);
+    }).catch(error => {
+        mintNFTRejected(error, listNewAuctionItem);
+    });;
   }
 
 
@@ -282,6 +324,7 @@ export default function MintPage() {
 
   return (
     <div>
+      <LoadScreen />
       <Box
         sx={{
           display: `grid`,
@@ -436,6 +479,8 @@ export default function MintPage() {
                   totalPrice={totalPrice}
                   setTotalPrice={setTotalPrice}
                   setTotalAmount={setTotalAmount}
+                  listingProcess={listingProcess}
+                  maxFraktions={MAX_FRACTIONS}
                 />
                 </TabPanel>
                 <TabPanel>
@@ -443,7 +488,8 @@ export default function MintPage() {
                     totalPrice={totalPrice}
                     setTotalPrice={setTotalPrice}
                     setTotalAmount={setTotalAmount}
-
+                    listingProcess={listingProcess}
+                    maxFraktions={MAX_FRACTIONS}
                   />
                 </TabPanel>
               </TabPanels>
@@ -514,4 +560,28 @@ export default function MintPage() {
       </Box>
     </div>
   );
-}
+};
+
+const mapStateToProps = (state) => {
+    return {
+        contractTransaction: state.loadingScreen
+    }
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        mintNFTRejected: (obj, buttonAction) => {
+            dispatch(rejectContract(MINT_NFT, obj, buttonAction))
+        },
+        tokenRejected: (obj, buttonAction) => {
+            dispatch(rejectContract(APPROVE_TOKEN, obj, buttonAction))
+        },
+        transferRejected: (obj, buttonAction) => {
+            dispatch(rejectContract(IMPORT_FRAKTAL, obj, buttonAction))
+        },
+        mintNFTApproved: (obj, receipt ) => {
+            dispatch(approvedTransaction(MINT_NFT, obj, receipt))
+        },
+    }
+};
+export default connect(mapStateToProps, mapDispatchToProps)(MintPage);

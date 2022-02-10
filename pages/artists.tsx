@@ -14,6 +14,7 @@ import { useWeb3Context } from "../contexts/Web3Context";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ArtistCard from "@/components/artistCard/ArtistCard";
 import { useRouter } from "next/router";
+import { useENSAddress } from 'components/useENSAddress';
 
 export default function ArtistsView() {
   const router = useRouter();
@@ -24,10 +25,14 @@ export default function ArtistsView() {
   const [artistsItems, setArtistsItems] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const { marketAddress, factoryAddress, loading } = useWeb3Context();
+  const [artistAddress, setArtistAddress] = useState("");
+  const [inputAddress, setInputAddress] = useState("");
+  
   const handleSortSelect = (item: string) => {
     setSortType(item);
     setSelectionMode(false);
   };
+
 
   function getArtistsObjects(artists, artistsItems) {
     const artistsObj = artists.map((x, i) => ({
@@ -78,6 +83,19 @@ export default function ArtistsView() {
       }
     }
   }
+
+  function searchHandle(e){
+    e.preventDefault();
+    if(e.target.value !== ""){
+      const inputVal=e.target.value;
+      let address_Artist= inputVal;
+      if(!inputVal.startsWith("0x")){
+        setInputAddress(e.target.value);
+      }
+      setArtistAddress(address_Artist);
+    }
+  }
+  const [isENSAddressValid, ethAddressFromENS] = useENSAddress(inputAddress)
 
   useEffect(() => {
     const fetchInitialArtists = async () => {
@@ -135,14 +153,25 @@ export default function ArtistsView() {
           )}
         </Box> */}
         <Text className="semi-48">Artists</Text>
-    {/*   <div className={styles.searchContainer}>
+      <div className={styles.searchContainer}>
           <input
             placeholder={"Search ENS or ETH address "}
             className={styles.searchInput}
+            onChange={searchHandle}
           />
-          <Image src="/search.svg" />
-        </div> */}
+          {
+            artistAddress !=="" &&
+              <NextLink
+                      href={`/artist/${artistAddress.startsWith("0x") ? artistAddress : ethAddressFromENS}`}
+                      key={`link--${artistAddress}`}
+                    >
+                <Image src="/search.svg" />
+              </NextLink>
+          }
+          
+        </div> 
       </HStack>
+
       {!loading && artistsItems.length > 0 && (
         <>
           <InfiniteScroll

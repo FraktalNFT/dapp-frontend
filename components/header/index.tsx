@@ -26,6 +26,28 @@ const Header = () => {
             paddingTop="2"
             display={{ base: "none", md: "flex" }}
           >
+          <NextLink href="/">
+            {router.pathname === "/" ? (
+              <Link
+                className="semi-16"
+                borderRadius="25"
+                padding="3"
+                sx={{ backgroundColor: `black`, color: `white` }}
+                _hover={{ backgroundColor: "black", textColor: "white" }}
+              >
+                Explore
+              </Link>
+            ) : (
+              <Link
+                className="semi-16"
+                borderRadius="25"
+                padding="3"
+                _hover={{ backgroundColor: "black", textColor: "white" }}
+              >
+                Explore
+              </Link>
+            )}
+          </NextLink>
             <NextLink href="/list-nft">
               {router.pathname === "/list-nft" ||
               router.pathname === "/import-nft" ? (
@@ -49,28 +71,7 @@ const Header = () => {
                 </Link>
               )}
             </NextLink>
-            <NextLink href="/">
-              {router.pathname === "/" ? (
-                <Link
-                  className="semi-16"
-                  borderRadius="25"
-                  padding="3"
-                  sx={{ backgroundColor: `black`, color: `white` }}
-                  _hover={{ backgroundColor: "black", textColor: "white" }}
-                >
-                  Marketplace
-                </Link>
-              ) : (
-                <Link
-                  className="semi-16"
-                  borderRadius="25"
-                  padding="3"
-                  _hover={{ backgroundColor: "black", textColor: "white" }}
-                >
-                  Marketplace
-                </Link>
-              )}
-            </NextLink>
+
             <NextLink href="/artists">
               {router.pathname === "/artists" ? (
                 <Link
@@ -104,7 +105,7 @@ const Header = () => {
               _hover={{ backgroundColor: "black", textColor: "white" }}
             >
               How it Works
-            </Link> 
+            </Link>
 
             {/*_hover={{backgroundColor: `black`}}*/}
         {/*  <Link

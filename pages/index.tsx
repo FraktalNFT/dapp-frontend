@@ -20,18 +20,27 @@ import { createListed,createListedAuction } from "../utils/nftHelpers";
 import { FiChevronDown } from "react-icons/fi";
 import InfiniteScroll from "react-infinite-scroll-component";
 import NFTAuctionItem from "@/components/nft-auction-item";
-const SORT_TYPES = ["Availability", "Popular", "Newly Listed"];
+const LOWEST_PRICE = "Lowest Price";
+const HIGHEST_PRICE = "Highest Price";
+const NEWLY_LISTED = "Newly Listed";
+const POPULAR = "Popular";
+const SORT_TYPES = [LOWEST_PRICE, HIGHEST_PRICE, NEWLY_LISTED, POPULAR];
 
 const Home: React.FC = () => {
   const [nftItems, setNftItems] = useState([]);
   const [nftData,setNftData] = useState([]);
   const [selectionMode, setSelectionMode] = useState(false);
-  const [sortType, setSortType] = useState("Newly Listed");
+  const [sortType, setSortType] = useState(POPULAR);
   const [listType, setListType] = useState("All Listings");
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [auctions,setAuctions] = useState({});
   const [refresh,setRefresh] = useState(false);
+
+  /**
+  *
+  * @param {string} item
+  */
   const handleSortSelect = (item: string) => {
     setSelectionMode(false);
     setSortType(item);
@@ -45,20 +54,25 @@ const Home: React.FC = () => {
   useEffect(()=>{
     setRefresh(!refresh);
     
-  },[nftItems])
+  },[nftItems]);
 
   const changeOrder = type => {
     let sortedItems;
-    if (type == "Availability") {
+
+    if (type === LOWEST_PRICE) {
       sortedItems = nftItems.sort((a, b) =>
-        parseInt(a.amount) > parseInt(b.amount) ? -1 : 1
+        a.price > b.price ? 1 : -1
       );
-    } else if (type == "Popular") {
-      sortedItems = nftItems.sort((a, b) => (a.holders > b.holders ? -1 : 1));
+    } else if (type === HIGHEST_PRICE) {
+      sortedItems = nftItems.sort((a, b) =>
+          a.price > b.price ? -1 : 1
+      );
+    } else if (type == NEWLY_LISTED) {
+        sortedItems = nftItems.sort((a, b) =>
+            a.createdAt > b.createdAt ? -1 : 1
+        );
     } else {
-      sortedItems = nftItems.sort((a, b) =>
-        a.createdAt > b.createdAt ? -1 : 1
-      );
+        sortedItems = nftItems.sort((a, b) => (a.holders > b.holders ? -1 : 1));
     }
     setNftItems(sortedItems);
   };
@@ -140,7 +154,7 @@ const Home: React.FC = () => {
     };
       
       auctionDataHash.push(itm);
-    }))
+    }));
     
 
     let auctionItems = [];
@@ -275,15 +289,13 @@ const Home: React.FC = () => {
               Sort: {sortType}
             </MenuButton>
             <MenuList>
-              <MenuItem onClick={() => handleSortSelect("Popular")}>
-                Popular
-              </MenuItem>
-              <MenuItem onClick={() => handleSortSelect("Availability")}>
-                Availability
-              </MenuItem>
-              <MenuItem onClick={() => handleSortSelect("Newly Listed")}>
-                Newly Listed
-              </MenuItem>
+                {
+                    SORT_TYPES.map((sortType) => (
+                        <MenuItem onClick={() => handleSortSelect(sortType)}>
+                            {sortType}
+                        </MenuItem>
+                    ))
+                }
             </MenuList>
           </Menu>
           <Menu closeOnSelect={true}  >

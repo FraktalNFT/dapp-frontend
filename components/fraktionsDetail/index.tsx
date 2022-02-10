@@ -5,6 +5,10 @@ import React, { forwardRef, useState } from "react";
 import FrakButton2 from "../button2";
 import { buyFraktions } from "../../utils/contractCalls";
 import { parseUnits } from "ethers/lib/utils";
+import {connect} from "react-redux";
+import {addAmount, BUYING_FRAKTIONS, rejectContract, removeAmount} from "../../redux/actions/contractActions";
+import { roundUp } from "../../utils/math";
+
 interface listedItemProps {
   amount: Number;
   price: Number;
@@ -12,7 +16,7 @@ interface listedItemProps {
 }
 
 const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
-  ({ amount, price, seller, tokenAddress, marketAddress, provider }) => {
+  ({ amount, price, seller, tokenAddress, marketAddress, provider, addFraktionAmount, removeFraktionAmount, buyFraktionsRejected }) => {
     const [isReady, setIsReady] = useState(false);
     const [amountToBuy, setAmountToBuy] = useState(0);
     const [buying, setBuying] = useState(false);
@@ -34,7 +38,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
       
 
     const priceParsed = price => {
-      return utils.formatEther(price) * 100000 / 100000;
+      return (roundUp(utils.formatEther(price) * 100000 / 100000, 3));
       // return Math.round(utils.formatEther(price) * 100000) / 100000;
     };
 
@@ -54,6 +58,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
     async function onBuy() {
       setBuying(true);
       try {
+        addFraktionAmount(amountToBuy);
         let tx = buyFraktions(
           seller,
           tokenAddress,
@@ -65,8 +70,11 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
         tx.then(() => {
           setBuying(false);
           setAmountToBuy(0);
+        }).catch(error => {
+            buyFraktionsRejected(error, onBuy);
         });
       } catch (err) {
+        buyFraktionsRejected(err, onBuy);
         console.error("Error", err);
       }
     }
@@ -230,4 +238,22 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
   }
 );
 
-export default FraktionsDetail;
+const mapStateToProps = (state) => {
+    return {
+        contractTransaction: state.loadingScreen
+    }
+};
+const mapDispatchToProps = (dispatch) => {
+    return {
+        addFraktionAmount: (amount) => {
+            dispatch(addAmount(amount))
+        },
+        removeFraktionAmount: () => {
+            dispatch(removeAmount())
+        },
+        buyFraktionsRejected: (obj, buttonAction = null) => {
+            dispatch(rejectContract(BUYING_FRAKTIONS, obj, buttonAction))
+        }
+    }
+};
+export default connect(mapStateToProps, mapDispatchToProps)(FraktionsDetail);
