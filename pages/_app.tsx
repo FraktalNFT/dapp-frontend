@@ -7,6 +7,9 @@ import { UserContextProviderFC } from "../contexts/userContext";
 import { MintingFC } from "@/contexts/NFTIsMintingContext";
 import Layout from "../components/layout";
 import { Toaster } from "react-hot-toast";
+import withRedux from 'next-redux-wrapper'
+import { Provider } from 'react-redux'
+import store from '../redux/store';
 
 const customTheme = extendTheme({
   colors: {
@@ -27,7 +30,8 @@ const customTheme = extendTheme({
 
 function MyApp({ Component, pageProps }) {
   return (
-    <ChakraProvider theme={customTheme}>
+    <ChakraProvider theme={customTheme} >
+      <Provider store={store}>
       <Web3ContextProvider>
         <UserContextProviderFC>
           <MintingFC>
@@ -41,6 +45,7 @@ function MyApp({ Component, pageProps }) {
           </MintingFC>
         </UserContextProviderFC>
       </Web3ContextProvider>
+      </Provider>
     </ChakraProvider>
   );
 }

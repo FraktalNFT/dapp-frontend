@@ -25,6 +25,7 @@ import {
   isFraktalOwner,
 } from "../../../utils/contractCalls";
 import { useRouter } from "next/router";
+import LoadScreen from '../../../components/load-screens';
 // import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
 // import Modal from '../../../components/modal';
 
@@ -77,7 +78,6 @@ export default function DetailsView() {
       "fraktions",
       tokenAddressSplitted
     );
-    // console.log(fraktionsFetch);
     if (fraktionsFetch.listItems) {
       setFraktionsListed(fraktionsFetch.listItems);
     }
@@ -229,9 +229,9 @@ export default function DetailsView() {
     }
   }
 
-
   return (
     <>
+      <LoadScreen />
       {isLoading && (
         <>
           <Box sx={{ display: `grid`, width: `100%`, placeItems: `center` }}>

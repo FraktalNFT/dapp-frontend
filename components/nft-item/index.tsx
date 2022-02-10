@@ -25,6 +25,7 @@ import { BigNumber, utils } from "ethers";
 import { useWeb3Context } from "../../contexts/Web3Context";
 import { getListingAmount, unlistItem } from "../../utils/contractCalls"
 import toast from "react-hot-toast";
+import { roundUp } from "../../utils/math";
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
@@ -61,6 +62,10 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
         );
       }
     },[])
+
+    const priceParsed = price => {
+      return (roundUp(price, 3));
+    }
 
     const unList = async () => {
       toast("Unlisting...")
@@ -191,7 +196,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 />
                 {price && (
                   <Text textAlign="end" className="medium-12">
-                    {price}
+                    {priceParsed(price)}
                     {/* {Math.round(price * 100000) / 100000} */}
                   </Text>
                 )}

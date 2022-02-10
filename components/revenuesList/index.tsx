@@ -5,8 +5,14 @@ import RevenuesDetail from "../revenuesDetail";
 import FrakButton2 from "../button2";
 import { utils } from "ethers";
 import { useWeb3Context } from "../../contexts/Web3Context";
+/**
+ * REDUX
+ */
+import {connect} from 'react-redux';
+import {callContract, rejectContract, approvedTransaction, DEPOSIT_REVENUE} from '../../redux/actions/contractActions';
 
-const RevenuesList = ({ revenuesCreated, tokenAddress }) => {
+const RevenuesList = (props) => {
+  const {revenuesCreated, tokenAddress, rejectDepositRevenue, depositRevenueApproved} = props;
   const { account, provider, marketAddress } = useWeb3Context();
   const [revenueValue, setRevenueValue] = useState(0);
   const [isCreating, setIsCreating] = useState(false);
@@ -17,8 +23,9 @@ const RevenuesList = ({ revenuesCreated, tokenAddress }) => {
     setIsCreating(true);
     let valueIn = utils.parseEther(revenueValue.toString()); //+0.000000000001
     try {
-      await createRevenuePayment(valueIn, provider, tokenAddress, marketAddress);
+      const tx = await createRevenuePayment(valueIn, provider, tokenAddress, marketAddress);
     } catch (error) {
+      rejectDepositRevenue(error, launchRevenuePayment);
       console.error("creating revenue failed, reason: ", error);
     }
     setIsCreating(false);
@@ -152,4 +159,17 @@ const RevenuesList = ({ revenuesCreated, tokenAddress }) => {
     </div>
   );
 };
-export default RevenuesList;
+
+const mapStateToProps = (state) => {
+    return {
+        contractTransaction: state.loadingScreen
+    }
+};
+const mapDispatchToProps = (dispatch) => {
+    return {
+        rejectDepositRevenue: (obj, actionButton) => {
+            dispatch(rejectContract(DEPOSIT_REVENUE, obj, actionButton))
+        },
+    }
+};
+export default connect(mapStateToProps, mapDispatchToProps)(RevenuesList);
