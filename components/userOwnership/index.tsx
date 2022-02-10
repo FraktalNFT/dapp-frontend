@@ -37,9 +37,9 @@ const UserOwnership=(({
 
   async function defraktionalization() {
     let tx;
-    // if(!isApproved){
-    //   tx = await approveMarket(marketAddress, provider, tokenAddress)
-    // }
+    if(!isApproved){
+      tx = await approveMarket(marketAddress, provider, tokenAddress)
+    }
     if(tx || isApproved){
       await exportFraktal(tokenAddress, provider, marketAddress)
       // defraktionalize leaves the nft in the market!!!
