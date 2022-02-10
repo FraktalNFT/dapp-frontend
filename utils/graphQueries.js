@@ -3,9 +3,10 @@ import { utils } from "ethers";
 const { CID } = require("ipfs-http-client");
 
 // const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.18';
-const APIURL = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9'
+// const APIURL = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9'
+const APIURL = 'https://api.studio.thegraph.com/query/16828/fraktal2/0.0.1'
 // const APIURL = 'https://gateway.testnet.thegraph.com/api/a2ae030e27fc11191339a53e73cea9c2/subgraphs/id/0x98e7910e754abd41ace110c23d679333779c2ff9-1'
-const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9';
+// const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9';
 // const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/testnetfraktalauction/0.4';
 // https://api.thegraph.com/subgraphs/name/drhongos/fraktalrinkeby // hosted
 
@@ -468,7 +469,7 @@ export const getSubgraphAuction = async (call, id) => {
     return x.name == call;
   });
   try {
-    const data = await request(AUCTIONAPI, callGql.call, { id });
+    const data = await request(APIURL, callGql.call, { id });
     // console.log('data for:',id,' found',data)
     return data;
   } catch (err) {

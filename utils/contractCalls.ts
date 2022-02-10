@@ -7,7 +7,7 @@ import { useMintingContext } from "@/contexts/NFTIsMintingContext";
 import { BigNumber, ethers, utils } from "ethers";
 //tested
 const factoryAbi = [
-  "function mint(string urlIpfs, uint16 majority, string memory _name, string memory _symbol)",
+  "function mint(string urlIpfs, uint16 majority, string _name, string _symbol)",
   "function importERC721(address _tokenAddress, uint256 _tokenId, uint16 majority)",
   "function importERC1155(address _tokenAddress, uint256 _tokenId, uint16 majority)",
   "function claimERC721(uint256 _tokenId)",
@@ -314,7 +314,7 @@ export async function createNFT(hash, provider, contractAddress) {
   const signer = await loadSigner(provider);
   const customContract = new Contract(contractAddress, factoryAbi, signer);
   
-  let tx = await customContract.mint(hash, defaultMajority);
+  let tx = await customContract.mint(hash, defaultMajority,"","");
   let response = await awaitTokenAddress(tx);
   // let receipt = processTx(tx);
   return response;

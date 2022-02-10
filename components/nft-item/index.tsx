@@ -145,7 +145,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                     objectFit: `cover`,
                   }}
                   style={{ verticalAlign: "middle" }}
-                  onLoad={() => onImageLoad(2000)}
+                  onLoad={() => onImageLoad(0)}
                 />
               </Box>
               {!isImageLoaded && (

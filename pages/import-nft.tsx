@@ -57,7 +57,7 @@ export default function ImportNFTPage() {
   const [isFraktionsAllowed, setIsFraktionsAllowed] = useState<boolean>(false);
   const [isNFTListed, setIsNFTListed] = useState<boolean>(false);
   const [isIntendedForListing, setIsIntentedForListing] = useState<boolean>(
-    false
+    true
   );
 
   const [tokenMintedAddress, setTokenMintedAddress] = useState<string>("");
@@ -173,10 +173,14 @@ export default function ImportNFTPage() {
   }
 
   async function listNewItem() {
+    const wei = utils.parseEther(totalPrice.toString());
+    const fei = utils.parseEther(totalAmount.toString());
+    const weiPerFrak = (wei.mul(utils.parseEther("1.0"))).div(fei);
+
     const response = await listItem(
       tokenMintedAddress,
-      totalAmount, // amount of fraktions to list
-      utils.parseUnits(totalPrice).div(totalAmount), // totalPrice is price for all fraktions sum
+      fei, // amount of fraktions to list
+      weiPerFrak, // totalPrice is price for all fraktions sum
       provider,
       marketAddress
     );
@@ -578,30 +582,30 @@ export default function ImportNFTPage() {
                 >
                   2. Import NFT
                 </FrakButton4>{" "}
-                <FrakButton4
+                {isIntendedForListing && <FrakButton4
                   status={!isMarketApproved ? "open" : "done"}
                   onClick={() => {
                     approveForMarket();
                   }}
                 >
                   3. Approve Fraktion Access
-                </FrakButton4>{" "}
-                <FrakButton4
+                </FrakButton4>}{" "}
+                {isIntendedForListing && <FrakButton4
                   status={!isFraktionsAllowed ? "open" : "done"}
                   onClick={() => {
                     importFraktalToMarket();
                   }}
                 >
                   4. Transfer Fraktions to Market
-                </FrakButton4>{" "}
-                <FrakButton4
+                </FrakButton4>}{" "}
+                {isIntendedForListing && <FrakButton4
                   status={!isNFTListed ? "open" : "done"}
                   onClick={() => {
                     listFraktions();
                   }}
                 >
                   5. List Fraktions for Sale
-                </FrakButton4>
+                </FrakButton4>}
               </Box>
             </Box>
           </Grid>

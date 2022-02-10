@@ -17,7 +17,7 @@ const binArrayToJson = function(binArray)
     return JSON.parse(str)
 };
 
-function checkImageCID(cid){ // this does not handle others than IPFS... correct THAT!
+export function checkImageCID(cid){ // this does not handle others than IPFS... correct THAT!
   let correctedCid
   if(cid.startsWith('https://ipfs.io/')){
     let splitted = cid.split('https://ipfs.io/ipfs/')
@@ -45,19 +45,28 @@ function toBase32(value) { // to transform V0 to V1 and use as `https://${cidV1}
 };
 
 async function fetchNftMetadata(hash){
+  const stored = JSON.parse(window.localStorage.getItem(hash));
+  if(stored){
+    return stored;
+  }
   if(hash.startsWith('Qm')){
     let chunks
     for await (const chunk of ipfsClient.cat(hash)) {
       chunks = binArrayToJson(chunk);
     }
     // console.log('found qm.., data:',chunks)
+    window.localStorage.setItem(hash,JSON.stringify(chunks));
     return chunks;
   } else {
-    let res = await fetch(hash)
+    console.log(hash);
+    let res = await fetch("https://fuckcors.app/"+hash)
     if(res){
-      let result = res.json()
+      let result = await res.json()
+      window.localStorage.setItem(hash,JSON.stringify(result));
       // console.log('found other, data:',result)
       return result
+    }else{
+      return null;
     }
   }
 };
@@ -116,8 +125,9 @@ export async function createObject(data){
   // and possibly tokenId
 
   try{
+    // let nftMetadata = useMemo(async ()=>await fetchNftMetadata(data.nft.hash),[data.nft.hash]);
     let nftMetadata = await fetchNftMetadata(data.nft.hash)
-    // console.log('meta',nftMetadata)
+    console.log('meta',nftMetadata)
     if(nftMetadata){
       return {
         id: data.nft.id,
