@@ -33,7 +33,7 @@ const PENDING_MESSAGE = 'Please wait a few moments while your transaction is pro
 const REJECTED_MESSAGE = 'User Denied Metamask Signature';
 
 const approveToken = {
-    heading: 'Minting NFT',
+    heading: 'Approving Tokens',
     button: {
         text: 'View NFT'
     }
