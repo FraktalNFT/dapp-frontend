@@ -34,7 +34,7 @@ const Home: React.FC = () => {
   const [listType, setListType] = useState("All Listings");
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [auctions,setAuctions] = useState({});
+  const [auctions, setAuctions] = useState({});
   const [refresh,setRefresh] = useState(false);
 
   /**
@@ -104,10 +104,10 @@ const Home: React.FC = () => {
 
   useEffect(()=>{
     getMoreListedItems(auctions);
-    
   },[auctions])
 
   useEffect(() => {
+    // TODO - WHAT?
     if (window?.sessionStorage.getItem("nftitems")) {
       // const stringedNFTItems = window?.sessionStorage.getItem("nftitems");
       // const unstringedNFTItems = JSON.parse(stringedNFTItems);
@@ -182,9 +182,6 @@ const Home: React.FC = () => {
       
     //   return;
     // }
-    
-    
-
     let dataOnSale;
     if (data?.listItems?.length != undefined) {
       dataOnSale = data?.listItems?.filter(x => {
@@ -228,9 +225,8 @@ const Home: React.FC = () => {
       // handleSortSelect(sortType);
       // handleListingSelect(listType);
 
-
     }else{
-
+      //TODO - REMOVE THIS ELSE
     }
   };
 
@@ -241,10 +237,7 @@ const Home: React.FC = () => {
       index === self.findIndex((t) => (
         JSON.stringify(t) === JSON.stringify(thing)
       ))
-    )
-    
-    
-
+    );
 
     const stringedNFTItems = JSON.stringify(result);
     if(stringedNFTItems.length>0){

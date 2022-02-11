@@ -13,7 +13,7 @@ const Header = () => {
     <Box minH="10rem" py="2.6rem" as="header" bg={"white"}>
       <Flex maxW="96.4rem" mx="auto" as="nav" justify="space-between">
         <HStack spacing="8">
-          <NextLink href="/">
+          <NextLink href="/landing">
             <Link>
               <Image src="/images/Logo.png" alt="logo" width="175px" />
             </Link>

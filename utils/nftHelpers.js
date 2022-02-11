@@ -141,8 +141,8 @@ export async function createObject(data){
 
 export async function createObject2(data){
   try{
-    let nftMetadata = await fetchNftMetadata(data.hash)
-    // console.log('meta',nftMetadata)
+    let nftMetadata = await fetchNftMetadata(data.hash);
+    console.log('meta', data)
     let object = {
       id: data.id,
       creator:data.creator.id,
@@ -150,7 +150,7 @@ export async function createObject2(data){
       balances: data.fraktions,
       createdAt: data.createdAt,
       status: data.status,
-    }
+    };
     if(nftMetadata && nftMetadata.name){
         object.name = nftMetadata.name
     }
@@ -161,7 +161,7 @@ export async function createObject2(data){
         object.imageURL = checkImageCID(nftMetadata.image)
     }
     return object;
-  }catch{
+  } catch{
     console.log('Error fetching 2 ',data.hash);
     return null;
   }

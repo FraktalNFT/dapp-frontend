@@ -35,10 +35,11 @@ interface NFTItemProps extends StackProps {
   imageURL: String;
   CTAText?: string;
   wait?: number;
+  height?: string;
 }
 
 const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
-  ({ item, amount, price, imageURL, name, onClick, CTAText, wait }, ref) => {
+  ({ item, amount, price, imageURL, name, onClick, CTAText, wait, height = '35rem'}, ref) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const [isListed,setIsListed] = useState(false);
@@ -116,7 +117,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
       <>
         {isVisible && (
           <Box
-            w="30rem"
+
             rounded="md"
             borderWidth="1px"
             boxShadow="md"
@@ -129,7 +130,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
           >
             <VStack cursor="pointer">
               <Box
-                h={isImageLoaded ? "35rem" : "0px"}
+                h={isImageLoaded ? height : "0px"}
                 w="100%"
                 position="relative"
                 sx={
