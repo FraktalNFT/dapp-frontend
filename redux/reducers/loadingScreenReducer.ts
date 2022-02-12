@@ -34,9 +34,7 @@ const REJECTED_MESSAGE = 'User Denied Metamask Signature';
 
 const approveToken = {
     heading: 'Approving Tokens',
-    button: {
-        text: 'View NFT'
-    }
+
 };
 
 const buyingFraktions = {
@@ -73,14 +71,14 @@ const depositingRevenue = {
 };
 
 const importFraktal = {
-    heading: 'Minting NFT',
+    heading: 'Fractionalizing NFT',
     button: {
         text: 'View NFT'
     }
 };
 
 const importNFT = {
-    heading: 'Importing NFT',
+    heading: 'Fractionalizing NFT',
     button: {
         text: 'View NFT'
     }
