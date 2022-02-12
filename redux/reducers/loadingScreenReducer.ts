@@ -35,21 +35,21 @@ const REJECTED_MESSAGE = 'User Denied Metamask Signature';
 const approveToken = {
     heading: 'Approving NFT',
     button: {
-        text: 'View NFT'
+        text: 'Success'
     }
 };
 
 const buyingFraktions = {
     heading: 'Buying Fraktions',
     button: {
-        text: 'View Fraktions'
+        text: 'View NFT'
     }
 };
 
 const claimingRevenue = {
     heading: 'Claiming Revenue',
     button: {
-        text: 'View Revenue'
+        text: 'View NFT'
     }
 };
 
@@ -62,34 +62,34 @@ const claimingBuyout = {
 const claimingFraktionsProfit = {
     heading: 'Claiming Fraktion Profit',
     button: {
-        text: 'View NFTs'
+        text: 'View NFT'
     }
 };
 const depositingRevenue = {
     heading: 'Depositing Revenue',
     button: {
-        text: 'View Revenue'
+        text: 'View NFT'
     }
 };
 
 const importFraktal = {
     heading: 'Fraktionalizing NFT',
     button: {
-        text: 'View NFT'
+        text: 'Success'
     }
 };
 
 const importNFT = {
     heading: 'Frationalizing NFT',
     button: {
-        text: 'View NFT'
+        text: 'Success'
     }
 };
 
 const mintingNFT = {
     heading: 'Minting NFT',
     button: {
-        text: 'View NFT'
+        text: 'Success'
     }
 };
 
@@ -103,7 +103,7 @@ const listingNFT = {
 const offeringBuyout = {
     heading: 'Offering Buy-out',
     button: {
-        text: 'View Fraktions'
+        text: 'View NFT'
     }
 };
 
