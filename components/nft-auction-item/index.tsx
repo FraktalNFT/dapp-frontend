@@ -44,7 +44,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const { fraktions } = useUserContext();
     const [ended,setEnded] = useState(false);
-    
+
     // const canList = item && !! (fraktions || []).find(fraktion => fraktion.id === item.id);
 
     // useEffect(() => {
@@ -178,7 +178,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 <Badge fontSize='md' colorScheme='green'>Success</Badge>
               )}
               {showProgress && !item.isAuctionSuccess && (
-                <Badge fontSize='md' colorScheme='red'>Failed</Badge>
+                <Badge fontSize='md' colorScheme='red'>Reserve not met</Badge>
               )}
 
 
@@ -207,15 +207,15 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
               { showProgress && ended && claimType=="participant" &&(
                 <Box textAlign="center" marginTop={5}>
                 {item.contributed != 0 && item.isAuctionSuccess && (
-                  <FrakButton  onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)} 
+                  <FrakButton  onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)}
                   >Claim Fraktions</FrakButton>
                 )}
                 {item.contributed != 0 && !item.isAuctionSuccess &&(
-                  <FrakButton  onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)} 
+                  <FrakButton  onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)}
                   >Claim Contributed ETH</FrakButton>
                 )}
                 {item.contributed == 0 &&(
-                  <FrakButton disabled onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)} 
+                  <FrakButton disabled onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)}
                   >Claimed</FrakButton>
                 )}
                 </Box>

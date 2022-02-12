@@ -54,7 +54,7 @@ const MintCard = ({ setName, setDescription, addFile, file }) => {
           isReady={true}
           onClick={() => openLocal()}
           setFunction={() => addFile()}
-          inputPlaceholder="PNG, GIF, WEBP, MP4 or MP3"
+          inputPlaceholder="PNG, JPG or GIF"
         >
           {file ? "Change File" : "Choose File"}
         </FrakButton3>

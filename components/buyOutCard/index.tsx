@@ -38,7 +38,7 @@ const BuyOutCard = ({
   // functions for the offers!
   //claim Fraktal
   // console.log({offers});
-  
+
 
   useEffect(() => {
     if (account && offers && offers.length) {
@@ -117,7 +117,7 @@ const BuyOutCard = ({
           lineHeight: "29px",
         }}
       >
-        Fraktal NFT Buyout
+        NFT Buyout
       </div>
       <Box
         sx={{

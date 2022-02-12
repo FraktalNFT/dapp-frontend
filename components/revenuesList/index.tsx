@@ -152,7 +152,7 @@ const RevenuesList = (props) => {
           </div>
         ) : (
           <div style={{ marginTop: "24px" }}>
-            There are no revenues on this NFT.
+            There is no revenue for this NFT.
           </div>
         )}
       </div>

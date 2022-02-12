@@ -28,12 +28,12 @@ const initState = {
     message: ''
 };
 
-const SUCCESSFUL_MESSAGE = 'Congrats! Your transaction has successfully been processed on Arbitrum.';
-const PENDING_MESSAGE = 'Please wait a few moments while your transaction is processed by Arbitrum';
+const SUCCESSFUL_MESSAGE = 'Congrats! Your transaction has successfully been processed on Ethereum.';
+const PENDING_MESSAGE = 'Please wait a few moments while your transaction is processed by Ethereum';
 const REJECTED_MESSAGE = 'User Denied Metamask Signature';
 
 const approveToken = {
-    heading: 'Minting NFT',
+    heading: 'Approving Tokens',
     button: {
         text: 'View NFT'
     }
