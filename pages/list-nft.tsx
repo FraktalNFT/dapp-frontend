@@ -526,7 +526,7 @@ const MintPage = (props) => {
                   disabled={!isApproved || !tokenMintedAddress }
                   onClick={() => importFraktalToMarket()}
                 >
-                  3. Transfer
+                  3. Frak It
                 </FrakButton4>
                 <FrakButton4
                   status={!listed ? "open" : "done"}

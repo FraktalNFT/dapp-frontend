@@ -66,11 +66,11 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
         let userReleased = await getReleased(account, provider, revenueAddress);
         let totalShares = await getTotalShares(provider, revenueAddress);
         // console.log({userShares,userReleased, revenueAddress});
-        
+
         if (userShares) {
           setShares(userShares);
           console.log({userShares});
-          
+
         }
         if (userReleased) {
           setReleased(userReleased / 10 ** 18);
@@ -201,8 +201,8 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
             _hover={{ cursor: `not-allowed` }}
           >
             {released == 0
-              ? `You must own shares to claim`
-              : `Already released`}
+              ? `You Must own Fraktions to Claim`
+              : `Claimed`}
           </Box>
         )}
       </HStack>
