@@ -416,7 +416,7 @@ export default function ListNFTView() {
                       </div>
                       <div>
                         <div className={styles.auctionCardDetailsNumber}>{totalAmount}</div>
-                        <div className={styles.auctionCardDetailsText}>shares in sell</div>
+                        <div className={styles.auctionCardDetailsText}>Frations for sale</div>
                       </div>
                     </div>
                   </div>

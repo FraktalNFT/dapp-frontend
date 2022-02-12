@@ -206,7 +206,7 @@ export default function ImportNFTPage() {
   async function listNewAuctionItem() {
     const response = await listItemAuction(
       tokenMintedAddress,
-      utils.parseUnits(totalPrice), 
+      utils.parseUnits(totalPrice),
       utils.parseUnits(totalAmount),
       provider,
       marketAddress
@@ -448,9 +448,7 @@ export default function ImportNFTPage() {
                           <Box sx={{ display: `flex` }}>
                               <Box>
                                 <Text>Total Price</Text>
-                                <Text sx={{ opacity: `0.75`, fontSize: `13px` }}>
-                                  Sum Price of ALL Fraktions
-                                </Text>
+
                                 <NumberInput
                                   placeholder={"5 ETH"}
                                   value={totalPrice}
@@ -469,15 +467,13 @@ export default function ImportNFTPage() {
                                   />
                                 </NumberInput>
                                 <Text sx={{ opacity: `0.75`, fontSize: `12px` }}>
-                                  Price: {(totalPrice!="")&&parseInt(totalPrice) / 10000} ETH per fraktion
+                                  Per Fraktion: {(totalPrice!="")&&parseInt(totalPrice) / 10000} ETH
                                 </Text>
                               </Box>
                               <Box sx={{ width: `1ch` }}></Box>
                               <Box>
                                 <Text>Fraktions to List</Text>
-                                <Text sx={{ opacity: `0.75`, fontSize: `13px` }}>
-                                  Declare how many Fraktions are for sale
-                                </Text>
+
                                 <NumberInput
                                   placeholder={"5000"}
                                   value={totalAmount}
@@ -498,7 +494,7 @@ export default function ImportNFTPage() {
                                   />
                                 </NumberInput>
                                 <Text sx={{ opacity: `0.75`, fontSize: `12px` }}>
-                                  Out of 10,000 Fraktions
+                                  Of 10000 Fraktions
                                 </Text>
                               </Box>
                           </Box>
@@ -508,9 +504,7 @@ export default function ImportNFTPage() {
                     <Box sx={{ display: `flex` }}>
                               <Box>
                                 <Text>Reserve Price</Text>
-                                <Text sx={{ opacity: `0.75`, fontSize: `13px` }}>
-                                  Sum Price of ALL Fraktions
-                                </Text>
+
                                 <NumberInput
                                   placeholder={"5 ETH"}
                                   value={totalPrice}
@@ -529,15 +523,13 @@ export default function ImportNFTPage() {
                                   />
                                 </NumberInput>
                                 <Text sx={{ opacity: `0.75`, fontSize: `12px` }}>
-                                  Price: {(totalPrice!="")&&parseInt(totalPrice) / 10000} ETH per fraktion
+                                  Per Fraktion: {(totalPrice!="")&&parseInt(totalPrice) / 10000} ETH
                                 </Text>
                               </Box>
                               <Box sx={{ width: `1ch` }}></Box>
                               <Box>
-                                <Text>Fraktions to List</Text>
-                                <Text sx={{ opacity: `0.75`, fontSize: `13px` }}>
-                                  Declare how many Fraktions are for sale
-                                </Text>
+                                <Text>Total Amount</Text>
+
                                 <NumberInput
                                   placeholder={"5000"}
                                   value={totalAmount}
@@ -558,7 +550,7 @@ export default function ImportNFTPage() {
                                   />
                                 </NumberInput>
                                 <Text sx={{ opacity: `0.75`, fontSize: `12px` }}>
-                                  Out of 10,000 Fraktions
+                                  Of 10000 Fraktions
                                 </Text>
                               </Box>
                           </Box>
@@ -571,7 +563,7 @@ export default function ImportNFTPage() {
                 onChange={() => setIsIntentedForListing(v => !v)}
                 size="lg"
               >
-                List your Fraktions for sale
+                Sell Fraktions
               </Checkbox>
               <Box
                 sx={{
@@ -588,7 +580,7 @@ export default function ImportNFTPage() {
                     approveForFactory();
                   }}
                 >
-                  1. Approve NFT Access
+                  1. Approve NFT
                 </FrakButton4>{" "}
                 <FrakButton4
                   status={!isNFTImported ? "open" : "done"}
@@ -596,7 +588,7 @@ export default function ImportNFTPage() {
                     importNFT();
                   }}
                 >
-                  2. Import NFT
+                  2. Frak It
                 </FrakButton4>{" "}
                 <FrakButton4
                   status={!isMarketApproved ? "open" : "done"}
@@ -604,7 +596,7 @@ export default function ImportNFTPage() {
                     approveForMarket();
                   }}
                 >
-                  3. Approve Fraktion Access
+                  3. Approve Fraktions
                 </FrakButton4>{" "}
                 <FrakButton4
                   status={!isFraktionsAllowed ? "open" : "done"}
@@ -612,7 +604,7 @@ export default function ImportNFTPage() {
                     importFraktalToMarket();
                   }}
                 >
-                  4. Transfer Fraktions to Market
+                  4. Transfer Fraktions
                 </FrakButton4>{" "}
                 <FrakButton4
                   status={!isNFTListed ? "open" : "done"}
@@ -620,7 +612,7 @@ export default function ImportNFTPage() {
                     listFraktions();
                   }}
                 >
-                  5. List Fraktions for Sale
+                  5. List Fraktions
                 </FrakButton4>
               </Box>
             </Box>
