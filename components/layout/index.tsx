@@ -1,8 +1,16 @@
 /**
+ * React
+ */
+import React, { ReactNode, useMemo, useState, useEffect } from "react";
+/**
  * Chakra UI
  */
-import { VStack, Text, Box, useToast } from "@chakra-ui/react";
-import React, { ReactNode, useMemo, useState, useEffect } from "react";
+
+import { Text, Box, useToast} from "@chakra-ui/react";
+/**
+ * NExt
+ */
+import {useRouter} from "next/router";
 /**
  * Context
  */
@@ -16,12 +24,17 @@ import { addChainToMetaMask } from "../../utils/helpers";
  */
 import Header from "../header";
 import ChainWarning from "../chainWarning";
+import AirdropBanner from '../airdropBanner';
+
 /**
- * TOASTER
-*/
+ * ROUTES
+ */
+import {CREATE_NFT} from "@/constants/routes";
+
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { providerChainId, connectWeb3 } = useWeb3Context();
+  const router = useRouter();
   const toast = useToast();
-  const { providerChainId } = useWeb3Context();
   const [isMobile, setIsMobile] = useState(false);
   const isValid = useMemo(() => [4].includes(providerChainId), [
     providerChainId,
@@ -33,7 +46,51 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
     if (height > width && width < 1280) {
       setIsMobile(true);
     }
-  });
+
+    const airdropConnectToWalletId = 'airdrop1';
+    const listNFTToClaimId = 'airdrop2';
+
+    if (!isValid) {
+        const title = 'FRAKs airdrop is live';
+        const subtitle = 'Connect your wallet to check if you are eligible.';
+
+        if (!toast.isActive(airdropConnectToWalletId)) {
+            toast({
+                id: airdropConnectToWalletId,
+                position: "top",
+                duration: null,
+                render: () => (
+                    <AirdropBanner
+                    icon={"🔥"}
+                    buttonText={"Connect Wallet"}
+                    onClick={connectWeb3}
+                    title={title}
+                    subtitle={subtitle}/> )
+            })
+        }
+    } else {
+        toast.close(airdropConnectToWalletId);
+        const title = 'Congrats, you have received 100 000 FRAK';
+        const subtitle = 'List an NFT to claim.';
+
+        if (!toast.isActive(listNFTToClaimId)) {
+            toast({
+                id: listNFTToClaimId,
+                position: "top",
+                duration: null,
+                render: () => (
+                    <AirdropBanner
+                     icon="🎁"
+                     onClick={() => {router.push(CREATE_NFT); toast.close(listNFTToClaimId);}}
+                     buttonText={"List NFT"}
+                     title={title} subtitle={subtitle}/> )
+            })
+        }
+    }
+
+
+  }, [isValid]);
+
 
   return (
     <>
@@ -86,5 +143,6 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
     </>
   );
 };
+
 
 export default Layout;

@@ -52,7 +52,10 @@ a:hover {
   text-align: right;
   color: #000000;
 }
-
+.chakra-toast__inner {
+  max-width: 100% !important;
+  margin-top: 85px !important;
+}
 @keyframes loadingCard {
   0% {
     box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.04),
