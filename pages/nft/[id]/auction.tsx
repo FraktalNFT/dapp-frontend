@@ -232,7 +232,7 @@ function AuctionNFTView({router}) {
                 Fraktion Amount
               </div>
               <div className={styles.cardText}>
-                {nftObject?`${utils.formatUnits(nftObject.amountOfShare)}/10000 FRAK (${Number(utils.formatUnits(nftObject.amountOfShare))/100}% of max. supply)`:'loading'}
+                {nftObject?`${utils.formatUnits(nftObject.amountOfShare)}/10,000 Fraktions (${Number(utils.formatUnits(nftObject.amountOfShare))/100}% of max. supply)`:'loading'}
               </div>
             </div>
           </div>
