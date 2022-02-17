@@ -1,4 +1,3 @@
-
 import NextLink from "next/link";
 const Anchor = ({ href, passHref, target, children }) => {
     return (
@@ -8,5 +7,5 @@ const Anchor = ({ href, passHref, target, children }) => {
             </a>
         </NextLink>
     )
-}
+};
 export default Anchor;
