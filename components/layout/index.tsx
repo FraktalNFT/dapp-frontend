@@ -62,6 +62,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
         const subtitle = 'Connect your wallet to check if you are eligible.';
 
         if (!toast.isActive(airdropConnectToWalletId)) {
+            toast.closeAll();
             toast({
                 id: airdropConnectToWalletId,
                 position: "top",
@@ -76,7 +77,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
             })
         }
     } else {
-        toast.close(airdropConnectToWalletId);
+        toast.closeAll();
     }
 
   }, [isValid]);
@@ -87,13 +88,11 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
           return;
       }
 
-      if (walletAssets.length == 0) {
-          toast.close(airdropConnectToWalletId);
-          const title = 'Congrats, you have received 100 000 FRAK';
-          const subtitle = 'List an NFT to claim.';
-
-          if (!toast.isActive(listNFTToClaimId)) {
-              toast({
+      toast.closeAll();
+      if (walletAssets == null || walletAssets.length == 0 && !toast.isActive(listNFTToClaimId)) {
+            const title = 'Congrats, you have received 100 000 FRAK';
+            const subtitle = 'List an NFT to claim.';
+            toast({
                   id: listNFTToClaimId,
                   position: "top",
                   duration: null,
@@ -106,12 +105,9 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
                           }}
                           buttonText={"List NFT"}
                           title={title} subtitle={subtitle}/> )
-              })
-          }
-      } else {
-          toast.close(listNFTToClaimId);
-          if (!toast.isActive(claimToastId)) {
-              toast({
+            })
+      } else if (!toast.isActive(claimToastId)) {
+            toast({
                   id: claimToastId,
                   position: "top",
                   duration: null,
@@ -125,8 +121,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
                           }
                           buttonText={"Claim"}
                           title={"Claim 100 000 FRAK"}/> )
-              })
-          }
+        })
       }
 
 
