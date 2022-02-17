@@ -30,9 +30,11 @@ import AirdropBanner from '../airdropBanner';
  * ROUTES
  */
 import {CREATE_NFT} from "@/constants/routes";
+import {useUserContext} from "@/contexts/userContext";
 
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { providerChainId, connectWeb3 } = useWeb3Context();
+  const { walletAssets } = useUserContext();
   const router = useRouter();
   const toast = useToast();
   const [isMobile, setIsMobile] = useState(false);
@@ -40,15 +42,20 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
     providerChainId,
   ]);
 
+  const airdropConnectToWalletId = 'connectToWallet';
+  const listNFTToClaimId = 'listNFT';
+  const claimToastId = 'claim';
+  const learnToastId = 'learn';
+
   useEffect(() => {
     const width = window?.innerWidth;
     const height = window?.innerHeight;
     if (height > width && width < 1280) {
-      setIsMobile(true);
+        setIsMobile(true);
     }
+  }, []);
 
-    const airdropConnectToWalletId = 'airdrop1';
-    const listNFTToClaimId = 'airdrop2';
+  useEffect(() => {
 
     if (!isValid) {
         const title = 'FRAKs airdrop is live';
@@ -70,26 +77,81 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
         }
     } else {
         toast.close(airdropConnectToWalletId);
-        const title = 'Congrats, you have received 100 000 FRAK';
-        const subtitle = 'List an NFT to claim.';
-
-        if (!toast.isActive(listNFTToClaimId)) {
-            toast({
-                id: listNFTToClaimId,
-                position: "top",
-                duration: null,
-                render: () => (
-                    <AirdropBanner
-                     icon="🎁"
-                     onClick={() => {router.push(CREATE_NFT); toast.close(listNFTToClaimId);}}
-                     buttonText={"List NFT"}
-                     title={title} subtitle={subtitle}/> )
-            })
-        }
     }
 
-
   }, [isValid]);
+
+
+  useEffect(() => {
+      if (!isValid || window?.localStorage.getItem("userClaimed") == 'true') {
+          return;
+      }
+
+      if (walletAssets.length == 0) {
+          toast.close(airdropConnectToWalletId);
+          const title = 'Congrats, you have received 100 000 FRAK';
+          const subtitle = 'List an NFT to claim.';
+
+          if (!toast.isActive(listNFTToClaimId)) {
+              toast({
+                  id: listNFTToClaimId,
+                  position: "top",
+                  duration: null,
+                  render: () => (
+                      <AirdropBanner
+                          icon="🎁"
+                          onClick={() => {
+                              router.push(CREATE_NFT);
+                              toast.close(listNFTToClaimId);
+                          }}
+                          buttonText={"List NFT"}
+                          title={title} subtitle={subtitle}/> )
+              })
+          }
+      } else {
+          toast.close(listNFTToClaimId);
+          if (!toast.isActive(claimToastId)) {
+              toast({
+                  id: claimToastId,
+                  position: "top",
+                  duration: null,
+                  render: () => (
+                      <AirdropBanner
+                          icon="🙌"
+                          onClick={() => {
+                              toast.close(claimToastId);
+                              window?.localStorage.setItem("userClaimed", 'true');
+                              openLearnMore()}
+                          }
+                          buttonText={"Claim"}
+                          title={"Claim 100 000 FRAK"}/> )
+              })
+          }
+      }
+
+
+  }, [walletAssets]);
+
+  const openLearnMore = () => {
+      if (toast.isActive(learnToastId) || window?.localStorage.getItem("userReadDoc") == 'true') {
+          return;
+      }
+      toast({
+          id: learnToastId,
+          position: "top",
+          duration: null,
+          render: () => (
+              <AirdropBanner
+                  icon="⛽️"
+                  onClick={() => {
+                      toast.close(learnToastId);
+                      window?.localStorage.setItem("userReadDoc", "true");
+                      window.open('https://docs.fraktal.io/fraktal-governance-token-frak/airdrop', '_blank');
+                  }}
+                  buttonText={"Learn More"}
+                  title={"Earn FRAK to offset gas costs"}/> )
+      })
+  };
 
 
   return (

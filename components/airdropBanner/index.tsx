@@ -11,7 +11,7 @@ import styles from "./airdrop.module.css";
  * @returns {any}
  * @constructor
  */
-const AirdropBanner = ({title, subtitle, onClick, buttonText, icon}) => {
+const AirdropBanner = ({title, subtitle = '', onClick, buttonText, icon}) => {
 
     return (
         <Stack className={styles.container}>

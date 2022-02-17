@@ -47,6 +47,7 @@ export const UserContextProviderFC = ({ children }) => {
   const [fraktals, setFraktals] = useState(null);
   const [fraktions, setFraktions] = useState(null);
   const [nfts, setNFTs] = useState(null);
+  const [walletAssets, setWalletAssets] = useState(null);
   const [balance, setBalance] = useState(null);
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -88,6 +89,7 @@ export const UserContextProviderFC = ({ children }) => {
         let nftObjectsClean;
 
         let openseaAssets = await assetsInWallet(account);
+        setWalletAssets(openseaAssets.assets);
         let fobjects = await getSubgraphData(
           "wallet",
           account.toLocaleLowerCase()
@@ -195,7 +197,7 @@ export const UserContextProviderFC = ({ children }) => {
 
   return (
     <UserContext.Provider
-      value={{ fraktals, fraktions, nfts, balance, loading, fetchNFTs }}
+      value={{ fraktals, fraktions, nfts, balance, loading, fetchNFTs, walletAssets }}
     >
       {children}
     </UserContext.Provider>
@@ -203,7 +205,7 @@ export const UserContextProviderFC = ({ children }) => {
 };
 
 export const useUserContext = () => {
-  const { fraktals, fraktions, nfts, balance, loading, fetchNFTs } = useContext(
+  const { fraktals, fraktions, nfts, balance, loading, fetchNFTs, walletAssets } = useContext(
     UserContext
   );
   return {
@@ -213,5 +215,6 @@ export const useUserContext = () => {
     balance,
     loading,
     fetchNFTs,
+    walletAssets
   };
 };
