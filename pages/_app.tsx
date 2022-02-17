@@ -7,7 +7,6 @@ import { UserContextProviderFC } from "../contexts/userContext";
 import { MintingFC } from "@/contexts/NFTIsMintingContext";
 import Layout from "../components/layout";
 import { Toaster } from "react-hot-toast";
-import withRedux from 'next-redux-wrapper'
 import { Provider } from 'react-redux'
 import store from '../redux/store';
 

@@ -4,16 +4,16 @@ import FrakButton from "../button";
 import { useWeb3Context } from "../../contexts/Web3Context";
 import { shortenHash } from "../../utils/helpers";
 import { useRouter } from "next/router";
+import {EXPLORE, ARTISTS, CREATE_NFT, LANDING, IMPORT_NFT} from "@/constants/routes";
 
 const Header = () => {
   const router = useRouter();
-  // console.log('header',router.pathname);
   const { connectWeb3, account } = useWeb3Context();
   return (
     <Box minH="10rem" py="2.6rem" as="header" bg={"white"}>
       <Flex maxW="96.4rem" mx="auto" as="nav" justify="space-between">
         <HStack spacing="8">
-          <NextLink href="/">
+          <NextLink href={LANDING}>
             <Link>
               <Image src="/images/Logo.png" alt="logo" width="175px" />
             </Link>
@@ -26,8 +26,8 @@ const Header = () => {
             paddingTop="2"
             display={{ base: "none", md: "flex" }}
           >
-          <NextLink href="/">
-            {router.pathname === "/" ? (
+          <NextLink href={EXPLORE}>
+            {router.pathname === EXPLORE ? (
               <Link
                 className="semi-16"
                 borderRadius="25"
@@ -48,9 +48,9 @@ const Header = () => {
               </Link>
             )}
           </NextLink>
-            <NextLink href="/list-nft">
-              {router.pathname === "/list-nft" ||
-              router.pathname === "/import-nft" ? (
+            <NextLink href={CREATE_NFT}>
+              {router.pathname === CREATE_NFT ||
+              router.pathname === IMPORT_NFT ? (
                 <Link
                   className="semi-16"
                   borderRadius="25"
@@ -72,8 +72,8 @@ const Header = () => {
               )}
             </NextLink>
 
-            <NextLink href="/artists">
-              {router.pathname === "/artists" ? (
+            <NextLink href={ARTISTS}>
+              {router.pathname === ARTISTS ? (
                 <Link
                   className="semi-16"
                   borderRadius="25"

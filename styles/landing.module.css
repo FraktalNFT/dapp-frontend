@@ -1,0 +1,30 @@
+.ladingLeft {
+    margin:auto;
+}
+.landingHeading {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 600;
+    font-size: 48px;
+    line-height: 64px;
+}
+.landingButtonContainer {
+    margin: 30px 0;
+}
+.landingPowered {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    margin: 16px 0;
+}
+.landingItems li {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    color: #985CFF;
+    margin-left: 5px;
+}

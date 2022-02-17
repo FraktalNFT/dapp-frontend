@@ -6,10 +6,8 @@ import {
   VStack,
   Box,
   Stack,
-  Grid,
   Text,
   Link,
-  Checkbox,
   Tabs,
   TabList,
   TabPanels,
@@ -38,7 +36,8 @@ import NFTItem from "../components/nft-item";
 import { useMintingContext } from "@/contexts/NFTIsMintingContext";
 import toast from "react-hot-toast";
 import LoadScreen from '../components/load-screens';
-import {awaitTokenAddress} from "../utils/helpers";/**
+import {awaitTokenAddress} from "../utils/helpers";
+/**
  * REDUX
  */
 import {connect} from 'react-redux';
@@ -51,6 +50,11 @@ import {
 } from "../redux/actions/contractActions";
 const { create } = require("ipfs-http-client");
 const MAX_FRACTIONS = 10000;
+
+/**
+ * Routes
+ */
+import {EXPLORE, ARTISTS, CREATE_NFT, LANDING, IMPORT_NFT} from "@/constants/routes";
 
 const MintPage = (props) => {
   const {mintNFTRejected, tokenRejected, transferRejected} = props;
@@ -268,8 +272,7 @@ const MintPage = (props) => {
 
     // const weiPerFrak = utils.parseEther(totalPrice.toString()).div(utils.parseUnits(totalAmount.toString()));
     // console.log("price",weiPerFrak.toString());
-    //TODO - REMOVE CONSOLE LOG
-    console.log('listItem');
+
     listItem(
       tokenMintedAddress,
       fei,//shares
@@ -278,7 +281,7 @@ const MintPage = (props) => {
       marketAddress
     ).then(() => {
         setInterval(() => {
-            router.push('/');
+            router.push(EXPLORE);
         }, 1000);
     }).catch(error => {
       mintNFTRejected(error, listNewItem);
@@ -296,11 +299,11 @@ const MintPage = (props) => {
       marketAddress
     ).then(() => {
         setInterval(() => {
-            router.push('/');
+            router.push(EXPLORE);
         }, 1000);
     }).catch(error => {
         mintNFTRejected(error, listNewAuctionItem);
-    });;
+    });
   }
 
 
@@ -396,7 +399,7 @@ const MintPage = (props) => {
               borderRadius="25"
               padding="5"
               _hover={{ bg: "black", textColor: "white" }}
-              onClick={() => router.push("/import-nft")}
+              onClick={() => router.push(IMPORT_NFT)}
             >
               Import NFT
             </Link>
