@@ -10,6 +10,7 @@ import { pinByHash } from "../utils/pinataPinner";
 import { createNFT } from "../utils/contractCalls";
 import { useRouter } from "next/router";
 const { create } = require("ipfs-http-client");
+import {MY_NFTS} from "@/constants/routes";
 
 export default function MintNFTView() {
   const router = useRouter();
@@ -62,7 +63,7 @@ export default function MintNFTView() {
     if (metadataCid) {
       createNFT(metadataCid.cid.toString(), provider, factoryAddress).then(
         () => {
-          router.push("/my-nfts");
+          router.push(MY_NFTS);
         }
       );
     }

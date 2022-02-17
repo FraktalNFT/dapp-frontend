@@ -50,13 +50,11 @@ async function fetchNftMetadata(hash){
     for await (const chunk of ipfsClient.cat(hash)) {
       chunks = binArrayToJson(chunk);
     }
-    // console.log('found qm.., data:',chunks)
     return chunks;
   } else {
     let res = await fetch(hash)
     if(res){
       let result = res.json()
-      // console.log('found other, data:',result)
       return result
     }
   }
@@ -88,9 +86,7 @@ export async function createOpenSeaObject(data){
       collateral: null,
       collateralType: null,
     }
-    // console.log('address',data.asset_contract.address)
     let fraktalData = await getFraktalData(data.asset_contract.address);
-    // console.log('fraktaldata',fraktalData)
     if(fraktalData?.fraktalId?.length){
       response.marketId = fraktalData.fraktalId;
     }
@@ -117,7 +113,6 @@ export async function createObject(data){
 
   try{
     let nftMetadata = await fetchNftMetadata(data.nft.hash)
-    // console.log('meta',nftMetadata)
     if(nftMetadata){
       return {
         id: data.nft.id,
@@ -134,6 +129,7 @@ export async function createObject(data){
       }
     }
   }catch{
+    //TODO - REMOVE THE CONSOLE.log
     console.log('Error fetching ',data);
     return null;
   }
@@ -142,7 +138,6 @@ export async function createObject(data){
 export async function createObject2(data){
   try{
     let nftMetadata = await fetchNftMetadata(data.hash);
-    console.log('meta', data)
     let object = {
       id: data.id,
       creator:data.creator.id,
@@ -162,6 +157,7 @@ export async function createObject2(data){
     }
     return object;
   } catch{
+    //TODO - REMOVE THE CONSOLE.log
     console.log('Error fetching 2 ',data.hash);
     return null;
   }
@@ -188,7 +184,6 @@ export async function createListed(data){
       }
     }
   }catch (err){
-    console.log('Error',err);
     return {error: `Error: ${err}`};
   }
 };
@@ -211,7 +206,6 @@ export async function createListedAuction(data){
       }
     }
   }catch (err){
-    console.log('Error',err);
     return {error: `Error: ${err}`};
   }
 };
