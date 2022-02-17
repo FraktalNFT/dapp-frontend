@@ -153,7 +153,7 @@ const Staking = ({totalStaked, unclaimedRewards}) => {
     const currency = 'FRAK';
     return (
         <TabsCard
-            labelTooltip=""
+            labelTooltip="Deposit your FRAK and start earning ETH from transaction fees. Unstake at any time."
             title="Staking">
             <StakePanels  totalStaked={totalStaked} currency={currency}/>
             <VStack className={styles.stackedContainer} spacing={10} divider={<StackDivider borderColor='#E0E0E0' />}>
@@ -179,8 +179,6 @@ const Staking = ({totalStaked, unclaimedRewards}) => {
 const Trading = ({unclaimedRewards, nextDistribution}) => {
     const currency = 'FRAK';
 
-    console.log(nextDistribution)
-
     const countdown = ({ hours, minutes}) => {
         return (
             <Text className={styles.countdown}>
@@ -190,7 +188,9 @@ const Trading = ({unclaimedRewards, nextDistribution}) => {
     };
 
     return (
-        <TabsCard title="Trading">
+        <TabsCard
+            labelTooltip="Earn FRAK based on your trading volume to offset gas costs."
+            title="Trading">
             <Box className={styles.cardTitle}>
                 Next Distribution in
             </Box>
@@ -228,7 +228,7 @@ const LiquidityPool = ({totalStaked, unclaimedRewards}) => {
     return (
         <TabsCard
             secondaryText="Add/Remove Liquidity"
-            labelTooltip="Every holder votes and the majority decision (>50%) determines if the offer is accepted"
+            labelTooltip="Provide liquidity in the ETH/FRAK pool on uniswap v2 and stake your LP tokens to earn FRAK."
             currency={currency}
             title="LP">
             <StakePanels totalStaked={totalStaked} currency={currency}/>

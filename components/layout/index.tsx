@@ -56,75 +56,76 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-
-    if (!isValid) {
+    if (!isValid && !toast.isActive(airdropConnectToWalletId)) {
         const title = 'FRAKs airdrop is live';
         const subtitle = 'Connect your wallet to check if you are eligible.';
 
-        if (!toast.isActive(airdropConnectToWalletId)) {
-            toast.closeAll();
-            toast({
-                id: airdropConnectToWalletId,
-                position: "top",
-                duration: null,
-                render: () => (
-                    <AirdropBanner
+        toast.closeAll();
+        toast({
+            id: airdropConnectToWalletId,
+            position: "top",
+            duration: null,
+            render: () => (
+                <AirdropBanner
                     icon={"🔥"}
                     buttonText={"Connect Wallet"}
                     onClick={connectWeb3}
                     title={title}
                     subtitle={subtitle}/> )
-            })
-        }
+        })
     } else {
         toast.closeAll();
+        showAirdropBanners();
     }
 
   }, [isValid]);
 
-
-  useEffect(() => {
+  const showAirdropBanners = () => {
       if (!isValid || window?.localStorage.getItem("userClaimed") == 'true') {
           return;
       }
 
       toast.closeAll();
       if (walletAssets == null || walletAssets.length == 0 && !toast.isActive(listNFTToClaimId)) {
-            const title = 'Congrats, you have received 100 000 FRAK';
-            const subtitle = 'List an NFT to claim.';
-            toast({
-                  id: listNFTToClaimId,
-                  position: "top",
-                  duration: null,
-                  render: () => (
-                      <AirdropBanner
-                          icon="🎁"
-                          onClick={() => {
-                              router.push(CREATE_NFT);
-                              toast.close(listNFTToClaimId);
-                          }}
-                          buttonText={"List NFT"}
-                          title={title} subtitle={subtitle}/> )
-            })
+          const title = 'Congrats, you have received 100 000 FRAK';
+          const subtitle = 'List an NFT to claim.';
+          toast({
+              id: listNFTToClaimId,
+              position: "top",
+              duration: null,
+              render: () => (
+                  <AirdropBanner
+                      icon="🎁"
+                      onClick={() => {
+                          router.push(CREATE_NFT);
+                          toast.close(listNFTToClaimId);
+                      }}
+                      buttonText={"List NFT"}
+                      title={title} subtitle={subtitle}/> )
+          })
       } else if (!toast.isActive(claimToastId)) {
-            toast({
-                  id: claimToastId,
-                  position: "top",
-                  duration: null,
-                  render: () => (
-                      <AirdropBanner
-                          icon="🙌"
-                          onClick={() => {
-                              toast.close(claimToastId);
-                              window?.localStorage.setItem("userClaimed", 'true');
-                              openLearnMore()}
-                          }
-                          buttonText={"Claim"}
-                          title={"Claim 100 000 FRAK"}/> )
-        })
+          toast({
+              id: claimToastId,
+              position: "top",
+              duration: null,
+              render: () => (
+                  <AirdropBanner
+                      icon="🙌"
+                      onClick={() => {
+                          toast.close(claimToastId);
+                          window?.localStorage.setItem("userClaimed", 'true');
+                          openLearnMore()}
+                      }
+                      buttonText={"Claim"}
+                      title={"Claim 100 000 FRAK"}/> )
+          })
       }
 
+  };
 
+
+  useEffect(() => {
+    showAirdropBanners();
   }, [walletAssets]);
 
   const openLearnMore = () => {

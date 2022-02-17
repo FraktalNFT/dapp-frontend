@@ -23,6 +23,7 @@ import {
     List,
     ListItem,
     ListIcon,
+    Link,
     Grid,
     GridItem,
     Text
@@ -109,7 +110,7 @@ const LandingPage = () => {
                 <Container>
                     {
                         nftData && (
-                            <NextLink
+                            <Anchor
                                 href={`/nft/${nftData.tokenAddress}/details`}
                             >
                                 <NFTItem
@@ -120,7 +121,7 @@ const LandingPage = () => {
                                     imageURL={nftData.imageURL}
                                     item={null}
                                 />
-                            </NextLink>
+                            </Anchor>
                         )
                     }
                 </Container>
@@ -128,5 +129,15 @@ const LandingPage = () => {
         </Grid>
     </>);
 };
+
+function Anchor({ href, passHref, target, children }) {
+    return (
+        <NextLink href={href} >
+            <a href={href} >
+                {children}
+            </a>
+        </NextLink>
+    )
+}
 
 export default LandingPage;
