@@ -1,3 +1,7 @@
+/**
+ * Chakra UI
+ */
+import { useState, useEffect } from "react";
 import { Flex, Grid, Spacer, Text, VStack } from "@chakra-ui/layout";
 import {
   MenuButton,
@@ -8,23 +12,42 @@ import {
   Box,
   Spinner,
 } from "@chakra-ui/react";
-import { BigNumber, utils } from "ethers";
+
+/**
+ * Next
+ */
 import Head from "next/head";
 import NextLink from "next/link";
-import { useState, useEffect } from "react";
-import FrakButton from "../components/button";
-import NFTItem from "../components/nft-item";
-import { FrakCard } from "../types";
-import { getSubgraphData, getSubgraphAuction } from "../utils/graphQueries";
-import { createListed,createListedAuction } from "../utils/nftHelpers";
+/**
+ * Icons
+ */
 import { FiChevronDown } from "react-icons/fi";
 import InfiniteScroll from "react-infinite-scroll-component";
-import NFTAuctionItem from "@/components/nft-auction-item";
+
+/**
+ * Utils
+ */
+
+import { FrakCard } from "../types";
+import { BigNumber, utils } from "ethers";
+import { getSubgraphData, getSubgraphAuction } from "../utils/graphQueries";
+import { createListed,createListedAuction } from "../utils/nftHelpers";
+/**
+ * Filters
+ * @type {string}
+ */
 const LOWEST_PRICE = "Lowest Price";
 const HIGHEST_PRICE = "Highest Price";
 const NEWLY_LISTED = "Newly Listed";
 const POPULAR = "Popular";
 const SORT_TYPES = [LOWEST_PRICE, HIGHEST_PRICE, NEWLY_LISTED, POPULAR];
+/**
+ * FRAKTAL Components
+ */
+import NFTItem from "../components/nft-item";
+import NFTAuctionItem from "@/components/nft-auction-item";
+import FrakButton from "../components/button";
+import Anchor from '@/components/anchor';
 
 const Marketplace: React.FC = () => {
   const [nftItems, setNftItems] = useState([]);
@@ -359,7 +382,7 @@ const Marketplace: React.FC = () => {
                       
                       if(item.endTime){//for auction
                         return (
-                          <NextLink
+                          <Anchor
                             key={`${item.seller}-${item.sellerNonce}`}
                             href={`/nft/${item.seller}-${item.sellerNonce}/auction`}
                           >
@@ -370,11 +393,11 @@ const Marketplace: React.FC = () => {
                               endTime={item.endTime}
                               item={item}
                             />
-                          </NextLink>
+                          </Anchor>
                           )
                       }else{
                         return (
-                          <NextLink
+                          <Anchor
                             key={item.id}
                             href={`/nft/${item.tokenAddress}/details`}
                           >
@@ -386,7 +409,7 @@ const Marketplace: React.FC = () => {
                               wait={250 * (index + 1)}
                               item={null}
                             />
-                          </NextLink>
+                          </Anchor>
                           )
                       }
                       
