@@ -40,6 +40,7 @@ import {getSubgraphData} from "../utils/graphQueries";
  */
 import NFTItem from "@/components/nft-item";
 import FrakButton from "@/components/button"
+import Anchor from '@/components/anchor';
 /**
  * STYLES
  */
@@ -109,7 +110,7 @@ const LandingPage = () => {
                 <Container>
                     {
                         nftData && (
-                            <NextLink
+                            <Anchor
                                 href={`/nft/${nftData.tokenAddress}/details`}
                             >
                                     <NFTItem
@@ -120,7 +121,7 @@ const LandingPage = () => {
                                     imageURL={nftData.imageURL}
                                     item={null}
                                 />
-                            </NextLink>
+                            </Anchor>
                         )
                     }
                 </Container>

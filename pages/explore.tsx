@@ -25,6 +25,7 @@ const HIGHEST_PRICE = "Highest Price";
 const NEWLY_LISTED = "Newly Listed";
 const POPULAR = "Popular";
 const SORT_TYPES = [LOWEST_PRICE, HIGHEST_PRICE, NEWLY_LISTED, POPULAR];
+import Anchor from '@/components/anchor';
 
 const Marketplace: React.FC = () => {
   const [nftItems, setNftItems] = useState([]);
@@ -359,7 +360,7 @@ const Marketplace: React.FC = () => {
                       
                       if(item.endTime){//for auction
                         return (
-                          <NextLink
+                          <Anchor
                             key={`${item.seller}-${item.sellerNonce}`}
                             href={`/nft/${item.seller}-${item.sellerNonce}/auction`}
                           >
@@ -370,11 +371,11 @@ const Marketplace: React.FC = () => {
                               endTime={item.endTime}
                               item={item}
                             />
-                          </NextLink>
+                          </Anchor>
                           )
                       }else{
                         return (
-                          <NextLink
+                          <Anchor
                             key={item.id}
                             href={`/nft/${item.tokenAddress}/details`}
                           >
@@ -386,7 +387,7 @@ const Marketplace: React.FC = () => {
                               wait={250 * (index + 1)}
                               item={null}
                             />
-                          </NextLink>
+                          </Anchor>
                           )
                       }
                       
