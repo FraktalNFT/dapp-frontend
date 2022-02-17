@@ -1,11 +1,26 @@
-import { VStack, Text, Box } from "@chakra-ui/react";
+/**
+ * Chakra UI
+ */
+import { VStack, Text, Box, useToast } from "@chakra-ui/react";
 import React, { ReactNode, useMemo, useState, useEffect } from "react";
+/**
+ * Context
+ */
 import { useWeb3Context } from "../../contexts/Web3Context";
+/**
+ * UTILS
+ */
 import { addChainToMetaMask } from "../../utils/helpers";
+/**
+ * Components
+ */
 import Header from "../header";
 import ChainWarning from "../chainWarning";
-
+/**
+ * TOASTER
+*/
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const toast = useToast();
   const { providerChainId } = useWeb3Context();
   const [isMobile, setIsMobile] = useState(false);
   const isValid = useMemo(() => [4].includes(providerChainId), [

@@ -4,3 +4,4 @@ export const EXPLORE = '/explore';
 export const IMPORT_NFT = '/import-nft';
 export const LANDING = '/';
 export const MY_NFTS = '"/my-nfts"';
+export const REWARDS = '/rewards';
