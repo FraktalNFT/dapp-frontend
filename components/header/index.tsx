@@ -49,16 +49,6 @@ const Header = () => {
               </Link>
             )}
           </NextLink>
-          <NextLink href={REWARDS}>
-              <Link
-                  className="semi-16"
-                  borderRadius="25"
-                  padding="3"
-                  _hover={{ backgroundColor: "black", textColor: "white" }}
-              >
-                  Rewards
-              </Link>
-          </NextLink>
           <NextLink href={CREATE_NFT}>
                     {router.pathname === CREATE_NFT ||
                     router.pathname === IMPORT_NFT ? (
@@ -105,7 +95,16 @@ const Header = () => {
                 </Link>
               )}
             </NextLink>
-
+            <NextLink href={REWARDS}>
+                <Link
+                    className="semi-16"
+                    borderRadius="25"
+                    padding="3"
+                    _hover={{ backgroundColor: "black", textColor: "white" }}
+                >
+                    Rewards
+                </Link>
+            </NextLink>
 
            <Link
               href="https://docs.fraktal.io/marketplace/get-started"

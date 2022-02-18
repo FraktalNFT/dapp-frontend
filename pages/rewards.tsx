@@ -58,6 +58,9 @@ const RewardsPage = () => {
                     <h2 className="fraktalHeading">Total FRAK in Wallet</h2>
                 </Box>
                 <Box>
+                    <h4 className="fraktalHeading">This page is not functional on testnet.</h2>
+                </Box>
+                <Box>
                     <HStack spacing={10} divider={<StackDivider borderColor='#9F66E3' />}>
                         <Box><Text className="fraktalTotal">1 000 000.00 FRAK</Text></Box>
                         <Box>
