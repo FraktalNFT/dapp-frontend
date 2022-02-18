@@ -82,7 +82,7 @@ const BuyOutCard = ({
     }
   }
 
-  const minPriceParsed = (price) => roundUp(price, 3);
+  const minPriceParsed = (price) => roundUp(parseFloat(price), 3);
 
   function onSetValue(d) {
     if (BigNumber.from(d).gte(minPrice)) {
@@ -194,7 +194,7 @@ const BuyOutCard = ({
                   color: "#000000",
                 }}
               >
-                {utils.formatEther(minPrice)}
+                {minPriceParsed(utils.formatEther(minPrice))}
               </div>
             </HStack>
           </VStack>
