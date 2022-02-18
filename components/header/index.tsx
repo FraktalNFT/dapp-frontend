@@ -4,11 +4,12 @@ import FrakButton from "../button";
 import { useWeb3Context } from "../../contexts/Web3Context";
 import { shortenHash } from "../../utils/helpers";
 import { useRouter } from "next/router";
-import {EXPLORE, ARTISTS, CREATE_NFT, LANDING, IMPORT_NFT} from "@/constants/routes";
+import {ARTISTS, CREATE_NFT, EXPLORE, LANDING, IMPORT_NFT, REWARDS} from "@/constants/routes";
 
 const Header = () => {
   const router = useRouter();
   const { connectWeb3, account } = useWeb3Context();
+
   return (
     <Box minH="10rem" py="2.6rem" as="header" bg={"white"}>
       <Flex maxW="96.4rem" mx="auto" as="nav" justify="space-between">
@@ -21,8 +22,8 @@ const Header = () => {
         </HStack>
         <Flex align="center">
           <HStack
-            spacing="2.2rem"
-            mr="3.2rem"
+            spacing="2.0rem"
+            mr="0.5rem"
             paddingTop="2"
             display={{ base: "none", md: "flex" }}
           >
@@ -48,9 +49,19 @@ const Header = () => {
               </Link>
             )}
           </NextLink>
-            <NextLink href={CREATE_NFT}>
-              {router.pathname === CREATE_NFT ||
-              router.pathname === IMPORT_NFT ? (
+          <NextLink href={REWARDS}>
+              <Link
+                  className="semi-16"
+                  borderRadius="25"
+                  padding="3"
+                  _hover={{ backgroundColor: "black", textColor: "white" }}
+              >
+                  Rewards
+              </Link>
+          </NextLink>
+          <NextLink href={CREATE_NFT}>
+                    {router.pathname === CREATE_NFT ||
+                    router.pathname === IMPORT_NFT ? (
                 <Link
                   className="semi-16"
                   borderRadius="25"
@@ -154,7 +165,8 @@ const Header = () => {
                 <Image src="/footer/icons8-discord.svg" />
               </Box>
             </Link>
-            */}
+            */
+        }
 
           </HStack>
           {!account ? (

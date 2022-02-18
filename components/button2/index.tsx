@@ -35,7 +35,7 @@ const FrakButton2 = forwardRef<
           outline: `none`,
           border: `none`,
           borderRadius: `15px 0px 0px 15px`,
-          height: `40px`,
+          height: `38px`,
           minWidth: "20%",
           marginRight: `0px`,
         }}
@@ -46,12 +46,11 @@ const FrakButton2 = forwardRef<
     
     	border: `1px solid transparent`,
     	color: '#777777',
-    	fontSize: "14px", 
-    	marginRight: `100px`,
-    	maxwidth:'50px',
+    	fontSize: "14px",
+    	maxWidth:'50px',
     	padding:'4px',
     	position: 'relative',
-    	marginRight: `100px`,
+    	marginRight: `110px`,
     	boxSizing: `content-box`,
     	transform: `translateX(2px) translateY(-2px)`,                
 	}}>{currency ? currency : null}</Text>
@@ -67,7 +66,7 @@ const FrakButton2 = forwardRef<
           borderRight: `2px solid #405466`,
           borderBottom: `2px solid #405466`,
           fontSize: "1.8rem",
-          height: `40px`,
+          height: `38px`,
           width: `100px`,
           transform: `translateX(2px) translateY(-2px)`,
           boxSizing: `content-box`,

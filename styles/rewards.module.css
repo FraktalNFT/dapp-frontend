@@ -1,0 +1,91 @@
+.stakedText {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 14px;
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #A7A7A7;
+}
+
+.apr {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 40px;
+    text-align: center;
+    background-color: #C387FF;
+    background-image: linear-gradient(90deg, #C387FF, #985CFF);
+    background-size: 100%;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+}
+
+.stakedText {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 14px;
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #A7A7A7;
+}
+
+.stakedQuantity {
+    font-family: "Inter";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 0em;
+    text-align: center;
+}
+.hoursMinutes {
+    font-size: 12px;
+    line-height: 14px;
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #A7A7A7;
+}
+.countdown {
+    font-size: 48px;
+    line-height: 64px;
+    background-color: #C387FF;
+    background-image: linear-gradient(90deg, #C387FF, #985CFF);
+    background-size: 100%;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+}
+.tabButtons {
+    border-bottom: 1px solid #E0E0E0;
+}
+.tabButtons button, .cardTitle {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 35px;
+    text-align: center;
+    color: #405466;
+    width: 150px;
+    margin: auto;
+}
+.cardTitle {
+    padding:8px 0;
+    width: 300px;
+    border-bottom: 1px solid #E0E0E0;
+}
+.stackedContainer {
+    padding: 8px 24px;
+}

@@ -129,8 +129,6 @@ const MintPage = (props) => {
         factoryAddress
       ).then(response => {
           if (!response?.error) {
-              //TODO REMOVE TOAST
-              // toast.success("Mint completed.");
               setIsMinting(false);
               setTokenMintedAddress(response);
               console.log('Approved');
@@ -153,8 +151,6 @@ const MintPage = (props) => {
       });
       if (response?.error) {
         mintNFTRejected(response?.error, prepareNftData);
-        //TODO REMOVE TOAST
-      //  toast.error("Transaction failed.");
         setIsMinting(false);
       }
 

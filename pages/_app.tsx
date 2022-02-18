@@ -1,15 +1,36 @@
+/**
+ * Chakra
+ */
 import { ChakraProvider, extendTheme, VStack } from "@chakra-ui/react";
-import Footer from "../components/footer";
+/**
+ * Styles
+ */
 import "../styles/globals.css";
 import "../styles/fonts.css";
-import Web3ContextProvider from "../contexts/Web3Context";
-import { UserContextProviderFC } from "../contexts/userContext";
+/**
+ * Contexts
+ */
+import Web3ContextProvider from "@/contexts/Web3Context"
+import { UserContextProviderFC } from "@/contexts/userContext";
 import { MintingFC } from "@/contexts/NFTIsMintingContext";
+/**
+ * App Fraktal Components
+ */
 import Layout from "../components/layout";
-import { Toaster } from "react-hot-toast";
+import Footer from "../components/footer";
+/**
+ * Redux
+ */
 import { Provider } from 'react-redux'
 import store from '../redux/store';
+/**
+ * Toaster
+ */
+import { Toaster } from "react-hot-toast";
 
+/**
+ *  Theme
+ */
 const customTheme = extendTheme({
   colors: {
     white: {
@@ -27,6 +48,13 @@ const customTheme = extendTheme({
   },
 });
 
+/**
+ * My APP
+ * @param {any} Component
+ * @param {any} pageProps
+ * @returns {any}
+ * @constructor
+ */
 function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider theme={customTheme} >

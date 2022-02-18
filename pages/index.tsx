@@ -23,6 +23,7 @@ import {
     List,
     ListItem,
     ListIcon,
+    Link,
     Grid,
     GridItem,
     Text
@@ -76,35 +77,35 @@ const LandingPage = () => {
     return(<>
         <Grid display={{ md: 'flex' }} templateColumns='repeat(2, 1fr)' gap={30}>
             <GridItem className={styles.ladingLeft} width="100%">
-                   <Box>
-                       <h2 className={styles.landingHeading}>Buy & Sell Fraktions of NFTs</h2>
-                       <Grid className={styles.landingButtonContainer} templateColumns='repeat(2, 1fr)' gap={6}>
-                           <GridItem w='100%'>
-                               <FrakButton
-                                   onClick={() => {router.push(EXPLORE)}}
-                                   px="80px">Explore</FrakButton>
-                           </GridItem>
-                           <GridItem w='100%'>
-                               <FrakButton
-                                   onClick={() => {router.push(CREATE_NFT)}}
-                                   border="2px solid #000"
-                                   px="80px"
-                                   background="#ffffff"
-                                   color="#000">Create</FrakButton>
-                           </GridItem>
-                       </Grid>
-                       <Text className={styles.landingPowered}>Powered by FRAK</Text>
-                       <List className={styles.landingItems} spacing={5}>
-                           <ListItem>
-                               <ListIcon as={FaCoins} color='yellow.500' marginRight="10px"  />
-                               Earn FRAK from trading to offset gas costs
-                           </ListItem>
-                           <ListItem>
-                               <ListIcon as={GiProfit} color='green.500' marginRight="10px" />
-                               Stake FRAK and earn ETH from transaction fees
-                           </ListItem>
-                       </List>
-                   </Box>
+                <Box>
+                    <h2 className={styles.landingHeading}>Buy & Sell Fraktions of NFTs</h2>
+                    <Grid className={styles.landingButtonContainer} templateColumns='repeat(2, 1fr)' gap={6}>
+                        <GridItem w='100%'>
+                            <FrakButton
+                                onClick={() => {router.push(EXPLORE)}}
+                                px="80px">Explore</FrakButton>
+                        </GridItem>
+                        <GridItem w='100%'>
+                            <FrakButton
+                                onClick={() => {router.push(CREATE_NFT)}}
+                                border="2px solid #000"
+                                px="80px"
+                                background="#ffffff"
+                                color="#000">Create</FrakButton>
+                        </GridItem>
+                    </Grid>
+                    <Text className={styles.landingPowered}>Powered by FRAK</Text>
+                    <List className={styles.landingItems} spacing={5}>
+                        <ListItem>
+                            <ListIcon as={FaCoins} color='yellow.500' marginRight="10px"  />
+                            Earn FRAK from trading to offset gas costs
+                        </ListItem>
+                        <ListItem>
+                            <ListIcon as={GiProfit} color='green.500' marginRight="10px" />
+                            Stake FRAK and earn ETH from transaction fees
+                        </ListItem>
+                    </List>
+                </Box>
             </GridItem>
             <GridItem  width="100%" >
                 <Container>
@@ -113,7 +114,7 @@ const LandingPage = () => {
                             <Anchor
                                 href={`/nft/${nftData.tokenAddress}/details`}
                             >
-                                    <NFTItem
+                                <NFTItem
                                     height="50rem"
                                     name={nftData.name}
                                     amount={nftData.amount}
@@ -129,5 +130,15 @@ const LandingPage = () => {
         </Grid>
     </>);
 };
+
+function Anchor({ href, passHref, target, children }) {
+    return (
+        <NextLink href={href} >
+            <a href={href} >
+                {children}
+            </a>
+        </NextLink>
+    )
+}
 
 export default LandingPage;

@@ -1,0 +1,31 @@
+.container {
+    width: 964px;
+    height: 80px;
+    background: #FFFFFF;
+    border: 1px solid #C387FF;
+    box-sizing: border-box;
+    box-shadow: 0px 1px 4px rgba(64, 84, 102, 0.04), 0px 4px 12px rgba(64, 84, 102, 0.08);
+    border-radius: 4px;
+}
+.container div {
+
+}
+.airdropTitle {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+}
+.subtitle {
+    font-size:14px;
+    line-height: 20px;
+}
+.airdropButton {
+    font-size: 14px;
+    width: 160px;
+    height: 40px;
+    background: #985CFF;
+    border-radius: 24px;
+    align-items: center;
+    padding: 12px 24px;
+}
