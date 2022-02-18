@@ -36,7 +36,7 @@ export default function DetailsView() {
   const router = useRouter();
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
   const [offers, setOffers] = useState();
-  const [minOffer, setMinOffer] = useState(0);
+  const [minOffer, setMinOffer] = useState<BigNumber>(BigNumber.from(0));
   const [nftObject, setNftObject] = useState({});
   const [tokenAddress, setTokenAddress] = useState<string>("");
   const [fraktionsListed, setFraktionsListed] = useState([]);
@@ -160,18 +160,17 @@ export default function DetailsView() {
 
   async function getOffers() {
     if (tokenAddress && marketAddress) {
-      let minPriceParsed;
       try {
         let minPrice:BigNumber = await getMinimumOffer(
           tokenAddress,
           provider,
           marketAddress
         );
-        minPriceParsed = utils.formatEther(minPrice.div(utils.parseEther("1.0")));
-      } catch {
-        minPriceParsed = 0;
+
+        setMinOffer(minPrice);
+      } catch (err) {
+        console.error('unable to retreive minimum offer');
       }
-      setMinOffer(minPriceParsed);
     }
   }
 
