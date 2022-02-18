@@ -131,14 +131,14 @@ const LandingPage = () => {
     </>);
 };
 
-function Anchor({ href, passHref, target, children }) {
-    return (
-        <NextLink href={href} >
-            <a href={href} >
-                {children}
-            </a>
-        </NextLink>
-    )
-}
+// function Anchor({ href, passHref, target, children }) {
+//     return (
+//         <NextLink href={href} >
+//             <a href={href} >
+//                 {children}
+//             </a>
+//         </NextLink>
+//     )
+// }
 
 export default LandingPage;

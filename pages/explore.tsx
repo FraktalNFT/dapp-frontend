@@ -383,6 +383,7 @@ const Marketplace: React.FC = () => {
                       if(item.endTime){//for auction
                         return (
                           <Anchor
+                            target="_blank"
                             key={`${item.seller}-${item.sellerNonce}`}
                             href={`/nft/${item.seller}-${item.sellerNonce}/auction`}
                           >
@@ -398,6 +399,7 @@ const Marketplace: React.FC = () => {
                       }else{
                         return (
                           <Anchor
+                            target="_blank"
                             key={item.id}
                             href={`/nft/${item.tokenAddress}/details`}
                           >
