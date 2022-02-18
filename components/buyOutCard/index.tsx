@@ -85,7 +85,7 @@ const BuyOutCard = ({
   const minPriceParsed = (price) => roundUp(parseFloat(price), 3);
 
   function onSetValue(d) {
-    if (BigNumber.from(d).gte(minPrice)) {
+    if (utils.parseEther(d).gte(minPrice)) {
       setValueToOffer(d);
       setIsReady(true);
     } else {
