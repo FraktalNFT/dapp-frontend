@@ -240,17 +240,6 @@ const Marketplace: React.FC = () => {
     
   }, [nftItems,nftData]);
 
-  const demoNFTItemsFull: FrakCard[] = Array.from({ length: 9 }).map(
-    (_, index) => ({
-      id: index + 1,
-      name: "Golden Fries Cascade",
-      imageURL: "/filler-image-1.png",
-      contributions: BigNumber.from(5).div(100),
-      createdAt: new Date().toISOString(),
-      countdown: new Date("06-25-2021"),
-    })
-  );
-
   return (
     <>
       <Head>
