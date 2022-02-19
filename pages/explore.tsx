@@ -83,19 +83,13 @@ const Marketplace: React.FC = () => {
     let sortedItems;
 
     if (type === LOWEST_PRICE) {
-      sortedItems = nftItems.sort((a, b) =>
-        a.price > b.price ? 1 : -1
-      );
+      sortedItems = nftItems.sort((a, b) => a.price - b.price);
     } else if (type === HIGHEST_PRICE) {
-      sortedItems = nftItems.sort((a, b) =>
-          a.price > b.price ? -1 : 1
-      );
+      sortedItems = nftItems.sort((a, b) => b.price - a.price);
     } else if (type == NEWLY_LISTED) {
-        sortedItems = nftItems.sort((a, b) =>
-            a.createdAt > b.createdAt ? -1 : 1
-        );
+        sortedItems = nftItems.sort((a, b) => b.createdAt - a.createdAt);
     } else {
-        sortedItems = nftItems.sort((a, b) => (a.holders > b.holders ? -1 : 1));
+        sortedItems = nftItems.sort((a, b) => b.holders - a.holders);
     }
     setNftItems(sortedItems);
   };
@@ -114,7 +108,7 @@ const Marketplace: React.FC = () => {
     } else if (type == "Fixed Price") {
       sortedItems = nftData.filter((item) => !item.endTime);
     } else {
-      sortedItems = nftData.filter((item) => item.endTime>0);
+      sortedItems = nftData.filter((item) => item.endTime);
     }
     setNftItems(sortedItems);
   };
@@ -132,29 +126,15 @@ const Marketplace: React.FC = () => {
   useEffect(() => {
     // TODO - WHAT?
     if (window?.sessionStorage.getItem("nftitems")) {
-      // const stringedNFTItems = window?.sessionStorage.getItem("nftitems");
-      // const unstringedNFTItems = JSON.parse(stringedNFTItems);
-      // const auctionOnly = unstringedNFTItems.filter(item=>item.endTime);
-      
-      
-      // setNftItems(unstringedNFTItems);
-      // setNftData(unstringedNFTItems);
-      // setAuctions(auctionOnly);
       getData();
     } else {
 
       // touch API iff no local version
       getData();
     }
-    // data storage handling
-    // const clearStorage = () => {
-    //   window.sessionStorage.clear();
-    // };
-    // window?.addEventListener("beforeunload", clearStorage);
-    // return () => window.removeEventListener("beforeunload", clearStorage);
   }, []);
 
-  const getMoreListedItems = async (auctionsObject:Object) => {
+  const getMoreListedItems = async (auctionsObject: Object) => {
     const data = await getSubgraphData("listed_items", "");
     let auctionData = await getSubgraphAuction("auctions","");
     
@@ -198,13 +178,7 @@ const Marketplace: React.FC = () => {
       ))
     )
     auctionItems = result;
-    
 
-    // if(JSON.stringify(auctionItems)==JSON.stringify(auctionsObject)){
-    //   console.log("no changes");
-      
-    //   return;
-    // }
     let dataOnSale;
     if (data?.listItems?.length != undefined) {
       dataOnSale = data?.listItems?.filter(x => {
@@ -247,9 +221,6 @@ const Marketplace: React.FC = () => {
       
       // handleSortSelect(sortType);
       // handleListingSelect(listType);
-
-    }else{
-      //TODO - REMOVE THIS ELSE
     }
   };
 
