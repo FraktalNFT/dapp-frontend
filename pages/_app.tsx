@@ -1,7 +1,7 @@
 /**
  * Chakra
  */
-import { ChakraProvider, extendTheme, VStack } from "@chakra-ui/react";
+import { ChakraProvider, ComponentStyleConfig, extendTheme, VStack } from "@chakra-ui/react";
 /**
  * Styles
  */
@@ -28,11 +28,35 @@ import store from '../redux/store';
  */
 import { Toaster } from "react-hot-toast";
 
+const Text: ComponentStyleConfig = {
+  variants: {
+    footer: {
+      color: "grey.500",
+      fontSize: "1.6rem",
+      fontWeight: "500",
+      lineHeight: "4rem"
+    }
+  }
+}
+
+const Heading: ComponentStyleConfig = {
+  variants: {
+    footer: {
+      fontSize: 14,
+      fontWeight: 700,
+      mb: [18, 18, "40px", "40px"]
+    }
+  }
+}
+
 /**
  *  Theme
  */
 const customTheme = extendTheme({
   colors: {
+    grey: {
+      500: "#666b6d",
+    },
     white: {
       100: "#E0E0E0",
       500: "#F9F9F9",
@@ -46,7 +70,19 @@ const customTheme = extendTheme({
       900: "#FF0000",
     },
   },
+  components: {
+    Heading,
+    Text,
+  }
 });
+
+/**
+ * App Performance Metrics
+ * @see https://nextjs.org/docs/advanced-features/measuring-performance
+ */
+export function reportWebVitals(metric) {
+  console.log(metric);
+}
 
 /**
  * My APP
