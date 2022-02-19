@@ -17,6 +17,7 @@ import { useWeb3Context } from "@/contexts/Web3Context";
 import { createListedAuction } from "utils/nftHelpers";
 import { introspectionFromSchema } from "graphql";
 import Custom404 from "../../404";
+import {EXPLORE} from "@/constants/routes";
 function AuctionNFTView({router}) {
 
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
@@ -198,7 +199,7 @@ function AuctionNFTView({router}) {
         <title>Fraktal - NFT</title>
       </Head>
       <div>
-        <Link href="/">
+        <Link href={EXPLORE}>
           <div className={styles.goBack}>← back to all NFTS</div>
         </Link>
 

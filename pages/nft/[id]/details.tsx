@@ -26,6 +26,7 @@ import {
 } from "../../../utils/contractCalls";
 import { useRouter } from "next/router";
 import LoadScreen from '../../../components/load-screens';
+import {EXPLORE} from "@/constants/routes";
 // import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
 // import Modal from '../../../components/modal';
 
@@ -250,7 +251,7 @@ export default function DetailsView() {
         >
           <Box sx={{ position: `relative` }}>
             <VStack marginRight="53px" sx={{ position: `sticky`, top: `20px` }}>
-              <Link href="/">
+              <Link href={EXPLORE}>
                 <div className={styles.goBack}>← back to all NFTS</div>
               </Link>
               <Image

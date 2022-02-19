@@ -387,6 +387,61 @@ const fraktalId_query = gql`
   }
 `;
 
+
+const limitedItems = gql`
+  query($limit: Int!, $offset: Int!, $orderDirection: String!) {
+    listItems(first: $limit, skip: $offset, where: { amount_gt: 0 }, orderBy: price, orderDirection: $orderDirection) {
+      id
+      price
+      amount
+      gains
+      seller {
+        id
+      }
+      fraktal {
+        id
+        hash
+        marketId
+        createdAt
+        status
+        fraktions {
+          amount
+        }
+        creator {
+          id
+        }
+      }
+    }
+  }
+`;
+
+const listedItems2 = gql`
+  query($id: String) {
+    listItems(first: 100, where: { amount_gt: 0 }) {
+      id
+      price
+      amount
+      gains
+      seller {
+        id
+      }
+      fraktal {
+        id
+        hash
+        marketId
+        createdAt
+        status
+        fraktions(where: { amount_gt: 10 }) {
+          amount
+        }
+        creator {
+          id
+        }
+      }
+    }
+  }
+`;
+
 const calls = [
   { name: "account_fraktions", call: account_fraktions_query },
   { name: "marketid_fraktal", call: marketid_query },
@@ -401,15 +456,16 @@ const calls = [
   { name: "bought", call: user_bought_query },
   { name: "offers", call: user_offers_query },
   { name: "listed_items", call: listedItems },
+  { name: "limited_items", call: limitedItems },
+  { name: "listed_items_2", call: listedItems2 },
   { name: "fraktal", call: fraktalId_query },
   { name: "fraktions", call: fraktions_query },
   { name: "fraktal_owners", call: fraktalOwners },
 ];
 
-
 const listedAuctions = gql`
-  query {
-    auctions{
+  query($limit: Int!, $offset: Int!, $endTime: Int!, $orderDirection: String!) {
+    auctions(first: $limit, skip: $offset, orderBy: reservePrice, orderDirection: $orderDirection, where: { endTime_gt: $endTime, reservePrice_gt: 0 }) {
       seller
       tokenAddress
       reservePrice
@@ -445,16 +501,16 @@ query($id: ID!) {
 
 const auctionCalls = [
   { name: "auctions", call: listedAuctions },
-  {name:"auctionsNFT", call:auctionFraktalNFT},
-  { name:"singleAuction", call: getSingleAuction}
-]
+  { name: "auctionsNFT", call:auctionFraktalNFT},
+  { name: "singleAuction", call: getSingleAuction}
+];
 
-export const getSubgraphData = async (call, id) => {
+export const getSubgraphData = async (call, id, options = null) => {
   let callGql = calls.find(x => {
     return x.name == call;
   });
   try {
-    const data = await request(APIURL, callGql.call, { id });
+    const data = await request(APIURL, callGql.call, { id, ...options });
     // console.log('data for:',id,' found',data)
     return data;
   } catch (err) {
@@ -463,12 +519,12 @@ export const getSubgraphData = async (call, id) => {
     return err;
   }
 };
-export const getSubgraphAuction = async (call, id) => {
+export const getSubgraphAuction = async (call, id, options = null) => {
   let callGql = auctionCalls.find(x => {
     return x.name == call;
   });
   try {
-    const data = await request(AUCTIONAPI, callGql.call, { id });
+    const data = await request(AUCTIONAPI, callGql.call, { id, ...options });
     // console.log('data for:',id,' found',data)
     return data;
   } catch (err) {

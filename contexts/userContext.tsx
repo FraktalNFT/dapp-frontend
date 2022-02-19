@@ -94,6 +94,7 @@ export const UserContextProviderFC = ({ children }) => {
           "wallet",
           account.toLocaleLowerCase()
         );
+        console.log(fobjects)
 
 
         if (fobjects && fobjects.users.length) {
@@ -104,6 +105,7 @@ export const UserContextProviderFC = ({ children }) => {
           let validFraktions = fobjects.users[0].fraktions.filter(x => {
             return x.status != "retrieved";
           });
+
           fraktionsObjects = await Promise.all(
             validFraktions.map(x => {
               return createObject(x);
@@ -117,24 +119,30 @@ export const UserContextProviderFC = ({ children }) => {
           }
           // Fraktals retrieval
           let userFraktalsFetched = fobjects.users[0].fraktals;
+
           let userFraktalObjects = await Promise.all(
             userFraktalsFetched.map(x => {
               return createObject2(x);
             })
           );
+
           if (userFraktalObjects) {
             fraktalsClean = userFraktalObjects.filter(x => {
               return x != null && x.imageURL.length && x.status != "retrieved";
             });
           }
+
           let userFraktalAddresses = fraktalsClean.map(x => {
             return x.id;
           });
+
           let userFraktionsAddreses = fraktionsObjectsClean.map(x => {
             return x.id;
           });
+
           totalAddresses = userFraktalAddresses.concat(userFraktionsAddreses);
         }
+
         if (
           openseaAssets &&
           openseaAssets.assets &&
@@ -143,27 +151,32 @@ export const UserContextProviderFC = ({ children }) => {
           nftsERC721_wallet = openseaAssets.assets.filter(x => {
             return x.asset_contract.schema_name == "ERC721";
           });
+
           if (nftsERC721_wallet && nftsERC721_wallet.length) {
             totalNFTs = totalNFTs.concat(nftsERC721_wallet);
           }
           nftsERC1155_wallet = openseaAssets.assets.filter(x => {
             return x.asset_contract.schema_name == "ERC1155";
           });
+
           totalNFTs = nftsERC721_wallet.concat(nftsERC1155_wallet);
           if (!fobjects || !fobjects.users[0] || !fobjects.users[0].fraktals) {
             totalAddresses = [];
           }
+
           // NFTs filtering
           let nftsFiltered = totalNFTs.map(x => {
             if (!totalAddresses.includes(x.asset_contract.address)) {
               return x;
             }
           });
+
           let nftObjects = await Promise.all(
             nftsFiltered.map(x => {
               return createOpenSeaObject(x);
             })
           );
+
           if (nftObjects) {
             nftObjectsClean = nftObjects.filter(x => {
               return x != null && x.imageURL.length;
@@ -171,6 +184,7 @@ export const UserContextProviderFC = ({ children }) => {
           } else {
             nftObjectsClean = nftObjects;
           }
+
           setFraktals(fraktalsClean);
           
           setFraktions(fraktionsObjectsClean);

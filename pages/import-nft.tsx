@@ -1,4 +1,11 @@
+/**
+ * React
+ */
 import { useEffect, useState } from "react";
+/**
+ * Chakra
+ */
+
 import {
   VStack,
   Box,
@@ -17,10 +24,17 @@ import {
   Tabs,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
+/**
+ * Contexts
+ */
+
 import { useWeb3Context } from "../contexts/Web3Context";
 import { useUserContext } from "../contexts/userContext";
-import NFTImportCardOS from "../components/nft-importcard-opensea";
 import ListCard from "../components/listCard";
+/**
+ * Contracts
+ */
+
 import {
   createNFT,
   approveMarket,
@@ -33,13 +47,24 @@ import {
   listItemAuction,
 } from "../utils/contractCalls";
 import { utils } from "ethers";
+/**
+ * Components
+ */
+
 import FrakButton4 from "@/components/button4";
+import LoadScreen from '@/components/load-screens';
+import NFTImportCardOS from "@/components/nft-importcard-opensea";
 import ListCardAuction from "@/components/listCardAuction";
 import toast from "react-hot-toast";
+/**
+ * Redux
+ */
 import store from "../redux/store";
 import {APPROVE_TOKEN, IMPORT_FRAKTAL, IMPORT_NFT, LISTING_NFT, rejectContract} from "../redux/actions/contractActions";
-import LoadScreen from '../components/load-screens';
-
+/**
+ * Constants
+ */
+import {CREATE_NFT, MY_NFTS} from "@/constants/routes";
 const { create } = require("ipfs-http-client");
 
 export default function ImportNFTPage() {
@@ -97,16 +122,6 @@ export default function ImportNFTPage() {
     catch(error => {
         store.dispatch(rejectContract(APPROVE_TOKEN, error, approveForMarket));
     });
- /*   if (response.error) {
-      alert(
-        "Transaction Failed! Sad! Many Such Cases! Contact the Development Team."
-      );
-      return null;
-    }
-    if (!response?.error) {
-      setIsMarketApproved(true);
-      importFraktalToMarket();
-    }*/
   }
 
   async function importNFT() {
@@ -140,7 +155,7 @@ export default function ImportNFTPage() {
       setIsNFTImported(true);
       if (!isIntendedForListing) {
         setInterval(() => {
-          router.push('/my-nfts');
+          router.push(MY_NFTS);
         }, 1000);
       }
     }
@@ -175,14 +190,6 @@ export default function ImportNFTPage() {
       }).catch(error => {
           store.dispatch(rejectContract(IMPORT_FRAKTAL, error, importFraktalToMarket));
       });
-    /*  if (response?.error) {
-        alert(
-          "Transaction Failed! Sad! Many Such Cases! Contact the Development Team."
-        );
-        return null;
-      }
-      if (!response?.error) {
-      }*/
     }
   }
 
@@ -196,7 +203,7 @@ export default function ImportNFTPage() {
     ).then(receipt => {
       setIsNFTListed(true);
       setInterval(() => {
-        router.push('/my-nfts');
+        router.push(MY_NFTS);
       }, 1000);
     }).catch(error => {
         store.dispatch(rejectContract(LISTING_NFT, error, listNewItem));
@@ -213,22 +220,11 @@ export default function ImportNFTPage() {
     ).then(receipt => {
         setIsNFTListed(true);
         setInterval(() => {
-            router.push('/my-nfts');
+            router.push(MY_NFTS);
         }, 1000);
     }).catch(error => {
         store.dispatch(rejectContract(LISTING_NFT, error, listItemAuction));
     });
-    /*
-    if (response?.error) {
-      alert(
-        "NFT did not list. Sad! Many Such Cases! Contact the development team immediately"
-      );
-      return null;
-    }
-    if (!response?.error) {
-      setIsNFTListed(true);
-      router.push("/my-nfts");
-    }*/
   }
 
   const listFraktions = async () => {
@@ -241,9 +237,7 @@ export default function ImportNFTPage() {
         listNewItem();
       }
     }
-  }
-
-
+  };
 
   // Show Loading State
   useEffect(() => {
@@ -297,7 +291,7 @@ export default function ImportNFTPage() {
                 borderRadius: `24px`,
                 cursor: `pointer`,
               }}
-              onClick={() => router.push("/list-nft")}
+              onClick={() => router.push(CREATE_NFT)}
             >
               Mint NFT
             </Box>
