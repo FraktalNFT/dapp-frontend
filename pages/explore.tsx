@@ -129,8 +129,9 @@ const Marketplace: React.FC = () => {
     getMoreListedItems(auctions);
   },[auctions])
 
+  
   useEffect(() => {
-    // TODO - WHAT?
+    // TODO - WHAT? 
     if (window?.sessionStorage.getItem("nftitems")) {
       // const stringedNFTItems = window?.sessionStorage.getItem("nftitems");
       // const unstringedNFTItems = JSON.parse(stringedNFTItems);
@@ -153,6 +154,8 @@ const Marketplace: React.FC = () => {
     // window?.addEventListener("beforeunload", clearStorage);
     // return () => window.removeEventListener("beforeunload", clearStorage);
   }, []);
+
+
 
   const getMoreListedItems = async (auctionsObject:Object) => {
     const data = await getSubgraphData("listed_items", "");
@@ -248,8 +251,6 @@ const Marketplace: React.FC = () => {
       // handleSortSelect(sortType);
       // handleListingSelect(listType);
 
-    }else{
-      //TODO - REMOVE THIS ELSE
     }
   };
 

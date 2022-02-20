@@ -196,7 +196,7 @@ export default function ArtistsView() {
                   >
                     <ArtistCard
                       bg={item.imageURL}
-                      onClick={() => router.push(`/artist/${item.id}`)}
+                      onClick={() => router.push(`/artist/${item.id}`, null, {scroll: false})}
                     />
                   </NextLink>
                 );
