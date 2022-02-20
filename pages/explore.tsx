@@ -137,7 +137,7 @@ const Marketplace: React.FC = () => {
     }
   }, []);
 
-  const getMoreListedItems = async (auctionsObject: Object) => {
+  const getMoreListedItems = async () => {
     try {
       const NOW = Math.round(Date.now()/1000);
       const { auctions: _auctions = [] } = await getSubgraphAuction("auctions","");
