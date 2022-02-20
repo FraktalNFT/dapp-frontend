@@ -45,11 +45,10 @@ const Footer: React.FC = () => {
   return (
     <Container 
       maxW={["100%", "38.4rem", "96.4rem"]}
-      py="15rem"
-      pt={["15rem", "30rem"]}
+      py={["5rem"]}
     >
       <Flex direction={["column", "column", "row", "row"]} justify="space-between">
-        <Box alignItems="start" flex={["1 1", "1 1", "1 1", "0.6 1"]}>
+        <Box alignItems="start" flex={["1 1", "0.6 1", "1 1", "0.6 1"]}>
           <Image src="/fraktal-full-logo.png" w={["100%", "320px"]}/>
           <Text fontSize={16} my="40px" lineHeight="30px" fontWeight={500} color="grey.500">
             Fraktal is a community first project, with a mission to to empower 
