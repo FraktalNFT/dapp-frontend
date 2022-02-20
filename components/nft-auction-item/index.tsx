@@ -27,10 +27,10 @@ import Countdown,{zeroPad} from 'react-countdown';
 
 interface NFTItemProps extends StackProps {
   item: any;
-  name: String;
+  name: string;
   amount: any;
   price: Number;
-  imageURL: String;
+  imageURL: string;
   // CTAText?: string;
   // wait: number;
   endTime: number;
@@ -67,7 +67,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const inVisibleAnimStyle = {
       animationName: `loadingCard`,
       animationDuration: `1s`,
-      "animation-iteration-count": `infinite`,
+      animationIterationCount: `infinite`,
     };
 
     const renderer = ({ days, hours, minutes, seconds, completed })=>{
