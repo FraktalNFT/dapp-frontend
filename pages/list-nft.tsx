@@ -277,7 +277,7 @@ const MintPage = (props) => {
       marketAddress
     ).then(() => {
         setInterval(() => {
-            router.push(EXPLORE);
+            router.push(EXPLORE, null, {scroll: false}); 
         }, 1000);
     }).catch(error => {
       mintNFTRejected(error, listNewItem);
@@ -295,7 +295,7 @@ const MintPage = (props) => {
       marketAddress
     ).then(() => {
         setInterval(() => {
-            router.push(EXPLORE);
+            router.push(EXPLORE, null, {scroll: false});
         }, 1000);
     }).catch(error => {
         mintNFTRejected(error, listNewAuctionItem);
