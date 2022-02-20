@@ -28,10 +28,9 @@ import InfiniteScroll from "react-infinite-scroll-component";
  * Utils
  */
 
-import { FrakCard } from "../types";
-import { BigNumber, utils } from "ethers";
+import { utils } from "ethers";
 import { getSubgraphData, getSubgraphAuction } from "../utils/graphQueries";
-import { createListed,createListedAuction } from "../utils/nftHelpers";
+import { createListed, createListedAuction } from "../utils/nftHelpers";
 /**
  * Filters
  * @type {string}
@@ -51,7 +50,7 @@ import Anchor from '@/components/anchor';
 
 const Marketplace: React.FC = () => {
   const [nftItems, setNftItems] = useState([]);
-  const [nftData,setNftData] = useState([]);
+  const [nftData, setNftData] = useState([]);
   const [selectionMode, setSelectionMode] = useState(false);
   const [sortType, setSortType] = useState(POPULAR);
   const [listType, setListType] = useState("All Listings");
@@ -70,9 +69,18 @@ const Marketplace: React.FC = () => {
     changeOrder(item);
   };
 
-  useEffect(()=>{
+  /**
+   * Filters
+   */
+   const hasNonZeroReservePrice = ({reservePrice}) => (!!reservePrice)
 
-  },[refresh])
+  const canSelfCheck = (thing, index, self) => (index === self.findIndex((t) => (
+    JSON.stringify(t) === JSON.stringify(thing)
+  )))
+   
+
+  // useEffect(()=>{
+  // },[refresh])
 
   useEffect(()=>{
     setRefresh(!refresh);
@@ -124,121 +132,56 @@ const Marketplace: React.FC = () => {
   },[auctions])
 
   useEffect(() => {
-    // TODO - WHAT?
     if (window?.sessionStorage.getItem("nftitems")) {
-      getData();
-    } else {
-
-      // touch API iff no local version
       getData();
     }
   }, []);
 
   const getMoreListedItems = async (auctionsObject: Object) => {
-    const data = await getSubgraphData("listed_items", "");
-    let auctionData = await getSubgraphAuction("auctions","");
+    try {
+      const NOW = Math.round(Date.now()/1000);
+      const { auctions: _auctions = [] } = await getSubgraphAuction("auctions","");
     
-    auctionData = auctionData?.auctions.filter(x=>x.reservePrice!=0);
-    
-    auctionData = auctionData?.filter(x=>{
-      const curTimestamp = Math.round(Date.now()/1000);
-      
-      return Number(x.endTime)>curTimestamp;
-    });
-    
-    
-    let auctionDataHash = [];
-    await Promise.all(auctionData?.map(async x=>{
-      let _hash = await getSubgraphAuction("auctionsNFT",x.tokenAddress);
+      const activeAuctions = await Promise.all(_auctions
+        .filter(hasNonZeroReservePrice)
+        .filter(x => Number(x.endTime) - NOW)
+        .map(async auction => {
+          let hash = await getSubgraphAuction("auctionsNFT", auction.tokenAddress);
+          
+          return createListedAuction({
+            hash: hash.fraktalNft.hash,
+            ...auction
+          })
+        }))
+      // gets 100 nfts ordered by createdAt (desc)
+      const { listItems } = await getSubgraphData("listed_items", "");
+      // this goes in the graphql query
+      const listings = (await Promise.all(listItems
+        .filter(nft => (nft.fraktal.status == "open"))
+        .map(nft => (createListed(nft)))
+      )).filter(nft => nft != undefined)
 
-      const itm = {
-        "id":`${x.tokenAddress}-${x.sellerNonce}`,
-        "hash":_hash.fraktalNft.hash
-    };
-      
-      auctionDataHash.push(itm);
-    }));
-    
+      const allListings = activeAuctions.concat(listings);
 
-    let auctionItems = [];
-    await Promise.all(auctionData?.map(async (auction,idx)=>{
-      let hash = auctionDataHash.filter(e=>e.id==`${auction.tokenAddress}-${auction.sellerNonce}`);
-      
-      
-      Object.assign(auction,{"hash":hash[0].hash});
-      const item = await createListedAuction(auction);
-      
-      auctionItems.push(item);
-      }
-    ));
-
-    const result = auctionItems.filter((thing, index, self) =>
-      index === self.findIndex((t) => (
-        JSON.stringify(t) === JSON.stringify(thing)
-      ))
-    )
-    auctionItems = result;
-
-    let dataOnSale;
-    if (data?.listItems?.length != undefined) {
-      dataOnSale = data?.listItems?.filter(x => {
-        return x.fraktal.status == "open";
-      }); // this goes in the graphql query
-      
-    }
-
-    let newArray;
-    
-    if (dataOnSale?.length >= 0) {
-      let objects = await Promise.all(
-        dataOnSale.map(x => {
-          let res = createListed(x);
-          if (typeof res !== "undefined") {
-            return res;
-          }
-        })
-      ); //.then((results)=>setNftItems([...nftItems, ...results]));
-      let deduplicatedObjects = objects.filter(item => {
-        const objectMatch = nftItems.find(nft => nft.id === item.id);
-        if (typeof objectMatch === "undefined") {
-          return true;
-        } else return false;
-      });
-      
-      if (typeof deduplicatedObjects[0] === "undefined") {
-        newArray = [...auctionItems, ...nftItems, ...deduplicatedObjects];
-        setHasMore(false);
-      } else {
-        // const newArray = [...auctionItems, ...nftItems, ...deduplicatedObjects];
-        newArray = [...auctionItems, ...nftItems, ...deduplicatedObjects];
-        // setNftItems(newItemList);
-        
-      }
-
-      setNftData(newArray);
-      setNftItems(newArray);
       setHasMore(false);
-      
-      // handleSortSelect(sortType);
-      // handleListingSelect(listType);
+      setNftData(allListings);
+      setNftItems(allListings);
+    } catch (err) {
+      console.error(err)
     }
   };
 
   // Store NFT Items in Session Storage
   useEffect(() => {
 
-    const result = nftData.filter((thing, index, self) =>
-      index === self.findIndex((t) => (
-        JSON.stringify(t) === JSON.stringify(thing)
-      ))
-    );
+    const result = nftData.filter(canSelfCheck);
 
     const stringedNFTItems = JSON.stringify(result);
     if(stringedNFTItems.length>0){
       window?.sessionStorage?.setItem("nftitems", stringedNFTItems);
     }
     
-  }, [nftItems,nftData]);
+  }, [nftItems, nftData]);
 
   return (
     <>
@@ -343,7 +286,7 @@ const Marketplace: React.FC = () => {
                       if(item.endTime){//for auction
                         return (
                           <Anchor
-                            key={`${item.seller}-${item.sellerNonce}`}
+                            key={`${item.seller}-${item.sellerNonce}-${index}`}
                             href={`/nft/${item.seller}-${item.sellerNonce}/auction`}
                           >
                             <NFTAuctionItem
@@ -358,7 +301,7 @@ const Marketplace: React.FC = () => {
                       }else{
                         return (
                           <Anchor
-                            key={item.id}
+                            key={`${item.seller}-${item.sellerNonce}-${index}`}
                             href={`/nft/${item.tokenAddress}/details`}
                           >
                             <NFTItem
