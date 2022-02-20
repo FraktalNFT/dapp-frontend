@@ -140,7 +140,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 }
               >
                 <Image
-                  src={"https://es.web.img3.acsta.net/r_1280_720/pictures/20/01/20/09/36/3192169.jpg"}
+                  src={"https://tight-sunset-c448.e7149.workers.dev/?width=300&image=https://es.web.img3.acsta.net/r_1280_720/pictures/20/01/20/09/36/3192169.jpg"}
                   width="100%"
                   height="100%"
                   objectFit="cover"
