@@ -64,7 +64,6 @@ const Marketplace: React.FC = () => {
   * @param {string} type
   */
   useEffect(() => {
-    console.log(`sortingOptionId: ${sortingOptionId}`)
     const sortItems = (id: number) => {
       const {prop, dir} = sortingOptions[id]
       const items = [...nftItems].sort((a, b) => {
