@@ -44,7 +44,7 @@ const AUCTIONS_TYPE = 'Auction';
 const FIXED_PRICE_TYPE = "Fixed Price";
 const DEFAULT_TYPE = "All Listings";
 //const SORT_TYPES = [LOWEST_PRICE, HIGHEST_PRICE, NEWLY_LISTED, POPULAR];
-const SORT_TYPES = [LOWEST_PRICE, HIGHEST_PRICE];
+const SORT_TYPES = [LOWEST_PRICE, HIGHEST_PRICE, NEWLY_LISTED];
 /**
  * FRAKTAL Components
  */
@@ -57,7 +57,7 @@ const Marketplace: React.FC = () => {
   const [nftItems, setNftItems] = useState([]);
   const [nftData, setNftData] = useState([]);
   const [selectionMode, setSelectionMode] = useState(false);
-  const [sortType, setSortType] = useState(HIGHEST_PRICE);
+  const [sortType, setSortType] = useState(NEWLY_LISTED);
   const [listType, setListType] = useState(DEFAULT_TYPE);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
@@ -80,12 +80,11 @@ const Marketplace: React.FC = () => {
 
   useEffect(()=>{
     if (refresh === true) {
-        setHasMore(false);
-        setLoading(true);
-        getData();
+      setHasMore(false);
+      setLoading(true);
+      getData();
     }
   }, [refresh]);
-
 
   useEffect(() => {
      setLoading(true);
@@ -114,30 +113,24 @@ const Marketplace: React.FC = () => {
 
   const changeOrder = type => {
     let sortedItems;
+    setOffset(0);
+    setNftData([]);
+    setNftItems([]);
     if (type === LOWEST_PRICE) {
         setOrderDirection('asc');
-        setOffset(0);
-        setNftData([]);
-        setNftItems([]);
         setRefresh(true);
-      console.log('LOWEST')
     /*  sortedItems = nftItems.sort((a, b) =>
         a.price > b.price ? 1 : -1
       );*/
     } else if (type === HIGHEST_PRICE) {
       setOrderDirection('desc');
-      setOffset(0);
-      setNftData([]);
-      setNftItems([]);
       setRefresh(true);
-        console.log('HIGH')
     /*  sortedItems = nftItems.sort((a, b) =>
           a.price > b.price ? -1 : 1
       );*/
     } else if (type == NEWLY_LISTED) {
-        sortedItems = nftItems.sort((a, b) =>
-            a.createdAt > b.createdAt ? -1 : 1
-        );
+        setOrderDirection('desc');
+        setRefresh(true);
     } else {
         sortedItems = nftItems.sort((a, b) => (a.holders > b.holders ? -1 : 1));
     }
@@ -186,69 +179,85 @@ const Marketplace: React.FC = () => {
   }
 
   async function getData() {
-      console.log('OTRA VEZ')
-    const listedData = await getSubgraphData("limited_items", "", {
-        limit: limit,
-        offset: offset,
-        orderDirection: orderDirection
-    });
-    //TODO - Get the server timestamp
-    const curTimestamp = Math.round(Date.now() / 1000);
-    let auctionData = await getSubgraphAuction("auctions", "", {
-        limit: limit,
-        offset: offset,
-        endTime: curTimestamp,
-        orderDirection: orderDirection
-    });
-    console.log('auction', auctionData)
-    if (listedData?.listItems?.length == 0 && auctionData.auctions.length == 0) {
-        setHasMore(false);
-        return;
-    }
+        let listedData = {
+            listItems: []
+        };
+        if (sortType == NEWLY_LISTED) {
+            const fraktals = await getSubgraphData("all", "", {
+                limit: limit,
+                offset: offset,
+                orderDirection: "desc"
+            });
+            if (fraktals?.fraktalNfts.length >= 0) {
+                console.log('fraktals order', fraktals?.fraktalNfts)
+                await Promise.all(fraktals?.fraktalNfts.map(async fraktalNft => {
+                    let item = await getSubgraphData("listed_items_2", fraktalNft.id);
+               //     console.log('created', item.listItems[0])
+                    if (item.listItems[0] !== undefined) {
+                        listedData.listItems.push(item.listItems[0]);
+                    }
+                }));
+            }
+        } else {
+            listedData = await getSubgraphData("limited_items", "", {
+                limit: limit,
+                offset: offset,
+                orderDirection: orderDirection,
+                orderBy: "price"
+            });
+        }
 
-    const auctionItems = await mapAuctionToFraktal(auctionData);
+        //TODO - Get the server timestamp
+        const curTimestamp = Math.round(Date.now() / 1000);
+        let auctionData = await getSubgraphAuction("auctions", "", {
+            limit: limit,
+            offset: offset,
+            endTime: curTimestamp,
+            orderDirection: orderDirection
+        });
+        console.log('auction', auctionData)
+        if (listedData?.listItems?.length == 0 && auctionData.auctions.length == 0) {
+            setHasMore(false);
+            console.log('No items')
+            return;
+        }
 
-    let dataOnSale;
-    if (listedData?.listItems?.length != undefined) {
-      dataOnSale = listedData?.listItems?.filter(x => {
-        return x.fraktal.status == "open";
-      }); // this goes in the graphql query
-    }
+        const auctionItems = await mapAuctionToFraktal(auctionData);
 
-    if (dataOnSale?.length >= 0) {
-        let objects = await Promise.all(
-        dataOnSale.map(x => {
-        let res = createListed(x);
-          if (typeof res !== "undefined") {
-            return res;
-          }
-      })
-     );
+        let dataOnSale;
+        if (listedData?.listItems?.length != undefined) {
+          dataOnSale = listedData?.listItems?.filter(x => {
+            return x.fraktal.status == "open";
+          }); // this goes in the graphql query
+        }
 
-     let nfts;
-        nfts = [...auctionItems, ...nftItems, ...objects];
-     if (listType == FIXED_PRICE_TYPE) {
-         setNftItems([...nftItems, ...objects]);
-     } else if (listType == AUCTIONS_TYPE) {
-         setNftItems([...nftItems, ...auctionItems]);
-     } else {
-         setNftItems(nfts);
+        if (dataOnSale?.length >= 0) {
+            let objects = await Promise.all(
+            dataOnSale.map(x => {
+            let res = createListed(x);
+              if (typeof res !== "undefined") {
+                return res;
+              }
+          })
+         );
+
+        let nfts;
+            nfts = [...auctionItems, ...nftItems, ...objects];
+        if (listType == FIXED_PRICE_TYPE) {
+            setNftItems([...nftItems, ...objects]);
+        } else if (listType == AUCTIONS_TYPE) {
+            setNftItems([...nftItems, ...auctionItems]);
+        } else {
+            setNftItems(nfts);
+        }
+
+        setNftData(nfts);
+        console.log('nftitems', nfts)
+        setOffset(offset+limit);
+        setLoading(false);
+        setHasMore(true);
+        setRefresh(false);
      }
-
-      setNftData(nfts);
-      console.log('nftitems', nfts)
-      setOffset(offset+limit);
-      setLoading(false);
-      setHasMore(true);
-      setRefresh(false);
-     }
-
-    //console.log(orderByHolders(listedData));
-    //let auctionData = await getSubgraphAuction("auctions", "");
-    //auctionData = getAuctionData(auctionData);
-  //  console.log('auctions', auctionData);
-  //  setTotalNFT([...listedData.listItems, ...auctionData]);
-   // await getMoreListedItems(auctions);
   }
 
   const orderByHolders = (listedData) => {
@@ -351,7 +360,6 @@ const Marketplace: React.FC = () => {
     }
   };
 
-
   return (
     <>
       <Head>
@@ -442,7 +450,6 @@ const Marketplace: React.FC = () => {
                     gap="3.2rem"
                   >
                     {nftItems.map((item, index) => {
-                      <div>{item.name}</div>
                       if(item.endTime){//for auction
                         return (
                           <Anchor

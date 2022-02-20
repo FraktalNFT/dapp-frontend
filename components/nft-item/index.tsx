@@ -140,7 +140,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 }
               >
                 <Image
-                  src={imageURL}
+                  src={"https://es.web.img3.acsta.net/r_1280_720/pictures/20/01/20/09/36/3192169.jpg"}
                   width="100%"
                   height="100%"
                   objectFit="cover"
@@ -151,7 +151,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                     objectFit: `cover`,
                   }}
                   style={{ verticalAlign: "middle" }}
-                  onLoad={() => onImageLoad(2000)}
+                  onLoad={() => onImageLoad(5)}
                 />
               </Box>
               {!isImageLoaded && (

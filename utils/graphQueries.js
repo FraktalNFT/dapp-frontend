@@ -98,19 +98,6 @@ const marketid_query = gql`
     }
   }
 `;
-const all_nfts = gql`
-  query {
-    fraktalNfts(first: 20, orderBy: "createdAt", orderDirection: "desc") {
-      id
-      marketId
-      hash
-      createdAt
-      creator {
-        id
-      }
-    }
-  }
-`;
 const creators_review = gql`
   query {
     users {
@@ -389,8 +376,8 @@ const fraktalId_query = gql`
 
 
 const limitedItems = gql`
-  query($limit: Int!, $offset: Int!, $orderDirection: String!) {
-    listItems(first: $limit, skip: $offset, where: { amount_gt: 0 }, orderBy: price, orderDirection: $orderDirection) {
+  query($limit: Int!, $offset: Int!, $orderBy: String!, $orderDirection: String!) {
+    listItems(first: $limit, skip: $offset, where: { amount_gt: 0 }, orderBy: $orderBy, orderDirection: $orderDirection) {
       id
       price
       amount
@@ -415,9 +402,22 @@ const limitedItems = gql`
   }
 `;
 
+const all_nfts = gql`
+  query($limit: Int!, $offset: Int!, $orderDirection: String! ) {
+    fraktalNfts(first: $limit, skip: $offset, orderBy: createdAt, orderDirection: $orderDirection) {
+      id
+      marketId
+      hash
+      createdAt
+      creator {
+        id
+      }
+    }
+  }
+`;
 const listedItems2 = gql`
-  query($id: String) {
-    listItems(first: 100, where: { amount_gt: 0 }) {
+  query($id: ID!) {
+    listItems(where: { fraktal: $id }) {
       id
       price
       amount
@@ -431,7 +431,7 @@ const listedItems2 = gql`
         marketId
         createdAt
         status
-        fraktions(where: { amount_gt: 10 }) {
+        fraktions {
           amount
         }
         creator {
