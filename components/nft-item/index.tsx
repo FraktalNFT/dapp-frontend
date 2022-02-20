@@ -29,10 +29,10 @@ import { roundUp } from "../../utils/math";
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
-  name: String;
-  amount: String;
+  name: string;
+  amount: string;
   price: Number;
-  imageURL: String;
+  imageURL: string;
   CTAText?: string;
   wait?: number;
   height?: string;
@@ -110,7 +110,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const inVisibleAnimStyle = {
       animationName: `loadingCard`,
       animationDuration: `1s`,
-      "animation-iteration-count": `infinite`,
+      animationIterationCount: `infinite`,
     };
 
     return (
