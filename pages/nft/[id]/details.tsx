@@ -216,7 +216,7 @@ export default function DetailsView() {
   async function callUnlistItem() {
     let tx = await unlistItem(tokenAddress, provider, marketAddress);
     if (typeof tx !== "undefined") {
-      router.push("/my-nfts");
+      router.push("/my-nfts", null, {scroll: false});
     }
   }
 
@@ -283,7 +283,7 @@ export default function DetailsView() {
                     <Text
                       sx={{ color: `hsla(224, 86%, 51%, 1)` }}
                       _hover={{ cursor: `pointer` }}
-                      onClick={() => router.push(`/artist/${nftObject.creator}`)}
+                      onClick={() => router.push(`/artist/${nftObject.creator}`, null, {scroll: false})}
                     >
                       {nftObject ?
                         shortenHash(nftObject.creator)
@@ -369,7 +369,7 @@ export default function DetailsView() {
                   <FrakButton
                     disabled={fraktionsIndex == 0 || userFraktions < 1}
                     onClick={() =>
-                      router.push(`/nft/${nftObject.marketId}/list-item`)
+                      router.push(`/nft/${nftObject.marketId}/list-item`, null, {scroll: false})
                     }
                   >
                     List Fraktions
