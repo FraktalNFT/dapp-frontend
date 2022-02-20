@@ -57,7 +57,7 @@ const Marketplace: React.FC = () => {
   const [nftItems, setNftItems] = useState([]);
   const [nftData, setNftData] = useState([]);
   const [selectionMode, setSelectionMode] = useState(false);
-  const [sortType, setSortType] = useState(NEWLY_LISTED);
+  const [sortType, setSortType] = useState(HIGHEST_PRICE);
   const [listType, setListType] = useState(DEFAULT_TYPE);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
@@ -440,6 +440,7 @@ const Marketplace: React.FC = () => {
                   next={getMoreListedItems}
                   hasMore={hasMore}
                   loader={<Loading/>}
+                  scrollThreshold={0.5}
                   endMessage={<h4>Nothing more to show</h4>}
                 >
                   <Grid
