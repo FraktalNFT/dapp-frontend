@@ -18,6 +18,7 @@ import {
  */
 import Head from "next/head";
 import NextLink from "next/link";
+
 /**
  * Icons
  */
@@ -31,15 +32,17 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { utils } from "ethers";
 import { getSubgraphData, getSubgraphAuction } from "../utils/graphQueries";
 import { createListed, createListedAuction } from "../utils/nftHelpers";
+
 /**
- * Filters
- * @type {string}
+ * Sorting
  */
-const LOWEST_PRICE = "Lowest Price";
-const HIGHEST_PRICE = "Highest Price";
-const NEWLY_LISTED = "Newly Listed";
-const POPULAR = "Popular";
-const SORT_TYPES = [LOWEST_PRICE, HIGHEST_PRICE, NEWLY_LISTED, POPULAR];
+const sortingOptions = [
+  { prop: "price", dir: "asc", label: "Lowest Price"},
+  { prop: "price", dir: "desc", label: "Highest Price"},
+  { prop: "createdAt", dir: "desc", label: "Newly Listed"},
+  { prop: "holders", dir: "desc", label: "Popular"},
+]
+
 /**
  * FRAKTAL Components
  */
@@ -50,99 +53,82 @@ import Anchor from '@/components/anchor';
 
 const Marketplace: React.FC = () => {
   const [nftItems, setNftItems] = useState([]);
-  const [nftData, setNftData] = useState([]);
-  const [selectionMode, setSelectionMode] = useState(false);
-  const [sortType, setSortType] = useState(POPULAR);
   const [listType, setListType] = useState("All Listings");
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [auctions, setAuctions] = useState({});
-  const [refresh,setRefresh] = useState(false);
+
+  const [sortingOptionId, setSortingOptionId] = useState(0)
 
   /**
-  *
-  * @param {string} item
+  * Sort select handler
+  * @param {string} type
   */
-  const handleSortSelect = (item: string) => {
-    setSelectionMode(false);
-    setSortType(item);
-    changeOrder(item);
-  };
+  useEffect(() => {
+    console.log(`sortingOptionId: ${sortingOptionId}`)
+    const sortItems = (id: number) => {
+      const {prop, dir} = sortingOptions[id]
+      const items = [...nftItems].sort((a, b) => {
+        if(a[prop] > b[prop]) return 1
+        if(a[prop] < b[prop]) return -1
+        return 0
+      })
+      if (dir === "desc") {
+        items.reverse()
+      }
+      setNftItems(items)
+    }
+
+    sortItems(sortingOptionId)
+  }, [sortingOptionId])
 
   /**
    * Filters
    */
-   const hasNonZeroReservePrice = ({reservePrice}) => (!!reservePrice)
+  const hasNonZeroReservePrice = ({reservePrice}) => (!!reservePrice)
 
   const canSelfCheck = (thing, index, self) => (index === self.findIndex((t) => (
     JSON.stringify(t) === JSON.stringify(thing)
   )))
-   
-
-  // useEffect(()=>{
-  // },[refresh])
-
-  useEffect(()=>{
-    setRefresh(!refresh);
-    
-  },[nftItems]);
-
-  const changeOrder = type => {
-    let sortedItems;
-
-    if (type === LOWEST_PRICE) {
-      sortedItems = nftItems.sort((a, b) => a.price - b.price);
-    } else if (type === HIGHEST_PRICE) {
-      sortedItems = nftItems.sort((a, b) => b.price - a.price);
-    } else if (type == NEWLY_LISTED) {
-        sortedItems = nftItems.sort((a, b) => b.createdAt - a.createdAt);
-    } else {
-        sortedItems = nftItems.sort((a, b) => b.holders - a.holders);
-    }
-    setNftItems(sortedItems);
-  };
 
   const handleListingSelect = (item: string) => {
-    setSelectionMode(false);
     setListType(item);
     changeList(item);
   };
 
-
   const changeList = type => {
     let sortedItems;
     if (type == "All Listings") {
-      sortedItems = nftData;
+      sortedItems = nftItems;
     } else if (type == "Fixed Price") {
-      sortedItems = nftData.filter((item) => !item.endTime);
+      sortedItems = nftItems.filter((item) => !item.endTime);
     } else {
-      sortedItems = nftData.filter((item) => item.endTime);
+      sortedItems = nftItems.filter((item) => item.endTime);
     }
     setNftItems(sortedItems);
   };
 
   async function getData() {
     setLoading(true);
-    await getMoreListedItems(auctions);
+    await getMoreListedItems();
     setLoading(false);
   }
 
   useEffect(()=>{
-    getMoreListedItems(auctions);
-  },[auctions])
+    getMoreListedItems();
+  },[])
 
   useEffect(() => {
-    if (window?.sessionStorage.getItem("nftitems")) {
+    if (window.sessionStorage.getItem("nftitems")) {
       getData();
     }
   }, []);
 
   const getMoreListedItems = async () => {
     try {
-      const NOW = Math.round(Date.now()/1000);
-      const { auctions: _auctions = [] } = await getSubgraphAuction("auctions","");
+      const NOW = Math.ceil(Date.now() / 1000);
+      const { auctions = [] } = await getSubgraphAuction("auctions","");
     
-      const activeAuctions = await Promise.all(_auctions
+      const activeAuctions = await Promise.all(auctions
         .filter(hasNonZeroReservePrice)
         .filter(x => Number(x.endTime) - NOW)
         .map(async auction => {
@@ -153,6 +139,7 @@ const Marketplace: React.FC = () => {
             ...auction
           })
         }))
+
       // gets 100 nfts ordered by createdAt (desc)
       const { listItems } = await getSubgraphData("listed_items", "");
       // this goes in the graphql query
@@ -164,7 +151,6 @@ const Marketplace: React.FC = () => {
       const allListings = activeAuctions.concat(listings);
 
       setHasMore(false);
-      setNftData(allListings);
       setNftItems(allListings);
     } catch (err) {
       console.error(err)
@@ -173,15 +159,14 @@ const Marketplace: React.FC = () => {
 
   // Store NFT Items in Session Storage
   useEffect(() => {
-
-    const result = nftData.filter(canSelfCheck);
+    const result = nftItems.filter(canSelfCheck);
 
     const stringedNFTItems = JSON.stringify(result);
-    if(stringedNFTItems.length>0){
-      window?.sessionStorage?.setItem("nftitems", stringedNFTItems);
+    if(stringedNFTItems.length){
+      window.sessionStorage.setItem("nftitems", stringedNFTItems);
     }
     
-  }, [nftItems, nftData]);
+  }, [nftItems]);
 
   return (
     <>
@@ -205,16 +190,19 @@ const Marketplace: React.FC = () => {
               fontWeight="bold"
               transition="all 0.2s"
             >
-              Sort: {sortType}
+              Sort: {sortingOptions[sortingOptionId].label}
             </MenuButton>
             <MenuList>
-                {
-                    SORT_TYPES.map((sortType) => (
-                        <MenuItem onClick={() => handleSortSelect(sortType)}>
-                            {sortType}
-                        </MenuItem>
-                    ))
-                }
+              {
+                sortingOptions.map(({label}, idx) => (
+                  <MenuItem 
+                    key={`sort-${idx}`}  
+                    onClick={() => setSortingOptionId(idx)}
+                  >
+                    {label}
+                  </MenuItem>
+                ))
+              }
             </MenuList>
           </Menu>
           <Menu closeOnSelect={true}  >
@@ -265,7 +253,7 @@ const Marketplace: React.FC = () => {
         )}
         {!loading && (
           <div>
-            {nftItems?.length > 0 && (
+            {nftItems.length > 0 && (
               <>
                 <InfiniteScroll
                   dataLength={nftItems.length}
