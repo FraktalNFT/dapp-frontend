@@ -186,7 +186,7 @@ export async function createListed(data){
   }catch (err){
     return {error: `Error: ${err}`};
   }
-};
+}
 
 export async function createListedAuction(data){
   try{
@@ -208,4 +208,4 @@ export async function createListedAuction(data){
   }catch (err){
     return {error: `Error: ${err}`};
   }
-};
+}
