@@ -39,8 +39,11 @@ import toast from "react-hot-toast";
 import store from "../redux/store";
 import {APPROVE_TOKEN, IMPORT_FRAKTAL, IMPORT_NFT, LISTING_NFT, rejectContract} from "../redux/actions/contractActions";
 import LoadScreen from '../components/load-screens';
+import styles from "../styles/mint-nft.module.css";
+import NFTCard from "@/components/nftCard";
 
 const { create } = require("ipfs-http-client");
+const MAX_FRACTIONS = 10000;
 
 export default function ImportNFTPage() {
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
@@ -60,7 +63,7 @@ export default function ImportNFTPage() {
   const [isFraktionsAllowed, setIsFraktionsAllowed] = useState<boolean>(false);
   const [isNFTListed, setIsNFTListed] = useState<boolean>(false);
   const [isIntendedForListing, setIsIntentedForListing] = useState<boolean>(
-    false
+    true
   );
 
   const [tokenMintedAddress, setTokenMintedAddress] = useState<string>("");
@@ -409,162 +412,106 @@ export default function ImportNFTPage() {
                 width: `clamp(200px, 100%, 50ch)`,
               }}
             >
-              <Text sx={{ fontWeight: `700` }}>MetaData</Text>
-              <Box>
-                <Text my="4">Name</Text>
-                <Input
-                  value={NFTName}
-                  onChange={d => setNFTName(d.target.value) /* d for data */}
-                  placeholder="NFT Name"
-                  sx={{ fontSize: `14px` }}
-                />
-              </Box>
-              <Box>
-                <Text my="4">Description</Text>
-                <Textarea
-                  value={NFTDescription}
-                  onChange={
-                    d => setNFTDescription(d.target.value) /* d for data */
-                  }
-                  placeholder="NFT Description"
-                  sx={{ fontSize: `14px` }}
-                />
-              </Box>
-              {isIntendedForListing && <Box my={8}>
-                <Text sx={{ fontWeight: `700` }}>Fraktionalize</Text>
-
-                <Tabs isFitted variant='enclosed'
-                    onChange={(e)=>setIsAuction(!isAuction)}
-                    >
-                      <TabList mb='1em'>
-                        <Tab
-                        >Fixed Price</Tab>
-                        <Tab
-                        >Auction</Tab>
-                      </TabList>
-                      <TabPanels>
-                        <TabPanel>
-                      {/* for fixed price  */}
-                          <Box sx={{ display: `flex` }}>
-                              <Box>
-                                <Text>Total Price</Text>
-
-                                <NumberInput
-                                  placeholder={"5 ETH"}
-                                  value={totalPrice}
-                                  onChange={d => setTotalPrice(d) /* d for data */}
-                                  max={59000000}
-                                  mt={8}
-                                >
-                                  <NumberInputField
-                                    sx={{
-                                      borderRadius: `12px`,
-                                      fontSize: `14px`,
-                                      padding: `1ex 1em`,
-                                      textAlign: `right`,
-                                      height: `auto`,
-                                    }}
-                                  />
-                                </NumberInput>
-                                <Text sx={{ opacity: `0.75`, fontSize: `12px` }}>
-                                  Per Fraktion: {(totalPrice!="")&&parseInt(totalPrice) / 10000} ETH
-                                </Text>
-                              </Box>
-                              <Box sx={{ width: `1ch` }}></Box>
-                              <Box>
-                                <Text>Fraktions to List</Text>
-
-                                <NumberInput
-                                  placeholder={"5000"}
-                                  value={totalAmount}
-                                  onChange={
-                                    d => setTotalAmount(d) /* needs regex control */
-                                  }
-                                  max={10000}
-                                  mt={8}
-                                >
-                                  <NumberInputField
-                                    sx={{
-                                      borderRadius: `12px`,
-                                      fontSize: `14px`,
-                                      padding: `1ex 1em`,
-                                      textAlign: `right`,
-                                      height: `auto`,
-                                    }}
-                                  />
-                                </NumberInput>
-                                <Text sx={{ opacity: `0.75`, fontSize: `12px` }}>
-                                  Of 10000 Fraktions
-                                </Text>
-                              </Box>
-                          </Box>
-                        </TabPanel>
-                    <TabPanel>
-                      {/* for auction  */}
-                    <Box sx={{ display: `flex` }}>
-                              <Box>
-                                <Text>Reserve Price</Text>
-
-                                <NumberInput
-                                  placeholder={"5 ETH"}
-                                  value={totalPrice}
-                                  onChange={d => setTotalPrice(d) /* d for data */}
-                                  max={59000000}
-                                  mt={8}
-                                >
-                                  <NumberInputField
-                                    sx={{
-                                      borderRadius: `12px`,
-                                      fontSize: `14px`,
-                                      padding: `1ex 1em`,
-                                      textAlign: `right`,
-                                      height: `auto`,
-                                    }}
-                                  />
-                                </NumberInput>
-                                <Text sx={{ opacity: `0.75`, fontSize: `12px` }}>
-                                  Per Fraktion: {(totalPrice!="")&&parseInt(totalPrice) / 10000} ETH
-                                </Text>
-                              </Box>
-                              <Box sx={{ width: `1ch` }}></Box>
-                              <Box>
-                                <Text>Total Amount</Text>
-
-                                <NumberInput
-                                  placeholder={"5000"}
-                                  value={totalAmount}
-                                  onChange={
-                                    d => setTotalAmount(d) /* needs regex control */
-                                  }
-                                  max={10000}
-                                  mt={8}
-                                >
-                                  <NumberInputField
-                                    sx={{
-                                      borderRadius: `12px`,
-                                      fontSize: `14px`,
-                                      padding: `1ex 1em`,
-                                      textAlign: `right`,
-                                      height: `auto`,
-                                    }}
-                                  />
-                                </NumberInput>
-                                <Text sx={{ opacity: `0.75`, fontSize: `12px` }}>
-                                  Of 10000 Fraktions
-                                </Text>
-                              </Box>
-                          </Box>
-                    </TabPanel>
-                  </TabPanels>
-                </Tabs>
-              </Box>}
-              <Checkbox
-                isChecked={isIntendedForListing}
-                onChange={() => setIsIntentedForListing(v => !v)}
-                size="lg"
+             <div>
+            <NFTCard
+              setName={setNFTName}
+              setDescription={setNFTDescription}
+              addFile={()=>{}}
+              file={null}
+              fileUpload={false}
+            />
+          </div>
+          <Box
+              sx={{
+                display: `flex`,
+                gap: `12px`,
+                alignItems: `center`,
+                marginBottom: `8px`,
+              }}
+            >
+              {isIntendedForListing && (
+                <Box
+                  sx={{
+                    width: `16px`,
+                    height: `16px`,
+                    borderRadius: `4px`,
+                    display: `block`,
+                    backgroundColor: `#00C49D`,
+                  }}
+                  _hover={{
+                    cursor: `pointer`,
+                  }}
+                  onClick={() => setIsIntentedForListing(!isIntendedForListing)}
+                ></Box>
+              )}
+              {!isIntendedForListing && (
+                <Box
+                  sx={{
+                    width: `16px`,
+                    height: `16px`,
+                    borderRadius: `4px`,
+                    border: `2px solid rgba(0,0,0,0.3)`,
+                    display: `block`,
+                  }}
+                  _hover={{
+                    cursor: `pointer`,
+                  }}
+                  onClick={() => setIsIntentedForListing(!isIntendedForListing)}
+                ></Box>
+              )}
+              <Text
+                sx={{
+                  fontSize: `16px`,
+                  fontFamily: `Inter, sans-serif`,
+                  fontWeight: `700`,
+                }}
+                _hover={{
+                  cursor: `pointer`,
+                }}
+                onClick={() => setIsIntentedForListing(!isIntendedForListing)}
               >
                 Sell Fraktions
-              </Checkbox>
+              </Text>
+            </Box>
+            <div>
+              {isIntendedForListing && (
+                <Tabs isFitted variant='enclosed'
+                onChange={(e)=>setIsAuction(!isAuction)}
+                >
+                  <TabList mb='1em'>
+                    <Tab
+                    >Fixed Price</Tab>
+                    <Tab
+                    >Auction</Tab>
+                  </TabList>
+                  <TabPanels>
+                    <TabPanel>
+                <ListCard
+                  totalPrice={totalPrice}
+                  setTotalPrice={setTotalPrice}
+                  setTotalAmount={setTotalAmount}
+                  listingProcess={false}
+                  maxFraktions={MAX_FRACTIONS}
+                />
+                </TabPanel>
+                <TabPanel>
+                <ListCardAuction
+                    totalPrice={totalPrice}
+                    setTotalPrice={setTotalPrice}
+                    setTotalAmount={setTotalAmount}
+                    listingProcess={false}
+                    maxFraktions={MAX_FRACTIONS}
+                  />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+              )}
+            </div>
+              
+              
+              
+
+
               <Box
                 sx={{
                   display: `flex`,

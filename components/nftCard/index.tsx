@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 import FrakButton3 from "../button3";
 import styles from "../../styles/mint-nft.module.css";
 import { Box, Input, Textarea } from "@chakra-ui/react";
-const MintCard = ({ setName, setDescription, addFile, file }) => {
+const NFTCard = ({ setName, setDescription, addFile, file, fileUpload=true }) => {
   function openLocal() {
     document.getElementById("imageInput").files = null;
     document.getElementById("imageInput").click();
@@ -35,7 +35,8 @@ const MintCard = ({ setName, setDescription, addFile, file }) => {
         }}
         onChange={e => setName(e.target.value)}
       />
-      <div>
+      {fileUpload ? 
+      (<div>
         <div
           style={{
             fontSize: "12px",
@@ -59,7 +60,7 @@ const MintCard = ({ setName, setDescription, addFile, file }) => {
           {file ? "Change File" : "Choose File"}
         </FrakButton3>
         <Box sx={{height: `16px`}}></Box>
-      </div>
+      </div>): null}
       <div
         style={{
           fontSize: "12px",
@@ -89,4 +90,4 @@ const MintCard = ({ setName, setDescription, addFile, file }) => {
   );
 };
 
-export default MintCard;
+export default NFTCard;
