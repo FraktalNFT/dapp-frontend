@@ -91,7 +91,7 @@ export default function FixPriceNFTView() {
         nftObject.tokenAddress,
         provider,
         marketAddress).then(()=>{
-          router.push('/my-nfts');
+          router.push('/my-nfts', null, {scroll: false});
         })
 
     }catch(e){
@@ -103,7 +103,7 @@ export default function FixPriceNFTView() {
     try {
       let tx = await claimFraktalSold(nftObject.marketId, provider, contractAddress);
       if(tx){
-        router.push('/my-nfts');
+        router.push('/my-nfts', null, {scroll: false});
       }
     }catch(e){
       console.error('There has been an error: ',e)

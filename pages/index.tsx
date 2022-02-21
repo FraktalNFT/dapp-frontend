@@ -82,12 +82,12 @@ const LandingPage = () => {
                     <Grid className={styles.landingButtonContainer} templateColumns='repeat(2, 1fr)' gap={6}>
                         <GridItem w='100%'>
                             <FrakButton
-                                onClick={() => {router.push(EXPLORE)}}
+                                onClick={() => {router.push(EXPLORE, null, {scroll: false})}}
                                 px="80px">Explore</FrakButton>
                         </GridItem>
                         <GridItem w='100%'>
                             <FrakButton
-                                onClick={() => {router.push(CREATE_NFT)}}
+                                onClick={() => {router.push(CREATE_NFT, null, {scroll: false})}}
                                 border="2px solid #000"
                                 px="80px"
                                 background="#ffffff"

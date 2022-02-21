@@ -96,7 +96,7 @@ const LoadScreen = ((props) => {
   };
 
   const goToTokenAddress = (tokenAddress) => {
-      router.push("/nft/" + tokenAddress + '/details').then(r => {
+      router.push("/nft/" + tokenAddress + '/details', null,  {scroll: false}).then(r => {
 
           return router.reload();
       });
