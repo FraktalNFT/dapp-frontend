@@ -46,7 +46,8 @@ import Anchor from '@/components/anchor';
  * STYLES
  */
 import styles from "../styles/landing.module.css";
-import {CREATE_NFT, EXPLORE} from "@/constants/routes";
+import {CREATE_NFT, EXPLORE, REWARDS} from "@/constants/routes";
+
 //TODO LandingPage ADD PROPS
 
 /**
@@ -96,11 +97,13 @@ const LandingPage = () => {
                     </Grid>
                     <Text className={styles.landingPowered}>Powered by FRAK</Text>
                     <List className={styles.landingItems} spacing={5}>
-                        <ListItem>
+                        <ListItem
+                        onClick={() => {router.push(REWARDS, null, {scroll: false})}}>
                             <ListIcon as={FaCoins} color='yellow.500' marginRight="10px"  />
                             Earn FRAK from trading to offset gas costs
                         </ListItem>
-                        <ListItem>
+                        <ListItem
+                          onClick={() => {router.push(REWARDS, null, {scroll: false})}}>
                             <ListIcon as={GiProfit} color='green.500' marginRight="10px" />
                             Stake FRAK and earn ETH from transaction fees
                         </ListItem>

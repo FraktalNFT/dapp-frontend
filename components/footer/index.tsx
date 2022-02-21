@@ -12,13 +12,13 @@ const urlLists = [
     items: [
       { text: "Blog", url: "https://blog.fraktal.io/" },
       { text: "Docs", url: "https://docs.fraktal.io/" },
-      { text: "Audit", url: "" }
+      { text: "Audit", url: "https://github.com/FraktalNFT/audits" }
     ]
   },
   {
     title: "Get Involved",
     items: [
-      { text: "Stake", url: "" },
+      { text: "Stake", url: "https://docs.fraktal.io/fraktal-governance-token-frak/staking-frak" },
       { text: "DAO", url: "https://docs.fraktal.io/fraktal-dao/overview" },
       { text: "Github", url: "https://github.com/FraktalNFT" },
     ]
@@ -26,9 +26,9 @@ const urlLists = [
   {
     title: "Need Help?",
     items: [
-      { text: "How it Works", url: "" },
-      { text: "Tutorials", url: "" },
-      { text: "Support", url: "https://discord.gg/B9atrdtEEx" }
+      { text: "How it Works", url: "https://docs.fraktal.io/marketplace/get-started" },
+      { text: "Tutorials", url: "https://www.youtube.com/channel/UCUpcKyPeUJ2Mhx7OWOSZL6w" },
+      { text: "Support", url: "https://discord.com/invite/P6fCPvtZtq" }
     ]
   }
 ]
@@ -36,23 +36,24 @@ const urlLists = [
 const socials = [
   { url: "https://twitter.com/fraktalnft", icon: TwitterIcon },
   { url: "https://www.instagram.com/fraktal.io/", icon: InstagramIcon },
-  { url: "https://discord.gg/B9atrdtEEx", icon: DiscordIcon },
+  { url: "https://discord.com/invite/P6fCPvtZtq", icon: DiscordIcon },
   // { url: "https://youtube.com", icon: InstagramIcon },
+  { url: "https://blog.fraktal.io/", icon: MediumIcon },
   { url: "https://blog.fraktal.io/", icon: MediumIcon }
 ]
 
 const Footer: React.FC = () => {
   return (
-    <Container 
+    <Container
       maxW={["100%", "38.4rem", "96.4rem"]}
-      py={["5rem"]}
+      py={["10rem"]}
     >
       <Flex direction={["column", "column", "row", "row"]} justify="space-between">
         <Box alignItems="start" flex={["1 1", "0.6 1", "1 1", "0.6 1"]}>
           <Image src="/fraktal-full-logo.png" w={["100%", "320px"]}/>
           <Text fontSize={16} my="40px" lineHeight="30px" fontWeight={500} color="grey.500">
-            Fraktal is a community first project, with a mission to to empower 
-            artists to be in full control of their work and have unlimited 
+            Fraktal is a community first project, with a mission to to empower
+            artists to be in full control of their work and have unlimited
             creative freedom.
           </Text>
 
@@ -69,7 +70,7 @@ const Footer: React.FC = () => {
             © Fraktal Technologies Ltd.
           </Text>
         </Box>
-        
+
 
       {urlLists.map(({title, items}, idx) => (
         <Flex direction="column" key={`footer-list-${idx}`}>
@@ -83,7 +84,7 @@ const Footer: React.FC = () => {
                   rel="noreferrer noopener"
                   display="flex"
                   alignItems="center"
-                >                
+                >
                 <Text as="span" variant="footer">{text}</Text>
               </Link>
             </ListItem>
