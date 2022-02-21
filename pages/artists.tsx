@@ -9,7 +9,7 @@ import styles from "../styles/artists.module.css";
 import { Image } from "@chakra-ui/image";
 import { shortenHash } from "../utils/helpers";
 import { getSubgraphData } from "../utils/graphQueries";
-import { createObject2 } from "../utils/nftHelpers";
+import { checkImageCID, fetchNftMetadata, createObject2 } from "../utils/nftHelpers";
 import { useWeb3Context } from "../contexts/Web3Context";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ArtistCard from "@/components/artistCard/ArtistCard";
@@ -33,62 +33,32 @@ export default function ArtistsView() {
     setSelectionMode(false);
   };
 
-
-  function getArtistsObjects(artists, artistsItems) {
-    const artistsObj = artists.map((x, i) => ({
-      id: x.id,
-      name: shortenHash(x.id),
-      imageURL: artistsItems[i]
-        ? artistsItems[i].imageURL
-        : "/filler-image-1.png",
-      totalGallery: x.created.length,
-    }));
-    return artistsObj;
-  }
-
-  async function fetchNewArtists() {
-    const data = await getSubgraphData("artists", "");
-    if (data && factoryAddress) {
-      let onlyCreators = data.users.filter(x => {
-        return x.created.length > 0;
-      });
-      let noImporters = onlyCreators.filter(x => {
-        return x.id != factoryAddress.toLocaleLowerCase();
-      });
-      setArtists([...artists, ...noImporters]);
-      let fraktalSamples = noImporters.map(x => {
-        return x.created[0];
-      }); // list the first NFT in the list of 'nfts this artist made'
-      let fraktalsSamplesObjects = await Promise.all(
-        fraktalSamples.map(x => {
-          return createObject2(x);
-        })
-      );
-      let artistObjects = getArtistsObjects(
-        noImporters,
-        fraktalsSamplesObjects
-      );
-      // make sure you're pulling new subgraph data
-      let deduplicatedArtistObjects = artistObjects.filter(item => {
-        const artistMatch = artistsItems.find(artist => artist.id === item.id);
-        if (typeof artistMatch === "undefined") {
-          return true;
-        } else return false;
-      });
-      if (typeof deduplicatedArtistObjects[0] === "undefined") {
-        setHasMore(false); // no new ArtistObjects, congrats on reaching the end of the internet
-      } else {
-        const newArray = [...artistsItems, ...deduplicatedArtistObjects];
-        setArtistsItems(newArray);
-      }
+  const fetchArtists = async () => {
+    try {
+      const { users = [] } = await getSubgraphData("firstArtists", "");
+      const artists = await Promise.all(users
+        .filter(({created}) => created.length > 0)
+        .map(async artist => {
+          const [nft] = artist.created
+          const meta = await fetchNftMetadata(nft.hash)
+          const image = checkImageCID(meta.image)
+          return {
+            ...artist,
+            ...meta,
+            image
+          }
+        }))
+      setArtists(artists)
+    } catch (err) {
+      console.error(err)
     }
   }
 
   function searchHandle(e){
     e.preventDefault();
     if(e.target.value !== ""){
-      const inputVal=e.target.value;
-      let address_Artist= inputVal;
+      const inputVal = e.target.value;
+      let address_Artist = inputVal;
       if(!inputVal.startsWith("0x")){
         setInputAddress(e.target.value);
       }
@@ -98,33 +68,7 @@ export default function ArtistsView() {
   const [isENSAddressValid, ethAddressFromENS] = useENSAddress(inputAddress)
 
   useEffect(() => {
-    const fetchInitialArtists = async () => {
-      const data = await getSubgraphData("firstArtists", "");
-      if (data && factoryAddress) {
-        let onlyCreators = data.users.filter(x => {
-          return x.created.length > 0;
-        });
-        let noImporters = onlyCreators.filter(x => {
-          return x.id != factoryAddress.toLocaleLowerCase();
-        }); // why?
-        setArtists(noImporters); // why?
-        let fraktalSamples = noImporters.map(x => {
-          return x.created[0];
-        }); // list the first NFT in the list of 'nfts this artist made'
-        let fraktalsSamplesObjects = await Promise.all(
-          fraktalSamples.map(x => {
-            return createObject2(x);
-          })
-        );
-        let artistsObj = getArtistsObjects(noImporters, fraktalsSamplesObjects);
-        if (artistsObj) {
-          setArtistsItems(artistsObj);
-        } else {
-          setArtistsItems([]);
-        }
-      }
-    };
-    fetchInitialArtists();
+    fetchArtists()
   }, [factoryAddress]);
 
   return (
@@ -160,11 +104,11 @@ export default function ArtistsView() {
             onChange={searchHandle}
           />
           {
-            artistAddress !=="" &&
+            artistAddress !== "" &&
               <NextLink
-                      href={`/artist/${artistAddress.startsWith("0x") ? artistAddress : ethAddressFromENS}`}
-                      key={`link--${artistAddress}`}
-                    >
+                href={`/artist/${artistAddress.startsWith("0x") ? artistAddress : ethAddressFromENS}`}
+                key={`link--${artistAddress}`}
+              >
                 <Image src="/search.svg" />
               </NextLink>
           }
@@ -172,11 +116,11 @@ export default function ArtistsView() {
         </div> 
       </HStack>
 
-      {!loading && artistsItems.length > 0 && (
+      {!loading && artists.length > 0 && (
         <>
           <InfiniteScroll
-            dataLength={artistsItems.length}
-            next={async () => await fetchNewArtists()}
+            dataLength={artists.length}
+            next={async () => await fetchArtists()}
             hasMore={hasMore}
             loader={<h3> Loading...</h3>}
             endMessage={<h4>Nothing more to show</h4>}
@@ -188,15 +132,15 @@ export default function ArtistsView() {
               templateColumns="repeat(3, 1fr)"
               gap="3.2rem"
             >
-              {artistsItems.map((item, i) => {
+              {artists.map((artist, i) => {
                 return (
                   <NextLink
-                    href={`/artist/${item.id}`}
-                    key={`link--${item.id}-${i}`}
+                    href={`/artist/${artist.id}`}
+                    key={`link--${artist.id}-${i}`}
                   >
                     <ArtistCard
-                      bg={item.imageURL}
-                      onClick={() => router.push(`/artist/${item.id}`)}
+                      bg={artist.image}
+                      onClick={() => router.push(`/artist/${artist.id}`)}
                     />
                   </NextLink>
                 );
