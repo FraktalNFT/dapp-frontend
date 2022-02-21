@@ -38,6 +38,7 @@ const socials = [
   { url: "https://www.instagram.com/fraktal.io/", icon: InstagramIcon },
   { url: "https://discord.com/invite/P6fCPvtZtq", icon: DiscordIcon },
   // { url: "https://youtube.com", icon: InstagramIcon },
+  { url: "https://blog.fraktal.io/", icon: MediumIcon },
   { url: "https://blog.fraktal.io/", icon: MediumIcon }
 ]
 
