@@ -52,6 +52,8 @@ import NFTItem from "../components/nft-item";
 import NFTAuctionItem from "@/components/nft-auction-item";
 import FrakButton from "../components/button";
 import Anchor from '@/components/anchor';
+import {MY_NFTS, MINT_NFT} from "@/constants/routes";
+
 
 const Marketplace: React.FC = () => {
   const [nftItems, setNftItems] = useState([]);
@@ -119,15 +121,9 @@ const Marketplace: React.FC = () => {
     if (type === LOWEST_PRICE) {
         setOrderDirection('asc');
         setRefresh(true);
-    /*  sortedItems = nftItems.sort((a, b) =>
-        a.price > b.price ? 1 : -1
-      );*/
     } else if (type === HIGHEST_PRICE) {
       setOrderDirection('desc');
       setRefresh(true);
-    /*  sortedItems = nftItems.sort((a, b) =>
-          a.price > b.price ? -1 : 1
-      );*/
     } else if (type == NEWLY_LISTED) {
         setOrderDirection('desc');
         setRefresh(true);
@@ -155,6 +151,11 @@ const Marketplace: React.FC = () => {
     setNftItems(sortedItems);
   };
 
+    /**
+     * Map Auction To Fraktal
+     * @param auctionData
+     * @returns {Promise<any[]>}
+     */
   async function mapAuctionToFraktal(auctionData) {
       let auctionDataHash = [];
       await Promise.all(auctionData?.auctions.map(async x => {
@@ -178,26 +179,40 @@ const Marketplace: React.FC = () => {
       return auctionItems;
   }
 
-  async function getData() {
+   /**
+   * getByDate
+   * @returns {Promise<{listItems: any[]}>}
+  */
+  async function getByDate() {
+      let listedData = {
+          listItems: []
+      };
+      const fraktals = await getSubgraphData("all", "", {
+          limit: limit,
+          offset: offset,
+          orderDirection: "desc"
+      });
+      if (fraktals?.fraktalNfts.length >= 0) {
+      }
+      await Promise.all(fraktals?.fraktalNfts.map(async fraktalNft => {
+          let item = await getSubgraphData("listed_items_by_fraktal_id", fraktalNft.id);
+          if (item.listItems[0] !== undefined) {
+              listedData.listItems.push(item.listItems[0]);
+          }
+      }));
+      return listedData;
+  }
+
+   /**
+   * getData
+   * @returns {Promise<void>}
+   */
+   async function getData() {
         let listedData = {
             listItems: []
         };
         if (sortType == NEWLY_LISTED) {
-            const fraktals = await getSubgraphData("all", "", {
-                limit: limit,
-                offset: offset,
-                orderDirection: "desc"
-            });
-            if (fraktals?.fraktalNfts.length >= 0) {
-                console.log('fraktals order', fraktals?.fraktalNfts)
-                await Promise.all(fraktals?.fraktalNfts.map(async fraktalNft => {
-                    let item = await getSubgraphData("listed_items_2", fraktalNft.id);
-               //     console.log('created', item.listItems[0])
-                    if (item.listItems[0] !== undefined) {
-                        listedData.listItems.push(item.listItems[0]);
-                    }
-                }));
-            }
+            listedData = await getByDate();
         } else {
             listedData = await getSubgraphData("limited_items", "", {
                 limit: limit,
@@ -209,16 +224,15 @@ const Marketplace: React.FC = () => {
 
         //TODO - Get the server timestamp
         const curTimestamp = Math.round(Date.now() / 1000);
-        let auctionData = await getSubgraphAuction("auctions", "", {
+        let auctionData = await getSubgraphAuction("limited_auctions", "", {
             limit: limit,
             offset: offset,
             endTime: curTimestamp,
             orderDirection: orderDirection
         });
-        console.log('auction', auctionData)
+
         if (listedData?.listItems?.length == 0 && auctionData.auctions.length == 0) {
             setHasMore(false);
-            console.log('No items')
             return;
         }
 
@@ -252,7 +266,6 @@ const Marketplace: React.FC = () => {
         }
 
         setNftData(nfts);
-        console.log('nftitems', nfts)
         setOffset(offset+limit);
         setLoading(false);
         setHasMore(true);
@@ -263,101 +276,6 @@ const Marketplace: React.FC = () => {
   const orderByHolders = (listedData) => {
       listedData.listItems.sort((a, b) => (a.fraktal.fraktions.length > b.fraktal.fraktions.length ? -1 : 1));
       return listedData;
-  };
-
-  const getMoreListedItemsOld = async (auctionsObject:Object) => {
-    console.log("Triggered")
-
-   // const data = await getSubgraphData("limited_items", "", 15);
-    const data = await getSubgraphData("listed_items", "", 15);
-    let auctionData = await getSubgraphAuction("auctions","");
-    
-    auctionData = auctionData?.auctions.filter(x=>x.reservePrice!=0);
-    
-    auctionData = auctionData?.filter(x=>{
-      const curTimestamp = Math.round(Date.now()/1000);
-      return Number(x.endTime) > curTimestamp;
-    });
-    
-    
-    let auctionDataHash = [];
-    await Promise.all(auctionData?.map(async x=>{
-      let _hash = await getSubgraphAuction("auctionsNFT", x.tokenAddress);
-
-      const itm = {
-        "id":`${x.tokenAddress}-${x.sellerNonce}`,
-        "hash":_hash.fraktalNft.hash
-      };
-      
-      auctionDataHash.push(itm);
-    }));
-    
-
-    let auctionItems = [];
-    await Promise.all(auctionData?.map(async (auction, idx) => {
-      let hash = auctionDataHash.filter(e=>e.id == `${auction.tokenAddress}-${auction.sellerNonce}`);
-
-      Object.assign(auction, {"hash":hash[0].hash});
-      const item = await createListedAuction(auction);
-      
-      auctionItems.push(item);
-      }
-    ));
-
-    const result = auctionItems.filter((thing, index, self) =>
-      index === self.findIndex((t) => (
-        JSON.stringify(t) === JSON.stringify(thing)
-      ))
-    );
-    auctionItems = result;
-    
-
-    // if(JSON.stringify(auctionItems)==JSON.stringify(auctionsObject)){
-    //   console.log("no changes");
-      
-    //   return;
-    // }
-    let dataOnSale;
-    if (data?.listItems?.length != undefined) {
-      dataOnSale = data?.listItems?.filter(x => {
-        return x.fraktal.status == "open";
-      }); // this goes in the graphql query
-      
-    }
-
-    let newArray;
-    
-    if (dataOnSale?.length >= 0) {
-      let objects = await Promise.all(
-        dataOnSale.map(x => {
-          let res = createListed(x);
-          if (typeof res !== "undefined") {
-            return res;
-          }
-        })
-      ); //.then((results)=>setNftItems([...nftItems, ...results]));
-      let deduplicatedObjects = objects.filter(item => {
-        const objectMatch = nftItems.find(nft => nft.id === item.id);
-        if (typeof objectMatch === "undefined") {
-          return true;
-        } else return false;
-      });
-      
-      if (typeof deduplicatedObjects[0] === "undefined") {
-        newArray = [...auctionItems, ...nftItems, ...deduplicatedObjects];
-        setHasMore(false);
-      } else {
-        newArray = [...auctionItems, ...nftItems, ...deduplicatedObjects];
-      }
-
-      setNftData(newArray);
-      setNftItems(newArray);
-      setHasMore(true);
-      //console.log('total NFT', newArray)
-
-    } else{
-      //TODO - REMOVE THIS ELSE
-    }
   };
 
   return (
@@ -495,7 +413,7 @@ const Marketplace: React.FC = () => {
                 <Text className="medium-16">
                   Check back later or list your own!
                 </Text>
-                <NextLink href="/mint-nft">
+                <NextLink href={MINT_NFT}>
                   <FrakButton mt="1.6rem !important">Mint NFT</FrakButton>
                 </NextLink>
               </VStack>
