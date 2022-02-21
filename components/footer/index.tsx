@@ -46,7 +46,7 @@ const Footer: React.FC = () => {
   return (
     <Container
       maxW={["100%", "38.4rem", "96.4rem"]}
-      py={["5rem"]}
+      py={["10rem"]}
     >
       <Flex direction={["column", "column", "row", "row"]} justify="space-between">
         <Box alignItems="start" flex={["1 1", "0.6 1", "1 1", "0.6 1"]}>
