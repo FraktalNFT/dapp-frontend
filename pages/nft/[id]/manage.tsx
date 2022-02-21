@@ -25,6 +25,7 @@ import {
   getLocked,
 } from "../../../utils/contractCalls";
 import { useRouter } from "next/router";
+import {EXPLORE} from "@/constants/routes";
 
 export default function ManageNFTView() {
   const { account, provider, contractAddress } = useWeb3Context();
@@ -210,7 +211,7 @@ export default function ManageNFTView() {
         <title>Fraktal - NFT</title>
       </Head>
       <div>
-        <Link href="/">
+        <Link href={EXPLORE}>
           <div className={styles.goBack}>← back to all NFTS</div>
         </Link>
         <div className={styles.header}>{nftObject ? nftObject.name : ""}</div>

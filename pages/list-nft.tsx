@@ -131,7 +131,6 @@ const MintPage = (props) => {
           if (!response?.error) {
               setIsMinting(false);
               setTokenMintedAddress(response);
-              console.log('Approved');
               let mintingArray = [];
               if (window?.localStorage.getItem("mintingNFTS")) {
                   let mintingNFTSString = window?.localStorage.getItem("mintingNFTS");
