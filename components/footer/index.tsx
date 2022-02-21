@@ -28,7 +28,7 @@ const urlLists = [
     items: [
       { text: "How it Works", url: "https://docs.fraktal.io/marketplace/get-started" },
       { text: "Tutorials", url: "https://www.youtube.com/channel/UCUpcKyPeUJ2Mhx7OWOSZL6w" },
-      { text: "Support", url: "https://discord.gg/B9atrdtEEx" }
+      { text: "Support", url: "https://discord.com/invite/P6fCPvtZtq" }
     ]
   }
 ]
