@@ -277,7 +277,7 @@ const MintPage = (props) => {
       marketAddress
     ).then(() => {
         setInterval(() => {
-            router.push(EXPLORE);
+            router.push(EXPLORE, null, {scroll: false});
         }, 1000);
     }).catch(error => {
       mintNFTRejected(error, listNewItem);
@@ -295,7 +295,7 @@ const MintPage = (props) => {
       marketAddress
     ).then(() => {
         setInterval(() => {
-            router.push(EXPLORE);
+            router.push(EXPLORE, null, {scroll: false});
         }, 1000);
     }).catch(error => {
         mintNFTRejected(error, listNewAuctionItem);
@@ -395,7 +395,7 @@ const MintPage = (props) => {
               borderRadius="25"
               padding="5"
               _hover={{ bg: "black", textColor: "white" }}
-              onClick={() => router.push(IMPORT_NFT)}
+              onClick={() => router.push(IMPORT_NFT, null, {scroll: false})}
             >
               Import NFT
             </Link>

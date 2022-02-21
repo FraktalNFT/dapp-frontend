@@ -140,7 +140,7 @@ export default function ListNFTView() {
       provider,
       marketAddress)
     if(tx) {
-      router.push(MY_NFTS);
+      router.push(MY_NFTS, null, {scroll: false});
     }
   }
   async function listNewItem(){
@@ -157,7 +157,7 @@ export default function ListNFTView() {
         provider,
         marketAddress).then(()=>{
           setInterval(() => {
-              router.push(EXPLORE)
+              router.push(EXPLORE, null, {scroll: false})
           }, 1000);
 
         }).catch(e => {
@@ -175,7 +175,7 @@ export default function ListNFTView() {
         provider,
         marketAddress).then(()=>{
           setInterval(() => {
-              router.push(EXPLORE)
+              router.push(EXPLORE, null, {scroll: false})
           }, 1000);
         }).catch(e => {
           store.dispatch(rejectContract(LISTING_NFT, e, listNewItem));

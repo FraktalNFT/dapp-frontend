@@ -140,7 +140,7 @@ export default function ImportNFTPage() {
       setIsNFTImported(true);
       if (!isIntendedForListing) {
         setInterval(() => {
-          router.push('/my-nfts');
+          router.push('/my-nfts', null, {scroll: false});
         }, 1000);
       }
     }
@@ -196,7 +196,7 @@ export default function ImportNFTPage() {
     ).then(receipt => {
       setIsNFTListed(true);
       setInterval(() => {
-        router.push('/my-nfts');
+        router.push('/my-nfts', null, {scroll: false});
       }, 1000);
     }).catch(error => {
         store.dispatch(rejectContract(LISTING_NFT, error, listNewItem));
@@ -213,7 +213,7 @@ export default function ImportNFTPage() {
     ).then(receipt => {
         setIsNFTListed(true);
         setInterval(() => {
-            router.push('/my-nfts');
+            router.push('/my-nfts', null, {scroll: false});
         }, 1000);
     }).catch(error => {
         store.dispatch(rejectContract(LISTING_NFT, error, listItemAuction));
@@ -297,7 +297,7 @@ export default function ImportNFTPage() {
                 borderRadius: `24px`,
                 cursor: `pointer`,
               }}
-              onClick={() => router.push("/list-nft")}
+              onClick={() => router.push("/list-nft", null, {scroll: false})}
             >
               Mint NFT
             </Box>
