@@ -86,6 +86,7 @@ export default function MintNFTView() {
   const proportionalImage = width => {
     return (imageSize[1] / imageSize[0]) * width;
   };
+
   return (
     <VStack spacing="0" mb="12.8rem">
       <Head>

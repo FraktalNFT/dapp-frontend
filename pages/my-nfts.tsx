@@ -46,6 +46,9 @@ import {
   getAuctionListings,
 } from "../utils/contractCalls";
 
+
+import {EXPLORE} from "@/constants/routes";
+
 export default function MyNFTsView() {
   const router = useRouter();
   const toast = useToast();
@@ -513,7 +516,7 @@ export default function MyNFTsView() {
               If you have already invested, contributions do not appear until
               the auctions are over.
             </Text>
-            <NextLink href={"/"}>
+            <NextLink href={EXPLORE}>
               <FrakButton
                 isOutlined
                 style={{ width: "240px", marginTop: "24px" }}
