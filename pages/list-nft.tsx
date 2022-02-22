@@ -1,5 +1,5 @@
 import FrakButton4 from "../components/button4";
-import MintCard from "../components/mintCard";
+import NFTCard from "../components/nftCard";
 import ListCardAuction from "../components/listCardAuction";
 import ListCard from "../components/listCard";
 import {
@@ -400,7 +400,7 @@ const MintPage = (props) => {
             </Link>
           </div>
           <div>
-            <MintCard
+            <NFTCard
               setName={setName}
               setDescription={setDescription}
               addFile={addFile}
