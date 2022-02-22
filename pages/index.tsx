@@ -60,7 +60,7 @@ const LandingPage = () => {
     const router = useRouter();
 
     const getItem = async () => {
-        //TODO - Get most popular NFT without listed items
+        //TODO - Get the most popular NFT without listing the items
         const data = await getSubgraphData("listed_items", "");
         const mostPopular = getMostPopular(data.listItems)[0];
         let nftObjects = await createListed(mostPopular);
