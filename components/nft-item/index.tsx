@@ -8,6 +8,8 @@ import {
   VStack,
   BoxProps,
   Spinner,
+  Tag,
+  TagLabel,
 } from "@chakra-ui/react";
 import React, { forwardRef } from "react";
 import {
@@ -179,9 +181,14 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
               )}
             </VStack>
             <Box margin="1rem">
-              <Text className="semi-16" mb="1rem">
-                {name}
-              </Text>
+              <Flex alignItems="center" justifyContent="space-between" mb="1rem">
+                <Text className="semi-16">
+                  {name}
+                </Text>
+                <Tag size="lg">
+                  <TagLabel fontSize="xl">Fixed Price</TagLabel>
+                </Tag>
+              </Flex>
               <Flex>
                 {amount && (
                   <Text className="medium-12">{showAmount}% Available</Text>

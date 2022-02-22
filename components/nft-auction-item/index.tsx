@@ -9,6 +9,8 @@ import {
   BoxProps,
   Spinner,
   Badge,
+  Tag,
+  TagLabel,
 } from "@chakra-ui/react";
 import React, { forwardRef } from "react";
 import {
@@ -153,9 +155,14 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
               )}
             </VStack>
             <Box margin="1rem">
-              <Text className="semi-16" mb="1rem">
-                {name}
-              </Text>
+              <Flex alignItems="center" justifyContent="space-between" mb="1rem">
+                <Text className="semi-16">
+                  {name}
+                </Text>
+                <Tag size="lg">
+                  <TagLabel fontSize="xl">Auction</TagLabel>
+                </Tag>
+              </Flex>
               <Flex>
                 {(amount!=0) && (
                   <Text className="medium-12">{amount==0?"Not":`${amount / 100}%`} Available</Text>
