@@ -3,7 +3,7 @@ import {
   Box,
   Text,
   Link,
-  Button,
+  Badge,
   Heading,
   Modal,
   ModalOverlay,
@@ -25,6 +25,7 @@ import { motion } from "framer-motion";
 import {connect} from "react-redux";
 import styles from "./loaders.module.css";
 import {useRouter} from "next/router";
+import React from 'react';
 
 //TODO - CHANGE TO process.env.NEXT_PUBLIC_BLOCK_EXPLORER
 const BLOCK_EXPLORER = 'https://rinkeby.etherscan.io/tx/';
@@ -55,7 +56,7 @@ const LoadScreen = ((props) => {
       }
   };
 
-  const getButtonStyle = (state) => {
+  const getButtonStyle = (state): Partial<React.CSSProperties> => {
       switch (state) {
           case PENDING_STATUS:
               return {
@@ -76,7 +77,7 @@ const LoadScreen = ((props) => {
               };
               break;
           default:
-              return '';
+              return {};
       }
   };
 
@@ -93,23 +94,6 @@ const LoadScreen = ((props) => {
 
   const hasAmount = (contractTransaction) => {
       return contractTransaction.state != REJECTED_STATUS;
-  };
-
-  const goToTokenAddress = (tokenAddress) => {
-      router.push("/nft/" + tokenAddress + '/details', null,  {scroll: false}).then(r => {
-
-          return router.reload();
-      });
-  };
-
-  const buttonClick = (contractTransaction) => {
-      closeModal();
-      switch (contractTransaction.state) {
-          case COMPLETED_STATUS:
-              return goToTokenAddress(contractTransaction.tokenAddress);
-          case REJECTED_STATUS:
-              return contractTransaction.button.action();
-      }
   };
 
   return (
@@ -166,16 +150,19 @@ const LoadScreen = ((props) => {
             <ModalFooter marginTop={10} style={{justifyContent: 'center'}}>
                 {
                     contractTransaction.button && (
-                        <Button
-                            style={getButtonStyle(contractTransaction.state)}
-                            width="104px"
-                            height="36px"
-                            fontWeight="500"
-                            borderRadius="50px"
-                            fontSize="15"
-                            onClick={() => buttonClick(contractTransaction)}
-                        >{contractTransaction.button.text}</Button>
-                    )
+                        <Badge
+                        style={getButtonStyle(contractTransaction.state)}
+                        width="104px"
+                        height="36px"
+                        fontWeight="500"
+                        borderRadius="50px"
+                        fontSize="15"
+                        textTransform="none"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                    >{contractTransaction.button.text}</Badge>
+                )
                 }
 
             </ModalFooter>
