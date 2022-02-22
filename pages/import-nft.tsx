@@ -12,11 +12,6 @@
    Grid,
    Spinner,
    Text,
-   Input,
-   Textarea,
-   NumberInput,
-   NumberInputField,
-   Checkbox,
    TabPanel,
    TabPanels,
    TabList,
@@ -52,7 +47,6 @@
   */
  
  import FrakButton4 from "@/components/button4";
- import LoadScreen from '@/components/load-screens';
  import NFTImportCardOS from "@/components/nft-importcard-opensea";
  import ListCardAuction from "@/components/listCardAuction";
  import toast from "react-hot-toast";
@@ -61,11 +55,16 @@
   */
  import store from "../redux/store";
  import {APPROVE_TOKEN, IMPORT_FRAKTAL, IMPORT_NFT, LISTING_NFT, rejectContract} from "../redux/actions/contractActions";
+ import LoadScreen from '../components/load-screens';
+ import styles from "../styles/mint-nft.module.css";
+ import NFTCard from "@/components/nftCard";
+ 
  /**
   * Constants
   */
  import {CREATE_NFT, MY_NFTS} from "@/constants/routes";
  const { create } = require("ipfs-http-client");
+ const MAX_FRACTIONS = 10000;
  
  export default function ImportNFTPage() {
    const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
@@ -85,7 +84,7 @@
    const [isFraktionsAllowed, setIsFraktionsAllowed] = useState<boolean>(false);
    const [isNFTListed, setIsNFTListed] = useState<boolean>(false);
    const [isIntendedForListing, setIsIntentedForListing] = useState<boolean>(
-     false
+     true
    );
  
    const [tokenMintedAddress, setTokenMintedAddress] = useState<string>("");
@@ -155,7 +154,7 @@
        setIsNFTImported(true);
        if (!isIntendedForListing) {
          setInterval(() => {
-           router.push(MY_NFTS, null, {scroll: false});
+           router.push(MY_NFTS);
          }, 1000);
        }
      }
@@ -203,9 +202,7 @@
      ).then(receipt => {
        setIsNFTListed(true);
        setInterval(() => {
-         
-         router.push(MY_NFTS, null, {scroll: false});
- 
+         router.push(MY_NFTS);
        }, 1000);
      }).catch(error => {
          store.dispatch(rejectContract(LISTING_NFT, error, listNewItem));
@@ -222,7 +219,7 @@
      ).then(receipt => {
          setIsNFTListed(true);
          setInterval(() => {
-          router.push(MY_NFTS, null, {scroll: false});
+             router.push(MY_NFTS);
          }, 1000);
      }).catch(error => {
          store.dispatch(rejectContract(LISTING_NFT, error, listItemAuction));
@@ -293,8 +290,7 @@
                  borderRadius: `24px`,
                  cursor: `pointer`,
                }}
-               
-               onClick={() => router.push(CREATE_NFT, null, {scroll: false})}
+               onClick={() => router.push(CREATE_NFT)}
              >
                Mint NFT
              </Box>
@@ -406,100 +402,103 @@
                  width: `clamp(200px, 100%, 50ch)`,
                }}
              >
-               <NFTCard
-              setName={setNFTName}
-              setDescription={setNFTDescription}
-              addFile={()=>{}}
-              file={null}
-              fileUpload={false}
-            />
-                <Box
-              sx={{
-                display: `flex`,
-                gap: `12px`,
-                alignItems: `center`,
-                marginBottom: `8px`,
-              }}
-            >
-              {isIntendedForListing && (
-                <Box
-                  sx={{
-                    width: `16px`,
-                    height: `16px`,
-                    borderRadius: `4px`,
-                    display: `block`,
-                    backgroundColor: `#00C49D`,
-                  }}
-                  _hover={{
-                    cursor: `pointer`,
-                  }}
-                  onClick={() => setIsIntentedForListing(!isIntendedForListing)}
-                ></Box>
-              )}
-              {!isIntendedForListing && (
-                <Box
-                  sx={{
-                    width: `16px`,
-                    height: `16px`,
-                    borderRadius: `4px`,
-                    border: `2px solid rgba(0,0,0,0.3)`,
-                    display: `block`,
-                  }}
-                  _hover={{
-                    cursor: `pointer`,
-                  }}
-                  onClick={() => setIsIntentedForListing(!isIntendedForListing)}
-                ></Box>
-              )}
-              <Text
-                sx={{
-                  fontSize: `16px`,
-                  fontFamily: `Inter, sans-serif`,
-                  fontWeight: `700`,
-                }}
-                _hover={{
-                  cursor: `pointer`,
-                }}
-                onClick={() => setIsIntentedForListing(!isIntendedForListing)}
-              >
-                Sell Fraktions
-              </Text>
-            </Box>
-            <div>
-              {isIntendedForListing && (
-                <Tabs isFitted variant='enclosed'
-                onChange={(e)=>setIsAuction(!isAuction)}
-                >
-                  <TabList mb='1em'>
-                    <Tab
-                    >Fixed Price</Tab>
-                    <Tab
-                    >Auction</Tab>
-                  </TabList>
-                  <TabPanels>
-                    <TabPanel>
-                <ListCard
-                  totalPrice={totalPrice}
-                  setTotalPrice={setTotalPrice}
-                  setTotalAmount={setTotalAmount}
-                  listingProcess={false}
-                  maxFraktions={MAX_FRACTIONS}
-                />
-                </TabPanel>
-                <TabPanel>
-                <ListCardAuction
-                    totalPrice={totalPrice}
-                    setTotalPrice={setTotalPrice}
-                    setTotalAmount={setTotalAmount}
-                    listingProcess={false}
-                    maxFraktions={MAX_FRACTIONS}
-                  />
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
-              )}
-            </div>
-               </Checkbox>
+              <div>
+             <NFTCard
+               setName={setNFTName}
+               setDescription={setNFTDescription}
+               addFile={()=>{}}
+               file={null}
+               fileUpload={false}
+             />
+           </div>
+           <Box
+               sx={{
+                 display: `flex`,
+                 gap: `12px`,
+                 alignItems: `center`,
+                 marginBottom: `8px`,
+               }}
+             >
+               {isIntendedForListing && (
+                 <Box
+                   sx={{
+                     width: `16px`,
+                     height: `16px`,
+                     borderRadius: `4px`,
+                     display: `block`,
+                     backgroundColor: `#00C49D`,
+                   }}
+                   _hover={{
+                     cursor: `pointer`,
+                   }}
+                   onClick={() => setIsIntentedForListing(!isIntendedForListing)}
+                 ></Box>
+               )}
+               {!isIntendedForListing && (
+                 <Box
+                   sx={{
+                     width: `16px`,
+                     height: `16px`,
+                     borderRadius: `4px`,
+                     border: `2px solid rgba(0,0,0,0.3)`,
+                     display: `block`,
+                   }}
+                   _hover={{
+                     cursor: `pointer`,
+                   }}
+                   onClick={() => setIsIntentedForListing(!isIntendedForListing)}
+                 ></Box>
+               )}
+               <Text
+                 sx={{
+                   fontSize: `16px`,
+                   fontFamily: `Inter, sans-serif`,
+                   fontWeight: `700`,
+                 }}
+                 _hover={{
+                   cursor: `pointer`,
+                 }}
+                 onClick={() => setIsIntentedForListing(!isIntendedForListing)}
+               >
+                 Sell Fraktions
+               </Text>
+             </Box>
+             <div>
+               {isIntendedForListing && (
+                 <Tabs isFitted variant='enclosed'
+                 onChange={(e)=>setIsAuction(!isAuction)}
+                 >
+                   <TabList mb='1em'>
+                     <Tab
+                     >Fixed Price</Tab>
+                     <Tab
+                     >Auction</Tab>
+                   </TabList>
+                   <TabPanels>
+                     <TabPanel>
+                 <ListCard
+                   totalPrice={totalPrice}
+                   setTotalPrice={setTotalPrice}
+                   setTotalAmount={setTotalAmount}
+                   listingProcess={false}
+                   maxFraktions={MAX_FRACTIONS}
+                 />
+                 </TabPanel>
+                 <TabPanel>
+                 <ListCardAuction
+                     totalPrice={totalPrice}
+                     setTotalPrice={setTotalPrice}
+                     setTotalAmount={setTotalAmount}
+                     listingProcess={false}
+                     maxFraktions={MAX_FRACTIONS}
+                   />
+                 </TabPanel>
+               </TabPanels>
+             </Tabs>
+               )}
+             </div>
+               
+ 
                <Box
                  sx={{
                    display: `flex`,
