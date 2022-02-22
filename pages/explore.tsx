@@ -66,7 +66,7 @@ const Marketplace: React.FC = () => {
   const [refresh, setRefresh] = useState(false);
   const [limit, setLimit] = useState(15);
   const [offset, setOffset] = useState(0);
-  const [orderDirection, setOrderDirection] = useState('asc');
+  const [orderDirection, setOrderDirection] = useState('desc');
 
   /**
   *
@@ -171,13 +171,13 @@ const Marketplace: React.FC = () => {
           orderDirection: "desc"
       });
       if (fraktals?.fraktalNfts.length >= 0) {
+          await Promise.all(fraktals?.fraktalNfts.map(async fraktalNft => {
+              let item = await getSubgraphData("listed_items_by_fraktal_id", fraktalNft.id);
+              if (item.listItems[0] !== undefined) {
+                  listedData.listItems.push(item.listItems[0]);
+              }
+          }));
       }
-      await Promise.all(fraktals?.fraktalNfts.map(async fraktalNft => {
-          let item = await getSubgraphData("listed_items_by_fraktal_id", fraktalNft.id);
-          if (item.listItems[0] !== undefined) {
-              listedData.listItems.push(item.listItems[0]);
-          }
-      }));
       return listedData;
   }
 
