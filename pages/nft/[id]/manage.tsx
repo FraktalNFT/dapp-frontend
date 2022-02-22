@@ -62,7 +62,7 @@ export default function ManageNFTView() {
         });
       } else {
         release(provider, revenueToClaim).then(() => {
-          router.push("/my-nfts");
+          router.push("/my-nfts", null, {scroll: false});
         });
       }
     } catch (e) {
@@ -78,7 +78,7 @@ export default function ManageNFTView() {
     if (tx || approved) {
       await defraktionalize(nftObject.marketId, provider, contractAddress).then(
         () => {
-          router.push("/my-nfts");
+          router.push("/my-nfts", null, {scroll: false});
         }
       );
     }

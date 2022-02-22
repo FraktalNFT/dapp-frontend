@@ -97,7 +97,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
                   <AirdropBanner
                       icon="🎁"
                       onClick={() => {
-                          router.push(CREATE_NFT);
+                          router.push(CREATE_NFT, null, {scroll: false});
                           toast.close(listNFTToClaimId);
                       }}
                       buttonText={"List NFT"}

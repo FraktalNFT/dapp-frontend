@@ -63,7 +63,7 @@ export default function MintNFTView() {
     if (metadataCid) {
       createNFT(metadataCid.cid.toString(), provider, factoryAddress).then(
         () => {
-          router.push(MY_NFTS);
+          router.push(MY_NFTS, null, {scroll: false});
         }
       );
     }

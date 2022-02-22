@@ -54,7 +54,6 @@ import FrakButton from "../components/button";
 import Anchor from '@/components/anchor';
 import {MY_NFTS, MINT_NFT} from "@/constants/routes";
 
-
 const Marketplace: React.FC = () => {
   const [nftItems, setNftItems] = useState([]);
   const [nftData, setNftData] = useState([]);
@@ -67,7 +66,6 @@ const Marketplace: React.FC = () => {
   const [refresh, setRefresh] = useState(false);
   const [limit, setLimit] = useState(15);
   const [offset, setOffset] = useState(0);
-  const [totalNFT, setTotalNFT] = useState([]);
   const [orderDirection, setOrderDirection] = useState('asc');
 
   /**
@@ -97,24 +95,7 @@ const Marketplace: React.FC = () => {
     getData();
   };
 
-    // Store NFT Items in Session Storage
-    useEffect(() => {
-        /*
-            const result = nftData.filter((thing, index, self) =>
-              index === self.findIndex((t) => (
-                JSON.stringify(t) === JSON.stringify(thing)
-              ))
-            );
-
-            const stringedNFTItems = JSON.stringify(result);
-            if(stringedNFTItems.length>0){
-              window?.sessionStorage?.setItem("nftitems", stringedNFTItems);
-            }
-        */
-    }, [nftItems, nftData]);
-
   const changeOrder = type => {
-    let sortedItems;
     setOffset(0);
     setNftData([]);
     setNftItems([]);
@@ -127,10 +108,7 @@ const Marketplace: React.FC = () => {
     } else if (type == NEWLY_LISTED) {
         setOrderDirection('desc');
         setRefresh(true);
-    } else {
-        sortedItems = nftItems.sort((a, b) => (a.holders > b.holders ? -1 : 1));
     }
-   // setNftItems(sortedItems);
   };
 
   const handleListingSelect = (item: string) => {
@@ -222,7 +200,6 @@ const Marketplace: React.FC = () => {
             });
         }
 
-        //TODO - Get the server timestamp
         const curTimestamp = Math.round(Date.now() / 1000);
         let auctionData = await getSubgraphAuction("limited_auctions", "", {
             limit: limit,
