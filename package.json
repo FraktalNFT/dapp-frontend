@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@apollo/client": "^3.3.21",
@@ -50,10 +51,16 @@
     "@storybook/react": "^6.3.12",
     "@types/react": "^17.0.5",
     "babel-loader": "^8.2.3",
+    "husky": ">=6",
+    "lint-staged": ">=10",
+    "prettier": "^2.5.1",
     "typescript": "^4.2.4"
   },
   "prettier": {
-    "tabWidth": 4,
+    "tabWidth": 2,
     "singleQuote": true
+  },
+  "lint-staged": {
+    "*.{js,ts,css,md}": "prettier --write"
   }
 }
