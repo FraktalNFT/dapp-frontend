@@ -96,11 +96,13 @@ const LoadScreen = ((props) => {
       return contractTransaction.state != REJECTED_STATUS;
   };
 
+  const showTransactionStep = contractTransaction.step != null && contractTransaction.totalStep != null
+
   return (
       <>
         <Modal isOpen={contractTransaction.modalOpen} onClose={closeModal}>
           <ModalOverlay/>
-          <ModalContent textAlign={"center"} maxWidth={400} height={437} padding={"80px 0"} borderRadius={15}  boxShadow={"0px 7px 20px rgba(0, 0, 0, 0.35)"}>
+          <ModalContent textAlign={"center"} maxWidth={400} height={497} padding={"60px 0"} borderRadius={15}  boxShadow={"0px 7px 20px rgba(0, 0, 0, 0.35)"}>
             <ModalHeader></ModalHeader>
             <ModalCloseButton />
             <ModalBody>
@@ -122,6 +124,13 @@ const LoadScreen = ((props) => {
                         >{showAmount(contractTransaction)}</Text>
                     )
                 }
+
+                {showTransactionStep &&
+                    <Text
+                        marginBottom="10px"
+                        color={"#969696"}
+                    >Transaction <b>{contractTransaction.step}</b> of <b>{contractTransaction.totalStep}</b></Text>
+                }
                 <Text
                     marginBottom="10px"
                     fontSize={contractTransaction.state == REJECTED_STATUS ? "20px" : "15px"}
@@ -130,6 +139,16 @@ const LoadScreen = ((props) => {
                     lineHeight="18px"
                     color={contractTransaction.state == REJECTED_STATUS ? "#FF2323" : "#969696"}
                 >{contractTransaction.message}</Text>
+                
+                {showTransactionStep && 
+                    <Text
+                        marginBottom="10px"
+                        color={"#969696"}
+                        fontWeight="500"
+                        fontSize="15px"
+                        padding="0 60px"
+                    >Please do not leave this page until confirming all transactions.</Text>
+                }
                 {
                     contractTransaction.tx && (
                         <Link

@@ -1,3 +1,4 @@
+import { Workflow } from 'types/workflow';
 import {
     CALL_CONTRACT,
     REJECTED_CONTRACT,
@@ -19,104 +20,114 @@ import {
     MINT_NFT,
     LISTING_NFT,
     OFFERING_BUYOUT,
-    VOTING_BUYOUTS
-} from "../actions/contractActions";
+    VOTING_BUYOUTS,
+} from '../actions/contractActions';
 
 const initState = {
     modalOpen: false,
     state: '',
-    message: ''
+    message: '',
 };
 
-const SUCCESSFUL_MESSAGE = 'Congrats! Your transaction has successfully been processed on Ethereum.';
-const PENDING_MESSAGE = 'Please wait a few moments while your transaction is processed by Ethereum';
+const SUCCESSFUL_MESSAGE =
+    'Congrats! Your transaction has successfully been processed on Ethereum.';
+const PENDING_MESSAGE =
+    'Please wait a few moments while your transaction is processed by Ethereum';
 const REJECTED_MESSAGE = 'User Denied Metamask Signature';
+
+type LoadingState = {
+    step?: number;
+    totalStep?: number;
+    heading?: string;
+    button?: {
+        text: string
+    }
+}
 
 const approveToken = {
     heading: 'Approving NFT',
     button: {
-        text: 'Success'
-    }
+        text: 'Success',
+    },
 };
 
 const buyingFraktions = {
     heading: 'Buying Fraktions',
     button: {
-        text: 'View NFT'
-    }
+        text: 'View NFT',
+    },
 };
 
 const claimingRevenue = {
     heading: 'Claiming Revenue',
     button: {
-        text: 'View NFT'
-    }
+        text: 'View NFT',
+    },
 };
 
 const claimingBuyout = {
     heading: 'Claiming Buy Out',
     button: {
-        text: 'View NFT'
-    }
+        text: 'View NFT',
+    },
 };
 const claimingFraktionsProfit = {
     heading: 'Claiming Profit',
     button: {
-        text: 'View NFT'
-    }
+        text: 'View NFT',
+    },
 };
 const depositingRevenue = {
     heading: 'Depositing Revenue',
     button: {
-        text: 'View NFT'
-    }
+        text: 'View NFT',
+    },
 };
 
 const importFraktal = {
     heading: 'Fraktionalizing NFT',
     button: {
-        text: 'Success'
-    }
+        text: 'Success',
+    },
 };
 
 const importNFT = {
     heading: 'Frationalizing NFT',
     button: {
-        text: 'Success'
-    }
+        text: 'Success',
+    },
 };
 
 const mintingNFT = {
     heading: 'Minting NFT',
     button: {
-        text: 'Success'
-    }
+        text: 'Success',
+    },
 };
 
 const listingNFT = {
     heading: 'Listing NFT',
     button: {
-        text: 'View NFT'
-    }
+        text: 'View NFT',
+    },
 };
 
 const offeringBuyout = {
     heading: 'Offering Buy-out',
     button: {
-        text: 'View NFT'
-    }
+        text: 'View NFT',
+    },
 };
 
 const votingBuyout = {
     heading: 'Voting on Buy-outs',
     button: {
-        text: 'View NFT'
-    }
+        text: 'View NFT',
+    },
 };
 
-
 const loadingScreenReducer = (state = initState, action) => {
-    let loadingScreenObject = {};
+    let loadingScreenObject: LoadingState = {};
 
     switch (action.transactionType) {
         case APPROVE_TOKEN:
@@ -157,21 +168,47 @@ const loadingScreenReducer = (state = initState, action) => {
             break;
     }
 
+    // TODO: merge this with loadingScreenObject switch case above
+    switch (action.workflow) {
+        case Workflow.IMPORT_NFT:
+        case Workflow.MINT_NFT:
+            loadingScreenObject.totalStep = 4
+            switch (action.transactionType) {
+                case MINT_NFT:
+                    loadingScreenObject.step = 1;
+                    break;
+                case APPROVE_TOKEN:
+                    loadingScreenObject.step = 2;
+                    break;
+                case IMPORT_FRAKTAL:
+                    loadingScreenObject.step = 3;
+                    break;
+                case LISTING_NFT:
+                    loadingScreenObject.step = 4;
+                    break;
+            }
+            break;
+        default:
+            loadingScreenObject.totalStep = null;
+            loadingScreenObject.step = null;
+            break;
+    }
+
     switch (action.type) {
         case ADD_AMOUNT:
             return {
                 ...state,
-                amount: action.amount
+                amount: action.amount,
             };
         case REMOVE_AMOUNT:
             return {
                 ...state,
-                amount: null
+                amount: null,
             };
         case CLOSE_MODAL:
             return {
                 ...state,
-                modalOpen: false
+                modalOpen: false,
             };
         case APPROVED_TRANSACTION:
             return {
@@ -182,11 +219,13 @@ const loadingScreenReducer = (state = initState, action) => {
                 message: SUCCESSFUL_MESSAGE,
                 obj: action.obj,
                 tokenAddress: action.tokenAddress,
-                tx: action.obj.transactionHash ? action.obj.transactionHash : action.obj.hash,
+                tx: action.obj.transactionHash
+                    ? action.obj.transactionHash
+                    : action.obj.hash,
                 state: COMPLETED_STATUS,
                 button: {
-                    text: loadingScreenObject.button.text
-                }
+                    text: loadingScreenObject.button.text,
+                },
             };
         case CALL_CONTRACT:
             return {
@@ -196,11 +235,13 @@ const loadingScreenReducer = (state = initState, action) => {
                 modalOpen: true,
                 message: PENDING_MESSAGE,
                 obj: action.obj,
-                tx: action.obj.transactionHash ? action.obj.transactionHash : action.obj.hash,
+                tx: action.obj.transactionHash
+                    ? action.obj.transactionHash
+                    : action.obj.hash,
                 state: PENDING_STATUS,
                 button: {
-                    text: 'Pending'
-                }
+                    text: 'Pending',
+                },
             };
         case REJECTED_CONTRACT:
             return {
@@ -213,8 +254,8 @@ const loadingScreenReducer = (state = initState, action) => {
                 state: REJECTED_STATUS,
                 button: {
                     text: 'Try Again',
-                    action: action.buttonAction
-                }
+                    action: action.buttonAction,
+                },
             };
         default:
             return state;

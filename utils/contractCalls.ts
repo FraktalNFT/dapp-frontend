@@ -6,7 +6,7 @@ import { loadSigner, processTx, awaitTokenAddress } from "./helpers";
 import { useMintingContext } from "@/contexts/NFTIsMintingContext";
 import { BigNumber, ethers, utils } from "ethers";
 import store from '../redux/store';
-import {approvedTransaction, callContract} from "../redux/actions/contractActions";
+import {ActionOpts, approvedTransaction, callContract} from "../redux/actions/contractActions";
 import {
     APPROVE_TOKEN,
     BUYING_FRAKTIONS,
@@ -264,16 +264,16 @@ export async function defraktionalize(provider, contract) {
   return receipt;
 }
 
-export async function approveMarket(to, provider, contract) {
+export async function approveMarket(to, provider, contract, opts?: ActionOpts) {
   console.log('Contract', contract)
   const signer = await loadSigner(provider);
   const customContract = new Contract(contract, tokenAbi, signer);
   try {
     let tx = await customContract.setApprovalForAll(to, true);
-    store.dispatch(callContract(APPROVE_TOKEN, tx));
+    store.dispatch(callContract(APPROVE_TOKEN, tx, opts));
     let receipt = await processTx(tx);
     if (!receipt?.error) {
-      store.dispatch(approvedTransaction(APPROVE_TOKEN, tx, contract));
+      store.dispatch(approvedTransaction(APPROVE_TOKEN, tx, contract, opts));
     }
     return receipt;
     } catch (e) {
@@ -299,15 +299,15 @@ export async function lockShares(from, to, provider, tokenContract) {
 
 const defaultMajority = 8000; //later give this argument to the creator (or owner)
 
-export async function createNFT(hash, provider, contractAddress) {
+export async function createNFT(hash, provider, contractAddress, opts?: ActionOpts) {
   const signer = await loadSigner(provider);
   const customContract = new Contract(contractAddress, factoryAbi, signer);
   try {
     let tx = await customContract.mint(hash, defaultMajority);
-    store.dispatch(callContract(MINT_NFT, tx));
+    store.dispatch(callContract(MINT_NFT, tx, opts));
     let receipt = await awaitTokenAddress(tx);
     if (!receipt?.error) {
-      store.dispatch(approvedTransaction(MINT_NFT, tx, receipt));
+      store.dispatch(approvedTransaction(MINT_NFT, tx, receipt, opts));
     }
     return receipt;
   } catch (e) {
@@ -319,7 +319,8 @@ export async function importFraktal(
   tokenAddress,
   fraktionsIndex,
   provider,
-  marketAddress
+  marketAddress,
+  opts?: ActionOpts
 ) {
   const signer = await loadSigner(provider);
   const override = { gasLimit: 500000 };
@@ -330,10 +331,10 @@ export async function importFraktal(
       fraktionsIndex,
       override
     );
-    store.dispatch(callContract(IMPORT_FRAKTAL, tx));
+    store.dispatch(callContract(IMPORT_FRAKTAL, tx, opts));
     let receipt = await processTx(tx);
     if (!receipt?.error) {
-      store.dispatch(approvedTransaction(IMPORT_FRAKTAL, tx, tokenAddress));
+      store.dispatch(approvedTransaction(IMPORT_FRAKTAL, tx, tokenAddress, opts));
     }
     return receipt;
   } catch (e) {
@@ -410,17 +411,18 @@ export async function listItem(
   amount,
   price,
   provider,
-  marketAddress
+  marketAddress,
+  opts?: ActionOpts
 ) {
   const override = { gasLimit: 300000 };
   const signer = await loadSigner(provider);
   const customContract = new Contract(marketAddress, marketAbi, signer);
   try {
     let tx = await customContract.listItem(tokenAddress, price, amount, override);
-    store.dispatch(callContract(LISTING_NFT, tx));
+    store.dispatch(callContract(LISTING_NFT, tx, opts));
     let receipt = await processTx(tx);
     if (!receipt?.error) {
-        store.dispatch(approvedTransaction(LISTING_NFT, tx, tokenAddress));
+        store.dispatch(approvedTransaction(LISTING_NFT, tx, tokenAddress, opts));
     }
     return receipt;
   } catch (e) {
@@ -632,15 +634,15 @@ export async function participateAuction( tokenAddress, seller, sellerNonce, val
   let receipt = processTx(tx);
   return receipt;
 }
-export async function listItemAuction( tokenAddress, reservePrice, numberOfShares, provider, marketAddress) {
+export async function listItemAuction( tokenAddress, reservePrice, numberOfShares, provider, marketAddress, opts?: ActionOpts) {
   const signer = await loadSigner(provider);
   const customContract = new Contract(marketAddress, marketAbi, signer);
   try {
     let tx = await customContract.listItemAuction(tokenAddress, reservePrice, numberOfShares);
-    store.dispatch(callContract(LISTING_NFT, tx));
+    store.dispatch(callContract(LISTING_NFT, tx, opts));
     let receipt = await processTx(tx);
     if (!receipt?.error) {
-      store.dispatch(approvedTransaction(LISTING_NFT, tx, tokenAddress));
+      store.dispatch(approvedTransaction(LISTING_NFT, tx, tokenAddress, opts));
     }
     return receipt;
   } catch (e) {
