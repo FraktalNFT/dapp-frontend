@@ -126,10 +126,19 @@ const LoadScreen = ((props) => {
                 }
 
                 {showTransactionStep &&
+                    <>
                     <Text
                         marginBottom="10px"
                         color={"#969696"}
                     >Transaction <b>{contractTransaction.step}</b> of <b>{contractTransaction.totalStep}</b></Text>
+                    <Text
+                        marginBottom="10px"
+                        color={"#969696"}
+                        fontWeight="700"
+                        fontSize="15px"
+                        padding="0 60px"
+                    >Do not leave this page until confirming all transactions.</Text>
+                    </>
                 }
                 <Text
                     marginBottom="10px"
@@ -140,15 +149,6 @@ const LoadScreen = ((props) => {
                     color={contractTransaction.state == REJECTED_STATUS ? "#FF2323" : "#969696"}
                 >{contractTransaction.message}</Text>
                 
-                {showTransactionStep && 
-                    <Text
-                        marginBottom="10px"
-                        color={"#969696"}
-                        fontWeight="500"
-                        fontSize="15px"
-                        padding="0 60px"
-                    >Please do not leave this page until confirming all transactions.</Text>
-                }
                 {
                     contractTransaction.tx && (
                         <Link
