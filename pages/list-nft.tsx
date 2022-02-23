@@ -54,7 +54,7 @@ const MAX_FRACTIONS = 10000;
 /**
  * Routes
  */
-import {EXPLORE, ARTISTS, CREATE_NFT, LANDING, IMPORT_NFT} from "@/constants/routes";
+import {EXPLORE, ARTISTS, CREATE_NFT, LANDING, IMPORT_NFT, resolveNFTRoute} from "@/constants/routes";
 import { Workflow } from "types/workflow";
 
 const actionOpts = { workflow: Workflow.MINT_NFT }
@@ -273,7 +273,11 @@ const MintPage = (props) => {
       actionOpts
     ).then(() => {
         setInterval(() => {
+          if (tokenMintedAddress) {
+            router.push(resolveNFTRoute(tokenMintedAddress), null, {scroll: false});
+          } else {
             router.push(EXPLORE, null, {scroll: false});
+          }
         }, 1000);
     }).catch(error => {
       mintNFTRejected(error, listNewItem);
@@ -292,7 +296,11 @@ const MintPage = (props) => {
       actionOpts
     ).then(() => {
         setInterval(() => {
+          if (tokenMintedAddress) {
+            router.push(resolveNFTRoute(tokenMintedAddress), null, {scroll: false});
+          } else {
             router.push(EXPLORE, null, {scroll: false});
+          }
         }, 1000);
     }).catch(error => {
         mintNFTRejected(error, listNewAuctionItem);
