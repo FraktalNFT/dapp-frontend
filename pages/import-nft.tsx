@@ -102,12 +102,12 @@ import { Workflow } from "types/workflow";
  
    async function approveForFactory() {
      if (tokenToImport && tokenToImport.id) {
-       let res = await approveMarket(factoryAddress, provider, tokenToImport.id)
+       let res = await approveMarket(factoryAddress, provider, tokenToImport.id, actionOpts)
            .then(success => {
            setIsFactoryApproved(true);
            importNFT();
        }).catch(error => {
-         store.dispatch(rejectContract(APPROVE_TOKEN, error, approveForFactory));
+         store.dispatch(rejectContract(APPROVE_TOKEN, error, approveForFactory, actionOpts));
        });
      }
    }
@@ -138,9 +138,10 @@ import { Workflow } from "types/workflow";
          parseInt(tokenToImport?.tokenId),
          tokenToImport?.id,
          provider,
-         factoryAddress
+         factoryAddress,
+         actionOpts
        ).catch(error => {
-           store.dispatch(rejectContract(IMPORT_NFT, error, importNFT));
+           store.dispatch(rejectContract(IMPORT_NFT, error, importNFT, actionOpts));
        });
      }
      if (tokenToImport?.token_schema === "ERC1155") {
@@ -148,9 +149,10 @@ import { Workflow } from "types/workflow";
          parseInt(tokenToImport?.tokenId),
          tokenToImport?.id,
          provider,
-         factoryAddress
+         factoryAddress,
+         actionOpts
        ).catch(error => {
-           store.dispatch(rejectContract(IMPORT_NFT, error, importNFT));
+           store.dispatch(rejectContract(IMPORT_NFT, error, importNFT, actionOpts));
        });
      }
      if (address?.length > 0) {
@@ -192,7 +194,7 @@ import { Workflow } from "types/workflow";
            setIsFraktionsAllowed(true);
            listFraktions();
        }).catch(error => {
-           store.dispatch(rejectContract(IMPORT_FRAKTAL, error, importFraktalToMarket));
+           store.dispatch(rejectContract(IMPORT_FRAKTAL, error, importFraktalToMarket, actionOpts));
        });
      }
    }

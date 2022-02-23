@@ -40,9 +40,9 @@ type LoadingState = {
     totalStep?: number;
     heading?: string;
     button?: {
-        text: string
-    }
-}
+        text: string;
+    };
+};
 
 const approveToken = {
     heading: 'Approving NFT',
@@ -171,8 +171,27 @@ const loadingScreenReducer = (state = initState, action) => {
     // TODO: merge this with loadingScreenObject switch case above
     switch (action.workflow) {
         case Workflow.IMPORT_NFT:
+            loadingScreenObject.totalStep = 5;
+            switch (action.transactionType) {
+                case APPROVE_TOKEN:
+                    loadingScreenObject.step = 1;
+                    break;
+                case IMPORT_NFT:
+                    loadingScreenObject.step = 2;
+                    break;
+                case APPROVE_TOKEN:
+                    loadingScreenObject.step = 3;
+                    break;
+                case IMPORT_FRAKTAL:
+                    loadingScreenObject.step = 4;
+                    break;
+                case LISTING_NFT:
+                    loadingScreenObject.step = 5;
+                    break;
+            }
+            break;
         case Workflow.MINT_NFT:
-            loadingScreenObject.totalStep = 4
+            loadingScreenObject.totalStep = 4;
             switch (action.transactionType) {
                 case MINT_NFT:
                     loadingScreenObject.step = 1;

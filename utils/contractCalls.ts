@@ -354,7 +354,8 @@ export async function importERC721(
   tokenId,
   tokenAddress,
   provider,
-  factoryAddress
+  factoryAddress,
+  opts?: ActionOpts
 ) {
   const signer = await loadSigner(provider);
   const override = { gasLimit: 1000000 };
@@ -366,10 +367,10 @@ export async function importERC721(
       defaultMajority,
       override
     );
-    store.dispatch(callContract(IMPORT_NFT, tx));
+    store.dispatch(callContract(IMPORT_NFT, tx, opts));
     let mintedTokenAddress = await awaitTokenAddress(tx);
     if (!mintedTokenAddress?.error) {
-      store.dispatch(approvedTransaction(IMPORT_NFT, tx, mintedTokenAddress));
+      store.dispatch(approvedTransaction(IMPORT_NFT, tx, mintedTokenAddress, opts));
     }
     return mintedTokenAddress;
   } catch (e) {
@@ -382,7 +383,8 @@ export async function importERC1155(
   tokenId,
   tokenAddress,
   provider,
-  factoryAddress
+  factoryAddress,
+  opts?: ActionOpts
 ) {
   const signer = await loadSigner(provider);
   const override = { gasLimit: 1000000 };
@@ -395,10 +397,10 @@ export async function importERC1155(
       defaultMajority,
       override
     );
-    store.dispatch(callContract(IMPORT_NFT, tx));
+    store.dispatch(callContract(IMPORT_NFT, tx, opts));
     let mintedTokenAddress = await awaitTokenAddress(tx);
     if (!mintedTokenAddress?.error) {
-      store.dispatch(approvedTransaction(IMPORT_NFT, tx, mintedTokenAddress));
+      store.dispatch(approvedTransaction(IMPORT_NFT, tx, mintedTokenAddress, opts));
     }
     return mintedTokenAddress;
   } catch (e) {
