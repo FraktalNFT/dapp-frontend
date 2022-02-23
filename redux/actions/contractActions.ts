@@ -1,3 +1,5 @@
+import { Workflow } from 'types/workflow';
+
 export const APPROVED_TRANSACTION = 'APPROVED_TRANSACTION';
 export const CALL_CONTRACT = 'CALL_CONTRACT';
 export const REJECTED_CONTRACT = 'REJECTED_CONTRACT';
@@ -23,47 +25,68 @@ export const LISTING_NFT = 'LISTING_NFT';
 export const OFFERING_BUYOUT = 'OFFERING_BUYOUT';
 export const VOTING_BUYOUTS = 'VOTING_BUYOUTS';
 
-export const callContract = (transactionType, obj) => {
+export type ActionOpts = { workflow?: Workflow }
+
+export const callContract = (
+    transactionType,
+    obj,
+    { workflow }: ActionOpts = {}
+) => {
     return {
         obj: obj,
         transactionType,
-        type: CALL_CONTRACT
-    }
+        type: CALL_CONTRACT,
+        workflow,
+    };
 };
 
-export const rejectContract = (transactionType, obj, buttonAction) => {
+export const rejectContract = (
+    transactionType,
+    obj,
+    buttonAction?: any,
+    {
+        workflow,
+    }: ActionOpts = {}
+) => {
     return {
         obj: obj,
         transactionType,
         buttonAction,
-        type: REJECTED_CONTRACT
-    }
+        type: REJECTED_CONTRACT,
+        workflow,
+    };
 };
 
-export const approvedTransaction = (transactionType, obj, tokenAddress) => {
+export const approvedTransaction = (
+    transactionType,
+    obj,
+    tokenAddress?: string,
+    { workflow }: ActionOpts = {}
+) => {
     return {
         obj: obj,
         transactionType,
         tokenAddress,
-        type: APPROVED_TRANSACTION
-    }
+        type: APPROVED_TRANSACTION,
+        workflow,
+    };
 };
 
 export const closeModal = () => {
     return {
-        type: CLOSE_MODAL
-    }
+        type: CLOSE_MODAL,
+    };
 };
 
 export const addAmount = (amount) => {
     return {
         amount,
-        type: ADD_AMOUNT
-    }
+        type: ADD_AMOUNT,
+    };
 };
 
 export const removeAmount = () => {
     return {
-        type: REMOVE_AMOUNT
-    }
+        type: REMOVE_AMOUNT,
+    };
 };

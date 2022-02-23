@@ -54,7 +54,10 @@ const MAX_FRACTIONS = 10000;
 /**
  * Routes
  */
-import {EXPLORE, ARTISTS, CREATE_NFT, LANDING, IMPORT_NFT} from "@/constants/routes";
+import {EXPLORE, ARTISTS, CREATE_NFT, LANDING, IMPORT_NFT, resolveNFTRoute} from "@/constants/routes";
+import { Workflow } from "types/workflow";
+
+const actionOpts = { workflow: Workflow.MINT_NFT }
 
 const MintPage = (props) => {
   const {mintNFTRejected, tokenRejected, transferRejected} = props;
@@ -126,7 +129,8 @@ const MintPage = (props) => {
       let response = await createNFT(
         metadataCid.cid.toString(),
         provider,
-        factoryAddress
+        factoryAddress,
+        actionOpts
       ).then(response => {
           if (!response?.error) {
               setIsMinting(false);
@@ -185,7 +189,7 @@ const MintPage = (props) => {
     fraktionalized;
 
   async function approveToken() {
-    await approveMarket(marketAddress, provider, tokenMintedAddress)
+    await approveMarket(marketAddress, provider, tokenMintedAddress, actionOpts)
         .then(
       () => {
         setIsApproved(true);
@@ -208,7 +212,8 @@ const MintPage = (props) => {
         tokenMintedAddress,
         index,
         provider,
-        marketAddress
+        marketAddress,
+        actionOpts
       ).then(() => {
         setFraktionalized(true);
         if(isAuction){
@@ -220,15 +225,6 @@ const MintPage = (props) => {
       }).catch(error => {
           transferRejected(error, importFraktalToMarket);
       });
-    }
-  }
-
-  async function approveNFT() {
-    if (tokenToImport && tokenToImport.id) {
-      let res = await approveMarket(factoryAddress, provider, tokenToImport.id);
-      if (res) {
-        setNftApproved(true);
-      }
     }
   }
 
@@ -273,10 +269,15 @@ const MintPage = (props) => {
       fei,//shares
       weiPerFrak,//price
       provider,
-      marketAddress
+      marketAddress,
+      actionOpts
     ).then(() => {
-        setInterval(() => {
+        setTimeout(() => {
+          if (tokenMintedAddress) {
+            router.push(resolveNFTRoute(tokenMintedAddress), null, {scroll: false});
+          } else {
             router.push(EXPLORE, null, {scroll: false});
+          }
         }, 1000);
     }).catch(error => {
       mintNFTRejected(error, listNewItem);
@@ -291,10 +292,15 @@ const MintPage = (props) => {
       utils.parseUnits(totalPrice),
       utils.parseUnits(totalAmount),
       provider,
-      marketAddress
+      marketAddress,
+      actionOpts
     ).then(() => {
-        setInterval(() => {
+        setTimeout(() => {
+          if (tokenMintedAddress) {
+            router.push(resolveNFTRoute(tokenMintedAddress), null, {scroll: false});
+          } else {
             router.push(EXPLORE, null, {scroll: false});
+          }
         }, 1000);
     }).catch(error => {
         mintNFTRejected(error, listNewAuctionItem);
@@ -569,16 +575,16 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     return {
         mintNFTRejected: (obj, buttonAction) => {
-            dispatch(rejectContract(MINT_NFT, obj, buttonAction))
+            dispatch(rejectContract(MINT_NFT, obj, buttonAction, { workflow: Workflow.MINT_NFT  }))
         },
         tokenRejected: (obj, buttonAction) => {
-            dispatch(rejectContract(APPROVE_TOKEN, obj, buttonAction))
+            dispatch(rejectContract(APPROVE_TOKEN, obj, buttonAction, { workflow: Workflow.MINT_NFT }))
         },
         transferRejected: (obj, buttonAction) => {
-            dispatch(rejectContract(IMPORT_FRAKTAL, obj, buttonAction))
+            dispatch(rejectContract(IMPORT_FRAKTAL, obj, buttonAction, { workflow: Workflow.MINT_NFT }))
         },
-        mintNFTApproved: (obj, receipt ) => {
-            dispatch(approvedTransaction(MINT_NFT, obj, receipt))
+        mintNFTApproved: (obj, receipt) => {
+            dispatch(approvedTransaction(MINT_NFT, obj, receipt, {  workflow: Workflow.MINT_NFT }))
         },
     }
 };
