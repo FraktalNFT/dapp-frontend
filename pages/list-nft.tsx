@@ -272,7 +272,7 @@ const MintPage = (props) => {
       marketAddress,
       actionOpts
     ).then(() => {
-        setInterval(() => {
+        setTimeout(() => {
           if (tokenMintedAddress) {
             router.push(resolveNFTRoute(tokenMintedAddress), null, {scroll: false});
           } else {
@@ -295,7 +295,7 @@ const MintPage = (props) => {
       marketAddress,
       actionOpts
     ).then(() => {
-        setInterval(() => {
+        setTimeout(() => {
           if (tokenMintedAddress) {
             router.push(resolveNFTRoute(tokenMintedAddress), null, {scroll: false});
           } else {
