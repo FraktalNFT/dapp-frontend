@@ -32,6 +32,17 @@ import { FrakCard } from "../types";
 import { BigNumber, utils } from "ethers";
 import { getSubgraphData, getSubgraphAuction } from "../utils/graphQueries";
 import { createListed,createListedAuction } from "../utils/nftHelpers";
+
+/**
+ * FRAKTAL Components
+ */
+import Anchor from '@/components/anchor';
+import FrakButton from "@/components/button";
+import NFTItem from "../components/nft-item";
+import NFTAuctionItem from "@/components/nft-auction-item";
+import {MY_NFTS, MINT_NFT} from "@/constants/routes";
+import Search from "@/components/search";
+
 /**
  * Filters
  * @type {string}
@@ -45,14 +56,8 @@ const FIXED_PRICE_TYPE = "Fixed Price";
 const DEFAULT_TYPE = "All Listings";
 //const SORT_TYPES = [LOWEST_PRICE, HIGHEST_PRICE, NEWLY_LISTED, POPULAR];
 const SORT_TYPES = [LOWEST_PRICE, HIGHEST_PRICE, NEWLY_LISTED];
-/**
- * FRAKTAL Components
- */
-import NFTItem from "../components/nft-item";
-import NFTAuctionItem from "@/components/nft-auction-item";
-import FrakButton from "../components/button";
-import Anchor from '@/components/anchor';
-import {MY_NFTS, MINT_NFT} from "@/constants/routes";
+const ORDER_ASC  = 'asc';
+const ORDER_DESC = 'desc';
 
 const Marketplace: React.FC = () => {
   const [nftItems, setNftItems] = useState([]);
@@ -66,7 +71,7 @@ const Marketplace: React.FC = () => {
   const [refresh, setRefresh] = useState(false);
   const [limit, setLimit] = useState(15);
   const [offset, setOffset] = useState(0);
-  const [orderDirection, setOrderDirection] = useState('desc');
+  const [orderDirection, setOrderDirection] = useState(ORDER_DESC);
 
   /**
   *
@@ -100,13 +105,13 @@ const Marketplace: React.FC = () => {
     setNftData([]);
     setNftItems([]);
     if (type === LOWEST_PRICE) {
-        setOrderDirection('asc');
+        setOrderDirection(ORDER_ASC);
         setRefresh(true);
     } else if (type === HIGHEST_PRICE) {
-      setOrderDirection('desc');
+      setOrderDirection(ORDER_DESC);
       setRefresh(true);
     } else if (type == NEWLY_LISTED) {
-        setOrderDirection('desc');
+        setOrderDirection(ORDER_DESC);
         setRefresh(true);
     }
   };
@@ -119,7 +124,7 @@ const Marketplace: React.FC = () => {
 
   const changeList = type => {
     let sortedItems;
-    if (type == "All Listings") {
+    if (type == DEFAULT_TYPE) {
       sortedItems = nftData;
     } else if (type == FIXED_PRICE_TYPE) {
       sortedItems = nftData.filter((item) => !item.endTime);
@@ -170,14 +175,12 @@ const Marketplace: React.FC = () => {
           offset: offset,
           orderDirection: "desc"
       });
-      if (fraktals?.fraktalNfts.length >= 0) {
-          await Promise.all(fraktals?.fraktalNfts.map(async fraktalNft => {
-              let item = await getSubgraphData("listed_items_by_fraktal_id", fraktalNft.id);
-              if (item.listItems[0] !== undefined) {
-                  listedData.listItems.push(item.listItems[0]);
-              }
-          }));
-      }
+      await Promise.all(fraktals?.fraktalNfts.map(async fraktalNft => {
+           let item = await getSubgraphData("listed_items_by_fraktal_id", fraktalNft.id);
+           if (item.listItems[0] !== undefined) {
+               listedData.listItems.push(item.listItems[0]);
+           }
+      }));
       return listedData;
   }
 
@@ -323,6 +326,7 @@ const Marketplace: React.FC = () => {
             </NextLink>
           </Box>
         </Flex>
+        <Search marginBottom="10px" width="100%"/>
         {loading && (
           <Loading/>
         )}

@@ -24,7 +24,7 @@ import {
 
 //tested
 const factoryAbi = [
-  "function mint(string urlIpfs, uint16 majority)",
+  "function mint(string urlIpfs, uint16 majority,  string _name, string _symbol)",
   "function importERC721(address _tokenAddress, uint256 _tokenId, uint16 majority)",
   "function importERC1155(address _tokenAddress, uint256 _tokenId, uint16 majority)",
   "function claimERC721(uint256 _tokenId)",
@@ -303,7 +303,7 @@ export async function createNFT(hash, provider, contractAddress) {
   const signer = await loadSigner(provider);
   const customContract = new Contract(contractAddress, factoryAbi, signer);
   try {
-    let tx = await customContract.mint(hash, defaultMajority);
+    let tx = await customContract.mint(hash, defaultMajority,"","");
     store.dispatch(callContract(MINT_NFT, tx));
     let receipt = await awaitTokenAddress(tx);
     if (!receipt?.error) {
