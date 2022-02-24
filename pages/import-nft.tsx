@@ -160,7 +160,7 @@ import { Workflow } from "types/workflow";
        setIsNFTImported(true);
        if (!isIntendedForListing) {
          setInterval(() => {
-           router.push(MY_NFTS);
+           router.push(MY_NFTS, null, {scroll: false});
          }, 1000);
        }
      }
@@ -210,7 +210,7 @@ import { Workflow } from "types/workflow";
      ).then(receipt => {
        setIsNFTListed(true);
        setInterval(() => {
-         router.push(MY_NFTS);
+         router.push(MY_NFTS, null, {scroll: false});
        }, 1000);
      }).catch(error => {
          store.dispatch(rejectContract(LISTING_NFT, error, listNewItem, actionOpts));
@@ -228,7 +228,7 @@ import { Workflow } from "types/workflow";
      ).then(receipt => {
          setIsNFTListed(true);
          setInterval(() => {
-             router.push(MY_NFTS);
+             router.push(MY_NFTS, null, {scroll: false});
          }, 1000);
      }).catch(error => {
          store.dispatch(
@@ -306,7 +306,7 @@ import { Workflow } from "types/workflow";
                  borderRadius: `24px`,
                  cursor: `pointer`,
                }}
-               onClick={() => router.push(CREATE_NFT)}
+               onClick={() => router.push(CREATE_NFT, null, {scroll: false})}
              >
                Mint NFT
              </Box>
