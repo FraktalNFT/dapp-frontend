@@ -1,6 +1,6 @@
-import { HStack, Box, Text } from "@chakra-ui/react";
-import { BigNumber, utils } from "ethers";
-import React, { forwardRef, useState, useEffect } from "react";
+import { HStack, Box, Text } from '@chakra-ui/react';
+import { BigNumber, utils } from 'ethers';
+import React, { forwardRef, useState, useEffect } from 'react';
 import {
   getReleased,
   getShares,
@@ -8,18 +8,21 @@ import {
   release,
   getApproved,
   approveMarket,
-} from "../../utils/contractCalls";
-import {CLAIMING_REVENUE, rejectContract} from "../../redux/actions/contractActions";
-import store from "../../redux/store";
+} from '../../utils/contractCalls';
+import {
+  CLAIMING_REVENUE,
+  rejectContract,
+} from '../../redux/actions/contractActions';
+import store from '../../redux/store';
 
 interface revenueItemProps {
-  value: Number;
-  account: String;
-  date: Number;
-  buyout: Boolean;
-  tokenAddress: String;
-  revenueAddress: String;
-  creator: String;
+  value: number;
+  account: string;
+  date: number;
+  buyout: boolean;
+  tokenAddress: string;
+  revenueAddress: string;
+  creator: string;
   provider: any;
 }
 
@@ -69,13 +72,12 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
 
         if (userShares) {
           setShares(userShares);
-          console.log({userShares});
-
+          console.log({ userShares });
         }
         if (userReleased) {
           setReleased(userReleased / 10 ** 18);
         }
-        if(totalShares){
+        if (totalShares) {
           setTotalShares(totalShares);
         }
       }
@@ -97,12 +99,11 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
     async function revenueClaiming() {
       setIsClaiming(true);
       try {
-        release(provider, revenueAddress, tokenAddress)
-            .catch(e => {
-            store.dispatch(rejectContract(CLAIMING_REVENUE, e, revenueClaiming));
+        release(provider, revenueAddress, tokenAddress).catch((e) => {
+          store.dispatch(rejectContract(CLAIMING_REVENUE, e, revenueClaiming));
         });
       } catch (e) {
-          console.error("There has been an error - Claiming Revenue: ", e);
+        console.error('There has been an error - Claiming Revenue: ', e);
       }
       setIsClaiming(false);
     }
@@ -110,7 +111,7 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
     return (
       <HStack
         style={{
-          marginTop: "24px",
+          marginTop: '24px',
           alignContent: `center`,
           alignItems: `center`,
           justifyContent: `space-between`,
@@ -128,24 +129,29 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
           gains
         </Text>
         {/* value = total value, shares = shares the user has */}
-        <div>{(Number(value) / 10 ** 18) * (Number(utils.formatEther(shares)) / Number(utils.formatEther(totalShares)))} ETH</div>
+        <div>
+          {(Number(value) / 10 ** 18) *
+            (Number(utils.formatEther(shares)) /
+              Number(utils.formatEther(totalShares)))}{' '}
+          ETH
+        </div>
         {isClaimable() && (
           <div>
             {buyout && !isApproved ? (
               <Box
                 sx={{
-                  padding: "4px 16px",
-                  backgroundColor: "#00C49D",
-                  border: "2px solid #00C49D",
-                  borderRadius: "24px",
-                  height: "32px",
+                  padding: '4px 16px',
+                  backgroundColor: '#00C49D',
+                  border: '2px solid #00C49D',
+                  borderRadius: '24px',
+                  height: '32px',
                   width: `429.59px`,
-                  fontFamily: "Inter",
+                  fontFamily: 'Inter',
                   fontWeight: 600,
-                  fontSize: "16px",
-                  lineHeight: "24px",
-                  color: "#FFFFFF",
-                  cursor: "pointer",
+                  fontSize: '16px',
+                  lineHeight: '24px',
+                  color: '#FFFFFF',
+                  cursor: 'pointer',
                   textAlign: `center`,
                   paddingTop: `2px`,
                 }}
@@ -156,19 +162,19 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
             ) : (
               <Box
                 sx={{
-                  padding: "4px 16px",
-                  backgroundColor: "#00C49D",
-                  border: "2px solid #00C49D",
-                  borderRadius: "24px",
-                  height: "32px",
+                  padding: '4px 16px',
+                  backgroundColor: '#00C49D',
+                  border: '2px solid #00C49D',
+                  borderRadius: '24px',
+                  height: '32px',
                   width: `429.59px`,
-                  justifyContent: "center",
-                  fontFamily: "Inter",
+                  justifyContent: 'center',
+                  fontFamily: 'Inter',
                   fontWeight: 600,
-                  fontSize: "16px",
-                  lineHeight: "24px",
-                  color: "#FFFFFF",
-                  cursor: "pointer",
+                  fontSize: '16px',
+                  lineHeight: '24px',
+                  color: '#FFFFFF',
+                  cursor: 'pointer',
                   textAlign: `center`,
                   paddingTop: `2px`,
                 }}
@@ -182,27 +188,25 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
         {!isClaimable() && (
           <Box
             sx={{
-              padding: "4px 16px",
-              backgroundColor: "rgba(0,0,0,0.4)",
-              border: "2px solid transparent",
-              borderRadius: "24px",
-              height: "32px",
+              padding: '4px 16px',
+              backgroundColor: 'rgba(0,0,0,0.4)',
+              border: '2px solid transparent',
+              borderRadius: '24px',
+              height: '32px',
               width: `429.59px`,
-              justifyContent: "center",
-              fontFamily: "Inter",
+              justifyContent: 'center',
+              fontFamily: 'Inter',
               fontWeight: 600,
-              fontSize: "16px",
-              lineHeight: "24px",
-              color: "#FFFFFF",
-              cursor: "pointer",
+              fontSize: '16px',
+              lineHeight: '24px',
+              color: '#FFFFFF',
+              cursor: 'pointer',
               textAlign: `center`,
               paddingTop: `2px`,
             }}
             _hover={{ cursor: `not-allowed` }}
           >
-            {released == 0
-              ? `You Must own Fraktions to Claim`
-              : `Claimed`}
+            {released == 0 ? `You Must own Fraktions to Claim` : `Claimed`}
           </Box>
         )}
       </HStack>

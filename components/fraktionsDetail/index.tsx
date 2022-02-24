@@ -1,32 +1,47 @@
-import { VStack, HStack } from "@chakra-ui/layout";
-import { Text } from '@chakra-ui/react'
-import { BigNumber, utils } from "ethers";
-import React, { forwardRef, useState } from "react";
-import FrakButton2 from "../button2";
-import { buyFraktions } from "../../utils/contractCalls";
-import { parseUnits } from "ethers/lib/utils";
-import {connect} from "react-redux";
-import {addAmount, BUYING_FRAKTIONS, rejectContract, removeAmount} from "../../redux/actions/contractActions";
-import { roundUp } from "../../utils/math";
+import { VStack, HStack } from '@chakra-ui/layout';
+import { Text } from '@chakra-ui/react';
+import { BigNumber, utils } from 'ethers';
+import React, { forwardRef, useState } from 'react';
+import FrakButton2 from '../button2';
+import { buyFraktions } from '../../utils/contractCalls';
+import { parseUnits } from 'ethers/lib/utils';
+import { connect } from 'react-redux';
+import {
+  addAmount,
+  BUYING_FRAKTIONS,
+  rejectContract,
+  removeAmount,
+} from '../../redux/actions/contractActions';
+import { roundUp } from '../../utils/math';
 
 interface listedItemProps {
-  amount: Number;
-  price: Number;
-  seller: String;
+  amount: number;
+  price: number;
+  seller: string;
 }
 
 const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
-  ({ amount, price, seller, tokenAddress, marketAddress, provider, addFraktionAmount, removeFraktionAmount, buyFraktionsRejected }) => {
+  ({
+    amount,
+    price,
+    seller,
+    tokenAddress,
+    marketAddress,
+    provider,
+    addFraktionAmount,
+    removeFraktionAmount,
+    buyFraktionsRejected,
+  }) => {
     const [isReady, setIsReady] = useState(false);
     const [amountToBuy, setAmountToBuy] = useState(0);
     const [buying, setBuying] = useState(false);
 
-    const toPay = () =>{
+    const toPay = () => {
       const fei = utils.parseEther(amountToBuy.toString());
-      const weiPerFrak = utils.parseUnits(price.toString(),0)
-      
-      let toPaid = (fei.mul(weiPerFrak)).div(utils.parseEther("1.0"));
-      toPaid = toPaid.add(utils.parseEther("0.00000000000000001"));
+      const weiPerFrak = utils.parseUnits(price.toString(), 0);
+
+      let toPaid = fei.mul(weiPerFrak).div(utils.parseEther('1.0'));
+      toPaid = toPaid.add(utils.parseEther('0.00000000000000001'));
       return toPaid;
       // const _price = utils.parseEther(
       //   (
@@ -34,26 +49,25 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
       //   )
       // );
       // return "1";
-    }
-      
+    };
 
-    const priceParsed = price => {
-      return (roundUp(utils.formatEther(price) * 100000 / 100000, 3));
+    const priceParsed = (price) => {
+      return roundUp((utils.formatEther(price) * 100000) / 100000, 3);
       // return Math.round(utils.formatEther(price) * 100000) / 100000;
     };
 
-   let amountString = "";
+    let amountString = '';
 
-   let feiString = "";
-   amountString = utils.formatEther(parseUnits(amount.toString(),"wei"));
-   
-  //  if(BigNumber.from(amount).lt(utils.parseEther("0.01"))){
-  //   amountString = utils.formatEther(parseUnits(amount.toString(),"wei"));
-  //   // amountString = "<0.01";
-  //    feiString = amount.toString();
-  //  }else{
-  //    amountString = utils.formatEther(parseUnits(amount.toString(),"wei"));
-  //  }
+    let feiString = '';
+    amountString = utils.formatEther(parseUnits(amount.toString(), 'wei'));
+
+    //  if(BigNumber.from(amount).lt(utils.parseEther("0.01"))){
+    //   amountString = utils.formatEther(parseUnits(amount.toString(),"wei"));
+    //   // amountString = "<0.01";
+    //    feiString = amount.toString();
+    //  }else{
+    //    amountString = utils.formatEther(parseUnits(amount.toString(),"wei"));
+    //  }
 
     async function onBuy() {
       setBuying(true);
@@ -70,12 +84,12 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
         tx.then(() => {
           setBuying(false);
           setAmountToBuy(0);
-        }).catch(error => {
-            buyFraktionsRejected(error, onBuy);
+        }).catch((error) => {
+          buyFraktionsRejected(error, onBuy);
         });
       } catch (err) {
         buyFraktionsRejected(err, onBuy);
-        console.error("Error", err);
+        console.error('Error', err);
       }
     }
     function onSetAmount(d) {
@@ -89,51 +103,51 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
     return (
       <HStack
         style={{
-          marginTop: "24px",
-          justifyContent: "space-between",
+          marginTop: '24px',
+          justifyContent: 'space-between',
         }}
       >
         <VStack
           style={{
-            textAlign: "start",
+            textAlign: 'start',
           }}
         >
           <div
             style={{
-              fontFamily: "Inter",
+              fontFamily: 'Inter',
               fontWeight: 600,
-              fontSize: "12px",
-              lineHeight: "14px",
-              letterSpacing: "1px",
-              color: "#A7A7A7",
-              alignSelf: "end",
+              fontSize: '12px',
+              lineHeight: '14px',
+              letterSpacing: '1px',
+              color: '#A7A7A7',
+              alignSelf: 'end',
             }}
           >
             AVAILABLE
           </div>
           <div
             style={{
-              fontFamily: "Inter",
+              fontFamily: 'Inter',
               fontWeight: 600,
-              fontSize: "32px",
-              lineHeight: "40px",
-              color: "#000000",
+              fontSize: '32px',
+              lineHeight: '40px',
+              color: '#000000',
             }}
           >
-          {/* {utils.formatEther(amount)} */}
-          {amountString}
+            {/* {utils.formatEther(amount)} */}
+            {amountString}
             {/* {amount.toLocaleString()} */}
           </div>
-          
+
           <div
             style={{
-              fontFamily: "Inter",
-              fontWeight: "normal",
-              fontSize: "12px",
-              lineHeight: "14px",
-              letterSpacing: "1px",
-              color: "#656464",
-              alignSelf: "end",
+              fontFamily: 'Inter',
+              fontWeight: 'normal',
+              fontSize: '12px',
+              lineHeight: '14px',
+              letterSpacing: '1px',
+              color: '#656464',
+              alignSelf: 'end',
             }}
           >
             of 10,000
@@ -141,19 +155,19 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
         </VStack>
         <VStack
           style={{
-            textAlign: "start",
-            marginLeft: "24px",
+            textAlign: 'start',
+            marginLeft: '24px',
           }}
         >
           <div
             style={{
-              fontFamily: "Inter",
+              fontFamily: 'Inter',
               fontWeight: 600,
-              fontSize: "12px",
-              lineHeight: "14px",
-              letterSpacing: "1px",
-              color: "#A7A7A7",
-              alignSelf: "end",
+              fontSize: '12px',
+              lineHeight: '14px',
+              letterSpacing: '1px',
+              color: '#A7A7A7',
+              alignSelf: 'end',
             }}
           >
             PRICE
@@ -161,17 +175,17 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
           <HStack>
             <img
               src="/eth.png"
-              alt={"ETH"}
-              style={{ height: "26px", marginRight: "4px" }}
+              alt={'ETH'}
+              style={{ height: '26px', marginRight: '4px' }}
             />
             <div
               style={{
-                fontFamily: "Inter",
+                fontFamily: 'Inter',
                 fontWeight: 600,
-                fontSize: "32px",
-                lineHeight: "40px",
-                color: "#000000",
-                maxWidth: "200px"
+                fontSize: '32px',
+                lineHeight: '40px',
+                color: '#000000',
+                maxWidth: '200px',
               }}
             >
               {priceParsed(price)}
@@ -179,13 +193,13 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
           </HStack>
           <div
             style={{
-              fontFamily: "Inter",
-              fontWeight: "normal",
-              fontSize: "12px",
-              lineHeight: "14px",
-              letterSpacing: "1px",
-              color: "#656464",
-              alignSelf: "end",
+              fontFamily: 'Inter',
+              fontWeight: 'normal',
+              fontSize: '12px',
+              lineHeight: '14px',
+              letterSpacing: '1px',
+              color: '#656464',
+              alignSelf: 'end',
             }}
           >
             per Fraktion
@@ -193,19 +207,19 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
         </VStack>
         <VStack
           style={{
-            textAlign: "end",
-            marginLeft: "24px",
+            textAlign: 'end',
+            marginLeft: '24px',
           }}
         >
           <div
             style={{
-              fontFamily: "Inter",
+              fontFamily: 'Inter',
               fontWeight: 600,
-              fontSize: "12px",
-              lineHeight: "14px",
-              letterSpacing: "1px",
-              textAlign: "end",
-              color: "#A7A7A7",
+              fontSize: '12px',
+              lineHeight: '14px',
+              letterSpacing: '1px',
+              textAlign: 'end',
+              color: '#A7A7A7',
             }}
           >
             BUY FRAKTIONS
@@ -216,20 +230,21 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
             setFunction={onSetAmount}
             currency={'FRAKTIONS'}
           >
-            {buying ? "BUYING" : "BUY"}
+            {buying ? 'BUYING' : 'BUY'}
           </FrakButton2>
           {amountToBuy > 0 ? (
             <div
               style={{
-                fontFamily: "Inter",
-                fontWeight: "normal",
-                fontSize: "12px",
-                lineHeight: "14px",
-                letterSpacing: "1px",
-                color: "#656464",
+                fontFamily: 'Inter',
+                fontWeight: 'normal',
+                fontSize: '12px',
+                lineHeight: '14px',
+                letterSpacing: '1px',
+                color: '#656464',
               }}
             >
-              equals {amountToBuy / 100}% of ownership for { amountToBuy * utils.formatEther(price) } ETH
+              equals {amountToBuy / 100}% of ownership for{' '}
+              {amountToBuy * utils.formatEther(price)} ETH
             </div>
           ) : null}
         </VStack>
@@ -239,21 +254,21 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
 );
 
 const mapStateToProps = (state) => {
-    return {
-        contractTransaction: state.loadingScreen
-    }
+  return {
+    contractTransaction: state.loadingScreen,
+  };
 };
 const mapDispatchToProps = (dispatch) => {
-    return {
-        addFraktionAmount: (amount) => {
-            dispatch(addAmount(amount))
-        },
-        removeFraktionAmount: () => {
-            dispatch(removeAmount())
-        },
-        buyFraktionsRejected: (obj, buttonAction = null) => {
-            dispatch(rejectContract(BUYING_FRAKTIONS, obj, buttonAction))
-        }
-    }
+  return {
+    addFraktionAmount: (amount) => {
+      dispatch(addAmount(amount));
+    },
+    removeFraktionAmount: () => {
+      dispatch(removeAmount());
+    },
+    buyFraktionsRejected: (obj, buttonAction = null) => {
+      dispatch(rejectContract(BUYING_FRAKTIONS, obj, buttonAction));
+    },
+  };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(FraktionsDetail);

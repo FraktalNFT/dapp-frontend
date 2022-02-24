@@ -1,5 +1,5 @@
-import { utils } from "ethers";
-import React, { forwardRef, useState, useEffect } from "react";
+import { utils } from 'ethers';
+import React, { forwardRef, useState, useEffect } from 'react';
 import {
   voteOffer,
   getLocked,
@@ -9,21 +9,25 @@ import {
   getApproved,
   approveMarket,
   rejectOffer,
-} from "../../utils/contractCalls";
-import { shortenHash, timezone } from "../../utils/helpers";
-import { Box, Text, HStack } from "@chakra-ui/react";
-import toast from "react-hot-toast";
+} from '../../utils/contractCalls';
+import { shortenHash, timezone } from '../../utils/helpers';
+import { Box, Text, HStack } from '@chakra-ui/react';
+import toast from 'react-hot-toast';
 import store from '../../redux/store';
-import {VOTING_BUYOUTS, CLAIMING_FRAKTIONS_PROFIT, rejectContract} from "../../redux/actions/contractActions";
+import {
+  VOTING_BUYOUTS,
+  CLAIMING_FRAKTIONS_PROFIT,
+  rejectContract,
+} from '../../redux/actions/contractActions';
 
 interface offerItemProps {
-  account: String;
-  fraktionsBalance: Number;
-  offerItem: Object;
-  tokenAddress: String;
-  marketAddress: String;
-  provider: Object;
-  fraktionsApproved: Boolean;
+  account: string;
+  fraktionsBalance: number;
+  offerItem: object;
+  tokenAddress: string;
+  marketAddress: string;
+  provider: object;
+  fraktionsApproved: boolean;
 }
 
 export default function OfferDetail({
@@ -37,17 +41,16 @@ export default function OfferDetail({
 }) {
   const [fraktionsLocked, setFraktionsLocked] = useState(false);
   const [isOfferer, setIsOfferer] = useState<boolean>(false);
-  console.log({offerItem,tokenAddress});
-  
+  console.log({ offerItem, tokenAddress });
 
   useEffect(() => {
     async function getData() {
-      if (account && tokenAddress && offerItem.status != "sold") {
+      if (account && tokenAddress && offerItem.status != 'sold') {
         let lockedStr = await getLocked(account, tokenAddress, provider);
         let lockedNum = Number(lockedStr);
         let locked = !!lockedNum; //change truty to boolean
-        console.log(lockedStr,lockedNum,locked);
-        
+        console.log(lockedStr, lockedNum, locked);
+
         setFraktionsLocked(locked);
       }
     }
@@ -79,28 +82,34 @@ export default function OfferDetail({
     fraktionsApproved,
   ]);
 
-    /**
-     * Reject Offer
-     * @returns {Promise<void>}
-     */
+  /**
+   * Reject Offer
+   * @returns {Promise<void>}
+   */
   async function cancelVote() {
-    rejectOffer(account,offerItem.offerer.id, tokenAddress, provider, marketAddress);
+    rejectOffer(
+      account,
+      offerItem.offerer.id,
+      tokenAddress,
+      provider,
+      marketAddress
+    );
   }
 
-    /**
-     * Vote Offer
-     * @returns {Promise<void>}
-     */
+  /**
+   * Vote Offer
+   * @returns {Promise<void>}
+   */
   async function voteOnOffer() {
     //TODO REMOVE TOAST
-   // toast("Voting in progress...");
+    // toast("Voting in progress...");
     let response = await voteOffer(
       offerItem.offerer.id,
       tokenAddress,
       provider,
       marketAddress
-    ).catch(e => {
-        store.dispatch(rejectContract(VOTING_BUYOUTS, e, voteOnOffer));
+    ).catch((e) => {
+      store.dispatch(rejectContract(VOTING_BUYOUTS, e, voteOnOffer));
     });
     if (response?.error) {
       //TODO REMOVE TOAST
@@ -113,46 +122,48 @@ export default function OfferDetail({
   }
 
   async function approveContract() {
-    toast("Approving...");
+    toast('Approving...');
     let response = await approveMarket(marketAddress, provider, tokenAddress);
     if (response?.error) {
-      toast.error("Approval Failed.");
+      toast.error('Approval Failed.');
     }
     if (!response?.error) {
-      toast.success("Approval Successful.");
+      toast.success('Approval Successful.');
     }
     // if (done) {
     //   setFraktionsApproved(true);
     // }
   }
 
-    /**
-     * Claiming
-     * @returns {Promise<void>}
-     */
+  /**
+   * Claiming
+   * @returns {Promise<void>}
+   */
   async function claimFraktal() {
     // this one goes to offersCard
     //TODO REMOVE TOAST
-   // toast("Claiming...");
+    // toast("Claiming...");
     try {
       let response = await claimFraktalSold(
         tokenAddress,
         provider,
         marketAddress
-      ).catch(error => {
-          store.dispatch(rejectContract(CLAIMING_FRAKTIONS_PROFIT, error, claimFraktal));
+      ).catch((error) => {
+        store.dispatch(
+          rejectContract(CLAIMING_FRAKTIONS_PROFIT, error, claimFraktal)
+        );
       });
       //TODO REMOVE TOAST
       //toast.success("Claim successful.");
     } catch (e) {
       //TODO REMOVE TOAST
-      console.error("There has been an error: ", e);
+      console.error('There has been an error: ', e);
       //toast.error("Claiming failed.");
     }
   }
 
-  const isCanceledOffer = () => offerItem.value <= 0
-  
+  const isCanceledOffer = () => offerItem.value <= 0;
+
   return (
     <>
       {offerItem?.offerer?.id.length > 0 && (
@@ -177,21 +188,21 @@ export default function OfferDetail({
           <Text w="80px" sx={{ textAlign: `right` }}>
             {offerItem.value > 0
               ? `${utils.formatEther(offerItem.value)} ETH`
-              : "N/A"}
+              : 'N/A'}
           </Text>
           <Box w="210px" sx={{ textAlign: `right` }}>
             {!isCanceledOffer() && fraktionsBalance <= 0 && !isOfferer && (
               <Text>Buy Fraktions to vote!</Text>
             )}
-            {!isCanceledOffer() && fraktionsBalance > 0 && !isOfferer && !!offerItem?.winner && (
-              <Text>Pending Buyer Claiming NFT</Text>
-            )}
-            {isCanceledOffer() && (<Text>Canceled</Text>)}
-            {!isCanceledOffer() && 
-            fraktionsBalance > 0 && !fraktionsApproved && (
+            {!isCanceledOffer() &&
+              fraktionsBalance > 0 &&
+              !isOfferer &&
+              !!offerItem?.winner && <Text>Pending Buyer Claiming NFT</Text>}
+            {isCanceledOffer() && <Text>Canceled</Text>}
+            {!isCanceledOffer() && fraktionsBalance > 0 && !fraktionsApproved && (
               <Box
                 sx={{
-                  borderColor: "#00C4B8",
+                  borderColor: '#00C4B8',
                   fontSize: `16px`,
                   display: `inline-block`,
                   boxSizing: `border-box`,
@@ -208,28 +219,31 @@ export default function OfferDetail({
                 Approve Fraktions
               </Box>
             )}
-            {!isCanceledOffer() && fraktionsBalance > 0 && fraktionsApproved && !fraktionsLocked && (
-              <Box
-                sx={{
-                  borderColor: "#00C4B8",
-                  fontSize: `16px`,
-                  display: `inline-block`,
-                  boxSizing: `border-box`,
-                  backgroundColor: `hsla(168, 100%, 38%, 1)`,
-                  padding: `4px 16px`,
-                  color: `white`,
-                  fontWeight: `500`,
-                  fontFamily: `Inter`,
-                  borderRadius: `24px`,
-                }}
-                _hover={{ cursor: `pointer` }}
-                onClick={() => voteOnOffer()}
-              >
-                Accept
-              </Box>
-            )}
+            {!isCanceledOffer() &&
+              fraktionsBalance > 0 &&
+              fraktionsApproved &&
+              !fraktionsLocked && (
+                <Box
+                  sx={{
+                    borderColor: '#00C4B8',
+                    fontSize: `16px`,
+                    display: `inline-block`,
+                    boxSizing: `border-box`,
+                    backgroundColor: `hsla(168, 100%, 38%, 1)`,
+                    padding: `4px 16px`,
+                    color: `white`,
+                    fontWeight: `500`,
+                    fontFamily: `Inter`,
+                    borderRadius: `24px`,
+                  }}
+                  _hover={{ cursor: `pointer` }}
+                  onClick={() => voteOnOffer()}
+                >
+                  Accept
+                </Box>
+              )}
             {fraktionsBalance > 0 &&
-            !isCanceledOffer() && 
+              !isCanceledOffer() &&
               fraktionsApproved &&
               !fraktionsLocked &&
               !offerItem?.winner && (
