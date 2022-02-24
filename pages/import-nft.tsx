@@ -277,7 +277,6 @@ import { Workflow } from "types/workflow";
  
    return (
      <>
-       <LoadScreen/>
        {isLoading && <Spinner size="xl" />}
        {!isLoading && (
          <>

@@ -328,7 +328,6 @@ const MintPage = (props) => {
 
   return (
     <div>
-      <LoadScreen />
       <Box
         sx={{
           display: `grid`,

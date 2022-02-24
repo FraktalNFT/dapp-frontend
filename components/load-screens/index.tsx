@@ -119,7 +119,7 @@ const LoadScreen = ((props) => {
                             marginBottom="8px"
                             fontSize="15px"
                             fontWeight="400"
-                            lineHeight="1.5px"
+                            lineHeight="15px"
                             color="#979797"
                         >{showAmount(contractTransaction)}</Text>
                     )
