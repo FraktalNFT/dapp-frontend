@@ -220,7 +220,6 @@ export default function ListNFTView() {
 
   return (
     <VStack spacing="0" mb="12.8rem">
-      <LoadScreen/>
       <Head>
         <title>Fraktal - NFT</title>
       </Head>

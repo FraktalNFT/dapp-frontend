@@ -232,7 +232,6 @@ export default function DetailsView() {
 
   return (
     <>
-      <LoadScreen />
       {isLoading && (
         <>
           <Box sx={{ display: `grid`, width: `100%`, placeItems: `center` }}>
