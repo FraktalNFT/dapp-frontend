@@ -14,6 +14,7 @@ import {
   CLAIM_DEPOSITED_FRAKTIONS,
   CLAIM_NFT,
   EXPORT_FRAKTAL,
+  PARTICIPATE_AUCTION,
   rejectContract,
   REJECT_OFFER,
   UNLIST_AUCTION_NFT,
@@ -792,7 +793,11 @@ export async function participateAuction(
     sellerNonce,
     override
   );
+  store.dispatch(callContract(PARTICIPATE_AUCTION, tx));
   let receipt = await processTx(tx);
+  if (!receipt?.error) {
+    store.dispatch(approvedTransaction(PARTICIPATE_AUCTION, tx, tokenAddress));
+  }
   return receipt;
 }
 export async function listItemAuction(

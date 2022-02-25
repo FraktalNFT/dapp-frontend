@@ -28,6 +28,7 @@ import {
   CLAIM_NFT,
   CLAIM_DEPOSITED_FRAKTIONS,
   CLAIM_CONTRIBUTED_ETH,
+  PARTICIPATE_AUCTION,
 } from '../actions/contractActions';
 
 const initState = {
@@ -73,7 +74,7 @@ const claimingRevenue = {
 };
 
 const claimingBuyout = {
-  heading: 'Claiming Buy Out',
+  heading: 'Claiming Profits',
   button: {
     text: 'View NFT',
   },
@@ -86,7 +87,7 @@ const claimingFraktionsProfit = {
 };
 
 const claimDepositedFraktions = {
-  heading: 'Claiming Fraktions',
+  heading: 'Claiming ETH',
   button: {
     text: 'Success',
   },
@@ -120,7 +121,7 @@ const exportFraktal = {
 };
 
 const importNFT = {
-  heading: 'Frationalizing NFT',
+  heading: 'Importing NFT to Fraktal',
   button: {
     text: 'Success',
   },
@@ -147,6 +148,20 @@ const unlistingNFT = {
   },
 };
 
+const participateAuction = {
+  heading: 'Participating in Auction',
+  button: {
+    text: 'Success',
+  },
+};
+
+const endAuction = {
+  heading: 'Ending Auction',
+  button: {
+    text: 'Success',
+  },
+};
+
 const rejectingOffer = {
   heading: 'Rejecting Offer',
   button: {
@@ -161,8 +176,8 @@ const claimNFT = {
   },
 };
 
-const offeringBuyout = {
-  heading: 'Offering Buy-out',
+const removingOffer = {
+  heading: 'Removing Offer',
   button: {
     text: 'View NFT',
   },
@@ -219,8 +234,13 @@ const loadingScreenReducer = (state = initState, action) => {
       loadingScreenObject = listingNFT;
       break;
     case UNLIST_NFT:
-    case UNLIST_AUCTION_NFT:
       loadingScreenObject = unlistingNFT;
+      break;
+    case UNLIST_AUCTION_NFT:
+      loadingScreenObject = endAuction;
+      break;
+    case PARTICIPATE_AUCTION:
+      loadingScreenObject = participateAuction;
       break;
     case REJECT_OFFER:
       loadingScreenObject = rejectingOffer;
@@ -229,7 +249,7 @@ const loadingScreenReducer = (state = initState, action) => {
       loadingScreenObject = claimNFT;
       break;
     case OFFERING_BUYOUT:
-      loadingScreenObject = offeringBuyout;
+      loadingScreenObject = removingOffer;
       break;
     case VOTING_BUYOUTS:
       loadingScreenObject = votingBuyout;
