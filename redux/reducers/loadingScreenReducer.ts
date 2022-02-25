@@ -21,6 +21,13 @@ import {
   LISTING_NFT,
   OFFERING_BUYOUT,
   VOTING_BUYOUTS,
+  UNLIST_NFT,
+  UNLIST_AUCTION_NFT,
+  REJECT_OFFER,
+  EXPORT_FRAKTAL,
+  CLAIM_NFT,
+  CLAIM_DEPOSITED_FRAKTIONS,
+  CLAIM_CONTRIBUTED_ETH,
 } from '../actions/contractActions';
 
 const initState = {
@@ -77,6 +84,21 @@ const claimingFraktionsProfit = {
     text: 'View NFT',
   },
 };
+
+const claimDepositedFraktions = {
+  heading: 'Claiming Fraktions',
+  button: {
+    text: 'Success',
+  },
+};
+
+const claimContributedEth = {
+  heading: 'Claiming ETH',
+  button: {
+    text: 'Success',
+  },
+};
+
 const depositingRevenue = {
   heading: 'Depositing Revenue',
   button: {
@@ -86,6 +108,12 @@ const depositingRevenue = {
 
 const importFraktal = {
   heading: 'Fraktionalizing NFT',
+  button: {
+    text: 'Success',
+  },
+};
+const exportFraktal = {
+  heading: 'De-Fraktionalizing NFT',
   button: {
     text: 'Success',
   },
@@ -109,6 +137,27 @@ const listingNFT = {
   heading: 'Listing NFT',
   button: {
     text: 'View NFT',
+  },
+};
+
+const unlistingNFT = {
+  heading: 'Unlisting NFT',
+  button: {
+    text: 'Success',
+  },
+};
+
+const rejectingOffer = {
+  heading: 'Rejecting Offer',
+  button: {
+    text: 'Success',
+  },
+};
+
+const claimNFT = {
+  heading: 'Claiming NFT',
+  button: {
+    text: 'Success',
   },
 };
 
@@ -145,6 +194,12 @@ const loadingScreenReducer = (state = initState, action) => {
     case CLAIMING_REVENUE:
       loadingScreenObject = claimingRevenue;
       break;
+    case CLAIM_DEPOSITED_FRAKTIONS:
+      loadingScreenObject = claimDepositedFraktions;
+      break;
+    case CLAIM_CONTRIBUTED_ETH:
+      loadingScreenObject = claimContributedEth;
+      break;
     case DEPOSIT_REVENUE:
       loadingScreenObject = depositingRevenue;
       break;
@@ -154,11 +209,24 @@ const loadingScreenReducer = (state = initState, action) => {
     case IMPORT_FRAKTAL:
       loadingScreenObject = importFraktal;
       break;
+    case EXPORT_FRAKTAL:
+      loadingScreenObject = exportFraktal;
+      break;
     case MINT_NFT:
       loadingScreenObject = mintingNFT;
       break;
     case LISTING_NFT:
       loadingScreenObject = listingNFT;
+      break;
+    case UNLIST_NFT:
+    case UNLIST_AUCTION_NFT:
+      loadingScreenObject = unlistingNFT;
+      break;
+    case REJECT_OFFER:
+      loadingScreenObject = rejectingOffer;
+      break;
+    case CLAIM_NFT:
+      loadingScreenObject = claimNFT;
       break;
     case OFFERING_BUYOUT:
       loadingScreenObject = offeringBuyout;
@@ -207,6 +275,27 @@ const loadingScreenReducer = (state = initState, action) => {
           break;
       }
       break;
+    case Workflow.FRAK_NFT:
+      loadingScreenObject.totalStep = 2;
+      switch (action.transactionType) {
+        case APPROVE_TOKEN:
+          loadingScreenObject.step = 1;
+          break;
+        case IMPORT_FRAKTAL:
+          loadingScreenObject.step = 2;
+          break;
+      }
+    case Workflow.CLAIM_NFT:
+      loadingScreenObject.totalStep = 2;
+      switch (action.transactionType) {
+        case APPROVE_TOKEN:
+          loadingScreenObject.step = 1;
+          break;
+        case CLAIM_NFT:
+          loadingScreenObject.step = 2;
+          break;
+      }
+      break;
     default:
       loadingScreenObject.totalStep = null;
       loadingScreenObject.step = null;
@@ -242,9 +331,11 @@ const loadingScreenReducer = (state = initState, action) => {
           ? action.obj.transactionHash
           : action.obj.hash,
         state: COMPLETED_STATUS,
-        button: {
-          text: loadingScreenObject.button.text,
-        },
+        button: loadingScreenObject.button
+          ? {
+              text: loadingScreenObject.button.text,
+            }
+          : null,
       };
     case CALL_CONTRACT:
       return {

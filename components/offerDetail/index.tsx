@@ -101,8 +101,6 @@ export default function OfferDetail({
    * @returns {Promise<void>}
    */
   async function voteOnOffer() {
-    //TODO REMOVE TOAST
-    // toast("Voting in progress...");
     let response = await voteOffer(
       offerItem.offerer.id,
       tokenAddress,
@@ -111,14 +109,6 @@ export default function OfferDetail({
     ).catch((e) => {
       store.dispatch(rejectContract(VOTING_BUYOUTS, e, voteOnOffer));
     });
-    if (response?.error) {
-      //TODO REMOVE TOAST
-      //toast.error("Voting Failed");
-    }
-    if (!response?.error) {
-      //TODO REMOVE TOAST
-      //toast.success("Vote cast");
-    }
   }
 
   async function approveContract() {
@@ -141,8 +131,6 @@ export default function OfferDetail({
    */
   async function claimFraktal() {
     // this one goes to offersCard
-    //TODO REMOVE TOAST
-    // toast("Claiming...");
     try {
       let response = await claimFraktalSold(
         tokenAddress,
@@ -153,12 +141,8 @@ export default function OfferDetail({
           rejectContract(CLAIMING_FRAKTIONS_PROFIT, error, claimFraktal)
         );
       });
-      //TODO REMOVE TOAST
-      //toast.success("Claim successful.");
     } catch (e) {
-      //TODO REMOVE TOAST
       console.error('There has been an error: ', e);
-      //toast.error("Claiming failed.");
     }
   }
 
@@ -255,6 +239,7 @@ export default function OfferDetail({
                     boxSizing: `border-box`,
                     backgroundColor: `white`,
                     padding: `4px 16px`,
+                    marginLeft: `8px`,
                     color: `red`,
                     fontWeight: `500`,
                     fontFamily: `Inter`,
