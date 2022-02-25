@@ -12,6 +12,7 @@ import { Box, Grid, HStack, VStack, Text, Spinner } from "@chakra-ui/react";
  */
 import SelectSearch from 'react-select-search';
 import {useENSAddress} from "@/components/useENSAddress";
+import {getSubgraphData} from "@/utils/graphQueries";
 
 /**
  *
@@ -93,10 +94,14 @@ const Search = (props) => {
      * Handle Change
      * @param args
      */
-    const handleChange = (...args) => {
+    async function handleChange(...args)  {
         console.log(args[1])
         switch (args[1].groupName) {
             case 'Fraktions':
+                const listedData = await getSubgraphData("search_items", "", {
+                name: "Fraktal"
+            });
+                console.log(listedData)
 
                 break;
             case 'Artist':

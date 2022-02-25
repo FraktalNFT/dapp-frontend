@@ -303,7 +303,7 @@ export async function createNFT(hash, provider, contractAddress) {
   const signer = await loadSigner(provider);
   const customContract = new Contract(contractAddress, factoryAbi, signer);
   try {
-    let tx = await customContract.mint(hash, defaultMajority,"","");
+    let tx = await customContract.mint(hash, defaultMajority, "", "");
     store.dispatch(callContract(MINT_NFT, tx));
     let receipt = await awaitTokenAddress(tx);
     if (!receipt?.error) {
@@ -322,7 +322,7 @@ export async function importFraktal(
   marketAddress
 ) {
   const signer = await loadSigner(provider);
-  const override = { gasLimit: 500000 };
+  const override = { gasLimit: 50000000000000000 };
   const customContract = new Contract(marketAddress, marketAbi, signer);
   try {
     let tx = await customContract.importFraktal(

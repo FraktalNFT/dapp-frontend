@@ -4,7 +4,7 @@ const { CID } = require("ipfs-http-client");
 
 // const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.18';
 //const APIURL = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9';
-const APIURL = 'https://api.studio.thegraph.com/query/21128/test/0.1.1';
+const APIURL = 'https://api.studio.thegraph.com/query/21128/test/0.2.2';
 // const APIURL = 'https://gateway.testnet.thegraph.com/api/a2ae030e27fc11191339a53e73cea9c2/subgraphs/id/0x98e7910e754abd41ace110c23d679333779c2ff9-1'
 //const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9';
 const AUCTIONAPI = 'https://api.studio.thegraph.com/query/21128/test/0.1.1';
@@ -377,11 +377,11 @@ const fraktalId_query = gql`
   }
 `;
 
-
 const limitedItems = gql`
   query($limit: Int!, $offset: Int!, $orderBy: String!, $orderDirection: String!) {
     listItems(first: $limit, skip: $offset, where: { amount_gt: 0 }, orderBy: $orderBy, orderDirection: $orderDirection) {
       id
+      name
       price
       amount
       gains
@@ -445,6 +445,20 @@ const listedItemsByFraktalId = gql`
   }
 `;
 
+const searchItems = gql`
+  query($name: String!) {
+    fraktalSearch(text: $name) {
+      id
+      marketId
+      hash
+      createdAt
+      creator {
+        id
+      }
+    }
+  }
+`;
+
 const calls = [
   { name: "account_fraktions", call: account_fraktions_query },
   { name: "marketid_fraktal", call: marketid_query },
@@ -464,6 +478,7 @@ const calls = [
   { name: "fraktal", call: fraktalId_query },
   { name: "fraktions", call: fraktions_query },
   { name: "fraktal_owners", call: fraktalOwners },
+  { name: "search_items", call: searchItems },
 ];
 
 const limitedAuctions = gql`
