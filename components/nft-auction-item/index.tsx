@@ -33,32 +33,28 @@ interface NFTItemProps extends StackProps {
   amount: any;
   price: Number;
   imageURL: String;
-  // CTAText?: string;
-  // wait: number;
   endTime: number;
-  reservePriceReached: any;
+  reservePriceReached: boolean;
+  showProgress: boolean;
+  isYourNFT: boolean;
+  claimType: string;
+  claimFunction: () => void
+  unlistFunction: () => void
 }
 
 const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
-  ({ item, amount, price, imageURL, name, onClick, CTAText, wait, endTime, showProgress, claimType,claimFunction, unlistFunction, reservePriceReached }, ref) => {
+  ({ item, amount, price, imageURL, name, onClick, endTime, showProgress, claimType,claimFunction, unlistFunction, reservePriceReached }, ref) => {
     const [isVisible, setIsVisible] = useState(false);
     const [timerOpacity,setTimerOpacity] = useState(0);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const { fraktions } = useUserContext();
     const [ended,setEnded] = useState(false);
 
-    // const canList = item && !! (fraktions || []).find(fraktion => fraktion.id === item.id);
-
-    // useEffect(() => {
-    //   setIsImageLoaded(false);
-    // }, []);
-
     const onImageLoad = (ms: number) => {
       setTimeout(() => {
         setIsImageLoaded(true);
       }, ms);
     };
-
 
     setTimeout(() => {
       setIsVisible(true);
@@ -79,10 +75,10 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
         return <div>Ended</div>;
       } else {
         // Render a countdown
-        if(days>0){
+        if(days > 0){
           return <span>{days} days :{zeroPad(hours)} hours</span>;
         }
-        if(hours>0){
+        if(hours > 0){
           return <span>{zeroPad(hours)} hours:{zeroPad(minutes)} mins</span>;
         }
         return <span>{zeroPad(minutes)} mins:{zeroPad(seconds)} secs</span>;
@@ -187,9 +183,6 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
               {showProgress && !item.isAuctionSuccess && (
                 <Badge fontSize='md' colorScheme='red'>Reserve not met</Badge>
               )}
-
-
-
 
               { showProgress && ended && claimType=="seller" &&(
                 <Box textAlign="center" marginTop={5}>
