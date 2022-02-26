@@ -25,30 +25,39 @@ import { FrakCard } from "../../types";
 import { motion, isValidMotionProp, HTMLMotionProps } from "framer-motion";
 import FrakButton from "../../components/button";
 import { useUserContext } from "@/contexts/userContext";
-import Countdown,{zeroPad} from 'react-countdown';
+import Countdown, { zeroPad } from 'react-countdown';
 
 interface NFTItemProps extends StackProps {
   item: any;
-  name: String;
+  name: string;
   amount: any;
-  price: Number;
-  imageURL: String;
+  price: number;
+  imageURL: string;
   endTime: number;
   reservePriceReached: boolean;
   showProgress: boolean;
   isYourNFT: boolean;
   claimType: string;
   claimFunction: (token: string, seller: string, sellerNonce: number) => void
-  unlistFunction: () => void
+  unlistFunction: (tokenAddress, sellerNonce: number) => void
+}
+
+// dipsplay the menu
+const NFTContextMenu = () => {
+  return (<>
+    <div>
+      link + icon
+    </div>
+  </>);
 }
 
 const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
-  ({ item, amount, price, imageURL, name, onClick, endTime, showProgress, claimType,claimFunction, unlistFunction, reservePriceReached }, ref) => {
+  ({ item, amount, price, imageURL, name, onClick, endTime, showProgress, claimType, claimFunction, unlistFunction, reservePriceReached }, ref) => {
     const [isVisible, setIsVisible] = useState(false);
-    const [timerOpacity,setTimerOpacity] = useState(0);
+    const [timerOpacity, setTimerOpacity] = useState(0);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const { fraktions } = useUserContext();
-    const [ended,setEnded] = useState(false);
+    const [ended, setEnded] = useState(false);
 
     const onImageLoad = (ms: number) => {
       setTimeout(() => {
@@ -68,17 +77,17 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
       "animation-iteration-count": `infinite`,
     };
 
-    const renderer = ({ days, hours, minutes, seconds, completed })=>{
+    const renderer = ({ days, hours, minutes, seconds, completed }) => {
       if (completed) {
         // Render a completed state
         setEnded(true);
         return <div>Ended</div>;
       } else {
         // Render a countdown
-        if(days > 0){
+        if (days > 0) {
           return <span>{days} days :{zeroPad(hours)} hours</span>;
         }
-        if(hours > 0){
+        if (hours > 0) {
           return <span>{zeroPad(hours)} hours:{zeroPad(minutes)} mins</span>;
         }
         return <span>{zeroPad(minutes)} mins:{zeroPad(seconds)} secs</span>;
@@ -111,7 +120,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 }
               >
                 <Image
-                  src={'https://image.fraktal.io/?height=350&image='+imageURL}
+                  src={'https://image.fraktal.io/?height=350&image=' + imageURL}
                   width="100%"
                   height="100%"
                   objectFit="cover"
@@ -160,12 +169,12 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 </Tag>
               </Flex>
               <Flex>
-                {(amount!=0) && (
-                  <Text className="medium-12">{amount==0?"Not":`${amount / 100}%`} Available</Text>
+                {(amount != 0) && (
+                  <Text className="medium-12">{amount == 0 ? "Not" : `${amount / 100}%`} Available</Text>
                 )}
 
                 <Spacer />
-                {endTime&&<Image
+                {endTime && <Image
                   align="vertical"
                   width="5"
                   height="5"
@@ -173,7 +182,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                   marginTop="5px"
                   src="timer.png"
                 />}
-                <Countdown renderer={renderer} date={Number(endTime)*1000} autoStart
+                <Countdown renderer={renderer} date={Number(endTime) * 1000} autoStart
                 />
               </Flex>
 
@@ -184,51 +193,51 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 <Badge fontSize='md' colorScheme='red'>Reserve not met</Badge>
               )}
 
-              { showProgress && ended && claimType=="seller" &&(
+              {showProgress && ended && claimType == "seller" && (
                 <Box textAlign="center" marginTop={5}>
-                    {item.currentReserve==0 &&(
-                      <FrakButton disabled onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)}
-                      >Nothing to claim</FrakButton>
-                    )
-                    }
-                    {item.currentReserve!=0 && item.isAuctionSuccess && (
-                      <FrakButton onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)}
-                      >Claim {item.currentReserve} ETH</FrakButton>
-                    )
-                    }
-                    {item.currentReserve!=0 && !item.isAuctionSuccess && (
-                      <FrakButton onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)}
-                      >Claim Deposited Fraktions</FrakButton>
-                    )
-                    }
+                  {item.currentReserve == 0 && (
+                    <FrakButton disabled onClick={() => claimFunction(item.tokenAddress, item.seller, item.sellerNonce)}
+                    >Nothing to claim</FrakButton>
+                  )
+                  }
+                  {item.currentReserve != 0 && item.isAuctionSuccess && (
+                    <FrakButton onClick={() => claimFunction(item.tokenAddress, item.seller, item.sellerNonce)}
+                    >Claim {item.currentReserve} ETH</FrakButton>
+                  )
+                  }
+                  {item.currentReserve != 0 && !item.isAuctionSuccess && (
+                    <FrakButton onClick={() => claimFunction(item.tokenAddress, item.seller, item.sellerNonce)}
+                    >Claim Deposited Fraktions</FrakButton>
+                  )
+                  }
 
                 </Box>
               )}
-              { showProgress && ended && claimType=="participant" &&(
+              {showProgress && ended && claimType == "participant" && (
                 <Box textAlign="center" marginTop={5}>
-                {item.contributed != 0 && item.isAuctionSuccess && (
-                  <FrakButton  onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)}
-                  >Claim Fraktions</FrakButton>
-                )}
-                {item.contributed != 0 && !item.isAuctionSuccess &&(
-                  <FrakButton  onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)}
-                  >Claim Contributed ETH</FrakButton>
-                )}
-                {item.contributed == 0 &&(
-                  <FrakButton disabled onClick={()=>claimFunction(item.tokenAddress,item.seller,item.sellerNonce)}
-                  >Claimed</FrakButton>
-                )}
+                  {item.contributed != 0 && item.isAuctionSuccess && (
+                    <FrakButton onClick={() => claimFunction(item.tokenAddress, item.seller, item.sellerNonce)}
+                    >Claim Fraktions</FrakButton>
+                  )}
+                  {item.contributed != 0 && !item.isAuctionSuccess && (
+                    <FrakButton onClick={() => claimFunction(item.tokenAddress, item.seller, item.sellerNonce)}
+                    >Claim Contributed ETH</FrakButton>
+                  )}
+                  {item.contributed == 0 && (
+                    <FrakButton disabled onClick={() => claimFunction(item.tokenAddress, item.seller, item.sellerNonce)}
+                    >Claimed</FrakButton>
+                  )}
                 </Box>
               )}
-              { showProgress && !ended && claimType=="seller" && (
+              {showProgress && !ended && claimType == "seller" && (
                 <Box textAlign="center" marginTop={5}>
                   <Button disabled >In Progress</Button>
-                  <Button size={'lg'} onClick={()=>unlistFunction(item.tokenAddress,item.sellerNonce)} >
+                  <Button size={'lg'} onClick={() => unlistFunction(item.tokenAddress, item.sellerNonce)} >
                     End Auction
                   </Button>
                 </Box>
               )}
-              { showProgress && !ended && claimType=="participant" && (
+              {showProgress && !ended && claimType == "participant" && (
                 <Box textAlign="center" marginTop={5}>
                   <Button disabled >In Progress</Button>
                 </Box>
