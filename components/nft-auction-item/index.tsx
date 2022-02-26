@@ -38,7 +38,7 @@ interface NFTItemProps extends StackProps {
   showProgress: boolean;
   isYourNFT: boolean;
   claimType: string;
-  claimFunction: () => void
+  claimFunction: (token: string, seller: string, sellerNonce: number) => void
   unlistFunction: () => void
 }
 
