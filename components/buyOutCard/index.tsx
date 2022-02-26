@@ -199,7 +199,7 @@ const BuyOutCard = ({
             </HStack>
           </VStack>
           {userIsOfferer && (
-            <FrakButton onClick={onOffer}>Take out offer</FrakButton>
+            <FrakButton onClick={onOffer}>Removing Buy-out Offer</FrakButton>
           )}
           {!userIsOfferer && (
             <Stack
@@ -226,7 +226,7 @@ const BuyOutCard = ({
                 setFunction={onSetValue}
                 currency={'ETH'}
               >
-                {offering ? "Making offer" : "Offer"}
+                {offering ? "Making Offer" : "Make Buy-out Offer"}
               </FrakButton2>
             </Stack>
           )}
