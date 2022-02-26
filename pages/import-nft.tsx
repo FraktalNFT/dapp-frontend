@@ -135,7 +135,7 @@ import { Workflow } from "types/workflow";
      }
      if (tokenToImport?.token_schema === "ERC721") {
        address = await importERC721(
-         parseInt(tokenToImport?.tokenId),
+         BigInt(tokenToImport?.tokenId),
          tokenToImport?.id,
          provider,
          factoryAddress,
@@ -146,7 +146,7 @@ import { Workflow } from "types/workflow";
      }
      if (tokenToImport?.token_schema === "ERC1155") {
        address = await importERC1155(
-         parseInt(tokenToImport?.tokenId),
+         BigInt(tokenToImport?.tokenId),
          tokenToImport?.id,
          provider,
          factoryAddress,
@@ -160,11 +160,11 @@ import { Workflow } from "types/workflow";
        setIsNFTImported(true);
        if (!isIntendedForListing) {
          setInterval(() => {
-           router.push(MY_NFTS);
+           router.push("/my-nfts");
          }, 1000);
        }
      }
- 
+
    }
  
    useEffect(()=>{
@@ -210,7 +210,7 @@ import { Workflow } from "types/workflow";
      ).then(receipt => {
        setIsNFTListed(true);
        setInterval(() => {
-         router.push(MY_NFTS);
+         router.push("/my-nfts");
        }, 1000);
      }).catch(error => {
          store.dispatch(rejectContract(LISTING_NFT, error, listNewItem, actionOpts));
@@ -228,7 +228,7 @@ import { Workflow } from "types/workflow";
      ).then(receipt => {
          setIsNFTListed(true);
          setInterval(() => {
-             router.push(MY_NFTS);
+             router.push("/my-nfts");
          }, 1000);
      }).catch(error => {
          store.dispatch(
