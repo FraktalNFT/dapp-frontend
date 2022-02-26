@@ -25,9 +25,11 @@ import FrakButton from '../../components/button';
 import { useUserContext } from '@/contexts/userContext';
 import { BigNumber, utils } from 'ethers';
 import { useWeb3Context } from '../../contexts/Web3Context';
-import { getListingAmount, unlistItem } from '../../utils/contractCalls';
+import { getListingAmount, unlistItem, claimERC721, claimERC1155 } from '../../utils/contractCalls';
 import toast from 'react-hot-toast';
 import { roundUp } from '../../utils/math';
+import {ActionOpts} from "../../redux/actions/contractActions";
+import {Workflow} from "../../types/workflow";
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
@@ -124,6 +126,19 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
       animationName: `loadingCard`,
       animationDuration: `1s`,
       'animation-iteration-count': `infinite`,
+    };
+
+    const withdrawNFT = async (item, event) => {
+        const actionOpts = { workflow: Workflow.CLAIM_NFT };
+        event.stopPropagation();
+        await claimERC1155(
+            item.marketId,
+            provider,
+            marketAddress,
+            actionOpts
+        ).then((response) => {
+          console.log(response)
+        });
     };
 
     return (
@@ -227,6 +242,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                   <NextLink href={`nft/${item.id}/details?frak=1`}>
                     <FrakButton size="sm">Frak it</FrakButton>
                   </NextLink>
+                  <FrakButton marginLeft="10px" size="sm" onClick={(e) => withdrawNFT(item, e)} >Withdraw NFT</FrakButton>
                 </Box>
               )}
 
