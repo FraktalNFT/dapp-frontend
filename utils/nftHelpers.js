@@ -64,7 +64,6 @@ async function fetchNftMetadata(hash){
       let result = await res.json()
       window.localStorage.setItem(hash,JSON.stringify(result));
       // console.log('found other, data:',result)
-      let result = res.json()
       return result
     }else{
       return null;
