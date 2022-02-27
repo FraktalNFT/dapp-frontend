@@ -145,7 +145,7 @@ const RevenuesList = (props) => {
                   creator={x.creator?.id ? x.creator.id : null}
                   buyout={x.buyout}
                   provider={provider}
-                  tokenAddress={x.tokenAddress}
+                  tokenAddress={x.fraktal}
                 />
               );
             })}

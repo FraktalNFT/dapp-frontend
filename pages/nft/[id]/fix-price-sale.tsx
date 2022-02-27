@@ -61,7 +61,7 @@ export default function FixPriceNFTView() {
       try {
         await buyFraktions(
           nftObject.seller,
-          nftObject.tokenAddress,
+          nftObject.fraktal,
           fraktionsToBuy,
           toPay(),
           provider,
@@ -88,7 +88,7 @@ export default function FixPriceNFTView() {
     try {
       makeOffer(
         utils.parseEther(offerValue),
-        nftObject.tokenAddress,
+        nftObject.fraktal,
         provider,
         marketAddress).then(()=>{
           router.push('/my-nfts', null, {scroll: false});

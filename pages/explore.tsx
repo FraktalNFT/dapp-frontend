@@ -122,9 +122,9 @@ const Marketplace: React.FC = () => {
     if (type == "All Listings") {
       sortedItems = nftData;
     } else if (type == FIXED_PRICE_TYPE) {
-      sortedItems = nftData.filter((item) => !item.endTime);
+      sortedItems = nftData.filter((item) => !item.end);
     } else {
-      sortedItems = nftData.filter((item) => item.endTime>0);
+      sortedItems = nftData.filter((item) => item.end>0);
     }
     setNftItems(sortedItems);
   };
@@ -137,10 +137,10 @@ const Marketplace: React.FC = () => {
   async function mapAuctionToFraktal(auctionData) {
       let auctionDataHash = [];
       await Promise.all(auctionData?.auctions.map(async x => {
-          let _hash = await getSubgraphAuction("auctionsNFT", x.tokenAddress);
+          let _hash = await getSubgraphAuction("auctionsNFT", x.fraktal);
 
           const itm = {
-              "id":`${x.tokenAddress}-${x.sellerNonce}`,
+              "id":`${x.fraktal}-${x.sellerNonce}`,
               "hash":_hash.fraktalNft.hash
           };
 
@@ -148,7 +148,7 @@ const Marketplace: React.FC = () => {
       }));
       let auctionItems = [];
       await Promise.all(auctionData?.auctions.map(async (auction, idx) => {
-              let hash = auctionDataHash.filter(e=>e.id == `${auction.tokenAddress}-${auction.sellerNonce}`);
+              let hash = auctionDataHash.filter(e=>e.id == `${auction.fraktal}-${auction.sellerNonce}`);
               Object.assign(auction, {"hash":hash[0].hash});
               const item = await createListedAuction(auction);
               auctionItems.push(item);
@@ -204,7 +204,7 @@ const Marketplace: React.FC = () => {
         let auctionData = await getSubgraphAuction("limited_auctions", "", {
             limit: limit,
             offset: offset,
-            endTime: curTimestamp,
+            end: curTimestamp,
             orderDirection: orderDirection
         });
 
@@ -346,7 +346,7 @@ const Marketplace: React.FC = () => {
                     gap="3.2rem"
                   >
                     {nftItems.map((item, index) => {
-                      if(item.endTime){//for auction
+                      if(item.end){//for auction
                         return (
                           <Anchor
                             key={`${item.seller}-${item.sellerNonce}`}
@@ -354,9 +354,9 @@ const Marketplace: React.FC = () => {
                           >
                             <NFTAuctionItem
                               name={item.name}
-                              amount={utils.formatEther(item.amountOfShare)}
+                              amount={utils.formatEther(item.shares)}
                               imageURL={item.imageURL}
-                              endTime={item.endTime}
+                              end={item.end}
                               item={item}
                             />
                           </Anchor>

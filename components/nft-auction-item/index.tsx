@@ -35,7 +35,7 @@ interface NFTItemProps extends StackProps {
   imageURL: string;
   // CTAText?: string;
   // wait: number;
-  endTime: number;
+  end: number;
   reservePriceReached: any;
 }
 
@@ -50,7 +50,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
       onClick,
       CTAText,
       wait,
-      endTime,
+      end,
       showProgress,
       claimType,
       claimFunction,
@@ -202,7 +202,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 )}
 
                 <Spacer />
-                {endTime && (
+                {end && (
                   <Image
                     align="vertical"
                     width="5"
@@ -214,7 +214,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 )}
                 <Countdown
                   renderer={renderer}
-                  date={Number(endTime) * 1000}
+                  date={Number(end) * 1000}
                   autoStart
                 />
               </Flex>
@@ -237,7 +237,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                       disabled
                       onClick={() =>
                         claimFunction(
-                          item.tokenAddress,
+                          item.fraktal,
                           item.seller,
                           item.sellerNonce
                         )
@@ -250,7 +250,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                     <FrakButton
                       onClick={() =>
                         claimFunction(
-                          item.tokenAddress,
+                          item.fraktal,
                           item.seller,
                           item.sellerNonce
                         )
@@ -263,7 +263,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                     <FrakButton
                       onClick={() =>
                         claimFunction(
-                          item.tokenAddress,
+                          item.fraktal,
                           item.seller,
                           item.sellerNonce
                         )
@@ -280,7 +280,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                     <FrakButton
                       onClick={() =>
                         claimFunction(
-                          item.tokenAddress,
+                          item.fraktal,
                           item.seller,
                           item.sellerNonce
                         )
@@ -293,7 +293,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                     <FrakButton
                       onClick={() =>
                         claimFunction(
-                          item.tokenAddress,
+                          item.fraktal,
                           item.seller,
                           item.sellerNonce
                         )
@@ -307,7 +307,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                       disabled
                       onClick={() =>
                         claimFunction(
-                          item.tokenAddress,
+                          item.fraktal,
                           item.seller,
                           item.sellerNonce
                         )
@@ -324,7 +324,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                   <Button
                     size={'lg'}
                     onClick={() =>
-                      unlistFunction(item.tokenAddress, item.sellerNonce)
+                      unlistFunction(item.fraktal, item.sellerNonce)
                     }
                   >
                     End Auction

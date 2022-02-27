@@ -136,7 +136,7 @@ export default function ListNFTView() {
 
   async function callUnlistItem(){
     let tx = await unlistItem(
-      nftObject.tokenAddress,
+      nftObject.fraktal,
       provider,
       marketAddress)
     if(tx) {

@@ -214,11 +214,11 @@ export default function MyNFTsView() {
       let auctionDataHash = [];
       await Promise.all(
         auctionData?.map(async (x) => {
-          let _hash = await getSubgraphAuction('auctionsNFT', x.tokenAddress);
+          let _hash = await getSubgraphAuction('auctionsNFT', x.fraktal);
 
           if (_hash.fraktalNft != null) {
             const itm = {
-              id: `${x.tokenAddress}-${x.sellerNonce}`,
+              id: `${x.fraktal}-${x.sellerNonce}`,
               hash: _hash.fraktalNft.hash,
             };
             auctionDataHash.push(itm);
@@ -230,7 +230,7 @@ export default function MyNFTsView() {
       await Promise.all(
         auctionData?.map(async (auction, idx) => {
           let hash = auctionDataHash.filter(
-            (e) => e.id == `${auction.tokenAddress}-${auction.sellerNonce}`
+            (e) => e.id == `${auction.fraktal}-${auction.sellerNonce}`
           );
 
           if (hash[0] != undefined) {
@@ -244,11 +244,11 @@ export default function MyNFTsView() {
       let auctionDataParticipatedHash = [];
       await Promise.all(
         auctionDataParticipated?.map(async (x) => {
-          let _hash = await getSubgraphAuction('auctionsNFT', x.tokenAddress);
+          let _hash = await getSubgraphAuction('auctionsNFT', x.fraktal);
 
           if (_hash.fraktalNft != null) {
             const itm = {
-              id: `${x.tokenAddress}-${x.sellerNonce}`,
+              id: `${x.fraktal}-${x.sellerNonce}`,
               hash: _hash.fraktalNft.hash,
             };
             auctionDataParticipatedHash.push(itm);
@@ -260,7 +260,7 @@ export default function MyNFTsView() {
       await Promise.all(
         auctionDataParticipated?.map(async (auction, idx) => {
           let hash = auctionDataParticipatedHash.filter(
-            (e) => e.id == `${auction.tokenAddress}-${auction.sellerNonce}`
+            (e) => e.id == `${auction.fraktal}-${auction.sellerNonce}`
           );
 
           if (hash[0] != undefined) {
@@ -276,7 +276,7 @@ export default function MyNFTsView() {
               auction.sellerNonce
             );
             const success = await auctionSuccess(
-              auction.tokenAddress,
+              auction.fraktal,
               auction.seller,
               auction.sellerNonce,
               itemReserve
@@ -300,7 +300,7 @@ export default function MyNFTsView() {
           const itemReserve = await auctionReserve(i.seller, i.sellerNonce);
           // const auctionSuccess = (itemReserve>i.reservePrice?true:false);
           const success = await auctionSuccess(
-            i.tokenAddress,
+            i.fraktal,
             i.seller,
             i.sellerNonce,
             itemReserve
@@ -312,13 +312,13 @@ export default function MyNFTsView() {
         })
       );
 
-      auctionItems = auctionItems.sort((a, b) => b.endTime - a.endTime);
+      auctionItems = auctionItems.sort((a, b) => b.end - a.end);
 
       await Promise.all(
         auctionItems.map(async (i) => {
           try {
             const estimate = await estimateRedeemAuctionSeller(
-              i.tokenAddress,
+              i.fraktal,
               i.seller,
               i.sellerNonce,
               provider,
@@ -612,12 +612,12 @@ export default function MyNFTsView() {
                     name={item.name}
                     amount={Number(
                       utils.formatEther(
-                        item.amountOfShare != undefined ? item.amountOfShare : 0
+                        item.shares != undefined ? item.shares : 0
                       )
                     )}
                     price={item.price}
                     imageURL={item.imageURL}
-                    endTime={item.endTime}
+                    end={item.end}
                     showProgress={true}
                     claimType={'participant'}
                     claimFunction={userClaimFrak}
@@ -658,10 +658,10 @@ export default function MyNFTsView() {
                   <NFTAuctionItem
                     item={item}
                     name={item.name}
-                    amount={utils.formatEther(item?.amountOfShare)}
+                    amount={utils.formatEther(item?.shares)}
                     price={item.price}
                     imageURL={item.imageURL}
-                    endTime={item.endTime}
+                    end={item.end}
                     showProgress={true}
                     claimType={'seller'}
                     claimFunction={sellerClaimEth}

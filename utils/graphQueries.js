@@ -464,13 +464,13 @@ const calls = [
 ];
 
 const limitedAuctions = gql`
-  query($limit: Int!, $offset: Int!, $endTime: Int!, $orderDirection: String!) {
-    auctions(first: $limit, skip: $offset, orderBy: reservePrice, orderDirection: $orderDirection, where: { endTime_gt: $endTime, reservePrice_gt: 0 }) {
+  query($limit: Int!, $offset: Int!, $end: Int!, $orderDirection: String!) {
+    auctions(first: $limit, skip: $offset, orderBy: price, orderDirection: $orderDirection, where: { end_gt: $end, price_gt: 0 }) {
       seller
       tokenAddress
-      reservePrice
-      amountOfShare
-      endTime
+      price
+      shares
+      end
       sellerNonce
       participants
       }
@@ -482,9 +482,9 @@ const listedAuctions = gql`
     auctions {
       seller
       tokenAddress
-      reservePrice
-      amountOfShare
-      endTime
+      price
+      shares
+      end
       sellerNonce
       participants
       }
@@ -504,10 +504,10 @@ query($id: ID!) {
   auction(id:$id) {
     id
     seller
-    tokenAddress
-    reservePrice
-    amountOfShare
-    endTime
+    fraktal
+    price
+    shares
+    end
     sellerNonce
 }
 }

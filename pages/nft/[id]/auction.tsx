@@ -52,12 +52,12 @@ function AuctionNFTView({router}) {
       });
       return;
     }
-    const {tokenAddress,seller,sellerNonce} = nftObject;
+    const {fraktal,seller,sellerNonce} = nftObject;
 
     const weiVal = utils.parseUnits(contribute.toString());
 
     try {
-      const tx = await participateAuction(tokenAddress,seller,sellerNonce,weiVal,provider,marketAddress)
+      const tx = await participateAuction(fraktal,seller,sellerNonce,weiVal,provider,marketAddress)
       .then((e)=>console.log(e)
       );
       toast({
@@ -107,7 +107,7 @@ function AuctionNFTView({router}) {
         return;
       }
 
-      let _hash = await getSubgraphAuction("auctionsNFT",obj.auction.tokenAddress);
+      let _hash = await getSubgraphAuction("auctionsNFT",obj.auction.fraktal);
       Object.assign(obj,{
         "hash":_hash.fraktalNft.hash,
       });
@@ -221,25 +221,25 @@ function AuctionNFTView({router}) {
                 TOKEN ADDRESS
               </div>
               <div className={styles.cardText}>
-                {nftObject?nftObject.tokenAddress:'loading'}
+                {nftObject?nftObject.fraktal:'loading'}
               </div>
               <div style={{ marginTop: "8px" }} className={styles.cardHeader}>
                 RESERVE PRICE
               </div>
               <div className={styles.cardText}>
-                {nftObject?`${utils.formatUnits(nftObject.reservePrice)} ETH`:'loading'}
+                {nftObject?`${utils.formatUnits(nftObject.price)} ETH`:'loading'}
               </div>
               <div style={{ marginTop: "8px" }} className={styles.cardHeader}>
                 Fraktion Amount
               </div>
               <div className={styles.cardText}>
-                {nftObject?`${utils.formatUnits(nftObject.amountOfShare)}/10,000 Fraktions (${Number(utils.formatUnits(nftObject.amountOfShare))/100}% of max. supply)`:'loading'}
+                {nftObject?`${utils.formatUnits(nftObject.shares)}/10,000 Fraktions (${Number(utils.formatUnits(nftObject.shares))/100}% of max. supply)`:'loading'}
               </div>
             </div>
           </div>
           {nftObject&&<div className={styles.auctionCard}>
             <div style={{ marginRight: "52px" }}>
-            <Countdown renderer={renderer} date={Number(nftObject.endTime)*1000} autoStart
+            <Countdown renderer={renderer} date={Number(nftObject.end)*1000} autoStart
                 />
             </div>
             {currentReserve!=-1&&(

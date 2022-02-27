@@ -171,7 +171,7 @@ export async function createListed(data){
         creator:data.fraktal.creator.id,
         marketId: data.fraktal.marketId,
         createdAt: data.fraktal.createdAt,
-        tokenAddress: data.fraktal.id,
+        fraktal: data.fraktal.id,
         holders: data.fraktal.fraktions.length,
         raised: data.gains,
         id: data.id,
@@ -193,13 +193,13 @@ export async function createListedAuction(data){
     let nftMetadata = await fetchNftMetadata(data.hash)
     if(nftMetadata){
       return {
-        amountOfShare: data.amountOfShare,
-        endTime: data.endTime,
+        shares: data.shares,
+        end: data.end,
         hash: data.hash,
-        reservePrice: data.reservePrice,
+        price: data.price,
         seller: data.seller,
         sellerNonce: data.sellerNonce,
-        tokenAddress: data.tokenAddress,
+        fraktal: data.fraktal,
         name: nftMetadata.name,
         description: nftMetadata.description,
         imageURL: checkImageCID(nftMetadata.image),
