@@ -37,19 +37,11 @@ import {
 
 //tested
 const factoryAbi = [
-<<<<<<< HEAD
   "function mint(string urlIpfs, uint16 majority, string _name, string _symbol)",
   "function importERC721(address _tokenAddress, uint256 _tokenId, uint16 majority)",
   "function importERC1155(address _tokenAddress, uint256 _tokenId, uint16 majority)",
   "function claimERC721(uint256 _tokenId)",
   "function claimERC1155(uint256 _tokenId)",
-=======
-  'function mint(string urlIpfs, uint16 majority)',
-  'function importERC721(address _tokenAddress, uint256 _tokenId, uint16 majority)',
-  'function importERC1155(address _tokenAddress, uint256 _tokenId, uint16 majority)',
-  'function claimERC721(uint256 _tokenId)',
-  'function claimERC1155(uint256 _tokenId)',
->>>>>>> b97c44ad8939307c503a9a5dac5156cf9f6d605b
 ];
 const marketAbi = [
   'function importFraktal(address tokenAddress, uint256 fraktionsIndex)',
