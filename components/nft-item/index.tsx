@@ -100,14 +100,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
       } else {
         showAmount = utils.formatEther(BIamount.div(100));
       }
-
-    } else {
-      showAmount = "";
     }
-
-    // useEffect(() => {
-    //   setIsImageLoaded(false);
-    // }, []);
 
     const onImageLoad = (ms: number) => {
       setTimeout(() => {
