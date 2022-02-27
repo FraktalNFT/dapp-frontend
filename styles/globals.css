@@ -36,6 +36,46 @@ a:hover {
   text-decoration: none !important;
 }
 
+.fraktalHeading {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 48px;
+  line-height: 64px;
+}
+.fraktalTotal {
+  font-style: normal;
+  font-weight: normal;
+  font-size: 21px;
+  line-height: 32px;
+  align-items: center;
+  text-align: right;
+  color: #000000;
+}
+
+.css-13o7eu2 .css-2zljzd {
+  border: none;
+}
+
+.css-13o7eu2 .css-2zljzd #tabs-2--tab-0[aria-selected=true] {
+  font-size: 1.8rem!important;
+  color: white!important;
+  background: #405466!important;
+  border-radius:16px 0 0 16px!important;
+  font-weight: bold!important;
+}
+
+.css-13o7eu2 .css-2zljzd #tabs-2--tab-1[aria-selected=true] {
+  font-size: 1.8rem!important;
+  color: white!important;
+  font-weight: bold!important;
+  background: #405466!important;
+  border-radius:0 16px 16px 0!important
+}
+.chakra-toast__inner {
+  max-width: 100% !important;
+  margin-top: 85px !important;
+}
 @keyframes loadingCard {
   0% {
     box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.04),

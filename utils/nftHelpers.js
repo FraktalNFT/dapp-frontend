@@ -64,6 +64,7 @@ async function fetchNftMetadata(hash){
       let result = await res.json()
       window.localStorage.setItem(hash,JSON.stringify(result));
       // console.log('found other, data:',result)
+      let result = res.json()
       return result
     }else{
       return null;
@@ -97,9 +98,7 @@ export async function createOpenSeaObject(data){
       collateral: null,
       collateralType: null,
     }
-    // console.log('address',data.asset_contract.address)
     let fraktalData = await getFraktalData(data.asset_contract.address);
-    // console.log('fraktaldata',fraktalData)
     if(fraktalData?.fraktalId?.length){
       response.marketId = fraktalData.fraktalId;
     }
@@ -127,7 +126,6 @@ export async function createObject(data){
   try{
     // let nftMetadata = useMemo(async ()=>await fetchNftMetadata(data.nft.hash),[data.nft.hash]);
     let nftMetadata = await fetchNftMetadata(data.nft.hash)
-    console.log('meta',nftMetadata)
     if(nftMetadata){
       return {
         id: data.nft.id,
@@ -144,6 +142,7 @@ export async function createObject(data){
       }
     }
   }catch{
+    //TODO - REMOVE THE CONSOLE.log
     console.log('Error fetching ',data);
     return null;
   }
@@ -151,8 +150,7 @@ export async function createObject(data){
 
 export async function createObject2(data){
   try{
-    let nftMetadata = await fetchNftMetadata(data.hash)
-    // console.log('meta',nftMetadata)
+    let nftMetadata = await fetchNftMetadata(data.hash);
     let object = {
       id: data.id,
       creator:data.creator.id,
@@ -160,7 +158,7 @@ export async function createObject2(data){
       balances: data.fraktions,
       createdAt: data.createdAt,
       status: data.status,
-    }
+    };
     if(nftMetadata && nftMetadata.name){
         object.name = nftMetadata.name
     }
@@ -171,7 +169,8 @@ export async function createObject2(data){
         object.imageURL = checkImageCID(nftMetadata.image)
     }
     return object;
-  }catch{
+  } catch{
+    //TODO - REMOVE THE CONSOLE.log
     console.log('Error fetching 2 ',data.hash);
     return null;
   }
@@ -198,10 +197,9 @@ export async function createListed(data){
       }
     }
   }catch (err){
-    console.log('Error',err);
     return {error: `Error: ${err}`};
   }
-};
+}
 
 export async function createListedAuction(data){
   try{
@@ -221,7 +219,6 @@ export async function createListedAuction(data){
       }
     }
   }catch (err){
-    console.log('Error',err);
     return {error: `Error: ${err}`};
   }
-};
+}

@@ -30,6 +30,8 @@ import store from '../../../redux/store';
 import {LISTING_NFT, rejectContract} from "../../../redux/actions/contractActions";
 import LoadScreen from '../../../components/load-screens';
 
+import {EXPLORE, MY_NFTS} from "@/constants/routes";
+
 const exampleNFT = {
   id: 0,
   name: "Golden Fries Cascade",
@@ -138,7 +140,7 @@ export default function ListNFTView() {
       provider,
       marketAddress)
     if(tx) {
-      router.push('/my-nfts');
+      router.push(MY_NFTS, null, {scroll: false});
     }
   }
   async function listNewItem(){
@@ -155,7 +157,7 @@ export default function ListNFTView() {
         provider,
         marketAddress).then(()=>{
           setInterval(() => {
-              router.push('/')
+              router.push(EXPLORE, null, {scroll: false})
           }, 1000);
 
         }).catch(e => {
@@ -173,7 +175,7 @@ export default function ListNFTView() {
         provider,
         marketAddress).then(()=>{
           setInterval(() => {
-              router.push('/')
+              router.push(EXPLORE, null, {scroll: false})
           }, 1000);
         }).catch(e => {
           store.dispatch(rejectContract(LISTING_NFT, e, listNewItem));
@@ -218,12 +220,11 @@ export default function ListNFTView() {
 
   return (
     <VStack spacing="0" mb="12.8rem">
-      <LoadScreen/>
       <Head>
         <title>Fraktal - NFT</title>
       </Head>
       <div>
-        <Link href="/">
+        <Link href={EXPLORE}>
           <div className={styles.goBack}>← back to all NFTS</div>
         </Link>
 
@@ -416,7 +417,7 @@ export default function ListNFTView() {
                       </div>
                       <div>
                         <div className={styles.auctionCardDetailsNumber}>{totalAmount}</div>
-                        <div className={styles.auctionCardDetailsText}>shares in sell</div>
+                        <div className={styles.auctionCardDetailsText}>Frations for sale</div>
                       </div>
                     </div>
                   </div>

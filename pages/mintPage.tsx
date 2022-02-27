@@ -1,5 +1,5 @@
 import FrakButton4 from "../components/button4";
-import MintCard from "../components/mintCard";
+import NFTCard from "../components/nftCard";
 import ListCard from "../components/listCard";
 import { VStack, Box, Stack, Grid, Text } from "@chakra-ui/layout";
 import { Link, Checkbox } from "@chakra-ui/react";

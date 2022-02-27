@@ -13,6 +13,7 @@ import { createListed } from '../../../utils/nftHelpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
 import { buyFraktions, makeOffer, claimFraktalSold } from '../../../utils/contractCalls';
 import { useRouter } from 'next/router';
+import {EXPLORE} from "@/constants/routes";
 
 export default function FixPriceNFTView() {
   const router = useRouter();
@@ -90,7 +91,7 @@ export default function FixPriceNFTView() {
         nftObject.tokenAddress,
         provider,
         marketAddress).then(()=>{
-          router.push('/my-nfts');
+          router.push('/my-nfts', null, {scroll: false});
         })
 
     }catch(e){
@@ -102,7 +103,7 @@ export default function FixPriceNFTView() {
     try {
       let tx = await claimFraktalSold(nftObject.marketId, provider, contractAddress);
       if(tx){
-        router.push('/my-nfts');
+        router.push('/my-nfts', null, {scroll: false});
       }
     }catch(e){
       console.error('There has been an error: ',e)
@@ -124,7 +125,7 @@ export default function FixPriceNFTView() {
         <title>Fraktal - NFT</title>
       </Head>
       <div>
-        <Link href="/">
+        <Link href={EXPLORE}>
           <div className={styles.goBack}>← back to all NFTS</div>
         </Link>
 

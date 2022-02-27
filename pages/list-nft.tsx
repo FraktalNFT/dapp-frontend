@@ -1,15 +1,13 @@
 import FrakButton4 from "../components/button4";
-import MintCard from "../components/mintCard";
+import NFTCard from "../components/nftCard";
 import ListCardAuction from "../components/listCardAuction";
 import ListCard from "../components/listCard";
 import {
   VStack,
   Box,
   Stack,
-  Grid,
   Text,
   Link,
-  Checkbox,
   Tabs,
   TabList,
   TabPanels,
@@ -38,7 +36,8 @@ import NFTItem from "../components/nft-item";
 import { useMintingContext } from "@/contexts/NFTIsMintingContext";
 import toast from "react-hot-toast";
 import LoadScreen from '../components/load-screens';
-import {awaitTokenAddress} from "../utils/helpers";/**
+import {awaitTokenAddress} from "../utils/helpers";
+/**
  * REDUX
  */
 import {connect} from 'react-redux';
@@ -51,6 +50,14 @@ import {
 } from "../redux/actions/contractActions";
 const { create } = require("ipfs-http-client");
 const MAX_FRACTIONS = 10000;
+
+/**
+ * Routes
+ */
+import {EXPLORE, ARTISTS, CREATE_NFT, LANDING, IMPORT_NFT, resolveNFTRoute} from "@/constants/routes";
+import { Workflow } from "types/workflow";
+
+const actionOpts = { workflow: Workflow.MINT_NFT }
 
 const MintPage = (props) => {
   const {mintNFTRejected, tokenRejected, transferRejected} = props;
@@ -122,14 +129,12 @@ const MintPage = (props) => {
       let response = await createNFT(
         metadataCid.cid.toString(),
         provider,
-        factoryAddress
+        factoryAddress,
+        actionOpts
       ).then(response => {
           if (!response?.error) {
-              //TODO REMOVE TOAST
-              // toast.success("Mint completed.");
               setIsMinting(false);
               setTokenMintedAddress(response);
-              console.log('Approved');
               let mintingArray = [];
               if (window?.localStorage.getItem("mintingNFTS")) {
                   let mintingNFTSString = window?.localStorage.getItem("mintingNFTS");
@@ -149,8 +154,6 @@ const MintPage = (props) => {
       });
       if (response?.error) {
         mintNFTRejected(response?.error, prepareNftData);
-        //TODO REMOVE TOAST
-      //  toast.error("Transaction failed.");
         setIsMinting(false);
       }
 
@@ -186,7 +189,7 @@ const MintPage = (props) => {
     fraktionalized;
 
   async function approveToken() {
-    await approveMarket(marketAddress, provider, tokenMintedAddress)
+    await approveMarket(marketAddress, provider, tokenMintedAddress, actionOpts)
         .then(
       () => {
         setIsApproved(true);
@@ -209,7 +212,8 @@ const MintPage = (props) => {
         tokenMintedAddress,
         index,
         provider,
-        marketAddress
+        marketAddress,
+        actionOpts
       ).then(() => {
         setFraktionalized(true);
         if(isAuction){
@@ -221,15 +225,6 @@ const MintPage = (props) => {
       }).catch(error => {
           transferRejected(error, importFraktalToMarket);
       });
-    }
-  }
-
-  async function approveNFT() {
-    if (tokenToImport && tokenToImport.id) {
-      let res = await approveMarket(factoryAddress, provider, tokenToImport.id);
-      if (res) {
-        setNftApproved(true);
-      }
     }
   }
 
@@ -268,17 +263,21 @@ const MintPage = (props) => {
 
     // const weiPerFrak = utils.parseEther(totalPrice.toString()).div(utils.parseUnits(totalAmount.toString()));
     // console.log("price",weiPerFrak.toString());
-    //TODO - REMOVE CONSOLE LOG
-    console.log('listItem');
+
     listItem(
       tokenMintedAddress,
       fei,//shares
       weiPerFrak,//price
       provider,
-      marketAddress
+      marketAddress,
+      actionOpts
     ).then(() => {
-        setInterval(() => {
-            router.push('/');
+        setTimeout(() => {
+          if (tokenMintedAddress) {
+            router.push(resolveNFTRoute(tokenMintedAddress), null, {scroll: false});
+          } else {
+            router.push(EXPLORE, null, {scroll: false});
+          }
         }, 1000);
     }).catch(error => {
       mintNFTRejected(error, listNewItem);
@@ -293,14 +292,19 @@ const MintPage = (props) => {
       utils.parseUnits(totalPrice),
       utils.parseUnits(totalAmount),
       provider,
-      marketAddress
+      marketAddress,
+      actionOpts
     ).then(() => {
-        setInterval(() => {
-            router.push('/');
+        setTimeout(() => {
+          if (tokenMintedAddress) {
+            router.push(resolveNFTRoute(tokenMintedAddress), null, {scroll: false});
+          } else {
+            router.push(EXPLORE, null, {scroll: false});
+          }
         }, 1000);
     }).catch(error => {
         mintNFTRejected(error, listNewAuctionItem);
-    });;
+    });
   }
 
 
@@ -324,7 +328,6 @@ const MintPage = (props) => {
 
   return (
     <div>
-      <LoadScreen />
       <Box
         sx={{
           display: `grid`,
@@ -396,13 +399,13 @@ const MintPage = (props) => {
               borderRadius="25"
               padding="5"
               _hover={{ bg: "black", textColor: "white" }}
-              onClick={() => router.push("/import-nft")}
+              onClick={() => router.push(IMPORT_NFT, null, {scroll: false})}
             >
               Import NFT
             </Link>
           </div>
           <div>
-            <MintCard
+            <NFTCard
               setName={setName}
               setDescription={setDescription}
               addFile={addFile}
@@ -526,7 +529,7 @@ const MintPage = (props) => {
                   disabled={!isApproved || !tokenMintedAddress }
                   onClick={() => importFraktalToMarket()}
                 >
-                  3. Transfer
+                  3. Frak It
                 </FrakButton4>
                 <FrakButton4
                   status={!listed ? "open" : "done"}
@@ -571,16 +574,16 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     return {
         mintNFTRejected: (obj, buttonAction) => {
-            dispatch(rejectContract(MINT_NFT, obj, buttonAction))
+            dispatch(rejectContract(MINT_NFT, obj, buttonAction, { workflow: Workflow.MINT_NFT  }))
         },
         tokenRejected: (obj, buttonAction) => {
-            dispatch(rejectContract(APPROVE_TOKEN, obj, buttonAction))
+            dispatch(rejectContract(APPROVE_TOKEN, obj, buttonAction, { workflow: Workflow.MINT_NFT }))
         },
         transferRejected: (obj, buttonAction) => {
-            dispatch(rejectContract(IMPORT_FRAKTAL, obj, buttonAction))
+            dispatch(rejectContract(IMPORT_FRAKTAL, obj, buttonAction, { workflow: Workflow.MINT_NFT }))
         },
-        mintNFTApproved: (obj, receipt ) => {
-            dispatch(approvedTransaction(MINT_NFT, obj, receipt))
+        mintNFTApproved: (obj, receipt) => {
+            dispatch(approvedTransaction(MINT_NFT, obj, receipt, {  workflow: Workflow.MINT_NFT }))
         },
     }
 };
