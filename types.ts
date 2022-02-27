@@ -11,8 +11,8 @@ export interface FrakCard {
 
 export interface NFTItemType {
   creator:string,
-  id:number,
-  name:string,
-  imageURL:string,
-  createdAt:number
-};
+  id: number,
+  name: string,
+  imageURL: string,
+  createdAt: number
+}

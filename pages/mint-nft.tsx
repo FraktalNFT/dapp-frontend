@@ -10,6 +10,8 @@ import { pinByHash } from "../utils/pinataPinner";
 import { createNFT } from "../utils/contractCalls";
 import { useRouter } from "next/router";
 const { create } = require("ipfs-http-client");
+import {MY_NFTS} from "@/constants/routes";
+import { Workflow } from "types/workflow";
 
 export default function MintNFTView() {
   const router = useRouter();
@@ -60,9 +62,9 @@ export default function MintNFTView() {
   async function minter(metadata) {
     let metadataCid = await uploadAndPin(JSON.stringify(metadata));
     if (metadataCid) {
-      createNFT(metadataCid.cid.toString(), provider, factoryAddress).then(
+      createNFT(metadataCid.cid.toString(), provider, factoryAddress, { workflow: Workflow.MINT_NFT }).then(
         () => {
-          router.push("/my-nfts");
+          router.push(MY_NFTS, null, {scroll: false});
         }
       );
     }
@@ -85,6 +87,7 @@ export default function MintNFTView() {
   const proportionalImage = width => {
     return (imageSize[1] / imageSize[0]) * width;
   };
+
   return (
     <VStack spacing="0" mb="12.8rem">
       <Head>

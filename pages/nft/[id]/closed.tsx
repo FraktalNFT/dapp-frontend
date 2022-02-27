@@ -9,6 +9,7 @@ import FrakButton from "../../../components/button";
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
 import {getSubgraphData} from '../../../utils/graphQueries';
 import { createObject } from "utils/nftHelpers";
+import {EXPLORE} from "@/constants/routes";
 export default function ClosedNFTView() {
   const [index, setIndex] = useState();
   const [nftObject, setNftObject] = useState();
@@ -45,7 +46,7 @@ export default function ClosedNFTView() {
         <title>Fraktal - NFT</title>
       </Head>
       <div>
-        <Link href="/">
+        <Link href={EXPLORE}>
           <div className={styles.goBack}>← back to all NFTS</div>
         </Link>
         <div className={styles.header}>{nftObject?nftObject.name:'loading'}</div>
