@@ -125,7 +125,7 @@ const TransferNFT = (): JSX.Element => {
             {transferNFT && transferNFT.name && (
               <Text fontSize="16px" marginBottom="8px" fontWeight="400" color="rgb(112, 122, 131)" isTruncated> <b>"{transferNFT.name}"</b> is about to be transfered to {recipientAddress}</Text>
             )}
-            {recipientAddress && (
+            {recipientAddress !== "..." && recipientAddress && (
               <Text fontWeight="400" fontSize="13px" color="rgb(112, 122, 131)">&#9888;
               Items sent to the wrong address cannot be recovered</Text>
             )}
