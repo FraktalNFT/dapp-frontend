@@ -63,7 +63,7 @@ export default function MyNFTsView() {
   const refreshPage = () =>{
     setRefresh(!refresh);
   };
-
+  
   const sellerEndAuction = async (tokenAddress,sellerNonce) =>{
     unlistAuctionItem(
       tokenAddress,
@@ -282,9 +282,6 @@ export default function MyNFTsView() {
     }
     getAuctions();
 
-
-
-
   },[userAccount,refresh]);
 
   useEffect(() => {
@@ -424,16 +421,15 @@ export default function MyNFTsView() {
         >
           {fraktals.map(item => (
             <div key={item.id + "-" + item.tokenId}>
-              <NextLink key={item.id} href={`/nft/${item.id}/details`}>
                 <NFTItem
+                  id={item.id}
+                  isMyNFT={true}
                   item={item}
                   name={item.name}
                   amount={null}
                   price={null}
                   imageURL={item.imageURL}
-
                 />
-              </NextLink>
             </div>
           ))}
 
@@ -484,15 +480,14 @@ export default function MyNFTsView() {
           >
             {fraktions &&
               fraktions.map(item => (
-                <NextLink key={item.id} href={`/nft/${item.id}/details`}>
                   <NFTItem
+                    isMyNFT={true} /* this prop is for toggling the transfer-menu  <NFTOptionsMenu/>. we can only trnasfer an NFT that belongs to user */
                     item={item}
                     name={item.name}
                     amount={item.userBalance}
                     price={null}
                     imageURL={item.imageURL}
                   />
-                </NextLink>
               ))}
           </Grid>
         </div>
