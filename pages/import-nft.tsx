@@ -70,11 +70,11 @@ import { Workflow } from "types/workflow";
  const actionOpts = { workflow: Workflow.IMPORT_NFT }
  
  export default function ImportNFTPage() {
-   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
-   const { fraktals, fraktions, nfts, balance } = useUserContext();
- 
-   const router = useRouter();
- 
+  const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
+  const { fraktals, fraktions, nfts, balance } = useUserContext();
+
+  const router = useRouter();
+
    const [isLoading, setIsLoading] = useState<boolean>(true);
    const [noNFTs, setNoNFTs] = useState<boolean>(false);
    const [fraktionalized, setFraktionalized] = useState<boolean>(false);
@@ -113,18 +113,18 @@ import { Workflow } from "types/workflow";
    }
  
    async function approveForMarket() {
-     let response = await approveMarket(
-       marketAddress,
-       provider,
-       tokenMintedAddress,
-       actionOpts
-     ).then(receipt => {
-         setIsMarketApproved(true);
-         importFraktalToMarket();
-     }).
-     catch(error => {
-         store.dispatch(rejectContract(APPROVE_TOKEN, error, approveForMarket, actionOpts));
-     });
+     try {
+       const response = await approveMarket(
+         marketAddress,
+         provider,
+         tokenMintedAddress,
+         actionOpts
+       )
+        setIsMarketApproved(true);
+        importFraktalToMarket();
+     } catch(error) { 
+      store.dispatch(rejectContract(APPROVE_TOKEN, error, approveForMarket, actionOpts));
+     };
    }
  
    async function importNFT() {
@@ -200,48 +200,52 @@ import { Workflow } from "types/workflow";
    }
  
    async function listNewItem() {
-     const response = await listItem(
-       tokenMintedAddress,
-       totalAmount, // amount of fraktions to list
-       utils.parseUnits(totalPrice).div(totalAmount), // totalPrice is price for all fraktions sum
-       provider,
-       marketAddress,
-       actionOpts
-     ).then(receipt => {
-       setIsNFTListed(true);
-       setInterval(() => {
-         router.push(MY_NFTS, null, {scroll: false});
-       }, 1000);
-     }).catch(error => {
-         store.dispatch(rejectContract(LISTING_NFT, error, listNewItem, actionOpts));
-     });
+    try {
+      const response = await listItem(
+        tokenMintedAddress,
+        totalAmount, // amount of fraktions to list
+        utils.parseUnits(totalPrice).div(totalAmount), // totalPrice is price for all fraktions sum
+        provider,
+        marketAddress,
+        actionOpts
+      )
+      setIsNFTListed(true);
+      setInterval(() => {
+        router.push(MY_NFTS, null, { scroll: false });
+      }, 1000);
+    } catch (error) {
+      store.dispatch(rejectContract(LISTING_NFT, error, listNewItem, actionOpts));
+    }
+  }
+
+  async function listNewAuctionItem() {
+
+    try {
+      const response = await listItemAuction(
+        tokenMintedAddress,
+        utils.parseUnits(totalPrice),
+        utils.parseUnits(totalAmount),
+        provider,
+        marketAddress,
+        actionOpts
+      );
+
+      setIsNFTListed(true);
+      setInterval(() => {
+        router.push(MY_NFTS, null, { scroll: false });
+      }, 1000);
+    } catch (error) {
+      store.dispatch(
+        rejectContract(
+          LISTING_NFT,
+          error,
+          listItemAuction,
+          actionOpts
+        )
+      );
    }
- 
-   async function listNewAuctionItem() {
-     const response = await listItemAuction(
-       tokenMintedAddress,
-       utils.parseUnits(totalPrice),
-       utils.parseUnits(totalAmount),
-       provider,
-       marketAddress,
-       actionOpts
-     ).then(receipt => {
-         setIsNFTListed(true);
-         setInterval(() => {
-             router.push(MY_NFTS, null, {scroll: false});
-         }, 1000);
-     }).catch(error => {
-         store.dispatch(
-           rejectContract(
-             LISTING_NFT,
-             error,
-             listItemAuction,
-             actionOpts
-           )
-        );
-     });
-   }
- 
+  }
+  
    const listFraktions = async () => {
      if(totalPrice == "" || totalAmount == ""){
        toast.error("Please input price and amount of fraktions");
