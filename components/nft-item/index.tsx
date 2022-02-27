@@ -67,12 +67,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
       if (item) {
         getListingAmount(account, item.id, provider, marketAddress).then(
           (amount: BigNumber) => {
-            if (amount.gt(0)) {
-              setIsListed(true);
-            } else {
-              setIsListed(false);
-            }
-
+            setIsListed(amount.gt(0));
           }
         );
       }
