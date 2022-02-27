@@ -26,6 +26,7 @@ import {
 } from "../../../utils/contractCalls";
 import { useRouter } from "next/router";
 import LoadScreen from '../../../components/load-screens';
+import {EXPLORE} from "@/constants/routes";
 // import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
 // import Modal from '../../../components/modal';
 
@@ -36,7 +37,7 @@ export default function DetailsView() {
   const router = useRouter();
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
   const [offers, setOffers] = useState();
-  const [minOffer, setMinOffer] = useState(0);
+  const [minOffer, setMinOffer] = useState<BigNumber>(BigNumber.from(0));
   const [nftObject, setNftObject] = useState({});
   const [tokenAddress, setTokenAddress] = useState<string>("");
   const [fraktionsListed, setFraktionsListed] = useState([]);
@@ -159,18 +160,17 @@ export default function DetailsView() {
 
   async function getOffers() {
     if (tokenAddress && marketAddress) {
-      let minPriceParsed;
       try {
         let minPrice:BigNumber = await getMinimumOffer(
           tokenAddress,
           provider,
           marketAddress
         );
-        minPriceParsed = utils.formatEther(minPrice.div(utils.parseEther("1.0")));
-      } catch {
-        minPriceParsed = 0;
+
+        setMinOffer(minPrice);
+      } catch (err) {
+        console.error('unable to retreive minimum offer');
       }
-      setMinOffer(minPriceParsed);
     }
   }
 
@@ -216,7 +216,7 @@ export default function DetailsView() {
   async function callUnlistItem() {
     let tx = await unlistItem(tokenAddress, provider, marketAddress);
     if (typeof tx !== "undefined") {
-      router.push("/my-nfts");
+      router.push("/my-nfts", null, {scroll: false});
     }
   }
 
@@ -231,7 +231,6 @@ export default function DetailsView() {
 
   return (
     <>
-      <LoadScreen />
       {isLoading && (
         <>
           <Box sx={{ display: `grid`, width: `100%`, placeItems: `center` }}>
@@ -249,7 +248,7 @@ export default function DetailsView() {
         >
           <Box sx={{ position: `relative` }}>
             <VStack marginRight="53px" sx={{ position: `sticky`, top: `20px` }}>
-              <Link href="/">
+              <Link href={EXPLORE}>
                 <div className={styles.goBack}>← back to all NFTS</div>
               </Link>
               <Image
@@ -283,7 +282,7 @@ export default function DetailsView() {
                     <Text
                       sx={{ color: `hsla(224, 86%, 51%, 1)` }}
                       _hover={{ cursor: `pointer` }}
-                      onClick={() => router.push(`/artist/${nftObject.creator}`)}
+                      onClick={() => router.push(`/artist/${nftObject.creator}`, null, {scroll: false})}
                     >
                       {nftObject ?
                         shortenHash(nftObject.creator)
@@ -369,7 +368,7 @@ export default function DetailsView() {
                   <FrakButton
                     disabled={fraktionsIndex == 0 || userFraktions < 1}
                     onClick={() =>
-                      router.push(`/nft/${nftObject.marketId}/list-item`)
+                      router.push(`/nft/${nftObject.marketId}/list-item`, null, {scroll: false})
                     }
                   >
                     List Fraktions

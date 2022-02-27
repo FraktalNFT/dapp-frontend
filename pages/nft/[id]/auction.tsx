@@ -17,6 +17,7 @@ import { useWeb3Context } from "@/contexts/Web3Context";
 import { createListedAuction } from "utils/nftHelpers";
 import { introspectionFromSchema } from "graphql";
 import Custom404 from "../../404";
+import {EXPLORE} from "@/constants/routes";
 function AuctionNFTView({router}) {
 
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
@@ -198,7 +199,7 @@ function AuctionNFTView({router}) {
         <title>Fraktal - NFT</title>
       </Head>
       <div>
-        <Link href="/">
+        <Link href={EXPLORE}>
           <div className={styles.goBack}>← back to all NFTS</div>
         </Link>
 
@@ -232,7 +233,7 @@ function AuctionNFTView({router}) {
                 Fraktion Amount
               </div>
               <div className={styles.cardText}>
-                {nftObject?`${utils.formatUnits(nftObject.amountOfShare)}/10000 FRAK (${Number(utils.formatUnits(nftObject.amountOfShare))/100}% of max. supply)`:'loading'}
+                {nftObject?`${utils.formatUnits(nftObject.amountOfShare)}/10,000 Fraktions (${Number(utils.formatUnits(nftObject.amountOfShare))/100}% of max. supply)`:'loading'}
               </div>
             </div>
           </div>

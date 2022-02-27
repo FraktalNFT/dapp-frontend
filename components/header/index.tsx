@@ -4,16 +4,17 @@ import FrakButton from "../button";
 import { useWeb3Context } from "../../contexts/Web3Context";
 import { shortenHash } from "../../utils/helpers";
 import { useRouter } from "next/router";
+import {ARTISTS, CREATE_NFT, EXPLORE, LANDING, IMPORT_NFT, REWARDS} from "@/constants/routes";
 
 const Header = () => {
   const router = useRouter();
-  // console.log('header',router.pathname);
   const { connectWeb3, account } = useWeb3Context();
+
   return (
     <Box minH="10rem" py="2.6rem" as="header" bg={"white"}>
       <Flex maxW="96.4rem" mx="auto" as="nav" justify="space-between">
         <HStack spacing="8">
-          <NextLink href="/">
+          <NextLink href={LANDING}>
             <Link>
               <Image src="/images/Logo.png" alt="logo" width="175px" />
             </Link>
@@ -21,13 +22,13 @@ const Header = () => {
         </HStack>
         <Flex align="center">
           <HStack
-            spacing="2.2rem"
-            mr="3.2rem"
+            spacing="2.0rem"
+            mr="0.5rem"
             paddingTop="2"
             display={{ base: "none", md: "flex" }}
           >
-          <NextLink href="/">
-            {router.pathname === "/" ? (
+          <NextLink href={EXPLORE}>
+            {router.pathname === EXPLORE ? (
               <Link
                 className="semi-16"
                 borderRadius="25"
@@ -48,9 +49,9 @@ const Header = () => {
               </Link>
             )}
           </NextLink>
-            <NextLink href="/list-nft">
-              {router.pathname === "/list-nft" ||
-              router.pathname === "/import-nft" ? (
+          <NextLink href={CREATE_NFT}>
+                    {router.pathname === CREATE_NFT ||
+                    router.pathname === IMPORT_NFT ? (
                 <Link
                   className="semi-16"
                   borderRadius="25"
@@ -72,8 +73,8 @@ const Header = () => {
               )}
             </NextLink>
 
-            <NextLink href="/artists">
-              {router.pathname === "/artists" ? (
+            <NextLink href={ARTISTS}>
+              {router.pathname === ARTISTS ? (
                 <Link
                   className="semi-16"
                   borderRadius="25"
@@ -94,7 +95,16 @@ const Header = () => {
                 </Link>
               )}
             </NextLink>
-
+            <NextLink href={REWARDS}>
+                <Link
+                    className="semi-16"
+                    borderRadius="25"
+                    padding="3"
+                    _hover={{ backgroundColor: "black", textColor: "white" }}
+                >
+                    Rewards
+                </Link>
+            </NextLink>
 
            <Link
               href="https://docs.fraktal.io/marketplace/get-started"
@@ -154,7 +164,8 @@ const Header = () => {
                 <Image src="/footer/icons8-discord.svg" />
               </Box>
             </Link>
-            */}
+            */
+        }
 
           </HStack>
           {!account ? (

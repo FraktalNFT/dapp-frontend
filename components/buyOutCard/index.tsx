@@ -1,7 +1,7 @@
 import { Divider } from "@chakra-ui/react";
 import { VStack, HStack, Box, Stack } from "@chakra-ui/layout";
 import React, { useState, useEffect } from "react";
-import { utils } from "ethers";
+import { utils, BigNumber } from "ethers";
 import FrakButton from "../button";
 import FrakButton2 from "../button2";
 import OfferDetail from "../offerDetail";
@@ -38,7 +38,7 @@ const BuyOutCard = ({
   // functions for the offers!
   //claim Fraktal
   // console.log({offers});
-  
+
 
   useEffect(() => {
     if (account && offers && offers.length) {
@@ -69,28 +69,23 @@ const BuyOutCard = ({
     setOffering(true);
     try {
       addEthAmount(valueToOffer);
-      let tx = await makeOffer(
+      await makeOffer(
         utils.parseEther(valueToOffer),
         tokenAddress,
         provider,
         marketAddress
-      ).then((receipt) => {
-        setOffering(false);
-        setValueToOffer("0");
-      }).catch(error => {
-        buyOutRejected(error, onOffer);
-      });
+      );
+      setOffering(false);
+      setValueToOffer("0");
     } catch (err) {
-      console.error("Error: ", err);
+      buyOutRejected(err, onOffer);
     }
   }
 
-  const minPriceParsed = minPrice => {
-    return (roundUp(minPrice, 3));
-  };
+  const minPriceParsed = (price) => roundUp(parseFloat(price), 3);
 
   function onSetValue(d) {
-    if (parseFloat(d) && parseFloat(d) >= minPrice) {
+    if (utils.parseEther(d).gte(minPrice)) {
       setValueToOffer(d);
       setIsReady(true);
     } else {
@@ -117,7 +112,7 @@ const BuyOutCard = ({
           lineHeight: "29px",
         }}
       >
-        Fraktal NFT Buyout
+        NFT Buyout
       </div>
       <Box
         sx={{
@@ -199,12 +194,12 @@ const BuyOutCard = ({
                   color: "#000000",
                 }}
               >
-                {minPriceParsed(minPrice)}
+                {minPriceParsed(utils.formatEther(minPrice))}
               </div>
             </HStack>
           </VStack>
           {userIsOfferer && (
-            <FrakButton onClick={onOffer}>Take out offer</FrakButton>
+            <FrakButton onClick={onOffer}>Removing Buy-out Offer</FrakButton>
           )}
           {!userIsOfferer && (
             <Stack
@@ -231,7 +226,7 @@ const BuyOutCard = ({
                 setFunction={onSetValue}
                 currency={'ETH'}
               >
-                {offering ? "Making offer" : "Offer"}
+                {offering ? "Making Offer" : "Make Buy-out Offer"}
               </FrakButton2>
             </Stack>
           )}

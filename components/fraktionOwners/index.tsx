@@ -52,7 +52,7 @@ export default function FraktionOwners(props) {
             lineHeight: "29px",
           }}
         >
-          Fraktion Owners
+          NFT Owners
         </div>
       </HStack>
       <div>
