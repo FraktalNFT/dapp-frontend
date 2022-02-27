@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router"
 import NextLink from "next/link";
 import { Image } from "@chakra-ui/image";
 import {
@@ -10,6 +11,11 @@ import {
   Spinner,
   Tag,
   TagLabel,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Button // @todo: Use a tiny badge with three dots icon
 } from "@chakra-ui/react";
 import React, { forwardRef } from "react";
 import {
@@ -28,8 +34,10 @@ import { useWeb3Context } from "../../contexts/Web3Context";
 import { getListingAmount, unlistItem } from "../../utils/contractCalls"
 import toast from "react-hot-toast";
 import { roundUp } from "../../utils/math";
+import { resolveTransferNFTRoute } from "@/constants/routes";
 
 interface NFTItemProps extends StackProps {
+  id: string;
   item: FrakCard;
   name: String;
   amount: String;
@@ -38,33 +46,37 @@ interface NFTItemProps extends StackProps {
   CTAText?: string;
   wait?: number;
   height?: string;
+  isMyNFT: boolean;
 }
 
 const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
-  ({ item, amount, price, imageURL, name, onClick, CTAText, wait, height = '35rem'}, ref) => {
+  ({ id, item, amount, price, imageURL, name, onClick, CTAText, isMyNFT, wait, height = '35rem' }, ref) => {
+
+    /// let risk a route
+    const router = useRouter();
     const [isVisible, setIsVisible] = useState(false);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
-    const [isListed,setIsListed] = useState(false);
+    const [isListed, setIsListed] = useState(false);
     const { fraktions, fraktals } = useUserContext();
-    const { account, provider, marketAddress} = useWeb3Context();
+    const { account, provider, marketAddress } = useWeb3Context();
 
-    const canFrak = item && !! (fraktals || []).find(fraktion => fraktion.id === item.id);
-    const canList = item && !! (fraktions || []).find(fraktion => fraktion.id === item.id);
+    const canFrak = item && !!(fraktals || []).find(fraktion => fraktion.id === item.id);
+    const canList = item && !!(fraktions || []).find(fraktion => fraktion.id === item.id);
 
-    useEffect(()=>{
-      if(item){
-        getListingAmount(account,item.id,provider,marketAddress).then(
+    useEffect(() => {
+      if (item) {
+        getListingAmount(account, item.id, provider, marketAddress).then(
           (amount: BigNumber) => {
-            if(amount.gt(0)){
+            if (amount.gt(0)) {
               setIsListed(true);
-            }else{
+            } else {
               setIsListed(false);
             }
-            
+
           }
         );
       }
-    },[])
+    }, [])
 
     const priceParsed = price => {
       return (roundUp(price, 3));
@@ -72,7 +84,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
 
     const unList = async () => {
       toast("Unlisting...")
-      await unlistItem(item.id,provider,marketAddress).then(
+      await unlistItem(item.id, provider, marketAddress).then(
         () => {
           toast.success("Fraktion Unlisted");
           setIsListed(!isListed);
@@ -81,15 +93,15 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     }
 
     let showAmount = "";
-    if(amount!=undefined){
-      const BIamount = utils.parseUnits(String(amount),"wei");
-      if(BIamount.lt(utils.parseEther("1.0"))){
-        showAmount="<0.01";
-      }else{
-        showAmount=utils.formatEther(BIamount.div(100));
+    if (amount != undefined) {
+      const BIamount = utils.parseUnits(String(amount), "wei");
+      if (BIamount.lt(utils.parseEther("1.0"))) {
+        showAmount = "<0.01";
+      } else {
+        showAmount = utils.formatEther(BIamount.div(100));
       }
-      
-    }else{
+
+    } else {
       showAmount = "";
     }
 
@@ -114,6 +126,24 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
       animationDuration: `1s`,
       "animation-iteration-count": `infinite`,
     };
+
+    const NFTOptionsMenu = () => {
+      const [isOpen, setisOpen] = useState<boolean>(true)
+      return (
+        <Menu>
+          {({ isOpen }) => (
+            <>
+              <MenuButton isActive={isOpen} as={Button}>
+                {isOpen ? 'Transfer' : 'Transfer'}
+              </MenuButton>
+              <MenuList>
+                <MenuItem onClick={() => router.push(resolveTransferNFTRoute(id))}>Transfer</MenuItem>
+              </MenuList>
+            </>
+          )}
+        </Menu>
+      )
+    }
 
     return (
       <>
@@ -141,20 +171,24 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                     : inVisibleStyle /* toggle visibility */
                 }
               >
-                <Image
-                  src={'https://image.fraktal.io/?height=350&image='+imageURL}
-                  width="100%"
-                  height="100%"
-                  objectFit="cover"
-                  margin-left="auto"
-                  margin-right="auto"
-                  display="flex"
-                  sx={{
-                    objectFit: `cover`,
-                  }}
-                  style={{ verticalAlign: "middle" }}
-                  onLoad={() => onImageLoad(5)}
-                />
+               {item && (
+                  <NextLink key={item.id} href={`/nft/${item.id}/details`}>
+                  <Image
+                    src={'https://image.fraktal.io/?height=350&image=' + imageURL}
+                    width="100%"
+                    height="100%"
+                    objectFit="cover"
+                    margin-left="auto"
+                    margin-right="auto"
+                    display="flex"
+                    sx={{
+                      objectFit: `cover`,
+                    }}
+                    style={{ verticalAlign: "middle" }}
+                    onLoad={() => onImageLoad(5)}
+                  />
+                </NextLink>
+               )}
               </Box>
               {!isImageLoaded && (
                 <Box
@@ -209,8 +243,10 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                   </Text>
                 )}
               </Flex>
-
-              { canFrak && (
+              {isMyNFT && (
+                <NFTOptionsMenu />
+              )}
+              {canFrak && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={`nft/${item.id}/details?frak=1`}>
                     <FrakButton size="sm">Frak it</FrakButton>
@@ -218,7 +254,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 </Box>
               )}
 
-              { canList && isListed &&  (
+              {canList && isListed && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={"my-nfts"} scroll={false}>
                     <FrakButton size="sm" onClick={unList}
@@ -226,7 +262,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                   </NextLink>
                 </Box>
               )}
-              { canList && !isListed &&  (
+              {canList && !isListed && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={`nft/${item.marketId}/list-item`}>
                     <FrakButton size="sm">Sell Fraktions</FrakButton>
