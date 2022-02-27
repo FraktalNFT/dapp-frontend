@@ -42,15 +42,6 @@ interface NFTItemProps extends StackProps {
   unlistFunction: (tokenAddress, sellerNonce: number) => void
 }
 
-// dipsplay the menu
-const NFTContextMenu = () => {
-  return (<>
-    <div>
-      link + icon
-    </div>
-  </>);
-}
-
 const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
   ({ item, amount, price, imageURL, name, onClick, endTime, showProgress, claimType, claimFunction, unlistFunction, reservePriceReached }, ref) => {
     const [isVisible, setIsVisible] = useState(false);
