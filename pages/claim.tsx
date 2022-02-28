@@ -159,7 +159,7 @@ import { Workflow } from "types/workflow";
 
         {canClaim && <Stack direction={"row"}>
         
-            <Input placeholder='Listed token address' value={listedTokenAddress} onChange={(e)=> setAddressInput(e.target.value)} />
+            <Input placeholder='Listed token address' value={listedTokenAddress} onChange={(e)=> setListedTokenAddress(e.target.value)} />
             <Button colorScheme='green' onClick={claim} >Claim now!</Button>
         </Stack>}
      </div>
