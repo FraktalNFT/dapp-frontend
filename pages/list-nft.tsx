@@ -1,7 +1,7 @@
-import FrakButton4 from "../components/button4";
-import NFTCard from "../components/nftCard";
-import ListCardAuction from "../components/listCardAuction";
-import ListCard from "../components/listCard";
+import FrakButton4 from '../components/button4';
+import NFTCard from '../components/nftCard';
+import ListCardAuction from '../components/listCardAuction';
+import ListCard from '../components/listCard';
 import {
   VStack,
   Box,
@@ -12,13 +12,13 @@ import {
   TabList,
   TabPanels,
   Tab,
-  TabPanel
-} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { Image as ImageComponent } from "@chakra-ui/image";
-import { useWeb3Context } from "../contexts/Web3Context";
-import { useUserContext } from "../contexts/userContext";
-import { utils } from "ethers";
+  TabPanel,
+} from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { Image as ImageComponent } from '@chakra-ui/image';
+import { useWeb3Context } from '../contexts/Web3Context';
+import { useUserContext } from '../contexts/userContext';
+import { utils } from 'ethers';
 import {
   createNFT,
   approveMarket,
@@ -29,44 +29,35 @@ import {
   getApproved,
   importERC721,
   importERC1155,
-} from "../utils/contractCalls";
-import { pinByHash } from "../utils/pinataPinner";
-import { useRouter } from "next/router";
-import NFTItem from "../components/nft-item";
-import { useMintingContext } from "@/contexts/NFTIsMintingContext";
-import toast from "react-hot-toast";
-import LoadScreen from '../components/load-screens';
-import {awaitTokenAddress} from "../utils/helpers";
-/**
- * REDUX
- */
-import {connect} from 'react-redux';
+} from '../utils/contractCalls';
+import { pinByHash } from '../utils/pinataPinner';
+import { useRouter } from 'next/router';
+
+import { useMintingContext } from '@/contexts/NFTIsMintingContext';
+
+import { connect } from 'react-redux';
 import {
-    approvedTransaction,
-    APPROVE_TOKEN,
-    MINT_NFT,
-    IMPORT_FRAKTAL,
-    rejectContract,
-} from "../redux/actions/contractActions";
-const { create } = require("ipfs-http-client");
+  approvedTransaction,
+  APPROVE_TOKEN,
+  MINT_NFT,
+  IMPORT_FRAKTAL,
+  rejectContract,
+} from '../redux/actions/contractActions';
+const { create } = require('ipfs-http-client');
 const MAX_FRACTIONS = 10000;
 
-/**
- * Routes
- */
-import {EXPLORE, ARTISTS, CREATE_NFT, LANDING, IMPORT_NFT, resolveNFTRoute} from "@/constants/routes";
-import { Workflow } from "types/workflow";
+import { EXPLORE, IMPORT_NFT, resolveNFTRoute } from '@/constants/routes';
+import { Workflow } from 'types/workflow';
 
-const actionOpts = { workflow: Workflow.MINT_NFT }
+const actionOpts = { workflow: Workflow.MINT_NFT };
 
 const MintPage = (props) => {
-  const {mintNFTRejected, tokenRejected, transferRejected} = props;
-  const { fraktals, nfts } = useUserContext();
+  const { mintNFTRejected, tokenRejected, transferRejected } = props;
   const { isMinting, setIsMinting } = useMintingContext();
   const router = useRouter();
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
   const [ipfsNode, setIpfsNode] = useState();
-  const [status, setStatus] = useState("mint");
+  const [status, setStatus] = useState('mint');
   const [imageData, setImageData] = useState(null);
   const [imageSize, setImageSize] = useState([]);
   const [name, setName] = useState();
@@ -80,21 +71,18 @@ const MintPage = (props) => {
   const [fraktionalized, setFraktionalized] = useState(false);
   const [listed, setListed] = useState(false);
   const [tokenMintedAddress, setTokenMintedAddress] = useState();
-  const [tokenToImport, setTokenToImport] = useState();
-  const [nftApproved, setNftApproved] = useState(false);
-  const [isAuction,setIsAuction] = useState(false);
+
+  const [isAuction, setIsAuction] = useState(false);
   const [listingProcess, setListingProcess] = useState(false);
-  const [isMintingFailed, setMitingFailed] = useState(false);
-  const [txResponse, setTxResponse] = useState({});
 
   // detect states (where is NFT and if its ready to list so send it here for listing!)
 
   // FUNCTIONS FOR MINTING
   useEffect(() => {
     const ipfsClient = create({
-      host: "ipfs.infura.io",
-      port: "5001",
-      protocol: "https",
+      host: 'ipfs.infura.io',
+      port: '5001',
+      protocol: 'https',
     });
     setIpfsNode(ipfsClient);
   }, []);
@@ -104,8 +92,8 @@ const MintPage = (props) => {
     try {
       dataUpload = await ipfsNode.add(data);
     } catch (e) {
-      console.error("Error: ", e);
-      return "Error uploading the file";
+      console.error('Error: ', e);
+      return 'Error uploading the file';
     }
     await pinByHash(dataUpload.cid.toString()); // Pinata
     return dataUpload;
@@ -131,37 +119,39 @@ const MintPage = (props) => {
         provider,
         factoryAddress,
         actionOpts
-      ).then(response => {
+      )
+        .then((response) => {
           if (!response?.error) {
-              setIsMinting(false);
-              setTokenMintedAddress(response);
-              let mintingArray = [];
-              if (window?.localStorage.getItem("mintingNFTS")) {
-                  let mintingNFTSString = window?.localStorage.getItem("mintingNFTS");
-                  let mintingNFTS = JSON.parse(mintingNFTSString);
-                  mintingArray = [...mintingNFTS, response];
-              } else {
-                  mintingArray = [response];
-              }
-              let mintingArrayString = JSON.stringify(mintingArray);
-              window?.localStorage.setItem("mintingNFTs", mintingArrayString);
-              setMinted(true);
+            setIsMinting(false);
+            setTokenMintedAddress(response);
+            let mintingArray = [];
+            if (window?.localStorage.getItem('mintingNFTS')) {
+              let mintingNFTSString = window?.localStorage.getItem(
+                'mintingNFTS'
+              );
+              let mintingNFTS = JSON.parse(mintingNFTSString);
+              mintingArray = [...mintingNFTS, response];
+            } else {
+              mintingArray = [response];
+            }
+            let mintingArrayString = JSON.stringify(mintingArray);
+            window?.localStorage.setItem('mintingNFTs', mintingArrayString);
+            setMinted(true);
           }
-        }
-      ).catch(e => {
+        })
+        .catch((e) => {
           setIsMinting(false);
           mintNFTRejected(e, prepareNftData);
-      });
+        });
       if (response?.error) {
         mintNFTRejected(response?.error, prepareNftData);
         setIsMinting(false);
       }
-
     }
   }
 
   async function addFile() {
-    const selectedFile = document.getElementById("imageInput").files[0];
+    const selectedFile = document.getElementById('imageInput').files[0];
     setFile(selectedFile);
     let reader = new FileReader();
     reader.readAsDataURL(selectedFile);
@@ -175,7 +165,7 @@ const MintPage = (props) => {
     };
   }
 
-  const proportionalImage = width => {
+  const proportionalImage = (width) => {
     return (imageSize[1] / imageSize[0]) * width;
   };
 
@@ -190,14 +180,13 @@ const MintPage = (props) => {
 
   async function approveToken() {
     await approveMarket(marketAddress, provider, tokenMintedAddress, actionOpts)
-        .then(
-      () => {
+      .then(() => {
         setIsApproved(true);
         importFraktalToMarket();
-      }
-    ).catch(error => {
-       tokenRejected(error, approveToken);
-    });
+      })
+      .catch((error) => {
+        tokenRejected(error, approveToken);
+      });
   }
 
   async function importFraktalToMarket() {
@@ -214,74 +203,56 @@ const MintPage = (props) => {
         provider,
         marketAddress,
         actionOpts
-      ).then(() => {
-        setFraktionalized(true);
-        if(isAuction){
-          listNewAuctionItem();
-        }
-        else{
-          listNewItem();
-        }
-      }).catch(error => {
+      )
+        .then(() => {
+          setFraktionalized(true);
+          if (isAuction) {
+            listNewAuctionItem();
+          } else {
+            listNewItem();
+          }
+        })
+        .catch((error) => {
           transferRejected(error, importFraktalToMarket);
-      });
+        });
     }
   }
 
-  async function importNFT() {
-    let address;
-    if (tokenToImport.token_schema == "ERC721") {
-      address = await importERC721(
-        parseInt(tokenToImport.tokenId),
-        tokenToImport.id,
-        provider,
-        factoryAddress
-      );
-    } else {
-      address = await importERC1155(
-        parseInt(tokenToImport.tokenId),
-        tokenToImport.id,
-        provider,
-        factoryAddress
-      );
-    }
-    if (address) {
-      setTokenMintedAddress(address);
-      setMinted(true);
-    }
-  }
-
-  useEffect(()=>{
+  useEffect(() => {
     // const pricePerFei = utils.parseUnits(totalPrice).div(utils.parseUnits(totalAmount));
     // console.log(`price:${totalPrice},amount:${totalAmount}`);
-  })
+  });
 
   async function listNewItem() {
     const wei = utils.parseEther(totalPrice.toString());
     const fei = utils.parseEther(totalAmount.toString());
-    const weiPerFrak = (wei.mul(utils.parseEther("1.0"))).div(fei);
+    const weiPerFrak = wei.mul(utils.parseEther('1.0')).div(fei);
 
     // const weiPerFrak = utils.parseEther(totalPrice.toString()).div(utils.parseUnits(totalAmount.toString()));
     // console.log("price",weiPerFrak.toString());
 
     listItem(
       tokenMintedAddress,
-      fei,//shares
-      weiPerFrak,//price
+      fei, //shares
+      weiPerFrak, //price
       provider,
       marketAddress,
       actionOpts
-    ).then(() => {
+    )
+      .then(() => {
         setTimeout(() => {
           if (tokenMintedAddress) {
-            router.push(resolveNFTRoute(tokenMintedAddress), null, {scroll: false});
+            router.push(resolveNFTRoute(tokenMintedAddress), null, {
+              scroll: false,
+            });
           } else {
-            router.push(EXPLORE, null, {scroll: false});
+            router.push(EXPLORE, null, { scroll: false });
           }
         }, 1000);
-    }).catch(error => {
-      mintNFTRejected(error, listNewItem);
-    });
+      })
+      .catch((error) => {
+        mintNFTRejected(error, listNewItem);
+      });
   }
   async function listNewAuctionItem() {
     //TODO - REMOVE CONSOLE LOG
@@ -294,19 +265,22 @@ const MintPage = (props) => {
       provider,
       marketAddress,
       actionOpts
-    ).then(() => {
+    )
+      .then(() => {
         setTimeout(() => {
           if (tokenMintedAddress) {
-            router.push(resolveNFTRoute(tokenMintedAddress), null, {scroll: false});
+            router.push(resolveNFTRoute(tokenMintedAddress), null, {
+              scroll: false,
+            });
           } else {
-            router.push(EXPLORE, null, {scroll: false});
+            router.push(EXPLORE, null, { scroll: false });
           }
         }, 1000);
-    }).catch(error => {
+      })
+      .catch((error) => {
         mintNFTRejected(error, listNewAuctionItem);
-    });
+      });
   }
-
 
   useEffect(() => {
     if (listItemCheck && tokenMintedAddress) {
@@ -316,13 +290,13 @@ const MintPage = (props) => {
 
   let msg = () => {
     if (!minted) {
-      return "";
+      return '';
     } else if (minted && !isApproved) {
-      return "";
+      return '';
     } else if (minted && isApproved && !fraktionalized) {
-      return "";
+      return '';
     } else {
-      return "";
+      return '';
     }
   };
 
@@ -340,22 +314,22 @@ const MintPage = (props) => {
             <div
               style={{
                 fontWeight: 800,
-                fontSize: "48px",
-                lineHeight: "64px",
-                color: "black",
+                fontSize: '48px',
+                lineHeight: '64px',
+                color: 'black',
               }}
             >
               Mint NFT
             </div>
             <div
               style={{
-                marginTop: "24px",
-                marginBottom: "16px",
+                marginTop: '24px',
+                marginBottom: '16px',
                 fontWeight: 600,
-                fontSize: "12px",
-                lineHeight: "14px",
-                letterSpacing: "1px",
-                color: "#656464",
+                fontSize: '12px',
+                lineHeight: '14px',
+                letterSpacing: '1px',
+                color: '#656464',
               }}
             >
               PREVIEW
@@ -363,23 +337,23 @@ const MintPage = (props) => {
             <ImageComponent
               src={imageData ? imageData : null}
               w="400px"
-              h={imageData ? proportionalImage(400) : "400px"}
-              style={{ borderRadius: "4px 4px 0px 0px", objectFit: `cover` }}
+              h={imageData ? proportionalImage(400) : '400px'}
+              style={{ borderRadius: '4px 4px 0px 0px', objectFit: `cover` }}
             />
             <div
               style={{
-                fontWeight: "bold",
-                fontSize: "16px",
-                lineHeight: "19px",
-                color: "#000000",
+                fontWeight: 'bold',
+                fontSize: '16px',
+                lineHeight: '19px',
+                color: '#000000',
               }}
             >
-              {name ? name : "name"}
+              {name ? name : 'name'}
             </div>
           </VStack>
         </Box>
         <Stack spacing="0" mb="12.8rem">
-          <div style={{ marginBottom: "24px", display: `flex`, gap: `16px` }}>
+          <div style={{ marginBottom: '24px', display: `flex`, gap: `16px` }}>
             <Link
               className="semi-16"
               borderRadius="25"
@@ -398,8 +372,8 @@ const MintPage = (props) => {
               className="semi-16"
               borderRadius="25"
               padding="5"
-              _hover={{ bg: "black", textColor: "white" }}
-              onClick={() => router.push(IMPORT_NFT, null, {scroll: false})}
+              _hover={{ bg: 'black', textColor: 'white' }}
+              onClick={() => router.push(IMPORT_NFT, null, { scroll: false })}
             >
               Import NFT
             </Link>
@@ -412,7 +386,7 @@ const MintPage = (props) => {
               file={file}
             />
           </div>
-          <div style={{ marginTop: "16px" }}>
+          <div style={{ marginTop: '16px' }}>
             <Box
               sx={{
                 display: `flex`,
@@ -467,49 +441,51 @@ const MintPage = (props) => {
             </Box>
             <div>
               {listItemCheck && (
-                <Tabs isFitted variant='enclosed'
-                onChange={(e)=>setIsAuction(!isAuction)}
+                <Tabs
+                  isFitted
+                  variant="enclosed"
+                  onChange={(e) => setIsAuction(!isAuction)}
                 >
-                  <TabList mb='1em'>
-                    <Tab
-                    >Fixed Price</Tab>
-                    <Tab
-                    >Auction</Tab>
+                  <TabList mb="1em">
+                    <Tab>Fixed Price</Tab>
+                    <Tab>Auction</Tab>
                   </TabList>
                   <TabPanels>
                     <TabPanel>
-                <ListCard
-                  totalPrice={totalPrice}
-                  setTotalPrice={setTotalPrice}
-                  setTotalAmount={setTotalAmount}
-                  listingProcess={listingProcess}
-                  maxFraktions={MAX_FRACTIONS}
-                />
-                </TabPanel>
-                <TabPanel>
-                <ListCardAuction
-                    totalPrice={totalPrice}
-                    setTotalPrice={setTotalPrice}
-                    setTotalAmount={setTotalAmount}
-                    listingProcess={listingProcess}
-                    maxFraktions={MAX_FRACTIONS}
-                  />
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
+                      <ListCard
+                        totalPrice={totalPrice}
+                        setTotalPrice={setTotalPrice}
+                        totalAmount={totalAmount}
+                        setTotalAmount={setTotalAmount}
+                        listingProcess={listingProcess}
+                        maxFraktions={MAX_FRACTIONS}
+                      />
+                    </TabPanel>
+                    <TabPanel>
+                      <ListCardAuction
+                        totalPrice={totalPrice}
+                        setTotalPrice={setTotalPrice}
+                        totalAmount={totalAmount}
+                        setTotalAmount={setTotalAmount}
+                        listingProcess={listingProcess}
+                        maxFraktions={MAX_FRACTIONS}
+                      />
+                    </TabPanel>
+                  </TabPanels>
+                </Tabs>
               )}
             </div>
           </div>
           <div
             style={{
-              marginTop: "24px",
-              justifyItems: "space-between",
+              marginTop: '24px',
+              justifyItems: 'space-between',
               display: `flex`,
               gap: `16px`,
             }}
           >
             <FrakButton4
-              status={!minted ? "open" : "done"}
+              status={!minted ? 'open' : 'done'}
               disabled={!name || !imageData}
               onClick={() => prepareNftData()}
             >
@@ -518,43 +494,42 @@ const MintPage = (props) => {
             {listItemCheck && (
               <>
                 <FrakButton4
-                  status={!isApproved ? "open" : "done"}
+                  status={!isApproved ? 'open' : 'done'}
                   disabled={!tokenMintedAddress}
                   onClick={() => approveToken()}
                 >
                   2. Approve
                 </FrakButton4>
                 <FrakButton4
-                  status={!fraktionalized ? "open" : "done"}
-                  disabled={!isApproved || !tokenMintedAddress }
+                  status={!fraktionalized ? 'open' : 'done'}
+                  disabled={!isApproved || !tokenMintedAddress}
                   onClick={() => importFraktalToMarket()}
                 >
                   3. Frak It
                 </FrakButton4>
                 <FrakButton4
-                  status={!listed ? "open" : "done"}
+                  status={!listed ? 'open' : 'done'}
                   disabled={!fraktalReady}
                   onClick={() => {
-                    if(isAuction){
+                    if (isAuction) {
                       listNewAuctionItem();
-                    }else{
-                      listNewItem()
+                    } else {
+                      listNewItem();
                     }
-                  }
-                  }
+                  }}
                 >
-                  4. {isAuction?"List Auction":"List"}
+                  4. {isAuction ? 'List Auction' : 'List'}
                 </FrakButton4>
               </>
             )}
           </div>
           <div
             style={{
-              marginTop: "16px",
-              color: "#405466",
-              fontSize: "16px",
+              marginTop: '16px',
+              color: '#405466',
+              fontSize: '16px',
               fontWeight: 600,
-              lineHeight: "19px",
+              lineHeight: '19px',
             }}
           >
             {msg()}
@@ -566,25 +541,41 @@ const MintPage = (props) => {
 };
 
 const mapStateToProps = (state) => {
-    return {
-        contractTransaction: state.loadingScreen
-    }
+  return {
+    contractTransaction: state.loadingScreen,
+  };
 };
 
 const mapDispatchToProps = (dispatch) => {
-    return {
-        mintNFTRejected: (obj, buttonAction) => {
-            dispatch(rejectContract(MINT_NFT, obj, buttonAction, { workflow: Workflow.MINT_NFT  }))
-        },
-        tokenRejected: (obj, buttonAction) => {
-            dispatch(rejectContract(APPROVE_TOKEN, obj, buttonAction, { workflow: Workflow.MINT_NFT }))
-        },
-        transferRejected: (obj, buttonAction) => {
-            dispatch(rejectContract(IMPORT_FRAKTAL, obj, buttonAction, { workflow: Workflow.MINT_NFT }))
-        },
-        mintNFTApproved: (obj, receipt) => {
-            dispatch(approvedTransaction(MINT_NFT, obj, receipt, {  workflow: Workflow.MINT_NFT }))
-        },
-    }
+  return {
+    mintNFTRejected: (obj, buttonAction) => {
+      dispatch(
+        rejectContract(MINT_NFT, obj, buttonAction, {
+          workflow: Workflow.MINT_NFT,
+        })
+      );
+    },
+    tokenRejected: (obj, buttonAction) => {
+      dispatch(
+        rejectContract(APPROVE_TOKEN, obj, buttonAction, {
+          workflow: Workflow.MINT_NFT,
+        })
+      );
+    },
+    transferRejected: (obj, buttonAction) => {
+      dispatch(
+        rejectContract(IMPORT_FRAKTAL, obj, buttonAction, {
+          workflow: Workflow.MINT_NFT,
+        })
+      );
+    },
+    mintNFTApproved: (obj, receipt) => {
+      dispatch(
+        approvedTransaction(MINT_NFT, obj, receipt, {
+          workflow: Workflow.MINT_NFT,
+        })
+      );
+    },
+  };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(MintPage);

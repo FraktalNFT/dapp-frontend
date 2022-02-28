@@ -1,82 +1,87 @@
 const { create, CID } = require('ipfs-http-client');
-import { utils } from "ethers";
+import { utils } from 'ethers';
 import { getSubgraphData } from './graphQueries';
 
 const ipfsClient = create({
-  host: "ipfs.infura.io",
-  port: "5001",
-  protocol: "https",});
+  host: 'ipfs.infura.io',
+  port: '5001',
+  protocol: 'https',
+});
 
 // Convert Binary Into JSON
-const binArrayToJson = function(binArray)
-{
-    var str = "";
-    for (var i = 0; i < binArray.length; i++) {
-        str += String.fromCharCode(parseInt(binArray[i]));
-    }
-    return JSON.parse(str)
+const binArrayToJson = function (binArray) {
+  var str = '';
+  for (var i = 0; i < binArray.length; i++) {
+    str += String.fromCharCode(parseInt(binArray[i]));
+  }
+  return JSON.parse(str);
 };
 
-function checkImageCID(cid){ // this does not handle others than IPFS... correct THAT!
-  let correctedCid
-  if(cid.startsWith('https://ipfs.io/')){
-    let splitted = cid.split('https://ipfs.io/ipfs/')
-    correctedCid = splitted[1]
-    let cidv1 = toBase32(correctedCid)
-    return `https://${cidv1}.ipfs.dweb.link`
-  } else if(cid.startsWith('ipfs://')){
-    let splitted = cid.split('ipfs://')
-    correctedCid = splitted[1]
-    let cidv1 = toBase32(correctedCid)
-    return `https://${cidv1}.ipfs.dweb.link`
-
-  }else if (cid.startsWith('Qm')){
-      correctedCid = cid
-      let cidv1 = toBase32(correctedCid)
-      return `https://${cidv1}.ipfs.dweb.link`
-  }else{
+function checkImageCID(cid) {
+  // this does not handle others than IPFS... correct THAT!
+  let correctedCid;
+  if (cid.startsWith('https://ipfs.io/')) {
+    let splitted = cid.split('https://ipfs.io/ipfs/');
+    correctedCid = splitted[1];
+    let cidv1 = toBase32(correctedCid);
+    return `https://${cidv1}.ipfs.dweb.link`;
+  } else if (cid.startsWith('ipfs://')) {
+    let splitted = cid.split('ipfs://');
+    correctedCid = splitted[1];
+    let cidv1 = toBase32(correctedCid);
+    return `https://${cidv1}.ipfs.dweb.link`;
+  } else if (cid.startsWith('Qm')) {
+    correctedCid = cid;
+    let cidv1 = toBase32(correctedCid);
+    return `https://${cidv1}.ipfs.dweb.link`;
+  } else {
     return cid;
   }
-};
+}
 
-function toBase32(value) { // to transform V0 to V1 and use as `https://${cidV1}.ipfs.dweb.link`
-  var cid = new CID(value)
-  return cid.toV1().toBaseEncodedString('base32')
-};
+function toBase32(value) {
+  // to transform V0 to V1 and use as `https://${cidV1}.ipfs.dweb.link`
+  var cid = new CID(value);
+  return cid.toV1().toBaseEncodedString('base32');
+}
 
-async function fetchNftMetadata(hash){
-  if(hash.startsWith('Qm')){
-    let chunks
+async function fetchNftMetadata(hash) {
+  if (hash.startsWith('ipfs://Qm')) {
+    hash = hash.slice(7)
+  }
+  if (hash.startsWith('Qm')) {
+    let chunks;
     for await (const chunk of ipfsClient.cat(hash)) {
       chunks = binArrayToJson(chunk);
     }
     return chunks;
   } else {
-    let res = await fetch(hash)
-    if(res){
-      let result = res.json()
-      return result
+    let res = await fetch(hash);
+    if (res) {
+      let result = res.json();
+      return result;
     }
-  }
-};
-
-async function getFraktalData(address){
-  let data = await getSubgraphData('fraktal', address);
-  if(data?.fraktalNfts?.length){
-    return {
-      fraktalId:data.fraktalNfts[0].marketId,
-      collateral:data.fraktalNfts[0].collateral
-    };
-  } else {
-    return {fraktalId:null, collateral:null};
   }
 }
 
-export async function createOpenSeaObject(data){
-  try{
+async function getFraktalData(address) {
+  let data = await getSubgraphData('fraktal', address);
+  if (data?.fraktalNfts?.length) {
+    return {
+      fraktalId: data.fraktalNfts[0].marketId,
+      collateral: data.fraktalNfts[0].collateral,
+    };
+  } else {
+    return { fraktalId: null, collateral: null };
+  }
+}
+
+export async function createOpenSeaObject(data) {
+  try {
+    if (!data) return null
     let response = {
       id: data.asset_contract.address,
-      creator:data.creator.address,
+      creator: data.creator?.address,
       token_schema: data.asset_contract.schema_name,
       tokenId: data.token_id,
       createdAt: data.asset_contract.created_date,
@@ -85,22 +90,23 @@ export async function createOpenSeaObject(data){
       marketId: null,
       collateral: null,
       collateralType: null,
-    }
+    };
     let fraktalData = await getFraktalData(data.asset_contract.address);
-    if(fraktalData?.fraktalId?.length){
+    if (fraktalData?.fraktalId?.length) {
       response.marketId = fraktalData.fraktalId;
     }
-    if(fraktalData.collateral){
+    if (fraktalData.collateral) {
       response.collateral = fraktalData.collateral.id;
       response.collateralType = fraktalData.collateral.type;
     }
     return response;
-  }catch{
+  } catch (e) {
+    console.log('error in createOpenSeaObject', e);
     return null;
   }
 }
 
-export async function createObject(data){
+export async function createObject(data) {
   // handle token_schema
 
   // ERC721 + ipfs(?)
@@ -111,12 +117,12 @@ export async function createObject(data){
 
   // and possibly tokenId
 
-  try{
-    let nftMetadata = await fetchNftMetadata(data.nft.hash)
-    if(nftMetadata){
+  try {
+    let nftMetadata = await fetchNftMetadata(data.nft.hash);
+    if (nftMetadata) {
       return {
         id: data.nft.id,
-        creator:data.nft.creator.id,
+        creator: data.nft.creator.id,
         marketId: data.nft.marketId,
         // balances: data.nft.fraktions,
         userBalance: data.amount,
@@ -126,49 +132,49 @@ export async function createObject(data){
         name: nftMetadata.name,
         description: nftMetadata.description,
         imageURL: checkImageCID(nftMetadata.image),
-      }
+      };
     }
-  }catch{
+  } catch {
     //TODO - REMOVE THE CONSOLE.log
-    console.log('Error fetching ',data);
+    console.log('Error fetching ', data);
     return null;
   }
-};
+}
 
-export async function createObject2(data){
-  try{
+export async function createObject2(data) {
+  try {
     let nftMetadata = await fetchNftMetadata(data.hash);
     let object = {
       id: data.id,
-      creator:data.creator.id,
+      creator: data.creator.id,
       marketId: data.marketId,
       balances: data.fraktions,
       createdAt: data.createdAt,
       status: data.status,
     };
-    if(nftMetadata && nftMetadata.name){
-        object.name = nftMetadata.name
+    if (nftMetadata && nftMetadata.name) {
+      object.name = nftMetadata.name;
     }
-    if(nftMetadata && nftMetadata.description){
-        object.description = nftMetadata.description
+    if (nftMetadata && nftMetadata.description) {
+      object.description = nftMetadata.description;
     }
-    if(nftMetadata && nftMetadata.image){
-        object.imageURL = checkImageCID(nftMetadata.image)
+    if (nftMetadata && nftMetadata.image) {
+      object.imageURL = checkImageCID(nftMetadata.image);
     }
     return object;
-  } catch{
+  } catch {
     //TODO - REMOVE THE CONSOLE.log
-    console.log('Error fetching 2 ',data.hash);
+    console.log('Error fetching 2 ', data.hash);
     return null;
   }
-};
+}
 
-export async function createListed(data){
-  try{
-    let nftMetadata = await fetchNftMetadata(data.fraktal.hash)
-    if(nftMetadata){
+export async function createListed(data) {
+  try {
+    let nftMetadata = await fetchNftMetadata(data.fraktal.hash);
+    if (nftMetadata) {
       return {
-        creator:data.fraktal.creator.id,
+        creator: data.fraktal.creator.id,
         marketId: data.fraktal.marketId,
         createdAt: data.fraktal.createdAt,
         tokenAddress: data.fraktal.id,
@@ -181,17 +187,17 @@ export async function createListed(data){
         name: nftMetadata.name,
         description: nftMetadata.description,
         imageURL: checkImageCID(nftMetadata.image),
-      }
+      };
     }
-  }catch (err){
-    return {error: `Error: ${err}`};
+  } catch (err) {
+    return { error: `Error: ${err}` };
   }
 }
 
-export async function createListedAuction(data){
-  try{
-    let nftMetadata = await fetchNftMetadata(data.hash)
-    if(nftMetadata){
+export async function createListedAuction(data) {
+  try {
+    let nftMetadata = await fetchNftMetadata(data.hash);
+    if (nftMetadata) {
       return {
         amountOfShare: data.amountOfShare,
         endTime: data.endTime,
@@ -203,9 +209,9 @@ export async function createListedAuction(data){
         name: nftMetadata.name,
         description: nftMetadata.description,
         imageURL: checkImageCID(nftMetadata.image),
-      }
+      };
     }
-  }catch (err){
-    return {error: `Error: ${err}`};
+  } catch (err) {
+    return { error: `Error: ${err}` };
   }
 }
