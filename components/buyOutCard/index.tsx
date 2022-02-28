@@ -35,11 +35,6 @@ const BuyOutCard = ({
   const [userIsOfferer, setUserIsOfferer] = useState(false);
   const [majority, setMajority] = useState(0);
 
-  // functions for the offers!
-  //claim Fraktal
-  // console.log({offers});
-
-
   useEffect(() => {
     if (account && offers && offers.length) {
       let userHasOffered = offers.find(

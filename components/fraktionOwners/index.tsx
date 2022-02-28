@@ -80,7 +80,7 @@ export default function FraktionOwners(props) {
           </Text>
         </Box>
           {internalData && internalData.length && internalData.map(
-              (user: object, index: number) => {
+              (user: object, idx: number) => {
                 let first4 = user.owner.id.substring(0, 6); // (0x + 4 digits)
                 let last4 = user.owner.id.substring(
                   user.owner.id.length - 4,
@@ -97,6 +97,7 @@ export default function FraktionOwners(props) {
                 // let percentOwned = (parseInt(user.amount) / 10000) * 100;
                 return (
                   <Box
+                    key={`owner-${idx}`}
                     sx={{
                       display: `flex`,
                       alignItems: `center`,

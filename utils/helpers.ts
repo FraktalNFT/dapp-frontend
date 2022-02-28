@@ -30,10 +30,8 @@ export const getExplorerUrl = (chainId: number) =>
 export const getNetworkCurrency = chainId =>
   networkCurrencies[chainId] || { name: "Unknown", symbol: "Unknown" };
 
-export const shortenHash = (hash) => {
-	if (typeof hash !== 'undefined') {
-		return `${hash.slice(0, 4)}...${hash.slice(hash.length - 4, hash.length)}`
-	}
+export const shortenHash = (hash: string) => {
+	return `${hash.slice(0, 4)}...${hash.slice(hash.length - 4, hash.length)}`
 };
 
 export const addChainToMetaMask = async (

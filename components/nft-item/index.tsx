@@ -125,7 +125,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const inVisibleAnimStyle = {
       animationName: `loadingCard`,
       animationDuration: `1s`,
-      'animation-iteration-count': `infinite`,
+      animationIterationCount: `infinite`,
     };
 
     const withdrawNFT = async (item, event) => {

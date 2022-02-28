@@ -94,8 +94,6 @@ export const UserContextProviderFC = ({ children }) => {
           "wallet",
           account.toLocaleLowerCase()
         );
-        console.log(fobjects)
-
 
         if (fobjects && fobjects.users.length) {
           // balance retrieval

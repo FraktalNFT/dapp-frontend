@@ -44,31 +44,30 @@ function toBase32(value) { // to transform V0 to V1 and use as `https://${cidV1}
   return cid.toV1().toBaseEncodedString('base32')
 };
 
-async function fetchNftMetadata(hash){
+export async function fetchNftMetadata(hash){
   if(hash.startsWith('Qm')){
     let chunks
     for await (const chunk of ipfsClient.cat(hash)) {
       chunks = binArrayToJson(chunk);
     }
+    if(chunks.image !== undefined) {
+      chunks.image = checkImageCID(chunks.image)
+    }
     return chunks;
   } else {
     let res = await fetch(hash)
     if(res){
-      let result = res.json()
-      return result
+      return res.json()
     }
   }
 };
 
 async function getFraktalData(address){
-  let data = await getSubgraphData('fraktal', address);
-  if(data?.fraktalNfts?.length){
-    return {
-      fraktalId:data.fraktalNfts[0].marketId,
-      collateral:data.fraktalNfts[0].collateral
-    };
-  } else {
-    return {fraktalId:null, collateral:null};
+  const { fraktalNft } = await getSubgraphData('fraktal', address)
+  const {marketId, collateral} = fraktalNft
+  return {
+    fraktalId: marketId,
+    collateral: collateral
   }
 }
 
@@ -140,7 +139,7 @@ export async function createObject2(data){
     let nftMetadata = await fetchNftMetadata(data.hash);
     let object = {
       id: data.id,
-      creator:data.creator.id,
+      creator: data.creator.id,
       marketId: data.marketId,
       balances: data.fraktions,
       createdAt: data.createdAt,

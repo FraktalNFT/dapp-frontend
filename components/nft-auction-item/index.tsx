@@ -86,7 +86,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const inVisibleAnimStyle = {
       animationName: `loadingCard`,
       animationDuration: `1s`,
-      'animation-iteration-count': `infinite`,
+      animationIterationCount: `infinite`,
     };
 
     const renderer = ({ days, hours, minutes, seconds, completed }) => {

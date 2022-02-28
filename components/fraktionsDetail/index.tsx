@@ -18,6 +18,9 @@ interface listedItemProps {
   amount: number;
   price: number;
   seller: string;
+  tokenAddress: string;
+  marketAddress: string;
+  provider: string;
 }
 
 const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
@@ -43,31 +46,13 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
       let toPaid = fei.mul(weiPerFrak).div(utils.parseEther('1.0'));
       toPaid = toPaid.add(utils.parseEther('0.00000000000000001'));
       return toPaid;
-      // const _price = utils.parseEther(
-      //   (
-      //     ((BigNumber.from(amountToBuy).mul(utils.formatEther(price.toString()))).add(BigNumber.from("0.00000000000000001"))).toString()
-      //   )
-      // );
-      // return "1";
     };
 
-    const priceParsed = (price) => {
-      return roundUp((utils.formatEther(price) * 100000) / 100000, 3);
-      // return Math.round(utils.formatEther(price) * 100000) / 100000;
+    const prettyPrice = (price: number) => {
+      return roundUp((utils.formatEther(price) * 100000) / 100000, 3)
     };
 
-    let amountString = '';
-
-    let feiString = '';
-    amountString = utils.formatEther(parseUnits(amount.toString(), 'wei'));
-
-    //  if(BigNumber.from(amount).lt(utils.parseEther("0.01"))){
-    //   amountString = utils.formatEther(parseUnits(amount.toString(),"wei"));
-    //   // amountString = "<0.01";
-    //    feiString = amount.toString();
-    //  }else{
-    //    amountString = utils.formatEther(parseUnits(amount.toString(),"wei"));
-    //  }
+    const amountString = utils.formatEther(parseUnits(amount.toString(), 'wei'))
 
     async function onBuy() {
       setBuying(true);
@@ -100,6 +85,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
         setIsReady(false);
       }
     }
+
     return (
       <HStack
         style={{
@@ -188,7 +174,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
                 maxWidth: '200px',
               }}
             >
-              {priceParsed(price)}
+              {prettyPrice(price)}
             </div>
           </HStack>
           <div

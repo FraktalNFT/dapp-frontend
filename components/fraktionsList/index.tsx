@@ -6,8 +6,6 @@ import { utils } from "ethers";
 // if account has fraktions.. display info to list?
 
 const FraktionsList=(({fraktionsListed, tokenAddress, marketAddress, provider}) => {
-
-
   return(
     <div style={{
       borderRadius:'4px',
@@ -30,7 +28,7 @@ const FraktionsList=(({fraktionsListed, tokenAddress, marketAddress, provider}) 
             return(
               <FraktionsDetail
                 key={x.id}
-                amount={x.amount}
+                amount={x.shares}
                 price={x.price}
                 seller={x.seller.id}
                 tokenAddress={tokenAddress}
