@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import NextLink from "next/link";
-import { Image } from "@chakra-ui/image";
+import { useState, useEffect } from 'react';
+import NextLink from 'next/link';
+import { Image } from '@chakra-ui/image';
 import {
   Box,
   StackProps,
@@ -10,87 +10,100 @@ import {
   Spinner,
   Tag,
   TagLabel,
-} from "@chakra-ui/react";
-import React, { forwardRef } from "react";
+} from '@chakra-ui/react';
+import React, { forwardRef } from 'react';
 import {
   Flex,
   Spacer,
   forwardRef as fRef,
   HTMLChakraProps,
   chakra,
-} from "@chakra-ui/react";
-import { FrakCard } from "../../types";
-import { motion, isValidMotionProp, HTMLMotionProps } from "framer-motion";
-import FrakButton from "../../components/button";
-import { useUserContext } from "@/contexts/userContext";
-import { BigNumber, utils } from "ethers";
-import { useWeb3Context } from "../../contexts/Web3Context";
-import { getListingAmount, unlistItem } from "../../utils/contractCalls"
-import toast from "react-hot-toast";
-import { roundUp } from "../../utils/math";
+} from '@chakra-ui/react';
+import { FrakCard } from '../../types';
+import { motion, isValidMotionProp, HTMLMotionProps } from 'framer-motion';
+import FrakButton from '../../components/button';
+import { useUserContext } from '@/contexts/userContext';
+import { BigNumber, utils } from 'ethers';
+import { useWeb3Context } from '../../contexts/Web3Context';
+import { getListingAmount, unlistItem, claimERC721, claimERC1155 } from '../../utils/contractCalls';
+import toast from 'react-hot-toast';
+import { roundUp } from '../../utils/math';
+import {ActionOpts} from "../../redux/actions/contractActions";
+import {Workflow} from "../../types/workflow";
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
-  name: String;
-  amount: String;
-  price: Number;
-  imageURL: String;
+  name: string;
+  amount: string;
+  price: number;
+  imageURL: string;
   CTAText?: string;
   wait?: number;
   height?: string;
 }
 
 const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
-  ({ item, amount, price, imageURL, name, onClick, CTAText, wait, height = '35rem'}, ref) => {
+  (
+    {
+      item,
+      amount,
+      price,
+      imageURL,
+      name,
+      onClick,
+      CTAText,
+      wait,
+      height = '35rem',
+    },
+    ref
+  ) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
-    const [isListed,setIsListed] = useState(false);
+    const [isListed, setIsListed] = useState(false);
     const { fraktions, fraktals } = useUserContext();
-    const { account, provider, marketAddress} = useWeb3Context();
+    const { account, provider, marketAddress } = useWeb3Context();
 
-    const canFrak = item && !! (fraktals || []).find(fraktion => fraktion.id === item.id);
-    const canList = item && !! (fraktions || []).find(fraktion => fraktion.id === item.id);
+    const canFrak =
+      item && !!(fraktals || []).find((fraktion) => fraktion.id === item.id);
+    const canList =
+      item && !!(fraktions || []).find((fraktion) => fraktion.id === item.id);
 
-    useEffect(()=>{
-      if(item){
-        getListingAmount(account,item.id,provider,marketAddress).then(
+    useEffect(() => {
+      if (item) {
+        getListingAmount(account, item.id, provider, marketAddress).then(
           (amount: BigNumber) => {
-            if(amount.gt(0)){
+            if (amount.gt(0)) {
               setIsListed(true);
-            }else{
+            } else {
               setIsListed(false);
             }
-            
           }
         );
       }
-    },[])
+    }, []);
 
-    const priceParsed = price => {
-      return (roundUp(price, 3));
-    }
+    const priceParsed = (price) => {
+      return roundUp(price, 3);
+    };
 
     const unList = async () => {
-      toast("Unlisting...")
-      await unlistItem(item.id,provider,marketAddress).then(
-        () => {
-          toast.success("Fraktion Unlisted");
-          setIsListed(!isListed);
-        }
-      )
-    }
+      toast('Unlisting...');
+      await unlistItem(item.id, provider, marketAddress).then(() => {
+        toast.success('Fraktion Unlisted');
+        setIsListed(!isListed);
+      });
+    };
 
-    let showAmount = "";
-    if(amount!=undefined){
-      const BIamount = utils.parseUnits(String(amount),"wei");
-      if(BIamount.lt(utils.parseEther("1.0"))){
-        showAmount="<0.01";
-      }else{
-        showAmount=utils.formatEther(BIamount.div(100));
+    let showAmount = '';
+    if (amount != undefined) {
+      const BIamount = utils.parseUnits(String(amount), 'wei');
+      if (BIamount.lt(utils.parseEther('1.0'))) {
+        showAmount = '<0.01';
+      } else {
+        showAmount = utils.formatEther(BIamount.div(100));
       }
-      
-    }else{
-      showAmount = "";
+    } else {
+      showAmount = '';
     }
 
     // useEffect(() => {
@@ -112,27 +125,39 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const inVisibleAnimStyle = {
       animationName: `loadingCard`,
       animationDuration: `1s`,
-      "animation-iteration-count": `infinite`,
+      'animation-iteration-count': `infinite`,
+    };
+
+    const withdrawNFT = async (item, event) => {
+        const actionOpts = { workflow: Workflow.CLAIM_NFT };
+        event.stopPropagation();
+        await claimERC1155(
+            item.marketId,
+            provider,
+            marketAddress,
+            actionOpts
+        ).then((response) => {
+          console.log(response)
+        });
     };
 
     return (
       <>
         {isVisible && (
           <Box
-
             rounded="md"
             borderWidth="1px"
             boxShadow="md"
             onClick={onClick}
             _hover={{
-              boxShadow: "xl",
+              boxShadow: 'xl',
             }}
             ref={ref}
             sx={isImageLoaded ? null : inVisibleAnimStyle}
           >
             <VStack cursor="pointer">
               <Box
-                h={isImageLoaded ? height : "0px"}
+                h={isImageLoaded ? height : '0px'}
                 w="100%"
                 position="relative"
                 sx={
@@ -142,7 +167,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 }
               >
                 <Image
-                  src={'https://image.fraktal.io/?height=350&image='+imageURL}
+                  src={'https://image.fraktal.io/?height=350&image=' + imageURL}
                   width="100%"
                   height="100%"
                   objectFit="cover"
@@ -152,7 +177,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                   sx={{
                     objectFit: `cover`,
                   }}
-                  style={{ verticalAlign: "middle" }}
+                  style={{ verticalAlign: 'middle' }}
                   onLoad={() => onImageLoad(5)}
                 />
               </Box>
@@ -169,7 +194,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 >
                   <Box
                     sx={{
-                      display: "grid",
+                      display: 'grid',
                       width: `100%`,
                       height: `100%`,
                       placeItems: `center`,
@@ -181,10 +206,12 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
               )}
             </VStack>
             <Box margin="1rem">
-              <Flex alignItems="center" justifyContent="space-between" mb="1rem">
-                <Text className="semi-16">
-                  {name}
-                </Text>
+              <Flex
+                alignItems="center"
+                justifyContent="space-between"
+                mb="1rem"
+              >
+                <Text className="semi-16">{name}</Text>
                 <Tag size="lg">
                   <TagLabel fontSize="xl">Fixed Price</TagLabel>
                 </Tag>
@@ -210,23 +237,25 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 )}
               </Flex>
 
-              { canFrak && (
+              {canFrak && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={`nft/${item.id}/details?frak=1`}>
                     <FrakButton size="sm">Frak it</FrakButton>
                   </NextLink>
+                  <FrakButton marginLeft="10px" size="sm" onClick={(e) => withdrawNFT(item, e)} >Withdraw NFT</FrakButton>
                 </Box>
               )}
 
-              { canList && isListed &&  (
+              {canList && isListed && (
                 <Box textAlign="center" marginTop={5}>
-                  <NextLink href={"my-nfts"} scroll={false}>
-                    <FrakButton size="sm" onClick={unList}
-                    >Unlist Fraktions</FrakButton>
+                  <NextLink href={'my-nfts'} scroll={false}>
+                    <FrakButton size="sm" onClick={unList}>
+                      Unlist Fraktions
+                    </FrakButton>
                   </NextLink>
                 </Box>
               )}
-              { canList && !isListed &&  (
+              {canList && !isListed && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={`nft/${item.marketId}/list-item`}>
                     <FrakButton size="sm">Sell Fraktions</FrakButton>

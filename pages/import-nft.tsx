@@ -63,8 +63,11 @@
   * Constants
   */
  import {CREATE_NFT, MY_NFTS} from "@/constants/routes";
+import { Workflow } from "types/workflow";
  const { create } = require("ipfs-http-client");
  const MAX_FRACTIONS = 10000;
+
+ const actionOpts = { workflow: Workflow.IMPORT_NFT }
  
  export default function ImportNFTPage() {
    const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
@@ -99,12 +102,12 @@
  
    async function approveForFactory() {
      if (tokenToImport && tokenToImport.id) {
-       let res = await approveMarket(factoryAddress, provider, tokenToImport.id)
+       let res = await approveMarket(factoryAddress, provider, tokenToImport.id, actionOpts)
            .then(success => {
            setIsFactoryApproved(true);
            importNFT();
        }).catch(error => {
-         store.dispatch(rejectContract(APPROVE_TOKEN, error, approveForFactory));
+         store.dispatch(rejectContract(APPROVE_TOKEN, error, approveForFactory, actionOpts));
        });
      }
    }
@@ -113,13 +116,14 @@
      let response = await approveMarket(
        marketAddress,
        provider,
-       tokenMintedAddress
+       tokenMintedAddress,
+       actionOpts
      ).then(receipt => {
          setIsMarketApproved(true);
          importFraktalToMarket();
      }).
      catch(error => {
-         store.dispatch(rejectContract(APPROVE_TOKEN, error, approveForMarket));
+         store.dispatch(rejectContract(APPROVE_TOKEN, error, approveForMarket, actionOpts));
      });
    }
  
@@ -134,9 +138,10 @@
          parseInt(tokenToImport?.tokenId),
          tokenToImport?.id,
          provider,
-         factoryAddress
+         factoryAddress,
+         actionOpts
        ).catch(error => {
-           store.dispatch(rejectContract(IMPORT_NFT, error, importNFT));
+           store.dispatch(rejectContract(IMPORT_NFT, error, importNFT, actionOpts));
        });
      }
      if (tokenToImport?.token_schema === "ERC1155") {
@@ -144,9 +149,10 @@
          parseInt(tokenToImport?.tokenId),
          tokenToImport?.id,
          provider,
-         factoryAddress
+         factoryAddress,
+         actionOpts
        ).catch(error => {
-           store.dispatch(rejectContract(IMPORT_NFT, error, importNFT));
+           store.dispatch(rejectContract(IMPORT_NFT, error, importNFT, actionOpts));
        });
      }
      if (address?.length > 0) {
@@ -182,12 +188,13 @@
          tokenMintedAddress,
          tokenID,
          provider,
-         marketAddress
+         marketAddress,
+         actionOpts
        ).then(receipt => {
            setIsFraktionsAllowed(true);
            listFraktions();
        }).catch(error => {
-           store.dispatch(rejectContract(IMPORT_FRAKTAL, error, importFraktalToMarket));
+           store.dispatch(rejectContract(IMPORT_FRAKTAL, error, importFraktalToMarket, actionOpts));
        });
      }
    }
@@ -198,14 +205,15 @@
        totalAmount, // amount of fraktions to list
        utils.parseUnits(totalPrice).div(totalAmount), // totalPrice is price for all fraktions sum
        provider,
-       marketAddress
+       marketAddress,
+       actionOpts
      ).then(receipt => {
        setIsNFTListed(true);
        setInterval(() => {
          router.push(MY_NFTS);
        }, 1000);
      }).catch(error => {
-         store.dispatch(rejectContract(LISTING_NFT, error, listNewItem));
+         store.dispatch(rejectContract(LISTING_NFT, error, listNewItem, actionOpts));
      });
    }
  
@@ -215,14 +223,22 @@
        utils.parseUnits(totalPrice),
        utils.parseUnits(totalAmount),
        provider,
-       marketAddress
+       marketAddress,
+       actionOpts
      ).then(receipt => {
          setIsNFTListed(true);
          setInterval(() => {
              router.push(MY_NFTS);
          }, 1000);
      }).catch(error => {
-         store.dispatch(rejectContract(LISTING_NFT, error, listItemAuction));
+         store.dispatch(
+           rejectContract(
+             LISTING_NFT,
+             error,
+             listItemAuction,
+             actionOpts
+           )
+        );
      });
    }
  
@@ -261,7 +277,6 @@
  
    return (
      <>
-       <LoadScreen/>
        {isLoading && <Spinner size="xl" />}
        {!isLoading && (
          <>

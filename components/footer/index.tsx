@@ -5,6 +5,7 @@ import TwitterIcon from "../icon/TwitterIcon";
 import InstagramIcon from "../icon/InstagramIcon";
 import DiscordIcon from "../icon/DiscordIcon";
 import MediumIcon from '../icon/MediumIcon';
+import YoutubeIcon from '../icon/YoutubeIcon';
 
 const urlLists = [
   {
@@ -37,9 +38,8 @@ const socials = [
   { url: "https://twitter.com/fraktalnft", icon: TwitterIcon },
   { url: "https://www.instagram.com/fraktal.io/", icon: InstagramIcon },
   { url: "https://discord.com/invite/P6fCPvtZtq", icon: DiscordIcon },
-  // { url: "https://youtube.com", icon: InstagramIcon },
+  { url: "https://www.youtube.com/channel/UCUpcKyPeUJ2Mhx7OWOSZL6w", icon: YoutubeIcon },
   { url: "https://blog.fraktal.io/", icon: MediumIcon },
-  { url: "https://blog.fraktal.io/", icon: MediumIcon }
 ]
 
 const Footer: React.FC = () => {
