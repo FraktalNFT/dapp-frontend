@@ -2,12 +2,8 @@ import { gql, request } from "graphql-request";
 import { utils } from "ethers";
 const { CID } = require("ipfs-http-client");
 
-// const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.18';
-const APIURL = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9';
-// const APIURL = 'https://gateway.testnet.thegraph.com/api/a2ae030e27fc11191339a53e73cea9c2/subgraphs/id/0x98e7910e754abd41ace110c23d679333779c2ff9-1'
-const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9';
-// const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/testnetfraktalauction/0.4';
-// https://api.thegraph.com/subgraphs/name/drhongos/fraktalrinkeby // hosted
+const APIURL = "https://api.thegraph.com/subgraphs/name/gmsteuart/fraktal-rinkeby"
+const AUCTIONAPI = APIURL
 
 const creator_query = gql`
   query($id: ID!) {
@@ -31,7 +27,7 @@ const fraktions_query = gql`
         id
       }
       price
-      amount
+      shares
       gains
       seller {
         id
@@ -174,10 +170,10 @@ const fraktal_fraktions_query = gql`
 //, orderBy:createdAt, orderDirection: desc
 const listedItems = gql`
   query {
-    listItems(first: 100, where: { amount_gt: 0 }) {
+    listItems(first: 100, where: { shares_gt: 0 }) {
       id
       price
-      amount
+      shares
       gains
       seller {
         id
@@ -204,7 +200,7 @@ const listedItemsId = gql`
     listItems(where: { id: $id, amount_gt: 0 }) {
       id
       price
-      amount
+      shares
       gains
       seller {
         id
@@ -377,10 +373,10 @@ const fraktalId_query = gql`
 
 const limitedItems = gql`
   query($limit: Int!, $offset: Int!, $orderBy: String!, $orderDirection: String!) {
-    listItems(first: $limit, skip: $offset, where: { amount_gt: 0 }, orderBy: $orderBy, orderDirection: $orderDirection) {
+    listItems(first: $limit, skip: $offset, where: { shares_gt: 0 }, orderBy: $orderBy, orderDirection: $orderDirection) {
       id
       price
-      amount
+      shares
       gains
       seller {
         id
@@ -420,7 +416,7 @@ const listedItemsByFraktalId = gql`
     listItems(where: { fraktal: $id }) {
       id
       price
-      amount
+      shares
       gains
       seller {
         id
@@ -467,7 +463,7 @@ const limitedAuctions = gql`
   query($limit: Int!, $offset: Int!, $end: Int!, $orderDirection: String!) {
     auctions(first: $limit, skip: $offset, orderBy: price, orderDirection: $orderDirection, where: { end_gt: $end, price_gt: 0 }) {
       seller
-      tokenAddress
+      fraktal
       price
       shares
       end
@@ -481,7 +477,7 @@ const listedAuctions = gql`
   query {
     auctions {
       seller
-      tokenAddress
+      fraktal
       price
       shares
       end
