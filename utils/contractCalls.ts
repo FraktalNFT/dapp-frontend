@@ -372,6 +372,7 @@ export async function defraktionalize(provider, contract) {
 }
 
 export async function approveMarket(to, provider, contract, opts?: ActionOpts) {
+  console.log('Contract', contract);
   const signer = await loadSigner(provider);
   const customContract = new Contract(contract, tokenAbi, signer);
   try {
@@ -521,7 +522,6 @@ export async function importERC1155(
       override
     );
     store.dispatch(callContract(IMPORT_NFT, tx, opts));
-
     let mintedTokenAddress = await awaitTokenAddress(tx);
     if (!mintedTokenAddress?.error) {
       store.dispatch(
