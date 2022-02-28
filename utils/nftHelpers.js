@@ -46,6 +46,9 @@ function toBase32(value) {
 }
 
 async function fetchNftMetadata(hash) {
+  if (hash.startsWith('ipfs://Qm')) {
+    hash = hash.slice(7)
+  }
   if (hash.startsWith('Qm')) {
     let chunks;
     for await (const chunk of ipfsClient.cat(hash)) {
