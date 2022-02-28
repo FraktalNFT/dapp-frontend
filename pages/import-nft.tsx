@@ -21,6 +21,7 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
+
 import { utils } from 'ethers';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -135,7 +136,7 @@ export default function ImportNFTPage() {
     }
     if (tokenToImport?.token_schema === 'ERC721') {
       address = await importERC721(
-        BigInt(tokenToImport?.tokenId),
+        parseInt(tokenToImport?.tokenId),
         tokenToImport?.id,
         provider,
         factoryAddress,
@@ -148,7 +149,7 @@ export default function ImportNFTPage() {
     }
     if (tokenToImport?.token_schema === 'ERC1155') {
       address = await importERC1155(
-        BigInt(tokenToImport?.tokenId),
+        parseInt(tokenToImport?.tokenId),
         tokenToImport?.id,
         provider,
         factoryAddress,
