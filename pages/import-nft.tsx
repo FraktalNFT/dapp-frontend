@@ -63,9 +63,7 @@ export default function ImportNFTPage() {
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [noNFTs, setNoNFTs] = useState<boolean>(false);
-  const [fraktionalized, setFraktionalized] = useState<boolean>(false);
-  const [nftApproved, setNFTApproved] = useState<boolean>(false);
-  const [minted, setMinted] = useState<boolean>(false);
+
   const [importingNFT, setImportingNFT] = useState<boolean>(false);
   const [isFactoryApproved, setIsFactoryApproved] = useState<boolean>(false);
   const [isNFTImported, setIsNFTImported] = useState<boolean>(false);
@@ -79,8 +77,8 @@ export default function ImportNFTPage() {
   const [tokenMintedAddress, setTokenMintedAddress] = useState<string>('');
   const [NFTName, setNFTName] = useState<string>('');
   const [NFTDescription, setNFTDescription] = useState<string>('');
-  const [totalAmount, setTotalAmount] = useState<string>('');
-  const [totalPrice, setTotalPrice] = useState<string>('');
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
 
   const [tokenToImport, setTokenToImport] = useState<object>({});
 
@@ -212,11 +210,15 @@ export default function ImportNFTPage() {
     }
   }
 
+  
   async function listNewItem() {
+    const wei = utils.parseEther(totalPrice.toString());
+    const fei = utils.parseEther(totalAmount.toString());
+    const weiPerFrak = (wei.mul(utils.parseEther("1.0"))).div(fei);
     const response = await listItem(
       tokenMintedAddress,
-      totalAmount, // amount of fraktions to list
-      utils.parseUnits(totalPrice).div(totalAmount), // totalPrice is price for all fraktions sum
+      fei, // amount of fraktions to list
+      weiPerFrak, // price per fraktal
       provider,
       marketAddress,
       actionOpts
