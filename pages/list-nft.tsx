@@ -120,7 +120,6 @@ const MintPage = (props) => {
 
   async function minter(metadata) {
     let metadataCid = await uploadAndPin(JSON.stringify(metadata));
-    console.log(metadata)
     if (metadataCid) {
       setListingProcess(true);
       setIsMinting(true);
