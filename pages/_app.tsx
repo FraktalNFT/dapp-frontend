@@ -5,7 +5,6 @@ import { ChakraProvider, ComponentStyleConfig, extendTheme, VStack } from "@chak
 /**
  * Styles
  */
-import '@fortawesome/fontawesome-free/css/all.css'
 import "../styles/globals.css";
 import "../styles/fonts.css";
 /**
