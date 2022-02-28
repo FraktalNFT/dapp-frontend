@@ -3,7 +3,11 @@ import ListCardAuction from '@/components/listCardAuction';
 import NFTImportCardOS from '@/components/nft-importcard-opensea';
 import NFTCard from '@/components/nftCard';
 
-import { CREATE_NFT, MY_NFTS } from '@/constants/routes';
+import {
+  CREATE_NFT,
+  resolveAuctionNFTRoute,
+  resolveNFTRoute,
+} from '@/constants/routes';
 
 import {
   Box,
@@ -89,7 +93,7 @@ export default function ImportNFTPage() {
         tokenToImport.id,
         actionOpts
       )
-        .then((success) => {
+        .then((receipt) => {
           setIsFactoryApproved(true);
           importNFT();
         })
@@ -160,7 +164,7 @@ export default function ImportNFTPage() {
       setIsNFTImported(true);
       if (!isIntendedForListing) {
         setTimeout(() => {
-          router.push(MY_NFTS);
+          router.push(resolveNFTRoute(address));
         }, 1000);
       }
     }
@@ -219,7 +223,7 @@ export default function ImportNFTPage() {
       .then((receipt) => {
         setIsNFTListed(true);
         setTimeout(() => {
-          router.push(MY_NFTS);
+          router.push(resolveNFTRoute(tokenMintedAddress));
         }, 1000);
       })
       .catch((error) => {
@@ -241,7 +245,7 @@ export default function ImportNFTPage() {
       .then((receipt) => {
         setIsNFTListed(true);
         setTimeout(() => {
-          router.push(MY_NFTS);
+          router.push(resolveAuctionNFTRoute(tokenMintedAddress));
         }, 1000);
       })
       .catch((error) => {
