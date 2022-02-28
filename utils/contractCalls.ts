@@ -100,6 +100,12 @@ const erc1155Abi = [
   "function uri(uint256 _id) external view returns (string memory)"
 ];
 
+const airdropABI = [
+  "function claim(uint256 amount,bytes32[] calldata merkleProof,address listedToken) external",
+  "function hasClaim(address) external"
+];
+
+
 // TODO
 const transferAbi = [
   'function makeSafeTransfer(address _to,uint256 _tokenId,uint256 _subId,uint256 _amount)',
@@ -886,6 +892,36 @@ export async function unlistAuctionItem(
     store.dispatch(
       approvedTransaction(UNLIST_AUCTION_NFT, tx, tokenAddress, opts)
     );
+  }
+  return receipt;
+}
+
+export async function hadClaimedAirdrop(
+  provider,
+  airdropAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(airdropAddress, airdropABI, signer);
+  let tx = await customContract.hasClaim();
+  let receipt = await processTx(tx);
+  if (!receipt?.error) {
+  }
+  return receipt;
+}
+export async function claimAirdrop(
+  amount,
+  merkleProof,
+  listedTokenAddress,
+  provider,
+  airdropAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(airdropAddress, airdropABI, signer);
+  let tx = await customContract.claim(amount, merkleProof, listedTokenAddress);
+  let receipt = await processTx(tx);
+  if (!receipt?.error) {
   }
   return receipt;
 }

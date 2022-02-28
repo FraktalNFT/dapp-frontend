@@ -25,6 +25,11 @@ export const factoryContracts = [
   // {providerChainId:4, address:'0x7edb6a54D10B4e3039Fd11D1A59582a6294a6ffE'},
 ]
 
+export const airdropContract = [
+  {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+  {providerChainId:4, address:'0x67a6335543b4295aA7D8165B3Cf906c7F36bcDFe'},
+]
+
 export const networkNames = {
   1: "ETH Mainnet",
   42: "Kovan Testnet",
