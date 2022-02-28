@@ -210,11 +210,10 @@ export default function ImportNFTPage() {
     }
   }
 
-  
   async function listNewItem() {
     const wei = utils.parseEther(totalPrice.toString());
     const fei = utils.parseEther(totalAmount.toString());
-    const weiPerFrak = (wei.mul(utils.parseEther("1.0"))).div(fei);
+    const weiPerFrak = wei.mul(utils.parseEther('1.0')).div(fei);
     const response = await listItem(
       tokenMintedAddress,
       fei, // amount of fraktions to list
@@ -259,7 +258,7 @@ export default function ImportNFTPage() {
   }
 
   const listFraktions = async () => {
-    if (totalPrice == '' || totalAmount == '') {
+    if (totalPrice == 0 || totalAmount == 0) {
       toast.error('Please input price and amount of fraktions');
     } else {
       if (isAuction) {
@@ -514,6 +513,7 @@ export default function ImportNFTPage() {
                         <ListCard
                           totalPrice={totalPrice}
                           setTotalPrice={setTotalPrice}
+                          totalAmount={totalAmount}
                           setTotalAmount={setTotalAmount}
                           listingProcess={false}
                           maxFraktions={MAX_FRACTIONS}
@@ -523,6 +523,7 @@ export default function ImportNFTPage() {
                         <ListCardAuction
                           totalPrice={totalPrice}
                           setTotalPrice={setTotalPrice}
+                          totalAmount={totalAmount}
                           setTotalAmount={setTotalAmount}
                           listingProcess={false}
                           maxFraktions={MAX_FRACTIONS}

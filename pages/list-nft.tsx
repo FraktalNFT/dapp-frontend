@@ -226,7 +226,7 @@ const MintPage = (props) => {
   async function listNewItem() {
     const wei = utils.parseEther(totalPrice.toString());
     const fei = utils.parseEther(totalAmount.toString());
-    const weiPerFrak = (wei.mul(utils.parseEther("1.0"))).div(fei);
+    const weiPerFrak = wei.mul(utils.parseEther('1.0')).div(fei);
 
     // const weiPerFrak = utils.parseEther(totalPrice.toString()).div(utils.parseUnits(totalAmount.toString()));
     // console.log("price",weiPerFrak.toString());
@@ -455,6 +455,7 @@ const MintPage = (props) => {
                       <ListCard
                         totalPrice={totalPrice}
                         setTotalPrice={setTotalPrice}
+                        totalAmount={totalAmount}
                         setTotalAmount={setTotalAmount}
                         listingProcess={listingProcess}
                         maxFraktions={MAX_FRACTIONS}
@@ -464,6 +465,7 @@ const MintPage = (props) => {
                       <ListCardAuction
                         totalPrice={totalPrice}
                         setTotalPrice={setTotalPrice}
+                        totalAmount={totalAmount}
                         setTotalAmount={setTotalAmount}
                         listingProcess={listingProcess}
                         maxFraktions={MAX_FRACTIONS}
