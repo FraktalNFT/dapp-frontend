@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 /**
  * Chakra UI
  */
-import { Box, Grid, HStack, VStack, Text, Spinner } from "@chakra-ui/react";
+import { Box, Icon, Grid, HStack, VStack, Text, Spinner } from "@chakra-ui/react";
 
 /**
  * Search
@@ -13,6 +13,8 @@ import { Box, Grid, HStack, VStack, Text, Spinner } from "@chakra-ui/react";
 import SelectSearch from 'react-select-search';
 import {useENSAddress} from "@/components/useENSAddress";
 import {getSubgraphData} from "@/utils/graphQueries";
+import {createListed} from "@/utils/nftHelpers";
+import {useRouter} from "next/router";
 
 /**
  *
@@ -23,36 +25,8 @@ const Search = (props) => {
 
     //const [isENSAddressValid, ethAddressFromENS] = useENSAddress(inputAddress);
     const [inputAddress, setInputAddress] = useState("");
-
-    const options = [
-        {
-            name: 'Fraktions',
-            type: 'group',
-            items: [{
-                value: 'FRAKTIONS - God Mode',
-                name: 'Test',
-                imageURL: 'https://image.fraktal.io/?width=48&height=48&fit=cover&image=https://bafybeihv4btcn3v2jmq3yuqvrghinfkigurfnztipxqrha6jf42347ixtu.ipfs.dweb.link',
-            }, {
-                value: 'FRAKTIONS - God Mode God Mode',
-                name: 'Picard',
-                imageURL: 'https://image.fraktal.io/?width=48&height=48&fit=cover&image=https://bafybeih7cg3w7v67634ewxbh3hciytfq44drbui52auoo6qkkzworsndri.ipfs.dweb.link',
-            }]
-        },
-        {
-            name: 'Artist',
-            type: 'group',
-            items: [{
-                value: 'Artist - soft',
-                name: 'Artist 1',
-                imageURL: 'https://image.fraktal.io/?width=48&height=48&fit=cover&image=https://bafybeigpgrdre5tztyrl4c2sgnd5b5yhccwvub5cdp4ep3gnqhy3rlcbbe.ipfs.dweb.link',
-            },
-                {
-                value: 'Artist - beer',
-                name: 'Artist 2',
-                imageURL: 'https://image.fraktal.io/?width=48&height=48&fit=cover&image=https://bafybeigpgrdre5tztyrl4c2sgnd5b5yhccwvub5cdp4ep3gnqhy3rlcbbe.ipfs.dweb.link',
-            }]
-        }
-    ];
+    const router = useRouter();
+    const options = [ ];
 
     const handleFilter = (items) => {
         return (searchValue) => {
@@ -85,7 +59,11 @@ const Search = (props) => {
 
         return (<button  {...valueProps}  type="button" className={'select-search__option'}>
             <span>
-                <img style={imgStyle} width="48" height="48" src={values.imageURL}/><span>{values.name}</span>
+                <img
+                    style={imgStyle}
+                    width="48" height="48"
+                    src={'https://image.fraktal.io/?width=48&height=48&fit=cover&image=' + values.imageURL}/>
+                <span>{values.name}</span>
             </span>
         </button>);
     }
@@ -95,28 +73,63 @@ const Search = (props) => {
      * @param args
      */
     async function handleChange(...args)  {
-        console.log(args[1])
-        switch (args[1].groupName) {
+        if (args[1] === null) {
+            return null;
+        }
+        const object = args[1];
+        switch (object.groupName) {
             case 'Fraktions':
-                const listedData = await getSubgraphData("search_items", "", {
-                name: "Fraktal"
-            });
-                console.log(listedData)
-
+                router.push("/nft/" + object.tokenAddress + '/details', null,  {scroll: false});
                 break;
             case 'Artist':
                 break;
         }
-    };
+    }
+
+    async function mapListed(listedItems) {
+        if (listedItems?.length >= 0) {
+            let objects = await Promise.all(
+                listedItems.map(x => {
+                    let res = createListed(x);
+                    if (typeof res !== "undefined") {
+                        return res;
+                    }
+                })
+            );
+            return objects;
+        }
+    }
+
+    async function getItems(query) {
+        if (query.length < 2) {
+            return options;
+        }
+        const listedData = await getSubgraphData("search_items", "", {
+            name: query + ':*'
+        });
+        let objects = await mapListed(listedData.fraktalSearch);
+        return [
+            {
+                name: 'Fraktions',
+                type: 'group',
+                items: objects
+            },
+            {
+                name: 'Artist',
+                type: 'group',
+                items: []
+            }
+        ]
+    }
 
     return (
         <HStack {...props}>
             <SelectSearch
+                options={[]}
                 renderOption={renderItem}
                 onChange={handleChange}
                 filterOptions={handleFilter}
-                emptyMessage="Not found"
-                options={options}
+                getOptions={getItems}
                 value=""
                 search
                 placeholder="Search Fraktal"

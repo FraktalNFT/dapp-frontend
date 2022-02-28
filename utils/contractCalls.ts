@@ -24,7 +24,7 @@ import {
 
 //tested
 const factoryAbi = [
-  "function mint(string urlIpfs, uint16 majority,  string _name, string _symbol)",
+  "function mint(string urlIpfs, uint16 majority, string _name, string _symbol)",
   "function importERC721(address _tokenAddress, uint256 _tokenId, uint16 majority)",
   "function importERC1155(address _tokenAddress, uint256 _tokenId, uint16 majority)",
   "function claimERC721(uint256 _tokenId)",
@@ -37,7 +37,7 @@ const marketAbi = [
   "function claimFraktal(address tokenAddress)",
   "function voteOffer(address offerer, address tokenAddress)",
   "function makeOffer(address tokenAddress, uint256 _value) payable",
-  "function listItem(address _tokenAddress,uint256 _price,uint256 _numberOfShares) external returns (bool)",
+  "function listItem(address _tokenAddress,uint256 _price,uint256 _numberOfShares, string _name) external returns (bool)",
   "function unlistItem(address tokenAddress)",
   "function maxPriceRegistered(address) view returns (uint256)",
   "function exportFraktal(address tokenAddress)",
@@ -322,7 +322,7 @@ export async function importFraktal(
   marketAddress
 ) {
   const signer = await loadSigner(provider);
-  const override = { gasLimit: 50000000000000000 };
+  const override = { gasLimit: 500000 };
   const customContract = new Contract(marketAddress, marketAbi, signer);
   try {
     let tx = await customContract.importFraktal(
@@ -410,13 +410,14 @@ export async function listItem(
   amount,
   price,
   provider,
-  marketAddress
+  marketAddress,
+  name
 ) {
   const override = { gasLimit: 300000 };
   const signer = await loadSigner(provider);
   const customContract = new Contract(marketAddress, marketAbi, signer);
   try {
-    let tx = await customContract.listItem(tokenAddress, price, amount, override);
+    let tx = await customContract.listItem(tokenAddress, price, amount, name, override);
     store.dispatch(callContract(LISTING_NFT, tx));
     let receipt = await processTx(tx);
     if (!receipt?.error) {

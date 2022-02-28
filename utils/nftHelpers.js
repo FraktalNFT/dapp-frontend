@@ -179,6 +179,7 @@ export async function createListed(data){
         amount: data.amount,
         seller: data.seller.id,
         name: nftMetadata.name,
+        value: nftMetadata.name,
         description: nftMetadata.description,
         imageURL: checkImageCID(nftMetadata.image),
       }

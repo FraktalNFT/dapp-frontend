@@ -4,7 +4,7 @@ const { CID } = require("ipfs-http-client");
 
 // const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.18';
 //const APIURL = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9';
-const APIURL = 'https://api.studio.thegraph.com/query/21128/test/0.2.2';
+const APIURL = 'https://api.studio.thegraph.com/query/21128/test/0.3.0';
 // const APIURL = 'https://gateway.testnet.thegraph.com/api/a2ae030e27fc11191339a53e73cea9c2/subgraphs/id/0x98e7910e754abd41ace110c23d679333779c2ff9-1'
 //const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9';
 const AUCTIONAPI = 'https://api.studio.thegraph.com/query/21128/test/0.1.1';
@@ -422,6 +422,7 @@ const listedItemsByFraktalId = gql`
   query($id: ID!) {
     listItems(where: { fraktal: $id }) {
       id
+      name
       price
       amount
       gains
@@ -449,11 +450,25 @@ const searchItems = gql`
   query($name: String!) {
     fraktalSearch(text: $name) {
       id
-      marketId
-      hash
-      createdAt
-      creator {
+      name
+      price
+      amount
+      gains
+      seller {
         id
+      }
+      fraktal {
+        id
+        hash
+        marketId
+        createdAt
+        status
+        fraktions {
+          amount
+        }
+        creator {
+          id
+        }
       }
     }
   }

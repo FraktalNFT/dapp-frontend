@@ -99,8 +99,18 @@ SEARCH
   z-index: 1;
 }
 
+.select-search__value::before {
+  background-image: url("https://www.w3schools.com/css/searchicon.png");
+  background-position: 15px 14px;
+  background-repeat: no-repeat;
+  width: 40px;
+  height: 40px;
+  content: "";
+  display: inline-block;
+  position: absolute;
+}
 .select-search__value::after {
-  content: "X";
+  content: "";
   display: inline-block;
   position: absolute;
   top: calc(50% - 9px);
@@ -116,8 +126,7 @@ SEARCH
   display: block;
   height: 48px;
   width: 100%;
-  padding: 0 40px 0 16px;
-  background: #fff;
+  padding: 0 40px 0 45px;
   border: 2px solid transparent;
   box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.15);
   border-radius: 24px;
@@ -211,7 +220,6 @@ SEARCH
 */
 .select-search__group-header {
   text-transform: uppercase;
-/*  background: #eee;*/
   padding: 20px 16px;
   font-style: normal;
   font-weight: 600;
@@ -249,9 +257,6 @@ SEARCH
 
 .select-search:not(.is-loading):not(.select-search--multiple)
 .select-search__value::after {
-  transform: rotate(45deg);
-  border-right: 1px solid #000;
-  border-bottom: 1px solid #000;
   pointer-events: none;
 }
 

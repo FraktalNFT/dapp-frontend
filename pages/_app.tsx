@@ -5,6 +5,7 @@ import { ChakraProvider, ComponentStyleConfig, extendTheme, VStack } from "@chak
 /**
  * Styles
  */
+import '@fortawesome/fontawesome-free/css/all.css'
 import "../styles/globals.css";
 import "../styles/fonts.css";
 /**
@@ -81,7 +82,7 @@ const customTheme = extendTheme({
  * @see https://nextjs.org/docs/advanced-features/measuring-performance
  */
 export function reportWebVitals(metric) {
-  console.log(metric);
+  //console.log(metric);
 }
 
 /**

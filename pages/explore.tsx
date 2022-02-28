@@ -282,7 +282,7 @@ const Marketplace: React.FC = () => {
             >
               Sort: {sortType}
             </MenuButton>
-            <MenuList>
+            <MenuList zIndex={2}>
                 {
                     SORT_TYPES.map((sortType) => (
                         <MenuItem onClick={() => handleSortSelect(sortType)}>
@@ -306,7 +306,7 @@ const Marketplace: React.FC = () => {
             >
               Listing: {listType}
             </MenuButton>
-            <MenuList>
+            <MenuList zIndex={2}>
               <MenuItem onClick={() => handleListingSelect(DEFAULT_TYPE)}>
                 {DEFAULT_TYPE}
               </MenuItem>

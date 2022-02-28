@@ -274,18 +274,21 @@ const MintPage = (props) => {
       fei,//shares
       weiPerFrak,//price
       provider,
-      marketAddress
-    ).then(() => {
-        setInterval(() => {
-            router.push(EXPLORE, null, {scroll: false});
-        }, 1000);
+      marketAddress,
+      name
+    ).then((response) => {
+        if (response.error) {
+            mintNFTRejected(response.error, listNewItem);
+        } else {
+            setInterval(() => {
+                router.push(EXPLORE, null, {scroll: false});
+            }, 1000);
+        }
     }).catch(error => {
       mintNFTRejected(error, listNewItem);
     });
   }
   async function listNewAuctionItem() {
-    //TODO - REMOVE CONSOLE LOG
-    console.log('Auction');
 
     listItemAuction(
       tokenMintedAddress,
