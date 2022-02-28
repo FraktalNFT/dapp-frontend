@@ -13,7 +13,6 @@ import FraktionOwners from "../../../components/fraktionOwners";
 import { Image } from "@chakra-ui/image";
 import { shortenHash, timezone } from "../../../utils/helpers";
 import { getSubgraphData } from "../../../utils/graphQueries";
-import { createObject2 } from "../../../utils/nftHelpers";
 import { useWeb3Context } from "../../../contexts/Web3Context";
 import {
   getBalanceFraktions,
@@ -27,196 +26,148 @@ import {
 import { useRouter } from "next/router";
 import LoadScreen from '../../../components/load-screens';
 import {EXPLORE} from "@/constants/routes";
-// import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
-// import Modal from '../../../components/modal';
-
+import { fetchNftMetadata } from '../../../utils/nftHelpers'
 
 const etherscanAddress = "https://rinkeby.etherscan.io/address/";
 
+interface Revenue {
+  id: string
+  value: BigInt
+  timestamp: BigInt
+  creator: string
+  tokenAddress: string
+  buyout: boolean
+}
+
+interface FraktalNft {
+  id: string
+  marketId: BigInt
+  hash: string
+  creator: {
+    id: string
+  }
+  collateral: string | null
+  owner: string
+  createdAt: BigInt
+  transactionHash: string
+  fraktions: []
+  revenues: Revenue[]
+  offers: []
+  status: string
+}
+
+interface MetaData {
+  name: string
+  description: string
+  image: string
+
+}
+
 export default function DetailsView() {
-  const router = useRouter();
-  const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
-  const [offers, setOffers] = useState();
+  const router = useRouter()
+  const { account, provider, marketAddress, factoryAddress } = useWeb3Context()
+  const [loading, setLoading] = useState(true)
+  const [tokenAddress, setTokenAddress] = useState("")
+  const [nft, setNft] = useState<FraktalNft>()
+  const [meta, setMeta] = useState<MetaData>()
+
   const [minOffer, setMinOffer] = useState<BigNumber>(BigNumber.from(0));
-  const [nftObject, setNftObject] = useState({});
-  const [tokenAddress, setTokenAddress] = useState<string>("");
   const [fraktionsListed, setFraktionsListed] = useState([]);
   const [userHasListed, setUserHasListed] = useState(false);
-  const [collateralNft, setCollateralNft] = useState();
   const [fraktionsApproved, setFraktionsApproved] = useState(false);
   const [factoryApproved, setFactoryApproved] = useState(false);
   const [userFraktions, setUserFraktions] = useState(0);
   const [isOwner, setIsOwner] = useState(false);
-  const [revenues, setRevenues] = useState();
-  const [isPageReady, setIsPageReady] = useState<boolean>(false);
-  // const [txInProgress, setTxInProgress] = useState(false);
   const [fraktionsIndex, setFraktionsIndex] = useState();
-  const [args, setArgs] = useState([]);
-  const [investors, setInvestors] = useState(0);
-  // use callbacks
-
-  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    // Component will get tokenAddress on second pass of useEffect
+    if(router.query.id) {
+      setTokenAddress(router.query.id.toString().toLowerCase())
+    }
+  })
 
   useEffect(() => {
-    if (router.isReady) {
-      let pathname = router.asPath;
-      let args = pathname.split("/");
-      do {
-        pathname = router.asPath;
-        setArgs(pathname.split("/"));
-        setIsPageReady(false);
-      } while (args[2] === "[id]" || typeof args[2] === "undefined");
-      // console.log('setting ready to true with:',args[2])
-      setIsPageReady(true);
+    if(tokenAddress !== "") {
+      setLoading(true)
+      getAllData()
     }
-  }, [router]);
+  }, [tokenAddress])
+
+  useEffect(() => {
+    if(account && provider) {
+      getContractData()
+    }
+  }, [account, provider])
+
+  useEffect(() => {
+    if(tokenAddress && account) {
+      getFraktions()
+    }
+  }, [tokenAddress, account])
+  
+  useEffect(() => {
+    if(tokenAddress && marketAddress && provider) {
+      getOffers()
+    }
+  }, [tokenAddress, marketAddress, provider])
+
+  const getAllData = async () => {
+    await getFraktal()
+    setLoading(false)
+  }
 
   async function getFraktal() {
-    const tokenAddress = args[2];
-    const tokenAddressSplitted = tokenAddress.toLocaleLowerCase();
-    setTokenAddress(tokenAddressSplitted);
-    let fraktionsFetch = await getSubgraphData(
-      "fraktions",
-      tokenAddressSplitted
-    );
+    let fraktionsFetch = await getSubgraphData("fraktions", tokenAddress)
     if (fraktionsFetch.listItems) {
       setFraktionsListed(fraktionsFetch.listItems);
     }
-    let fraktalFetch = await getSubgraphData("fraktal", tokenAddressSplitted);
-    if (
-      fraktalFetch &&
-      fraktalFetch.fraktalNfts &&
-      fraktalFetch.fraktalNfts[0]
-    ) {
-      let nftObjects = await createObject2(fraktalFetch.fraktalNfts[0]);
-      if (nftObjects) {
-        let investorsWBalance = nftObjects.balances.filter(x => {
-          return parseInt(x.amount) > 0;
-        });
-        // console.log('investors',investorsWBalance)
-        setInvestors(investorsWBalance.length);
-        setNftObject(nftObjects);
-      }
-      if (fraktalFetch.fraktalNfts[0].offers) {
-        setOffers(fraktalFetch.fraktalNfts[0].offers);
-      }
-      if (fraktalFetch.fraktalNfts[0].collateral) {
-        setCollateralNft(fraktalFetch.fraktalNfts[0].collateral);
-      }
-      let revenuesValid = fraktalFetch.fraktalNfts[0].revenues.filter(x => {
-        return x.value > 0;
-      });
-      if (revenuesValid) {
-        setRevenues(revenuesValid);
-        console.log({revenuesValid});
-        
-      }
-    }
+
+    const { fraktalNft } = await getSubgraphData("getFraktalByAddress", tokenAddress)
+    setNft(fraktalNft)
+
+    const meta = await fetchNftMetadata(fraktalNft.hash)
+    setMeta(meta)
   }
 
   async function getFraktions() {
-    if (fraktionsListed && account && tokenAddress) {
-      let fraktionsFetch = await getSubgraphData("fraktions", tokenAddress);
-      let userFraktionsListed = fraktionsFetch?.listItems?.find(
-        x => x.seller.id == account.toLocaleLowerCase()
-      );
-      if (userFraktionsListed && userFraktionsListed?.amount > 0) {
-        setUserHasListed(true);
-      }
-    } else setUserHasListed(false);
+    let fraktionsFetch = await getSubgraphData("fraktions", tokenAddress)
+    let userFraktionsListed = fraktionsFetch?.listItems?.find(({seller}) => 
+      seller.id == account.toLowerCase()
+    )
+
+    setUserHasListed((userFraktionsListed && userFraktionsListed?.amount > 0))
   }
 
   async function getContractData() {
-    if (tokenAddress && account && provider) {
-      try {
-        let userBalance = await getBalanceFraktions(
-          account,
-          provider,
-          tokenAddress
-        );
-        let index = await getFraktionsIndex(provider, tokenAddress);
-        let marketApproved = await getApproved(
-          account,
-          marketAddress,
-          provider,
-          tokenAddress
-        );
-        let factoryApproved = await getApproved(
-          account,
-          factoryAddress,
-          provider,
-          tokenAddress
-        );
-        let isOwner = await isFraktalOwner(account, provider, tokenAddress);
-        setFraktionsIndex(index);
-        setFraktionsApproved(marketApproved);
-        setFactoryApproved(factoryApproved);
-        setUserFraktions(userBalance);
-        setIsOwner(isOwner);
-      } catch (e) {
-        console.error("Error:", e);
-      }
+    try {
+      let userBalance = await getBalanceFraktions(account, provider, tokenAddress)
+      let index = await getFraktionsIndex(provider, tokenAddress)
+      let marketApproved = await getApproved(account, marketAddress, provider, tokenAddress);
+      let factoryApproved = await getApproved(account, factoryAddress, provider, tokenAddress);
+      let isOwner = await isFraktalOwner(account, provider, tokenAddress);
+      setFraktionsIndex(index);
+      setFraktionsApproved(marketApproved);
+      setFactoryApproved(factoryApproved);
+      setUserFraktions(userBalance);
+      setIsOwner(isOwner);
+    } catch (err) {
+      console.error(err);
     }
   }
 
   async function getOffers() {
-    if (tokenAddress && marketAddress) {
-      try {
-        let minPrice:BigNumber = await getMinimumOffer(
-          tokenAddress,
-          provider,
-          marketAddress
-        );
-
-        setMinOffer(minPrice);
-      } catch (err) {
-        console.error('unable to retreive minimum offer');
-      }
+    try {
+      let minPrice: BigNumber = await getMinimumOffer(tokenAddress, provider, marketAddress)
+      setMinOffer(minPrice);
+    } catch (err) {
+      console.error('unable to retreive minimum offer');
     }
   }
 
-  const [fraktionsGot, setFraktionsGot] = useState(false);
-  const [fraktalsGot, setFraktalsGot] = useState(false);
-  const [offersGot, setOffersGot] = useState(false);
-  const [contractDataGot, setContractDataGot] = useState(false);
-
-
-  useEffect(() => {
-    async function getAllData() {
-      if (isPageReady) {
-        if (!fraktionsGot) {
-          await getFraktions();
-          setFraktionsGot(true);
-        }
-        if (!fraktalsGot) {
-          await getFraktal();
-          setFraktalsGot(true);
-        }
-        if (!offersGot) {
-          await getOffers();
-          setOffersGot(true);
-        }
-        if (!contractDataGot) {
-          await getContractData();
-          setContractDataGot(true);
-        }
-        setIsLoading(false);
-      }
-    }
-    getAllData();
-  }, [
-    isPageReady,
-    account,
-    provider,
-    tokenAddress,
-    fraktionsListed,
-    nftObject,
-    marketAddress,
-  ]);
-
   async function callUnlistItem() {
     let tx = await unlistItem(tokenAddress, provider, marketAddress);
-    if (typeof tx !== "undefined") {
+    if (typeof tx !== undefined) {
       router.push("/my-nfts", null, {scroll: false});
     }
   }
@@ -232,14 +183,14 @@ export default function DetailsView() {
 
   return (
     <>
-      {isLoading && (
+      {loading && (
         <>
           <Box sx={{ display: `grid`, width: `100%`, placeItems: `center` }}>
             <Spinner size="xl" />
           </Box>
         </>
       )}
-      {!isLoading && (
+      {!loading && (
         <Box
           sx={{
             display: `grid`,
@@ -253,7 +204,7 @@ export default function DetailsView() {
                 <div className={styles.goBack}>← back to all NFTS</div>
               </Link>
               <Image
-                src={nftObject ? nftObject.imageURL : null}
+                src={meta.image}
                 w="400px"
                 h="400px"
                 style={{ borderRadius: "4px 4px 0px 0px", objectFit: `cover` }}
@@ -283,13 +234,9 @@ export default function DetailsView() {
                     <Text
                       sx={{ color: `hsla(224, 86%, 51%, 1)` }}
                       _hover={{ cursor: `pointer` }}
-                      onClick={() => router.push(`/artist/${nftObject.creator}`, null, {scroll: false})}
+                      onClick={() => router.push(`/artist/${nft.creator.id}`, null, {scroll: false})}
                     >
-                      {nftObject ?
-                        shortenHash(nftObject.creator)
-                        :
-                        "loading"
-                      }
+                      {shortenHash(nft.creator.id)}
                     </Text>
                   </div>
                 </VStack>
@@ -314,7 +261,7 @@ export default function DetailsView() {
                       lineHeight: "19px",
                     }}
                   >
-                    {nftObject ? timezone(nftObject.createdAt) : "loading"}
+                    {timezone(nft.createdAt)}
                   </div>
                 </VStack>
               </HStack>
@@ -340,7 +287,7 @@ export default function DetailsView() {
                       lineHeight: "19px",
                     }}
                   >
-                    <a href={etherscanAddress+nftObject.id+"/"}>{nftObject ? shortenHash(nftObject.id) : "loading"}</a>
+                    <a href={etherscanAddress+nft.id+"/"}>{shortenHash(nft.id)}</a>
                   </div>
               </VStack>
               </HStack>
@@ -350,11 +297,11 @@ export default function DetailsView() {
               <UserOwnership
                 fraktions={userFraktions}
                 isFraktalOwner={isOwner}
-                collateral={collateralNft}
+                collateral={nft.collateral}
                 isApproved={fraktionsApproved}
                 marketAddress={marketAddress}
                 tokenAddress={tokenAddress}
-                marketId={nftObject ? nftObject.marketId : null}
+                marketId={nft.marketId}
                 factoryAddress={factoryAddress}
                 provider={provider}
                 factoryApproved={factoryApproved}
@@ -369,7 +316,7 @@ export default function DetailsView() {
                   <FrakButton
                     disabled={fraktionsIndex == 0 || userFraktions < 1}
                     onClick={() =>
-                      router.push(`/nft/${nftObject.marketId}/list-item`, null, {scroll: false})
+                      router.push(`/nft/${nft.marketId}/list-item`, null, {scroll: false})
                     }
                   >
                     List Fraktions
@@ -387,7 +334,7 @@ export default function DetailsView() {
                 lineHeight: "64px",
               }}
             >
-              {nftObject ? nftObject.name : "Loading"}
+              {meta.name}
             </div>
             <div
               style={{
@@ -398,11 +345,9 @@ export default function DetailsView() {
                 marginBottom: "40px",
               }}
             >
-              {nftObject && nftObject.description
-                ? nftObject.description
-                : null}
+              {meta.description}
             </div>
-            {nftObject && nftObject.status == "open" ? (
+            {nft.status == "open" ? (
               <FraktionsList
                 fraktionsListed={fraktionsListed}
                 tokenAddress={tokenAddress}
@@ -416,36 +361,26 @@ export default function DetailsView() {
                 minPrice={minOffer}
                 fraktionsBalance={userFraktions}
                 fraktionsApproved={fraktionsApproved}
-                investors={investors}
-                offers={offers}
+                investors={nft.fraktions.filter(({amount}) => BigNumber.from(amount).gt(0)).length}
+                offers={nft.offers}
                 tokenAddress={tokenAddress}
                 marketAddress={marketAddress}
                 provider={provider}
-                itemStatus={
-                  nftObject && nftObject.status ? nftObject.status : null
-                }
+                itemStatus={nft.status}
               />
             </div>
             <div style={{ marginTop: "40px" }}>
               <RevenuesList
                 account={account}
-                revenuesCreated={revenues}
+                revenuesCreated={nft.revenues.filter(x => x.value)}
                 tokenAddress={tokenAddress}
                 marketAddress={marketAddress}
               />
             </div>
             <div style={{ marginTop: "40px" }}>
-              <FraktionOwners data={nftObject.balances} nftObject={nftObject} />
+              <FraktionOwners data={nft.fraktions} nftObject={nft} />
             </div>
           </Stack>
-          {/*
-      <Modal
-        open={txInProgress}
-        onClose={()=>setTxInProgress(false)}
-      >
-        Tx's in course!
-      </Modal>
-    */}
         </Box>
       )}
     </>
