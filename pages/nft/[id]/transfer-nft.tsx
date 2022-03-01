@@ -5,6 +5,7 @@ import { useUserContext } from "@/contexts/userContext";
 import { Box, Flex, Input, Text, Image } from "@chakra-ui/react";
 import FrakButton4 from "@/components/button4";
 import styles from "../../../styles/my-nfts.module.css"
+import { transferER721 } from "@/utils/contractCalls";
 
 interface NFT {
   collateral: string;
@@ -29,7 +30,13 @@ const TransferNFT = (): JSX.Element => {
 
   const [transferNFT, setTransferNFT] = useState<NFT | null>(null);
   const [recipientAddress, setRecipientAddress] = useState<string>('...')
+  const [submit, setSubmit] = useState<boolean>(false)
 
+  const handleSubmit = async() => {
+    setSubmit(true)
+    const {tokenId} = transferNFT
+   ;
+  }
 
   useEffect(() => {
     if (router.isReady) {
@@ -43,6 +50,7 @@ const TransferNFT = (): JSX.Element => {
       setIsPageReady(true);
     }
   }, [router, fraktals]);
+
 
 
   return (<>
@@ -133,7 +141,7 @@ const TransferNFT = (): JSX.Element => {
              marginTop="8px"
              status={recipientAddress ? "Transfer" : ""}
              disabled={recipientAddress.length && recipientAddress!== "..." ? false: true}
-             onClick={() => { }}
+             onClick={() => handleSubmit}
             >
              Transfer
             </FrakButton4>
