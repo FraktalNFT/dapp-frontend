@@ -1,9 +1,15 @@
-import { Box } from "@chakra-ui/react";
+import { Box, StackProps } from "@chakra-ui/react"
+import { forwardRef } from "react"
 
-export default function ArtistCard(props) {
+interface ArtistCardProps extends StackProps {
+  bg: string;
+}
+
+const ArtistCard = forwardRef<HTMLDivElement, ArtistCardProps>((props, ref) => {
   return (
     <>
       <Box
+        ref={ref}
         sx={{
           height: `250px`,
           width: `250px`,
@@ -20,5 +26,7 @@ export default function ArtistCard(props) {
         }}
       ></Box>
     </>
-  );
-}
+  )
+})
+
+export default ArtistCard
