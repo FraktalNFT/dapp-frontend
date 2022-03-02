@@ -88,7 +88,7 @@ const MintPage = (props) => {
   const [txResponse, setTxResponse] = useState({});
 
   // detect states (where is NFT and if its ready to list so send it here for listing!)
-
+  
   // FUNCTIONS FOR MINTING
   useEffect(() => {
     const ipfsClient = create({
@@ -467,13 +467,13 @@ const MintPage = (props) => {
             </Box>
             <div>
               {listItemCheck && (
-                <Tabs isFitted variant='enclosed'
-                onChange={(e)=>setIsAuction(!isAuction)}
-                >
+                <Tabs isFitted variant='enclosed'>
                   <TabList mb='1em'>
                     <Tab
+                      onClick={() => setIsAuction(false)}
                     >Fixed Price</Tab>
                     <Tab
+                      onClick={() => setIsAuction(true)}
                     >Auction</Tab>
                   </TabList>
                   <TabPanels>
