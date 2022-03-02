@@ -5,19 +5,18 @@ import { useUserContext } from "@/contexts/userContext";
 import { Box, Flex, Input, Text, Image } from "@chakra-ui/react";
 import FrakButton4 from "@/components/button4";
 import styles from "../../../styles/my-nfts.module.css"
-import { transferER721 } from "@/utils/contractCalls";
 
 interface NFT {
   collateral: string;
   collateralType: null;
-  createdAt: Date
-  creator: string// "0x1df4d4fa3d513de5d6a4e95a5dccc8cbb02569b3"
-  id: string,// "0x88b48f654c30e99bc2e4a1559b4dcf1ad93fa656"
-  imageURL: string// "https://lh3.googleusercontent.com/NVwZ-gPp7hrGd49QwUwsfVaFGC-5U2pDdhp5ONYB01V5JKc3vovI83n8Uu-nu2lEhbyDX05M_dmLNQpJJ6mlT7GdAFjze_PE9YzDzks"
-  marketId: string | number
-  name: string
-  tokenId: string // "13549653209390308151435410202515607127174271485949955940401382317821500850177"
-  token_schema: "ERC1155" | "ERC721"
+  createdAt: Date;
+  creator: string;
+  id: string;
+  imageURL: string;
+  marketId: string | number;
+  name: string;
+  tokenId: string;
+  token_schema: "ERC1155" | "ERC721";
 }
 
 const TransferNFT = (): JSX.Element => {
@@ -34,8 +33,7 @@ const TransferNFT = (): JSX.Element => {
 
   const handleSubmit = async() => {
     setSubmit(true)
-    const {tokenId} = transferNFT
-   ;
+    const {tokenId} = transferNFT;
   }
 
   useEffect(() => {
