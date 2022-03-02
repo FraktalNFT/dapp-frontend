@@ -23,7 +23,7 @@ const Header = () => {
         <Flex align="center">
           <HStack
             spacing="2.0rem"
-            mr="0.5rem"
+            mr="2.5rem"
             paddingTop="2"
             display={{ base: "none", md: "flex" }}
           >
