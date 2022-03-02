@@ -289,7 +289,8 @@ const MintPage = (props) => {
       utils.parseUnits(totalAmount),
       provider,
       marketAddress,
-      actionOpts
+      name,
+      actionOpts,
     ).then(() => {
         setTimeout(() => {
           if (tokenMintedAddress) {

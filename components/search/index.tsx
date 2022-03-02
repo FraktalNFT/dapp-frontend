@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 /**
  * Chakra UI
  */
-import { Box, Icon, Grid, HStack, VStack, Text, Spinner } from "@chakra-ui/react";
+import {  HStack} from "@chakra-ui/react";
 
 /**
  * Search
@@ -13,8 +13,13 @@ import { Box, Icon, Grid, HStack, VStack, Text, Spinner } from "@chakra-ui/react
 import SelectSearch from 'react-select-search';
 import {useENSAddress} from "@/components/useENSAddress";
 import {getSubgraphData} from "@/utils/graphQueries";
-import {createListed} from "@/utils/nftHelpers";
+import {createListed, createObject, createListedAuction} from "@/utils/nftHelpers";
 import {useRouter} from "next/router";
+import {resolveNFTRoute} from "@/constants/routes";
+
+const SEARCH_LISTED_ITEMS = 'Listed Items';
+const SEARCH_AUCTION_ITEMS = 'Auction Items';
+const SEARCH_FRAKTIONS_ITEMS = 'Fraktions';
 
 /**
  *
@@ -35,8 +40,16 @@ const Search = (props) => {
             }
             const updatedItems = items.map((list) => {
                 const newItems = list.items.filter((item) => {
-                    return item.name.toLowerCase().includes(searchValue.toLowerCase());
+                    if (item !== undefined) {
+                        return item.name;
+                    }
+                    /*if (list.name == SEARCH_LISTED_ITEMS) {
+                        return item.name.toLowerCase().includes(searchValue.toLowerCase());
+                    } else {
+                        return item.name;
+                    }*/
                 });
+
                 return { ...list, items: newItems };
             });
             return updatedItems;
@@ -77,48 +90,108 @@ const Search = (props) => {
             return null;
         }
         const object = args[1];
+        router.push(resolveNFTRoute(object.tokenAddress), null, {scroll: false});
         switch (object.groupName) {
             case 'Fraktions':
-                router.push("/nft/" + object.tokenAddress + '/details', null,  {scroll: false});
                 break;
             case 'Artist':
+
                 break;
         }
     }
 
+    //TODO - REFACTOR
     async function mapListed(listedItems) {
-        if (listedItems?.length >= 0) {
-            let objects = await Promise.all(
-                listedItems.map(x => {
-                    let res = createListed(x);
+        let objects = await Promise.all(
+        listedItems.map(x => {
+         let res = createListed(x);
+            if (typeof res !== "undefined") {
+                return res;
+                }
+            })
+        );
+        return objects;
+    }
+
+    //TODO - REFACTOR
+    async function mapAuction(listedItems) {
+        let objects = await Promise.all(
+            listedItems.map(x => {
+                x.hash = x.fraktal.hash;
+                let res = createListedAuction(x);
+                if (typeof res !== "undefined") {
+                    return res;
+                }
+            })
+        );
+        return objects;
+    }
+
+
+    //TODO - REFACTOR
+    async function mapFraktion(userSearch, creator) {
+        let objects = await Promise.all(
+            userSearch[0].fraktions.map(fraktion => {
+                console.log('creatorId', fraktion.nft.creator.id, creator)
+                if (fraktion.nft.creator.id.toLowerCase() !== creator.toLowerCase()) {
+                    let res = createObject(fraktion);
                     if (typeof res !== "undefined") {
                         return res;
                     }
-                })
-            );
-            return objects;
-        }
+                }
+
+            })
+        );
+        return objects;
     }
 
+    /**
+     * Get Items
+     * @param query
+     * @returns {Promise<any>}
+     */
     async function getItems(query) {
         if (query.length < 2) {
             return options;
         }
-        const listedData = await getSubgraphData("search_items", "", {
-            name: query + ':*'
+        const searchData = await getSubgraphData("search_items", "", {
+            name: "'" +query+ "'" + ':*'
         });
-        let objects = await mapListed(listedData.fraktalSearch);
+        let listedObjects;
+        let userFraktions;
+        let auctionsObjects;
+        if (searchData?.fraktalSearch !== undefined && searchData?.fraktalSearch.length > 0) {
+            listedObjects = await mapListed(searchData.fraktalSearch);
+            console.log('listedObjects', listedObjects)
+        }
+        if (searchData?.userSearch !== undefined && searchData?.userSearch.length > 0) {
+            //TODO - Validate Creator ID
+            const creator = query;
+            listedObjects = await mapListed(searchData.userSearch[0].listedItems);
+            auctionsObjects = await mapAuction(searchData.userSearch[0].auctionItems);
+            userFraktions = await mapFraktion(searchData?.userSearch, creator);
+        }
+
+        if (searchData?.auctionSearch !== undefined && searchData?.auctionSearch.length > 0) {
+            auctionsObjects = await mapAuction(searchData.auctionSearch);
+        }
+
         return [
             {
-                name: 'Fraktions',
+                name: SEARCH_LISTED_ITEMS,
                 type: 'group',
-                items: objects
+                items: listedObjects !== undefined ? listedObjects : []
             },
             {
-                name: 'Artist',
+                name: SEARCH_AUCTION_ITEMS,
                 type: 'group',
-                items: []
-            }
+                items: auctionsObjects !== undefined ? auctionsObjects : []
+            },
+            {
+                name: SEARCH_FRAKTIONS_ITEMS,
+                type: 'group',
+                items: userFraktions !== undefined ? userFraktions : []
+            },
         ]
     }
 

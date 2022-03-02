@@ -124,6 +124,7 @@ export async function createObject(data){
         createdAt: data.nft.createdAt,
         status: data.nft.status,
         name: nftMetadata.name,
+        value: nftMetadata.name,
         description: nftMetadata.description,
         imageURL: checkImageCID(nftMetadata.image),
       }
@@ -194,6 +195,7 @@ export async function createListedAuction(data){
     let nftMetadata = await fetchNftMetadata(data.hash)
     if(nftMetadata){
       return {
+        value: nftMetadata.name,
         amountOfShare: data.amountOfShare,
         endTime: data.endTime,
         hash: data.hash,

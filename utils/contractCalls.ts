@@ -55,7 +55,7 @@ const marketAbi = [
     'function redeemAuctionSeller(address _tokenAddress,address _seller,uint256 _sellerNonce) external',
     'function redeemAuctionParticipant(address _tokenAddress,address _seller,uint256 _sellerNonce) external',
     'function participateAuction(address tokenAddress,address seller,uint256 sellerNonce) external payable',
-    'function listItemAuction(address _tokenAddress,uint256 _reservePrice,uint256 _numberOfShares) external returns (uint256)',
+    'function listItemAuction(address _tokenAddress,uint256 _reservePrice,uint256 _numberOfShares, string _name) external returns (uint256)',
     'function unlistAuctionItem(address tokenAddress,uint256 sellerNonce) external',
     'function auctionReserve(address, uint256) public view returns (uint256)',
     'function participantContribution(address, uint256, address) public view returns (uint256)',
@@ -799,6 +799,7 @@ export async function listItemAuction(
   numberOfShares,
   provider,
   marketAddress,
+  name,
   opts?: ActionOpts
 ) {
   const signer = await loadSigner(provider);
@@ -807,7 +808,8 @@ export async function listItemAuction(
     let tx = await customContract.listItemAuction(
       tokenAddress,
       reservePrice,
-      numberOfShares
+      numberOfShares,
+      name
     );
     store.dispatch(callContract(LISTING_NFT, tx, opts));
     let receipt = await processTx(tx);
