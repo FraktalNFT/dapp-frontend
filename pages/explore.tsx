@@ -30,7 +30,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
  */
 import { utils } from "ethers";
 import { getSubgraphData } from "../utils/graphQueries";
-import { createListed,createListedAuction } from "../utils/nftHelpers";
+import { fetchNftMetadata } from "../utils/nftHelpers";
 
 /**
  * Sorting
@@ -52,7 +52,7 @@ const listingOptions = [
   { label: "Fixed Price", filter: (item) => !item.hasOwnProperty("end")},
 ]
 
-const hasNonZeroReservePrice = ({reservePrice}) => (!!reservePrice)
+const hasNonZeroReservePrice = ({price}) => (!!Number(price))
 
 const canSelfCheck = (thing, index, self) => (index === self.findIndex((t) => (
   JSON.stringify(t) === JSON.stringify(thing)
@@ -104,42 +104,50 @@ const Marketplace: React.FC = () => {
 
     updateItems(sortingOptionId, listingOptionId)
   }, [sortingOptionId, listingOptionId])
-  async function getAll() {
-    setLoading(true)
-    await getItems()
-    setLoading(false)
-  }
+  
 
   useEffect(() => {
+    const getAll = async function () {
+      setLoading(true)
+      await getItems()
+      setLoading(false)
+    }
+
     getAll()
   },[])
 
   const getItems = async () => {
     try {
       const NOW = Math.ceil(Date.now() / 1000);
-      const { auctions = [] } = await getSubgraphData("auctions","");
-    
-      const activeAuctions = await Promise.all(auctions
+      const { auctions = [] } = await getSubgraphData("auctions");
+
+      const activeAuctions = auctions
         .filter(hasNonZeroReservePrice)
-        .filter(x => Number(x.endTime) - NOW)
-        .map(async auction => {
-          let hash = await getSubgraphData("auctionsNFT", auction.tokenAddress);
-          
-          return createListedAuction({
-            hash: hash.fraktalNft.hash,
-            ...auction
-          })
-        }))
+        .filter(x => Number(x.end) - NOW)
 
       // gets 100 nfts ordered by createdAt (desc)
-      const { listItems } = await getSubgraphData("listed_items", "");
+      const { listItems } = await getSubgraphData("listed_items");
       // this goes in the graphql query
-      const listings = (await Promise.all(listItems
+      const listings = listItems
         .filter(nft => (nft.fraktal.status == "open"))
-        .map(nft => (createListed(nft)))
-      )).filter(nft => nft != undefined)
 
-      const allListings = activeAuctions.concat(listings)
+      const allListings = await Promise.all(activeAuctions.concat(listings)
+      .filter(nft => nft.fraktal.hash != "")
+      .map((nft, idx) => {
+        const { hash } = nft.fraktal
+        if(hash.startsWith('Qm')) {
+          nft.fraktal.hash = `https://ipfs.io/ipfs/${hash}`
+        } else if (hash.startsWith("ipfs://Qm")) {
+          nft.fraktal.hash = hash.replace("ipfs://Qm", "https://ipfs.io/ipfs/Qm")
+        }
+
+        return nft
+      })
+      .map(async nft => {
+        const meta = await fetchNftMetadata(nft.fraktal.hash)
+        return {...nft, ...meta}
+      }))
+
       setNftItems(allListings)
     } catch (err) {
       console.error(err)
@@ -254,13 +262,13 @@ const Marketplace: React.FC = () => {
                       if(item.end){//for auction
                         return (
                           <Anchor
-                            key={`a-${item.id}`}
+                            key={`nft-${index}-${item.id}`}
                             href={`/nft/${item.seller}-${item.sellerNonce}/auction`}
                           >
                             <NFTAuctionItem
                               name={item.name}
-                              amount={utils.formatEther(item.shares)}
-                              imageURL={item.imageURL}
+                              shares={utils.formatEther(item.shares)}
+                              image={item.image}
                               end={item.end}
                               item={item}
                             />
@@ -269,14 +277,14 @@ const Marketplace: React.FC = () => {
                       } else {
                         return (
                           <Anchor
-                            key={`a-${item.id}`}
-                            href={`/nft/${item.fraktal}/details`}
+                            key={`nft-${index}-${item.id}`}
+                            href={`/nft/${item.fraktal.id}/details`}
                           >
                             <NFTItem
                               name={item.name}
-                              amount={item.amount}
+                              shares={item.shares}
                               price={item.price}
-                              imageURL={item.imageURL}
+                              image={item.image}
                               wait={250 * (index + 1)}
                               item={null}
                             />

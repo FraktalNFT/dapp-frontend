@@ -68,8 +68,7 @@ export default function DetailsView() {
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context()
   const [loading, setLoading] = useState(true)
   const [tokenAddress, setTokenAddress] = useState("")
-  const [nft, setNft] = useState<FraktalNft>()
-  const [meta, setMeta] = useState<MetaData>()
+  const [nft, setNft] = useState<FraktalNft & MetaData>()
 
   const [minOffer, setMinOffer] = useState<BigNumber>(BigNumber.from(0));
   const [fraktionsListed, setFraktionsListed] = useState([]);
@@ -88,82 +87,77 @@ export default function DetailsView() {
   })
 
   useEffect(() => {
+
+    const getFraktal = async () => {
+      let fraktionsFetch = await getSubgraphData("fraktions", tokenAddress)
+      if (fraktionsFetch.listItems) {
+        setFraktionsListed(fraktionsFetch.listItems);
+      }
+  
+      const { fraktalNft } = await getSubgraphData("getFraktalByAddress", tokenAddress)
+      const meta = await fetchNftMetadata(fraktalNft.hash)
+      setNft({...fraktalNft, ...meta})
+    }
+
+    setLoading(true)
     if(tokenAddress !== "") {
-      setLoading(true)
-      getAllData()
+      getFraktal().catch(console.error)
     }
   }, [tokenAddress])
 
   useEffect(() => {
+    if(nft) {
+      setLoading(false)
+    }
+  }, [nft])
+
+  useEffect(() => {
+    const getContractData = async () => {
+      let userBalance = await getBalanceFraktions(account, provider, tokenAddress)
+      let index = await getFraktionsIndex(provider, tokenAddress)
+      let _marketApproved = await getApproved(account, marketAddress, provider, tokenAddress);
+      let _factoryApproved = await getApproved(account, factoryAddress, provider, tokenAddress);
+      let _isOwner = await isFraktalOwner(account, provider, tokenAddress);
+      setFraktionsIndex(index);
+      setFraktionsApproved(_marketApproved);
+      setFactoryApproved(_factoryApproved);
+      setUserFraktions(userBalance);
+      setIsOwner(_isOwner);
+    }
+
     if(account && provider) {
-      getContractData()
+      getContractData().catch(console.error)
     }
   }, [account, provider])
 
   useEffect(() => {
+    const getFraktions = async () => {
+      let fraktionsFetch = await getSubgraphData("fraktions", tokenAddress)
+      let userFraktionsListed = fraktionsFetch?.listItems?.find(({seller}) => 
+        seller.id == account.toLowerCase()
+      )
+  
+      setUserHasListed((userFraktionsListed && userFraktionsListed?.amount > 0))
+    }
+
     if(tokenAddress && account) {
-      getFraktions()
+      getFraktions().catch(console.error)  
     }
   }, [tokenAddress, account])
   
   useEffect(() => {
+    const getOffers = async () => {
+      try {
+        let minPrice: BigNumber = await getMinimumOffer(tokenAddress, provider, marketAddress)
+        setMinOffer(minPrice);
+      } catch (err) {
+        console.error('unable to retreive minimum offer');
+      }
+    }
     if(tokenAddress && marketAddress && provider) {
-      getOffers()
+      getOffers().catch(console.error)
     }
   }, [tokenAddress, marketAddress, provider])
-
-  const getAllData = async () => {
-    await getFraktal()
-    setLoading(false)
-  }
-
-  async function getFraktal() {
-    let fraktionsFetch = await getSubgraphData("fraktions", tokenAddress)
-    if (fraktionsFetch.listItems) {
-      setFraktionsListed(fraktionsFetch.listItems);
-    }
-
-    const { fraktalNft } = await getSubgraphData("getFraktalByAddress", tokenAddress)
-    setNft(fraktalNft)
-
-    const meta = await fetchNftMetadata(fraktalNft.hash)
-    setMeta(meta)
-  }
-
-  async function getFraktions() {
-    let fraktionsFetch = await getSubgraphData("fraktions", tokenAddress)
-    let userFraktionsListed = fraktionsFetch?.listItems?.find(({seller}) => 
-      seller.id == account.toLowerCase()
-    )
-
-    setUserHasListed((userFraktionsListed && userFraktionsListed?.amount > 0))
-  }
-
-  async function getContractData() {
-    try {
-      let userBalance = await getBalanceFraktions(account, provider, tokenAddress)
-      let index = await getFraktionsIndex(provider, tokenAddress)
-      let marketApproved = await getApproved(account, marketAddress, provider, tokenAddress);
-      let factoryApproved = await getApproved(account, factoryAddress, provider, tokenAddress);
-      let isOwner = await isFraktalOwner(account, provider, tokenAddress);
-      setFraktionsIndex(index);
-      setFraktionsApproved(marketApproved);
-      setFactoryApproved(factoryApproved);
-      setUserFraktions(userBalance);
-      setIsOwner(isOwner);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  async function getOffers() {
-    try {
-      let minPrice: BigNumber = await getMinimumOffer(tokenAddress, provider, marketAddress)
-      setMinOffer(minPrice);
-    } catch (err) {
-      console.error('unable to retreive minimum offer');
-    }
-  }
 
   async function callUnlistItem() {
     let tx = await unlistItem(tokenAddress, provider, marketAddress);
@@ -204,7 +198,7 @@ export default function DetailsView() {
                 <div className={styles.goBack}>← back to all NFTS</div>
               </Link>
               <Image
-                src={meta.image}
+                src={nft.image}
                 w="400px"
                 h="400px"
                 style={{ borderRadius: "4px 4px 0px 0px", objectFit: `cover` }}
@@ -334,7 +328,7 @@ export default function DetailsView() {
                 lineHeight: "64px",
               }}
             >
-              {meta.name}
+              {nft.name}
             </div>
             <div
               style={{
@@ -345,7 +339,7 @@ export default function DetailsView() {
                 marginBottom: "40px",
               }}
             >
-              {meta.description}
+              {nft.description}
             </div>
             {nft.status == "open" ? (
               <FraktionsList

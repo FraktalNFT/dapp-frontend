@@ -31,7 +31,7 @@ import {
 /**
  * NFT HELPER
  */
-import { createObject2, createListed } from "../utils/nftHelpers";
+import { fetchNftMetadata } from "../utils/nftHelpers";
 /**
  * API GRAPH QUERY
  */
@@ -59,19 +59,19 @@ const LandingPage = () => {
     const [nftData, setNftData] = useState({});
     const router = useRouter();
 
-    const getItem = async () => {
-        //TODO - Get the most popular NFT without listing the items
-        const data = await getSubgraphData("listed_items", "");
-        const mostPopular = getMostPopular(data.listItems)[0];
-        let nftObjects = await createListed(mostPopular);
-        setNftData(nftObjects);
-    };
-
     const getMostPopular = (items) => {
-        return items.sort((a, b) => (a.fraktal.fraktions.length > b.fraktal.fraktions.length ? -1 : 1));
+        return items.sort((a, b) => b.fraktal.fraktions.length - a.fraktal.fraktions.length);
     };
 
     useEffect(()=>{
+        const getItem = async () => {
+            //TODO - Get the most popular NFT without listing the items
+            const data = await getSubgraphData("listed_items");
+            const [mostPopular] = getMostPopular(data.listItems);
+            const meta = await fetchNftMetadata(mostPopular.fraktal.hash);
+            setNftData({...mostPopular, ...meta});
+        };
+
         getItem();
     }, []);
 
@@ -120,9 +120,9 @@ const LandingPage = () => {
                                 <NFTItem
                                     height="50rem"
                                     name={nftData.name}
-                                    amount={nftData.amount}
+                                    shares={nftData.shares}
                                     price={nftData.price}
-                                    imageURL={nftData.imageURL}
+                                    image={nftData.image}
                                     item={null}
                                 />
                             </Anchor>

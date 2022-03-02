@@ -30,9 +30,9 @@ import Countdown, { zeroPad } from 'react-countdown';
 interface NFTItemProps extends StackProps {
   item: any;
   name: string;
-  amount: any;
+  shares: any;
   price: number;
-  imageURL: string;
+  image: string;
   // CTAText?: string;
   // wait: number;
   end: number;
@@ -43,9 +43,9 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
   (
     {
       item,
-      amount,
+      shares,
       price,
-      imageURL,
+      image,
       name,
       onClick,
       CTAText,
@@ -91,8 +91,6 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
 
     const renderer = ({ days, hours, minutes, seconds, completed }) => {
       if (completed) {
-        // Render a completed state
-        setEnded(true);
         return <div>Ended</div>;
       } else {
         // Render a countdown
@@ -144,7 +142,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 }
               >
                 <Image
-                  src={'https://image.fraktal.io/?height=350&image=' + imageURL}
+                  src={'https://image.fraktal.io/?height=350&image=' + image}
                   width="100%"
                   height="100%"
                   objectFit="cover"
@@ -195,9 +193,9 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 </Tag>
               </Flex>
               <Flex>
-                {amount != 0 && (
+                {shares != 0 && (
                   <Text className="medium-12">
-                    {amount == 0 ? 'Not' : `${amount / 100}%`} Available
+                    {`${shares / 100}%`} Available
                   </Text>
                 )}
 

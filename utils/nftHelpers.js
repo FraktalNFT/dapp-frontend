@@ -17,7 +17,7 @@ const binArrayToJson = function(binArray)
     return JSON.parse(str)
 };
 
-function checkImageCID(cid){ // this does not handle others than IPFS... correct THAT!
+export function checkImageCID(cid){ // this does not handle others than IPFS... correct THAT!
   let correctedCid
   if(cid.startsWith('https://ipfs.io/')){
     let splitted = cid.split('https://ipfs.io/ipfs/')
@@ -54,16 +54,26 @@ export async function fetchNftMetadata(hash){
       chunks.image = checkImageCID(chunks.image)
     }
     return chunks;
+  } else if (hash.startsWith("ipfs://Qm")) {
+    let uri = hash.replace("ipfs://Qm", "https://ipfs.io/ipfs/Qm")
+    const res = await fetch(uri)
+    let data = await res.json()
+    if(data.image) {
+      data.image = checkImageCID(data.image)
+    }
+    return data
   } else {
     let res = await fetch(hash)
-    if(res){
-      return res.json()
+    let data = await res.json()
+    if(data.image) {
+      data.image = checkImageCID(data.image)
     }
+    return data
   }
 };
 
 async function getFraktalData(address){
-  const { fraktalNft } = await getSubgraphData('fraktal', address)
+  const { fraktalNft } = await getSubgraphData("getFraktalByAddress", address)
   const {marketId, collateral} = fraktalNft
   return {
     fraktalId: marketId,
@@ -155,10 +165,8 @@ export async function createObject2(data){
         object.imageURL = checkImageCID(nftMetadata.image)
     }
     return object;
-  } catch{
-    //TODO - REMOVE THE CONSOLE.log
-    console.log('Error fetching 2 ',data.hash);
-    return null;
+  } catch (err) {
+    console.error(err);
   }
 };
 

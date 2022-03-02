@@ -140,7 +140,10 @@ const creators_review = gql`
   query {
     users {
       id
-      fraktals
+      fraktals {
+        id
+        hash
+      }
       created {
         id
         marketId
@@ -155,12 +158,17 @@ const creators_small_review = gql`
   query {
     users(first: 10) {
       id
-      fraktals
+      fraktals {
+        id
+        hash
+      }
       created {
         id
         marketId
         hash
-        creator
+        creator {
+          id
+        }
         createdAt
       }
     }
@@ -481,14 +489,25 @@ const limitedAuctions = gql`
 const listedAuctions = gql`
   query {
     auctions {
-      seller
-      fraktal
+      seller {
+        id
+      }
+      fraktal {
+        id
+        hash
+        marketId
+        createdAt
+        status
+        fraktions {
+          amount
+        }
+      }
       price
       shares
       end
       sellerNonce
       participants
-      }
+    }
   }
 `;
 

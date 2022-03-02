@@ -34,9 +34,9 @@ import {Workflow} from "../../types/workflow";
 interface NFTItemProps extends StackProps {
   item: FrakCard;
   name: string;
-  amount: string;
+  shares: string;
   price: number;
-  imageURL: string;
+  image: string;
   CTAText?: string;
   wait?: number;
   height?: string;
@@ -46,9 +46,9 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
   (
     {
       item,
-      amount,
+      shares,
       price,
-      imageURL,
+      image,
       name,
       onClick,
       CTAText,
@@ -94,16 +94,16 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
       });
     };
 
-    let showAmount = '';
-    if (amount != undefined) {
-      const BIamount = utils.parseUnits(String(amount), 'wei');
+    let showShares = '';
+    if (shares != undefined) {
+      const BIamount = utils.parseUnits(String(shares), 'wei');
       if (BIamount.lt(utils.parseEther('1.0'))) {
-        showAmount = '<0.01';
+        showShares = '<0.01';
       } else {
-        showAmount = utils.formatEther(BIamount.div(100));
+        showShares = utils.formatEther(BIamount.div(100));
       }
     } else {
-      showAmount = '';
+      showShares = '';
     }
 
     // useEffect(() => {
@@ -167,7 +167,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 }
               >
                 <Image
-                  src={'https://image.fraktal.io/?height=350&image=' + imageURL}
+                  src={'https://image.fraktal.io/?height=350&image=' + image}
                   width="100%"
                   height="100%"
                   objectFit="cover"
@@ -217,8 +217,8 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 </Tag>
               </Flex>
               <Flex>
-                {amount && (
-                  <Text className="medium-12">{showAmount}% Available</Text>
+                {shares && (
+                  <Text className="medium-12">{showShares}% Available</Text>
                 )}
 
                 <Spacer />
