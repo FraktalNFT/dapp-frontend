@@ -61,7 +61,7 @@ const TabsCard = ({
           </Box>
           {secondaryText && (
             <Box paddingLeft="10px" margin="auto">
-              <Link href="https://app.uniswap.org" target="_blank">
+              <Link href="https://app.uniswap.org/#/add/v2/ETH/0x1f81f8f262714cc932141c7C79495B481eF27258?chain=mainnet" target="_blank">
                 {secondaryText}
               </Link>
             </Box>
