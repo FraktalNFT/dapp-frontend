@@ -42,6 +42,7 @@ import {
   MINT_NFT,
   IMPORT_FRAKTAL,
   rejectContract,
+  closeModal,
 } from '../redux/actions/contractActions';
 const { create } = require('ipfs-http-client');
 const MAX_FRACTIONS = 10000;
@@ -52,7 +53,7 @@ import { Workflow } from 'types/workflow';
 const actionOpts = { workflow: Workflow.MINT_NFT };
 
 const MintPage = (props) => {
-  const { mintNFTRejected, tokenRejected, transferRejected } = props;
+  const { mintNFTRejected, tokenRejected, transferRejected, closeModal } = props;
   const { isMinting, setIsMinting } = useMintingContext();
   const router = useRouter();
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
@@ -109,6 +110,19 @@ const MintPage = (props) => {
     await minter(metadata);
   }
 
+  function redirectToNewNFT(tokenAddress) {
+    setTimeout(() => {
+      closeModal()
+      if (tokenAddress) {
+        router.push(resolveNFTRoute(tokenAddress), null, {
+          scroll: false,
+        });
+      } else {
+        router.push(EXPLORE, null, { scroll: false });
+      }
+    }, 2000);
+  }
+
   async function minter(metadata) {
     let metadataCid = await uploadAndPin(JSON.stringify(metadata));
     if (metadataCid) {
@@ -118,7 +132,7 @@ const MintPage = (props) => {
         metadataCid.cid.toString(),
         provider,
         factoryAddress,
-        actionOpts
+        {...actionOpts, custom: { totalStep: listItemCheck ? 4 : 1 }}
       )
         .then((response) => {
           if (!response?.error) {
@@ -137,6 +151,11 @@ const MintPage = (props) => {
             let mintingArrayString = JSON.stringify(mintingArray);
             window?.localStorage.setItem('mintingNFTs', mintingArrayString);
             setMinted(true);
+
+            // Deselected sell fraktions option
+            if (!listItemCheck) {
+              redirectToNewNFT(response)
+            }
           }
         })
         .catch((e) => {
@@ -240,15 +259,7 @@ const MintPage = (props) => {
       actionOpts
     )
       .then(() => {
-        setTimeout(() => {
-          if (tokenMintedAddress) {
-            router.push(resolveNFTRoute(tokenMintedAddress), null, {
-              scroll: false,
-            });
-          } else {
-            router.push(EXPLORE, null, { scroll: false });
-          }
-        }, 1000);
+        redirectToNewNFT(tokenMintedAddress)
       })
       .catch((error) => {
         mintNFTRejected(error, listNewItem);
@@ -267,15 +278,7 @@ const MintPage = (props) => {
       actionOpts
     )
       .then(() => {
-        setTimeout(() => {
-          if (tokenMintedAddress) {
-            router.push(resolveNFTRoute(tokenMintedAddress), null, {
-              scroll: false,
-            });
-          } else {
-            router.push(EXPLORE, null, { scroll: false });
-          }
-        }, 1000);
+        redirectToNewNFT(tokenMintedAddress)
       })
       .catch((error) => {
         mintNFTRejected(error, listNewAuctionItem);
@@ -576,6 +579,9 @@ const mapDispatchToProps = (dispatch) => {
         })
       );
     },
+    closeModal: () => {
+      dispatch(closeModal())
+    }
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(MintPage);
