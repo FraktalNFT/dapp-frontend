@@ -217,6 +217,7 @@ const Marketplace: React.FC = () => {
         }
 
         const auctionItems = await mapAuctionToFraktal(auctionData);
+        console.log('auctionsItem', auctionItems)
 
         let dataOnSale;
         if (listedData?.listItems?.length != undefined) {

@@ -17,9 +17,9 @@ import {createListed, createObject, createListedAuction} from "@/utils/nftHelper
 import {useRouter} from "next/router";
 import {resolveNFTRoute} from "@/constants/routes";
 
-const SEARCH_LISTED_ITEMS = 'Listed Items';
-const SEARCH_AUCTION_ITEMS = 'Auction Items';
-const SEARCH_FRAKTIONS_ITEMS = 'Fraktions';
+const SEARCH_LISTED_ITEMS = 'Fixed Price';
+const SEARCH_AUCTION_ITEMS = 'Auctions';
+const SEARCH_FRAKTIONS_ITEMS = 'Not for Sale';
 
 /**
  *
@@ -105,7 +105,7 @@ const Search = (props) => {
         let objects = await Promise.all(
         listedItems.map(x => {
          let res = createListed(x);
-            if (typeof res !== "undefined") {
+            if (typeof res !== "undefined" && x.amount > 0) {
                 return res;
                 }
             })
@@ -132,7 +132,6 @@ const Search = (props) => {
     async function mapFraktion(userSearch, creator) {
         let objects = await Promise.all(
             userSearch[0].fraktions.map(fraktion => {
-                console.log('creatorId', fraktion.nft.creator.id, creator)
                 if (fraktion.nft.creator.id.toLowerCase() !== creator.toLowerCase()) {
                     let res = createObject(fraktion);
                     if (typeof res !== "undefined") {
@@ -145,6 +144,17 @@ const Search = (props) => {
         return objects;
     }
 
+    async function mapNotForSale(listedItems) {
+        let objects = await Promise.all(
+            listedItems.map(x => {
+                let res = createListed(x);
+                if (typeof res !== "undefined" && x.amount == 0) {
+                    return res;
+                }
+            })
+        );
+        return objects;
+    }
     /**
      * Get Items
      * @param query
@@ -158,24 +168,23 @@ const Search = (props) => {
             name: "'" +query+ "'" + ':*'
         });
         let listedObjects;
-        let userFraktions;
+        let notForSale = [];
         let auctionsObjects;
         if (searchData?.fraktalSearch !== undefined && searchData?.fraktalSearch.length > 0) {
             listedObjects = await mapListed(searchData.fraktalSearch);
-            console.log('listedObjects', listedObjects)
+            notForSale = await mapNotForSale(searchData?.fraktalSearch);
         }
         if (searchData?.userSearch !== undefined && searchData?.userSearch.length > 0) {
             //TODO - Validate Creator ID
             const creator = query;
             listedObjects = await mapListed(searchData.userSearch[0].listedItems);
             auctionsObjects = await mapAuction(searchData.userSearch[0].auctionItems);
-            userFraktions = await mapFraktion(searchData?.userSearch, creator);
+            notForSale = await mapFraktion(searchData?.userSearch, creator);
         }
 
         if (searchData?.auctionSearch !== undefined && searchData?.auctionSearch.length > 0) {
             auctionsObjects = await mapAuction(searchData.auctionSearch);
         }
-
         return [
             {
                 name: SEARCH_LISTED_ITEMS,
@@ -190,7 +199,7 @@ const Search = (props) => {
             {
                 name: SEARCH_FRAKTIONS_ITEMS,
                 type: 'group',
-                items: userFraktions !== undefined ? userFraktions : []
+                items: notForSale !== undefined ? notForSale : []
             },
         ]
     }
