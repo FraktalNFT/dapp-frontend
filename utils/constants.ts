@@ -63,6 +63,7 @@ export const networkCurrencies = {
     symbol: "ETH",
   },
 };
+
 export const chainUrls = {
   1: {
     rpc: "https://mainnet.infura.io/v3/" + process.env.NEXT_PUBLIC_INFURA_ID,
