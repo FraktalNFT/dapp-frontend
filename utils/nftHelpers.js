@@ -4,6 +4,7 @@ import { getSubgraphData } from './graphQueries';
 const { create, CID } = require('ipfs-http-client');
 
 let infuraAuth;
+console.log('envs', process.env.NEXT_PUBLIC_INFURA_PROJECT_ID )
 if (process.env.NEXT_PUBLIC_INFURA_PROJECT_ID !== undefined && process.env.NEXT_PUBLIC_INFURA_PROJECT_SECRET !== undefined) {
   infuraAuth = 'Basic ' + Buffer.from(process.env.NEXT_PUBLIC_INFURA_PROJECT_ID + ':' + process.env.NEXT_PUBLIC_INFURA_PROJECT_SECRET).toString('base64')
 }
