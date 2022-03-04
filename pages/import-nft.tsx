@@ -2,6 +2,7 @@ import FrakButton4 from '@/components/button4';
 import ListCardAuction from '@/components/listCardAuction';
 import NFTImportCardOS from '@/components/nft-importcard-opensea';
 import NFTCard from '@/components/nftCard';
+import { connect } from 'react-redux';
 
 import {
   CREATE_NFT,
@@ -37,10 +38,10 @@ import {
   IMPORT_NFT,
   LISTING_NFT,
   rejectContract,
+  closeModal,
 } from '../redux/actions/contractActions';
 
 import store from '../redux/store';
-
 import {
   approveMarket,
   getIndexUsed,
@@ -55,7 +56,7 @@ const MAX_FRACTIONS = 10000;
 
 const actionOpts = { workflow: Workflow.IMPORT_NFT };
 
-export default function ImportNFTPage() {
+function ImportNFTPage() {
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
   const { fraktals, fraktions, nfts, balance } = useUserContext();
 
@@ -163,8 +164,9 @@ export default function ImportNFTPage() {
       setIsNFTImported(true);
       if (!isIntendedForListing) {
         setTimeout(() => {
+          closeModal()
           router.push(resolveNFTRoute(address));
-        }, 1000);
+        }, 2000);
       }
     }
   }
@@ -225,8 +227,9 @@ export default function ImportNFTPage() {
       .then((receipt) => {
         setIsNFTListed(true);
         setTimeout(() => {
+          closeModal()
           router.push(resolveNFTRoute(tokenMintedAddress));
-        }, 1000);
+        }, 2000);
       })
       .catch((error) => {
         store.dispatch(
@@ -247,6 +250,7 @@ export default function ImportNFTPage() {
       .then((receipt) => {
         setIsNFTListed(true);
         setTimeout(() => {
+          closeModal()
           router.push(resolveAuctionNFTRoute(tokenMintedAddress));
         }, 1000);
       })
@@ -591,3 +595,13 @@ export default function ImportNFTPage() {
     </>
   );
 }
+
+const mapStateToProps = (state) => ({});
+const mapDispatchToProps = (dispatch) => {
+  return {
+    closeModal: () => {
+      dispatch(closeModal())
+    }
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(ImportNFTPage);
