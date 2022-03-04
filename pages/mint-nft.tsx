@@ -9,9 +9,14 @@ import { useWeb3Context } from '../contexts/Web3Context';
 import { pinByHash } from '../utils/pinataPinner';
 import { createNFT } from '../utils/contractCalls';
 import { useRouter } from 'next/router';
-const { create } = require('ipfs-http-client');
 import { MY_NFTS } from '@/constants/routes';
 import { Workflow } from 'types/workflow';
+
+/**
+ * IPFS
+ */
+const { create } = require('ipfs-http-client');
+import {infuraConfig} from "@/utils/nftHelpers";
 
 export default function MintNFTView() {
   const router = useRouter();
@@ -24,12 +29,7 @@ export default function MintNFTView() {
   const [file, setFile] = useState();
 
   useEffect(() => {
-    const ipfsClient = create({
-      host: 'ipfs.infura.io',
-      port: '5001',
-      protocol: 'https',
-    });
-    setIpfsNode(ipfsClient);
+      setIpfsNode(create(infuraConfig));
   }, []);
 
   function openLocal() {

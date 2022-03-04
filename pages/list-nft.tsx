@@ -43,11 +43,16 @@ import {
   IMPORT_FRAKTAL,
   rejectContract,
 } from '../redux/actions/contractActions';
-const { create } = require('ipfs-http-client');
 const MAX_FRACTIONS = 10000;
 
 import { EXPLORE, IMPORT_NFT, resolveNFTRoute } from '@/constants/routes';
 import { Workflow } from 'types/workflow';
+
+/**
+ * INFURA
+ */
+const { create } = require('ipfs-http-client');
+import {infuraConfig} from '@/utils/nftHelpers';
 
 const actionOpts = { workflow: Workflow.MINT_NFT };
 
@@ -79,12 +84,7 @@ const MintPage = (props) => {
 
   // FUNCTIONS FOR MINTING
   useEffect(() => {
-    const ipfsClient = create({
-      host: 'ipfs.infura.io',
-      port: '5001',
-      protocol: 'https',
-    });
-    setIpfsNode(ipfsClient);
+    setIpfsNode(create(infuraConfig));
   }, []);
 
   async function uploadAndPin(data) {
