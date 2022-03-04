@@ -15,7 +15,6 @@ const RescueCard = ({ marketAddress, provider, gains }) => {
     }
     if (response?.error) {
       toast.error("Transaction failed.");
-      console.error()
     }
   }
 
