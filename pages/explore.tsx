@@ -97,6 +97,8 @@ const Marketplace: React.FC = () => {
 
   useEffect(()=>{
     if (refresh === true) {
+      setNftItems([]);
+      setNftData([]);
       setHasMore(false);
       setLoading(true);
       getData();
@@ -267,6 +269,8 @@ const Marketplace: React.FC = () => {
   const removeFilter = () => {
     router.push(EXPLORE, "", { shallow: true });
     setOffset(0);
+    setNftData([]);
+    setNftItems([]);
     setRefresh(true);
   };
 
