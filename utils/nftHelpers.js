@@ -206,7 +206,7 @@ export async function createListedAuction(data) {
         endTime: data.endTime,
         hash: data.hash,
         reservePrice: data.reservePrice,
-        seller: data.seller,
+        seller: typeof data.seller === "object" ? data.seller.id : data.seller,
         sellerNonce: data.sellerNonce,
         tokenAddress: data.tokenAddress,
         name: nftMetadata.name,

@@ -22,15 +22,25 @@ const SEARCH_AUCTION_ITEMS = 'Auctions';
 const SEARCH_FRAKTIONS_ITEMS = 'Not for Sale';
 
 /**
+ * SEARCH Utils
+ */
+import {getItems} from '@/utils/search';
+/**
+ * Routers
+ */
+
+import {EXPLORE} from "@/constants/routes";
+/**
  *
  * @returns {any}
  * @constructor
  */
 const Search = (props) => {
-
+    const {queryString} = props;
     //const [isENSAddressValid, ethAddressFromENS] = useENSAddress(inputAddress);
     const [inputAddress, setInputAddress] = useState("");
     const router = useRouter();
+    const [searchQuery, setSearchQuery] = useState("");
     const options = [ ];
 
     const handleFilter = (items) => {
@@ -91,13 +101,13 @@ const Search = (props) => {
         }
         const object = args[1];
         router.push(resolveNFTRoute(object.tokenAddress), null, {scroll: false});
-        switch (object.groupName) {
+      /*  switch (object.groupName) {
             case 'Fraktions':
                 break;
             case 'Artist':
 
                 break;
-        }
+        }*/
     }
 
     //TODO - REFACTOR
@@ -204,20 +214,52 @@ const Search = (props) => {
         ]
     }
 
+    const onKeyUp = (event) => {
+        if (event.keyCode == 13) {
+            router.push(
+                {
+                    pathname: EXPLORE,
+                    query: {
+                        query:searchQuery
+                    }
+                }
+            );
+        }
+    };
+
+    function renderValue (valueProps, values) {
+        setSearchQuery(values.search);
+        return (
+            <>
+                <div className="select-search">
+                    <div className="select-search__value">
+                        <input {...valueProps} onKeyUp={onKeyUp} tabindex="0"  autoComplete="on" className="select-search__input"/>
+                    </div>
+                </div>
+            </>
+    )
+    }
+
+    const onFocus = (e) => {
+    }
+
     return (
         <HStack {...props}>
             <SelectSearch
+                printOptions="on-focus"
+                onFocus={onFocus}
+                renderValue={renderValue}
+                debounce={100}
                 options={[]}
                 renderOption={renderItem}
                 onChange={handleChange}
                 filterOptions={handleFilter}
                 getOptions={getItems}
-                value=""
+                value={queryString}
                 search
                 placeholder="Search Fraktal"
             />
         </HStack>
     );
 };
-
 export default Search;

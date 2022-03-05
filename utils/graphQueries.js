@@ -582,13 +582,28 @@ const calls = [
 const limitedAuctions = gql`
   query($limit: Int!, $offset: Int!, $endTime: Int!, $orderDirection: String!) {
     auctions(first: $limit, skip: $offset, orderBy: reservePrice, orderDirection: $orderDirection, where: { endTime_gt: $endTime, reservePrice_gt: 0 }) {
-      seller
+      seller {
+        id
+      }
       tokenAddress
       reservePrice
       amountOfShare
       endTime
       sellerNonce
       participants
+      fraktal {
+          id
+          hash
+          marketId
+          createdAt
+          status
+          fraktions {
+            amount
+          }
+          creator {
+            id
+          }
+        }      
       }
   }
 `;

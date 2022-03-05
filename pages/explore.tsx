@@ -18,6 +18,7 @@ import {
  */
 import Head from "next/head";
 import NextLink from "next/link";
+import { useRouter } from 'next/router';
 /**
  * Icons
  */
@@ -44,6 +45,10 @@ import {MY_NFTS, MINT_NFT} from "@/constants/routes";
 import Search from "@/components/search";
 
 /**
+ * SEARCH Utils
+ */
+import {getItems} from '@/utils/search';
+/**
  * Filters
  * @type {string}
  */
@@ -60,6 +65,7 @@ const ORDER_ASC  = 'asc';
 const ORDER_DESC = 'desc';
 
 const Marketplace: React.FC = () => {
+  const router = useRouter();
   const [nftItems, setNftItems] = useState([]);
   const [nftData, setNftData] = useState([]);
   const [selectionMode, setSelectionMode] = useState(false);
@@ -72,6 +78,7 @@ const Marketplace: React.FC = () => {
   const [limit, setLimit] = useState(15);
   const [offset, setOffset] = useState(0);
   const [orderDirection, setOrderDirection] = useState(ORDER_DESC);
+  const [queryString, setQueryString] = useState('');
 
   /**
   *
@@ -95,6 +102,11 @@ const Marketplace: React.FC = () => {
      setLoading(true);
      getData();
   }, []);
+
+  useEffect(() => {
+      setQueryString(router.query.query)
+      getData();
+  }, [router]);
 
   const getMoreListedItems = async () => {
     getData();
@@ -140,7 +152,17 @@ const Marketplace: React.FC = () => {
      * @returns {Promise<any[]>}
      */
   async function mapAuctionToFraktal(auctionData) {
-      let auctionDataHash = [];
+        let objects = await Promise.all(
+            auctionData.map(x => {
+                x.hash = x.fraktal.hash;
+                let res = createListedAuction(x);
+                if (typeof res !== "undefined") {
+                    return res;
+                }
+            })
+        );
+        return objects;
+    /*  let auctionDataHash = [];
       await Promise.all(auctionData?.auctions.map(async x => {
           let _hash = await getSubgraphAuction("auctionsNFT", x.tokenAddress);
 
@@ -153,13 +175,13 @@ const Marketplace: React.FC = () => {
       }));
       let auctionItems = [];
       await Promise.all(auctionData?.auctions.map(async (auction, idx) => {
-              let hash = auctionDataHash.filter(e=>e.id == `${auction.tokenAddress}-${auction.sellerNonce}`);
-              Object.assign(auction, {"hash":hash[0].hash});
+             // let hash = auctionDataHash.filter(e=>e.id == `${auction.tokenAddress}-${auction.sellerNonce}`);
+             // Object.assign(auction, {"hash":hash[0].hash});
               const item = await createListedAuction(auction);
               auctionItems.push(item);
           }
       ));
-      return auctionItems;
+      return auctionItems;*/
   }
 
    /**
@@ -189,6 +211,25 @@ const Marketplace: React.FC = () => {
    * @returns {Promise<void>}
    */
    async function getData() {
+       const queryParams = new URLSearchParams(window.location.search);
+       const query = queryParams.get("query");
+       setQueryString(query);
+       if (query) {
+            const result = await getItems(query);
+            let nfts = [];
+            if (result.auctions) {
+                nfts = [...result.auctions, ...nfts];
+            }
+            if (result.fixedPrice) {
+                nfts = [...result.fixedPrice, ...nfts];
+            }
+            setNftItems(nfts);
+            setNftData(nfts);
+            setLoading(false);
+            setHasMore(true);
+            setRefresh(false);
+            return;
+        }
         let listedData = {
             listItems: []
         };
@@ -216,8 +257,7 @@ const Marketplace: React.FC = () => {
             return;
         }
 
-        const auctionItems = await mapAuctionToFraktal(auctionData);
-        console.log('auctionsItem', auctionItems)
+        const auctionItems = await mapAuctionToFraktal(auctionData.auctions);
 
         let dataOnSale;
         if (listedData?.listItems?.length != undefined) {
@@ -245,7 +285,7 @@ const Marketplace: React.FC = () => {
         } else {
             setNftItems(nfts);
         }
-
+        console.log('NFT ITEMS', nfts)
         setNftData(nfts);
         setOffset(offset+limit);
         setLoading(false);
@@ -327,7 +367,7 @@ const Marketplace: React.FC = () => {
             </NextLink>
           </Box>
         </Flex>
-        <Search marginBottom="10px" width="100%"/>
+        <Search marginBottom="10px" width="100%" queryString={queryString}/>
         {loading && (
           <Loading/>
         )}
