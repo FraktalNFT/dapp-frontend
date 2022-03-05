@@ -184,7 +184,6 @@ const Marketplace: React.FC = () => {
        setQueryString(query);
        if (query) {
 
-           console.log('Loading', query)
             const result = await getItems(query);
             let nfts = [];
             if (result.auctions) {
@@ -201,8 +200,6 @@ const Marketplace: React.FC = () => {
             return;
         }
 
-        console.log('off',offset)
-       console.log("limit", limit)
         let listedData = {
             listItems: []
         };
