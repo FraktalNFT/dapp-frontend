@@ -356,7 +356,7 @@ const Marketplace: React.FC = () => {
                         size="lg"
                         borderRadius='full'
                         variant='solid'
-                        colorScheme='green'
+                        background="rgba(195, 135, 255, 0.7)"
                     >
                         <TagLabel>{queryString}</TagLabel>
                         <TagCloseButton onClick={removeFilter} />
