@@ -11,11 +11,7 @@ import {
   Spinner,
   Tag,
   TagLabel,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Button // @todo: Use a tiny badge with three dots icon
+  Button 
 } from "@chakra-ui/react";
 import React, { forwardRef } from "react";
 import {
@@ -115,22 +111,8 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
       "animation-iteration-count": `infinite`,
     };
 
-    const NFTOptionsMenu = () => {
-      const [isOpen, setisOpen] = useState<boolean>(true)
-      return (
-        <Menu>
-          {({ isOpen }) => (
-            <>
-              <MenuButton isActive={isOpen} as={Button}>
-                {isOpen ? 'Transfer' : 'Transfer'}
-              </MenuButton>
-              <MenuList>
-                <MenuItem onClick={() => router.push(resolveTransferNFTRoute(id))}>Transfer</MenuItem>
-              </MenuList>
-            </>
-          )}
-        </Menu>
-      )
+    const TransferButton = () => {
+      return (<Button onClick={() => router.push(resolveTransferNFTRoute(id))}>Transfer</Button>)
     }
 
     return (
@@ -232,7 +214,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 )}
               </Flex>
               {isMyNFT && (
-                <NFTOptionsMenu />
+                <TransferButton />
               )}
               {canFrak && (
                 <Box textAlign="center" marginTop={5}>
