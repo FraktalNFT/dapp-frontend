@@ -11,6 +11,11 @@ import {
   MenuItem,
   Box,
   Spinner,
+  Tag,
+  TagLabel,
+  TagLeftIcon,
+  TagRightIcon,
+  TagCloseButton,
 } from "@chakra-ui/react";
 
 /**
@@ -41,13 +46,13 @@ import Anchor from '@/components/anchor';
 import FrakButton from "@/components/button";
 import NFTItem from "../components/nft-item";
 import NFTAuctionItem from "@/components/nft-auction-item";
-import {MY_NFTS, MINT_NFT} from "@/constants/routes";
+import {MY_NFTS, MINT_NFT, EXPLORE} from "@/constants/routes";
 import Search from "@/components/search";
 
 /**
  * SEARCH Utils
  */
-import {getItems} from '@/utils/search';
+import {getItems, mapAuctions, mapListed} from '@/utils/search';
 /**
  * Filters
  * @type {string}
@@ -104,9 +109,11 @@ const Marketplace: React.FC = () => {
   }, []);
 
   useEffect(() => {
-      setQueryString(router.query.query)
-      getData();
-  }, [router]);
+      if (refresh === false && router.query.query !== undefined) {
+          setQueryString(router.query.query)
+          getData();
+      }
+  }, [router.query]);
 
   const getMoreListedItems = async () => {
     getData();
@@ -145,45 +152,6 @@ const Marketplace: React.FC = () => {
     }
     setNftItems(sortedItems);
   };
-
-    /**
-     * Map Auction To Fraktal
-     * @param auctionData
-     * @returns {Promise<any[]>}
-     */
-  async function mapAuctionToFraktal(auctionData) {
-        let objects = await Promise.all(
-            auctionData.map(x => {
-                x.hash = x.fraktal.hash;
-                let res = createListedAuction(x);
-                if (typeof res !== "undefined") {
-                    return res;
-                }
-            })
-        );
-        return objects;
-    /*  let auctionDataHash = [];
-      await Promise.all(auctionData?.auctions.map(async x => {
-          let _hash = await getSubgraphAuction("auctionsNFT", x.tokenAddress);
-
-          const itm = {
-              "id":`${x.tokenAddress}-${x.sellerNonce}`,
-              "hash":_hash.fraktalNft.hash
-          };
-
-          auctionDataHash.push(itm);
-      }));
-      let auctionItems = [];
-      await Promise.all(auctionData?.auctions.map(async (auction, idx) => {
-             // let hash = auctionDataHash.filter(e=>e.id == `${auction.tokenAddress}-${auction.sellerNonce}`);
-             // Object.assign(auction, {"hash":hash[0].hash});
-              const item = await createListedAuction(auction);
-              auctionItems.push(item);
-          }
-      ));
-      return auctionItems;*/
-  }
-
    /**
    * getByDate
    * @returns {Promise<{listItems: any[]}>}
@@ -215,6 +183,8 @@ const Marketplace: React.FC = () => {
        const query = queryParams.get("query");
        setQueryString(query);
        if (query) {
+
+           console.log('Loading', query)
             const result = await getItems(query);
             let nfts = [];
             if (result.auctions) {
@@ -230,6 +200,9 @@ const Marketplace: React.FC = () => {
             setRefresh(false);
             return;
         }
+
+        console.log('off',offset)
+       console.log("limit", limit)
         let listedData = {
             listItems: []
         };
@@ -257,7 +230,7 @@ const Marketplace: React.FC = () => {
             return;
         }
 
-        const auctionItems = await mapAuctionToFraktal(auctionData.auctions);
+        const auctionItems = await mapAuctions(auctionData.auctions);
 
         let dataOnSale;
         if (listedData?.listItems?.length != undefined) {
@@ -266,15 +239,8 @@ const Marketplace: React.FC = () => {
           }); // this goes in the graphql query
         }
 
-        if (dataOnSale?.length >= 0) {
-            let objects = await Promise.all(
-            dataOnSale.map(x => {
-            let res = createListed(x);
-              if (typeof res !== "undefined") {
-                return res;
-              }
-          })
-         );
+       if (dataOnSale?.length >= 0) {
+        let objects = await mapListed(dataOnSale)
 
         let nfts;
             nfts = [...auctionItems, ...nftItems, ...objects];
@@ -285,7 +251,6 @@ const Marketplace: React.FC = () => {
         } else {
             setNftItems(nfts);
         }
-        console.log('NFT ITEMS', nfts)
         setNftData(nfts);
         setOffset(offset+limit);
         setLoading(false);
@@ -297,6 +262,15 @@ const Marketplace: React.FC = () => {
   const orderByHolders = (listedData) => {
       listedData.listItems.sort((a, b) => (a.fraktal.fraktions.length > b.fraktal.fraktions.length ? -1 : 1));
       return listedData;
+  };
+
+  /**
+  * Remove Search Filter
+  */
+  const removeFilter = () => {
+    router.push(EXPLORE, "", { shallow: true });
+    setOffset(0);
+    setRefresh(true);
   };
 
   return (
@@ -373,14 +347,27 @@ const Marketplace: React.FC = () => {
         )}
         {!loading && (
           <div>
-            {nftItems?.length > 0 && (
+            {nftItems && nftItems?.length > 0 && (
               <>
+                {queryString && (<>
+                    <Text marginBottom="10px">Search results for:
+                    <Tag
+                        marginLeft="5px"
+                        size="lg"
+                        borderRadius='full'
+                        variant='solid'
+                        colorScheme='green'
+                    >
+                        <TagLabel>{queryString}</TagLabel>
+                        <TagCloseButton onClick={removeFilter} />
+                    </Tag></Text>
+                </>)}
                 <InfiniteScroll
                   dataLength={nftItems?.length}
                   next={getMoreListedItems}
                   hasMore={hasMore}
                   loader={<Loading/>}
-                  scrollThreshold={0.5}
+                  scrollThreshold={0.7}
                   endMessage={<h4>Nothing more to show</h4>}
                 >
                   <Grid
@@ -391,7 +378,7 @@ const Marketplace: React.FC = () => {
                     gap="3.2rem"
                   >
                     {nftItems.map((item, index) => {
-                      if(item.endTime){//for auction
+                      if(item.endTime) {//for auction
                         return (
                           <Anchor
                             key={`${item.seller}-${item.sellerNonce}`}

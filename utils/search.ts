@@ -1,10 +1,6 @@
 import {createListed, createListedAuction, createObject} from "@/utils/nftHelpers";
 import {getSubgraphData} from "@/utils/graphQueries";
 
-const SEARCH_LISTED_ITEMS = 'Fixed Price';
-const SEARCH_AUCTION_ITEMS = 'Auctions';
-const SEARCH_FRAKTIONS_ITEMS = 'Not for Sale';
-
 //TODO - REFACTOR
 async function mapListed(listedItems) {
     let objects = await Promise.all(
@@ -13,13 +9,13 @@ async function mapListed(listedItems) {
             if (typeof res !== "undefined" && x.amount > 0) {
                 return res;
             }
-        })
+        }).filter(notUndefined => notUndefined !== undefined)
     );
     return objects;
 }
 
 //TODO - REFACTOR
-async function mapAuction(listedItems) {
+async function mapAuctions(listedItems) {
     let objects = await Promise.all(
         listedItems.map(x => {
             x.hash = x.fraktal.hash;
@@ -27,7 +23,7 @@ async function mapAuction(listedItems) {
             if (typeof res !== "undefined") {
                 return res;
             }
-        })
+        }).filter(notUndefined => notUndefined !== undefined)
     );
     return objects;
 }
@@ -44,11 +40,12 @@ async function mapFraktion(userSearch, creator) {
                 }
             }
 
-        })
+        }).filter(notUndefined => notUndefined !== undefined)
     );
     return objects;
 }
 
+//TODO - REFACTOR
 async function mapNotForSale(listedItems) {
     let objects = await Promise.all(
         listedItems.map(x => {
@@ -56,36 +53,40 @@ async function mapNotForSale(listedItems) {
             if (typeof res !== "undefined" && x.amount == 0) {
                 return res;
             }
-        })
+        }).filter(notUndefined => notUndefined !== undefined)
     );
     return objects;
 }
 
-async function getItems(query) {
+/**
+ * Get Search Items
+ * @param query
+ * @param options
+ */
+async function getItems(query, options = []) {
     if (query.length < 2) {
         return options;
     }
     const searchData = await getSubgraphData("search_items", "", {
-        name: "'" +query+ "'" + ':*'
+        name: "'" + query + "'" + ':*'
     });
-    let listedObjects;
+    let listedObjects = [];
     let notForSale = [];
-    let auctionsObjects;
+    let auctionsObjects = [];
     if (searchData?.fraktalSearch !== undefined && searchData?.fraktalSearch.length > 0) {
         listedObjects = await mapListed(searchData.fraktalSearch);
-        console.log(listedObjects)
         notForSale = await mapNotForSale(searchData?.fraktalSearch);
     }
     if (searchData?.userSearch !== undefined && searchData?.userSearch.length > 0) {
         //TODO - Validate Creator ID
         const creator = query;
         listedObjects = await mapListed(searchData.userSearch[0].listedItems);
-        auctionsObjects = await mapAuction(searchData.userSearch[0].auctionItems);
+        auctionsObjects = await mapAuctions(searchData.userSearch[0].auctionItems);
         notForSale = await mapFraktion(searchData?.userSearch, creator);
     }
 
     if (searchData?.auctionSearch !== undefined && searchData?.auctionSearch.length > 0) {
-        auctionsObjects = await mapAuction(searchData.auctionSearch);
+        auctionsObjects = await mapAuctions(searchData.auctionSearch);
     }
 
     return {
@@ -93,24 +94,6 @@ async function getItems(query) {
         auctions: auctionsObjects,
         notForSale: notForSale
     }
-
-    /*return [
-        {
-            name: SEARCH_LISTED_ITEMS,
-            type: 'group',
-            items: listedObjects !== undefined ? listedObjects : []
-        },
-        {
-            name: SEARCH_AUCTION_ITEMS,
-            type: 'group',
-            items: auctionsObjects !== undefined ? auctionsObjects : []
-        },
-        {
-            name: SEARCH_FRAKTIONS_ITEMS,
-            type: 'group',
-            items: notForSale !== undefined ? notForSale : []
-        },
-    ]*/
 }
 
-export {getItems}
+export {getItems, mapAuctions, mapFraktion, mapListed, mapNotForSale}

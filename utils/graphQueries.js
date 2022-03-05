@@ -534,7 +534,9 @@ const searchItems = gql`
     auctionSearch(text: $name) {
         id
         name
-        seller
+        seller {
+          id
+        }
         tokenAddress
         reservePrice
         amountOfShare
