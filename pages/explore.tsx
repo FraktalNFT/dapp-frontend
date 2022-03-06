@@ -112,6 +112,7 @@ const Marketplace: React.FC = () => {
 
   useEffect(() => {
       if (refresh === false && router.query.query !== undefined) {
+          setLoading(true);
           setQueryString(router.query.query)
           getData();
       }
@@ -185,7 +186,6 @@ const Marketplace: React.FC = () => {
        const query = queryParams.get("query");
        setQueryString(query);
        if (query) {
-
             const result = await getItems(query);
             let nfts = [];
             if (result.auctions) {
@@ -342,7 +342,7 @@ const Marketplace: React.FC = () => {
             </NextLink>
           </Box>
         </Flex>
-        <Search marginBottom="10px" width="100%" queryString={queryString}/>
+        <Search marginBottom="10px" width="100%"/>
         {loading && (
           <Loading/>
         )}

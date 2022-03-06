@@ -18,21 +18,22 @@ import { createListedAuction } from "utils/nftHelpers";
 import { introspectionFromSchema } from "graphql";
 import Custom404 from "../../404";
 import {EXPLORE} from "@/constants/routes";
+
 function AuctionNFTView({router}) {
 
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
   const [index, setIndex] = useState();
   const [nftObject, setNftObject] = useState(null);
   const [contribute,setContribute] = useState(0);
-  const [error,setError] = useState(false);
+  const [error, setError] = useState(false);
   const [currentReserve,setCurrentReserve] = useState(-1);
   const [refresh,setRefresh] = useState(true);
   const [completed,setCompleted] = useState(false);
   const toast = useToast();
 
-  const auctionReserve = async (seller,sellerNonce) =>{
-    if(provider){
-      const reserve = await getAuctionReserve(seller,sellerNonce,provider,marketAddress);
+  const auctionReserve = async (seller, sellerNonce) =>{
+    if(provider) {
+      const reserve = await getAuctionReserve(seller, sellerNonce, provider, marketAddress);
       return reserve;
     }
     return -1;
@@ -75,11 +76,7 @@ function AuctionNFTView({router}) {
         isClosable: true,
       })
       console.log(error);
-
     }
-
-
-
 
   }
 
@@ -101,34 +98,35 @@ function AuctionNFTView({router}) {
       if(index){
         setIndex(index)
       }
-      let obj = await getSubgraphAuction('singleAuction',index);
-      if(obj?.auction==null){
+
+      let obj = await getSubgraphAuction('singleAuction', index);
+
+      if(obj?.auction == null){
         setError(true);
         return;
       }
 
       let _hash = await getSubgraphAuction("auctionsNFT",obj.auction.tokenAddress);
-      Object.assign(obj,{
+      Object.assign(obj.auction,{
         "hash":_hash.fraktalNft.hash,
       });
-      const item = await createListedAuction(obj);
+
+      const item = await createListedAuction(obj.auction);
+      console.log('ITEM', item)
       Object.assign(obj.auction,{
         "hash":_hash.fraktalNft.hash,
         "name":item.name,
-        "imageURL":item.imageURL
+        "imageURL":item.imageURL,
+        "seller": item.seller
       });
 
-
-
-
-      if(obj){
+      if(obj) {
         setNftObject(obj.auction);
-        const objReserve = await auctionReserve(obj.auction.seller,obj.auction.sellerNonce);
+        const objReserve = await auctionReserve(obj.auction.seller, obj.auction.sellerNonce);
         setCurrentReserve(Number(utils.formatEther(objReserve)));
-        // console.log(utils.formatEther(objReserve));
-
       }
   },[router.isReady,refresh])
+
   const exampleNFT = {
     id: 0,
     name: "Golden Fries Cascade",

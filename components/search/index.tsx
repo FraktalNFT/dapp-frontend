@@ -15,7 +15,7 @@ import {useENSAddress} from "@/components/useENSAddress";
 import {getSubgraphData} from "@/utils/graphQueries";
 import {createListed, createObject, createListedAuction} from "@/utils/nftHelpers";
 import {useRouter} from "next/router";
-import {resolveNFTRoute} from "@/constants/routes";
+import {resolveAuctionNFTRoute, resolveNFTRoute} from "@/constants/routes";
 
 const SEARCH_LISTED_ITEMS = 'Fixed Price';
 const SEARCH_AUCTION_ITEMS = 'Auctions';
@@ -101,14 +101,14 @@ const Search = (props) => {
             return null;
         }
         const object = args[1];
-        router.push(resolveNFTRoute(object.tokenAddress), null, {scroll: false});
-      /*  switch (object.groupName) {
-            case 'Fraktions':
+        switch (object.groupName) {
+            case SEARCH_AUCTION_ITEMS:
+                router.push(resolveAuctionNFTRoute(object.seller + '-' + object.sellerNonce), null, {scroll: false});
                 break;
-            case 'Artist':
-
+            default:
+                router.push(resolveNFTRoute(object.tokenAddress), null, {scroll: false});
                 break;
-        }*/
+        }
     }
     /**
      * Get Items
@@ -156,11 +156,10 @@ const Search = (props) => {
             <>
                 <div className="select-search">
                     <div className="select-search__value">
-                        <input {...valueProps} onKeyUp={onKeyUp} tabindex="0"  autoComplete="on" className="select-search__input"/>
+                        <input {...valueProps} onKeyUp={onKeyUp} tabIndex="0"  autoComplete="on" className="select-search__input"/>
                     </div>
                 </div>
-            </>
-    )
+            </>)
     }
 
     const onFocus = (e) => {

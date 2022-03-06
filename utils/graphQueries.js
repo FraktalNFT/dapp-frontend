@@ -613,7 +613,9 @@ const limitedAuctions = gql`
 const listedAuctions = gql`
   query {
     auctions {
-      seller
+      seller {
+        id
+      }
       tokenAddress
       reservePrice
       amountOfShare
@@ -636,7 +638,9 @@ const getSingleAuction = gql`
 query($id: ID!) {
   auction(id:$id) {
     id
-    seller
+    seller {
+      id
+    }
     tokenAddress
     reservePrice
     amountOfShare

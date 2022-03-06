@@ -72,29 +72,6 @@ const Header = () => {
                 </Link>
               )}
             </NextLink>
-
-            <NextLink href={ARTISTS}>
-              {router.pathname === ARTISTS ? (
-                <Link
-                  className="semi-16"
-                  borderRadius="25"
-                  padding="3"
-                  sx={{ backgroundColor: `black`, color: `white` }}
-                  _hover={{ backgroundColor: "black", textColor: "white" }}
-                >
-                  Artists
-                </Link>
-              ) : (
-                <Link
-                  className="semi-16"
-                  borderRadius="25"
-                  padding="3"
-                  _hover={{ backgroundColor: "black", textColor: "white" }}
-                >
-                  Artists
-                </Link>
-              )}
-            </NextLink>
             <NextLink href={REWARDS}>
                 <Link
                     className="semi-16"
