@@ -27,7 +27,7 @@ export default function ArtistsView() {
   const { marketAddress, factoryAddress, loading } = useWeb3Context();
   const [artistAddress, setArtistAddress] = useState("");
   const [inputAddress, setInputAddress] = useState("");
-  
+
   const handleSortSelect = (item: string) => {
     setSortType(item);
     setSelectionMode(false);
@@ -142,7 +142,7 @@ export default function ArtistsView() {
           )}
         </Box> */}
         <Text className="semi-48">Artists</Text>
-      <div className={styles.searchContainer}>
+  {/*    <div className={styles.searchContainer}>
           <input
             placeholder={"Search ENS or ETH address "}
             className={styles.searchInput}
@@ -157,8 +157,8 @@ export default function ArtistsView() {
                 <Image src="/search.svg" />
               </NextLink>
           }
-          
-        </div> 
+
+        </div> */}
       </HStack>
 
       {!loading && artists.length > 0 && (

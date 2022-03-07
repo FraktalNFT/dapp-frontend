@@ -1,17 +1,22 @@
-import { VStack } from "@chakra-ui/layout";
-import React, { useState, useEffect } from "react";
-import Head from "next/head";
-import styles from "../styles/mint-nft.module.css";
-import Button from "../components/button";
-import { HStack } from "@chakra-ui/layout";
-import { Image as ImageComponent } from "@chakra-ui/image";
-import { useWeb3Context } from "../contexts/Web3Context";
-import { pinByHash } from "../utils/pinataPinner";
-import { createNFT } from "../utils/contractCalls";
-import { useRouter } from "next/router";
-const { create } = require("ipfs-http-client");
-import {MY_NFTS} from "@/constants/routes";
-import { Workflow } from "types/workflow";
+import { VStack } from '@chakra-ui/layout';
+import React, { useState, useEffect } from 'react';
+import Head from 'next/head';
+import styles from '../styles/mint-nft.module.css';
+import Button from '../components/button';
+import { HStack } from '@chakra-ui/layout';
+import { Image as ImageComponent } from '@chakra-ui/image';
+import { useWeb3Context } from '../contexts/Web3Context';
+import { pinByHash } from '../utils/pinataPinner';
+import { createNFT } from '../utils/contractCalls';
+import { useRouter } from 'next/router';
+import { MY_NFTS } from '@/constants/routes';
+import { Workflow } from 'types/workflow';
+
+/**
+ * IPFS
+ */
+const { create } = require('ipfs-http-client');
+import {infuraConfig} from "@/utils/nftHelpers";
 
 export default function MintNFTView() {
   const router = useRouter();
@@ -24,17 +29,12 @@ export default function MintNFTView() {
   const [file, setFile] = useState();
 
   useEffect(() => {
-    const ipfsClient = create({
-      host: "ipfs.infura.io",
-      port: "5001",
-      protocol: "https",
-    });
-    setIpfsNode(ipfsClient);
+      setIpfsNode(create(infuraConfig));
   }, []);
 
   function openLocal() {
-    document.getElementById("imageInput").files = null;
-    document.getElementById("imageInput").click();
+    document.getElementById('imageInput').files = null;
+    document.getElementById('imageInput').click();
     // test type? or add accept attributes in input?
   }
 
@@ -43,8 +43,8 @@ export default function MintNFTView() {
     try {
       dataUpload = await ipfsNode.add(data);
     } catch (e) {
-      console.error("Error: ", e);
-      return "Error uploading the file";
+      console.error('Error: ', e);
+      return 'Error uploading the file';
     }
     await pinByHash(dataUpload.cid.toString()); // Pinata
     return dataUpload;
@@ -62,16 +62,16 @@ export default function MintNFTView() {
   async function minter(metadata) {
     let metadataCid = await uploadAndPin(JSON.stringify(metadata));
     if (metadataCid) {
-      createNFT(metadataCid.cid.toString(), provider, factoryAddress, { workflow: Workflow.MINT_NFT }).then(
-        () => {
-          router.push(MY_NFTS, null, {scroll: false});
-        }
-      );
+      createNFT(metadataCid.cid.toString(), provider, factoryAddress, {
+        workflow: Workflow.MINT_NFT,
+      }).then(() => {
+        router.push(MY_NFTS, null, { scroll: false });
+      });
     }
   }
 
   async function addFile() {
-    const selectedFile = document.getElementById("imageInput").files[0];
+    const selectedFile = document.getElementById('imageInput').files[0];
     setFile(selectedFile);
     let reader = new FileReader();
     reader.readAsDataURL(selectedFile);
@@ -84,7 +84,7 @@ export default function MintNFTView() {
       };
     };
   }
-  const proportionalImage = width => {
+  const proportionalImage = (width) => {
     return (imageSize[1] / imageSize[0]) * width;
   };
 
@@ -104,19 +104,19 @@ export default function MintNFTView() {
           <input
             className={styles.input}
             id="nameIn"
-            onChange={e => setName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
           />
-          <div className={styles.inputHeader} style={{ marginTop: "32px" }}>
+          <div className={styles.inputHeader} style={{ marginTop: '32px' }}>
             DESCRIPTION (OPTIONAL)
           </div>
           <input
             className={styles.input}
             id="descriptionIn"
-            onChange={e => setDescription(e.target.value)}
+            onChange={(e) => setDescription(e.target.value)}
           />
           <Button
             disabled={!imageData || !name}
-            style={{ display: "block", marginTop: "40px" }}
+            style={{ display: 'block', marginTop: '40px' }}
             onClick={() => prepareNftData()}
           >
             Create NFT
@@ -127,26 +127,26 @@ export default function MintNFTView() {
           <div className={styles.uploadContainer}>
             {!imageData ? (
               <div>
-                <div style={{ textAlign: "center", fontWeight: 500 }}>
+                <div style={{ textAlign: 'center', fontWeight: 500 }}>
                   PNG, JPG, or GIF. Max 30mb.
                 </div>
                 <div
                   style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    marginTop: "16px",
+                    display: 'flex',
+                    justifyContent: 'center',
+                    marginTop: '16px',
                   }}
                 >
                   <input
                     type="file"
                     id="imageInput"
-                    style={{ display: "none" }}
+                    style={{ display: 'none' }}
                     onChange={() => addFile()}
                     multiple={false}
                   ></input>
                   <Button
                     isOutlined
-                    style={{ width: "160px" }}
+                    style={{ width: '160px' }}
                     onClick={() => openLocal()}
                   >
                     Choose file
@@ -156,25 +156,25 @@ export default function MintNFTView() {
             ) : (
               <>
                 <ImageComponent
-                  src={"/trash.svg"}
+                  src={'/trash.svg'}
                   style={{
-                    position: "absolute",
-                    top: "24px",
-                    right: "24px",
-                    cursor: "pointer",
+                    position: 'absolute',
+                    top: '24px',
+                    right: '24px',
+                    cursor: 'pointer',
                   }}
                   onClick={() => setImageData(null)}
                 />
                 <div
                   style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}
                 >
                   <ImageComponent
                     src={imageData}
-                    w={"200px"}
+                    w={'200px'}
                     h={proportionalImage(200)}
                   />
                 </div>

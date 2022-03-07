@@ -396,28 +396,28 @@ export default function MyNFTsView() {
       provider,
       item.id
     );
+    // console.log('is approved?',approved)
     if (!approved) {
       done = await approveContract(factoryAddress, item.id);
     } else {
       done = true;
     }
+    // overflow problem with opensea assets.. subid toooo big
     if (done) {
       if (item.token_schema == 'ERC721') {
         res = await importERC721(
-          BigInt(item.tokenId),
+          parseInt(item.tokenId),
           item.id,
           provider,
           factoryAddress
         );
       } else {
         res = await importERC1155(
-          BigInt(item.tokenId),
+          parseInt(item.tokenId),
           item.id,
           provider,
           factoryAddress
-        ).catch(e => {
-          console.log(e)
-        });
+        );
       }
     }
     if (done && res) {

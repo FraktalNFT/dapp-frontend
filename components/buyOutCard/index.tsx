@@ -221,7 +221,7 @@ const BuyOutCard = ({
                 setFunction={onSetValue}
                 currency={'ETH'}
               >
-                {offering ? "Making Offer" : "Make Buy-out Offer"}
+                {offering ? "Making Offer" : "Buy Out"}
               </FrakButton2>
             </Stack>
           )}

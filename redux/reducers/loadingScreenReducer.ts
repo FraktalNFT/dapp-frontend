@@ -262,13 +262,14 @@ const loadingScreenReducer = (state = initState, action) => {
       loadingScreenObject.totalStep = 5;
       switch (action.transactionType) {
         case APPROVE_TOKEN:
-          loadingScreenObject.step = 1;
+          if (action.custom === 'fraktions') {
+            loadingScreenObject.step = 3;
+          } else {
+            loadingScreenObject.step = 1;
+          }
           break;
         case IMPORT_NFT:
           loadingScreenObject.step = 2;
-          break;
-        case APPROVE_TOKEN:
-          loadingScreenObject.step = 3;
           break;
         case IMPORT_FRAKTAL:
           loadingScreenObject.step = 4;

@@ -23,7 +23,7 @@ const Header = () => {
         <Flex align="center">
           <HStack
             spacing="2.0rem"
-            mr="0.5rem"
+            mr="3.5rem"
             paddingTop="2"
             display={{ base: "none", md: "flex" }}
           >
@@ -73,8 +73,9 @@ const Header = () => {
               )}
             </NextLink>
 
-            <NextLink href={ARTISTS}>
-              {router.pathname === ARTISTS ? (
+
+            <NextLink href={REWARDS}>
+              {router.pathname === REWARDS ? (
                 <Link
                   className="semi-16"
                   borderRadius="25"
@@ -82,7 +83,7 @@ const Header = () => {
                   sx={{ backgroundColor: `black`, color: `white` }}
                   _hover={{ backgroundColor: "black", textColor: "white" }}
                 >
-                  Artists
+                  Rewards
                 </Link>
               ) : (
                 <Link
@@ -91,19 +92,9 @@ const Header = () => {
                   padding="3"
                   _hover={{ backgroundColor: "black", textColor: "white" }}
                 >
-                  Artists
+                  Rewards
                 </Link>
               )}
-            </NextLink>
-            <NextLink href={REWARDS}>
-                <Link
-                    className="semi-16"
-                    borderRadius="25"
-                    padding="3"
-                    _hover={{ backgroundColor: "black", textColor: "white" }}
-                >
-                    Rewards
-                </Link>
             </NextLink>
 
            <Link
