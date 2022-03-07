@@ -186,6 +186,7 @@ export async function createListed(data) {
     let nftMetadata = await fetchNftMetadata(data.fraktal.hash);
     if (nftMetadata) {
       return {
+        link: `/nft/${data.fraktal.id}/details`,
         creator: data.fraktal.creator.id,
         marketId: data.fraktal.marketId,
         createdAt: data.fraktal.createdAt,
@@ -211,6 +212,7 @@ export async function createListedAuction(data) {
     let nftMetadata = await fetchNftMetadata(data.hash);
     if (nftMetadata) {
       return {
+        link: `/nft/${data.seller}-${data.sellerNonce}/auction`,
         amountOfShare: data.amountOfShare,
         endTime: data.endTime,
         hash: data.hash,
@@ -246,7 +248,7 @@ async function mapFixedPrice(data) {
         if (typeof res !== "undefined") {
           return res;
         }
-      })
+      }).filter(notUndefined => notUndefined !== undefined)
   );
   return objects;
 }
@@ -275,7 +277,7 @@ async function mapAuctionToFraktal(auctionData) {
         const item = await createListedAuction(auction);
         auctionItems.push(item);
       }
-  ));
+  ).filter(notUndefined => notUndefined !== undefined));
   return auctionItems;
 }
 

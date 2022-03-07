@@ -57,7 +57,6 @@ import NFTAuctionItem from "@/components/nft-auction-item";
 import FrakButton from "../components/button";
 import Anchor from '@/components/anchor';
 import {MY_NFTS, MINT_NFT} from "@/constants/routes";
-import styles from "@/styles/rewards.module.css";
 import FrakButton2 from "@/components/button2";
 
 const Marketplace: React.FC = () => {
@@ -230,7 +229,6 @@ const NFTTab = forwardRef(({subgraphMethod, sort, orderBy, mapping, additionalQu
         });
 
         let mappedItems = await mapping(data);
-
         if (mappedItems?.length > 0) {
             setNftItems([...nftItems, ...mappedItems]);
             setOffset(offset + limit);
@@ -240,6 +238,50 @@ const NFTTab = forwardRef(({subgraphMethod, sort, orderBy, mapping, additionalQu
             setHasMore(false);
         }
         setLoading(false);
+    }
+
+    /**
+     * renderNFTItem
+     * @param item
+     * @param index
+     */
+    const renderNFTItem = (item, index) => {
+        if (item.error) {
+            return;
+        }
+        if (item.endTime) {
+            return (
+                <Anchor
+                    key={item.link}
+                    href={item.link}
+                >
+                    <NFTAuctionItem
+                        name={item.name}
+                        amount={utils.formatEther(item.amountOfShare)}
+                        imageURL={item.imageURL}
+                        endTime={item.endTime}
+                        item={item}
+                    />
+                </Anchor>
+            )
+        } else {
+            return (
+                <Anchor
+                    key={item.link}
+                    href={item.link}
+                >
+                    <NFTItem
+                        name={item.name}
+                        amount={item.amount}
+                        price={item.price}
+                        imageURL={item.imageURL}
+                        wait={250 * (index + 1)}
+                        item={null}
+                    />
+
+                </Anchor>
+            );
+        }
     }
 
     return (
@@ -265,19 +307,7 @@ const NFTTab = forwardRef(({subgraphMethod, sort, orderBy, mapping, additionalQu
                     >
                         {nftItems.map((item, index) => (
                             <>
-                                <Anchor
-                                    key={item.id}
-                                    href={`/nft/${item.tokenAddress}/details`}
-                                >
-                                    <NFTItem
-                                        name={item.name}
-                                        amount={item.amount}
-                                        price={item.price}
-                                        imageURL={item.imageURL}
-                                        wait={250 * (index + 1)}
-                                        item={null}
-                                    />
-                                </Anchor>
+                                {renderNFTItem(item, index)}
                             </>
                         ))}
                     </Grid>
