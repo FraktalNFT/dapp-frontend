@@ -23,7 +23,7 @@ const Header = () => {
         <Flex align="center">
           <HStack
             spacing="2.0rem"
-            mr="0.5rem"
+            mr="3.5rem"
             paddingTop="2"
             display={{ base: "none", md: "flex" }}
           >
@@ -73,16 +73,27 @@ const Header = () => {
               )}
             </NextLink>
             <NextLink href={REWARDS}>
-                <Link
-                    className="semi-16"
-                    borderRadius="25"
-                    padding="3"
-                    _hover={{ backgroundColor: "black", textColor: "white" }}
-                >
-                    Rewards
-                </Link>
-            </NextLink>
-
+                {router.pathname === REWARDS ? (
+                    <Link
+                        className="semi-16"
+                        borderRadius="25"
+                        padding="3"
+                        sx={{ backgroundColor: `black`, color: `white` }}
+                        _hover={{ backgroundColor: "black", textColor: "white" }}
+                    >
+                        Rewards
+                    </Link>
+                ) : (
+                    <Link
+                        className="semi-16"
+                        borderRadius="25"
+                        padding="3"
+                        _hover={{ backgroundColor: "black", textColor: "white" }}
+                    >
+                        Rewards
+                    </Link>
+                )}
+           </NextLink>
            <Link
               href="https://docs.fraktal.io/marketplace/get-started"
               target="_blank"
@@ -93,56 +104,6 @@ const Header = () => {
             >
               How it Works
             </Link>
-
-            {/*_hover={{backgroundColor: `black`}}*/}
-        {/*  <Link
-              href="https://www.instagram.com/fraktal.io/"
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <Box
-                sx={{
-                  display: `grid`,
-                  placeItems: `center`,
-                  borderRadius: `12px`,
-                }}
-              >
-                <Image src="/footer/icons8-instagram.svg" />
-              </Box>
-            </Link>
-            <Link
-              href="https://twitter.com/fraktalnft"
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <Box
-                sx={{
-                  display: `grid`,
-                  placeItems: `center`,
-                  borderRadius: `12px`,
-                }}
-              >
-                <Image src="/footer/icons8-twitter.svg" />
-              </Box>
-            </Link>
-
-            <Link
-              href="https://discord.gg/B9atrdtEEx"
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <Box
-                sx={{
-                  display: `grid`,
-                  placeItems: `center`,
-                  borderRadius: `12px`,
-                }}
-              >
-                <Image src="/footer/icons8-discord.svg" />
-              </Box>
-            </Link>
-            */
-        }
 
           </HStack>
           {!account ? (

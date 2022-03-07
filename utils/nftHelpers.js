@@ -1,12 +1,21 @@
-const { create, CID } = require('ipfs-http-client');
 import { utils } from 'ethers';
 import { getSubgraphData } from './graphQueries';
 
-const ipfsClient = create({
+const { create, CID } = require('ipfs-http-client');
+
+let infuraAuth;
+if (process.env.NEXT_PUBLIC_INFURA_PROJECT_ID !== undefined && process.env.NEXT_PUBLIC_INFURA_PROJECT_SECRET !== undefined) {
+  infuraAuth = 'Basic ' + Buffer.from(process.env.NEXT_PUBLIC_INFURA_PROJECT_ID + ':' + process.env.NEXT_PUBLIC_INFURA_PROJECT_SECRET).toString('base64')
+}
+const infuraConfig = {
   host: 'ipfs.infura.io',
-  port: '5001',
+  port: 5001,
   protocol: 'https',
-});
+  headers: {
+    Authorization: infuraAuth
+  }
+};
+const ipfsClient = create(infuraConfig);
 
 // Convert Binary Into JSON
 const binArrayToJson = function (binArray) {
@@ -218,3 +227,5 @@ export async function createListedAuction(data) {
     return { error: `Error: ${err}` };
   }
 }
+
+export {infuraConfig}

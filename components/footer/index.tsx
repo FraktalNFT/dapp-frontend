@@ -20,7 +20,7 @@ const urlLists = [
     title: "Get Involved",
     items: [
       { text: "Stake", url: "https://docs.fraktal.io/fraktal-governance-token-frak/staking-frak" },
-      { text: "DAO", url: "https://docs.fraktal.io/fraktal-dao/overview" },
+      { text: "DAO", url: "https://dao.fraktal.io/#/" },
       { text: "Github", url: "https://github.com/FraktalNFT" },
     ]
   },
