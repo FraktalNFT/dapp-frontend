@@ -32,7 +32,7 @@ const NFTImportCardOS = forwardRef<HTMLDivElement, NFTItemProps>(
         _hover={{transform: `translateY(-16px)`}}
       >
         <Box minH='30rem' w='100%' position='relative' >
-          <Image src={item.imageURL} width='100%' height='100%' style={{verticalAlign:'auto'}}/>
+          <Image src={item.image} width='100%' height='100%' style={{verticalAlign:'auto'}}/>
         </Box>
           <Text mb='1.6rem' sx={{width: `100%`, padding: `0 1rem`, fontFamily: `Inter, sans-serif`, fontWeight: `700`}}>
             {item?.name}

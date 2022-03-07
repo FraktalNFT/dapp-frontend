@@ -26,7 +26,7 @@ const NFTItemManager = forwardRef<HTMLDivElement, NFTItemProps>(
         ref={ref}
       >
         <Box minH='30rem' w='100%' position='relative' >
-          <Image src={item.imageURL} width='100%' height='100%' style={{verticalAlign:'auto'}}/>
+          <Image src={item.image} width='100%' height='100%' style={{verticalAlign:'auto'}}/>
           {item.countdown && (
             <VStack
               spacing='0'
