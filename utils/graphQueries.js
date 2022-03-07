@@ -2,11 +2,12 @@ import { gql, request } from "graphql-request";
 import { utils } from "ethers";
 const { CID } = require("ipfs-http-client");
 
-// const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.18';
+//const APIURL = 'https://api.studio.thegraph.com/query/21128/marketplaceperformance/0.0.1';
+//const AUCTIONAPI = 'https://api.studio.thegraph.com/query/21128/marketplaceperformance/0.0.1';
 const APIURL = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9';
-// const APIURL = 'https://gateway.testnet.thegraph.com/api/a2ae030e27fc11191339a53e73cea9c2/subgraphs/id/0x98e7910e754abd41ace110c23d679333779c2ff9-1'
 const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9';
-// const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/testnetfraktalauction/0.4';
+// const APIURL = 'https://gateway.testnet.thegraph.com/api/a2ae030e27fc11191339a53e73cea9c2/subgraphs/id/0x98e7910e754abd41ace110c23d679333779c2ff9-1'
+
 // https://api.thegraph.com/subgraphs/name/drhongos/fraktalrinkeby // hosted
 
 const creator_query = gql`
@@ -442,6 +443,20 @@ const listedItemsByFraktalId = gql`
   }
 `;
 
+const limitedAuctions = gql`
+  query($limit: Int!, $offset: Int!, $endTime: Int!, $orderBy: String!, $orderDirection: String!) {
+    auctions(first: $limit, skip: $offset, orderBy: $orderBy, orderDirection: $orderDirection, where: { endTime_gt: $endTime, reservePrice_gt: 0 }) {
+      seller
+      tokenAddress
+      reservePrice
+      amountOfShare
+      endTime
+      sellerNonce
+      participants
+      }
+  }
+`;
+
 const calls = [
   { name: "account_fraktions", call: account_fraktions_query },
   { name: "marketid_fraktal", call: marketid_query },
@@ -461,21 +476,9 @@ const calls = [
   { name: "fraktal", call: fraktalId_query },
   { name: "fraktions", call: fraktions_query },
   { name: "fraktal_owners", call: fraktalOwners },
+  { name: "limited_auctions", call: limitedAuctions },
 ];
 
-const limitedAuctions = gql`
-  query($limit: Int!, $offset: Int!, $endTime: Int!, $orderDirection: String!) {
-    auctions(first: $limit, skip: $offset, orderBy: reservePrice, orderDirection: $orderDirection, where: { endTime_gt: $endTime, reservePrice_gt: 0 }) {
-      seller
-      tokenAddress
-      reservePrice
-      amountOfShare
-      endTime
-      sellerNonce
-      participants
-      }
-  }
-`;
 
 const listedAuctions = gql`
   query {
@@ -515,7 +518,6 @@ query($id: ID!) {
 
 const auctionCalls = [
   { name: "auctions", call: listedAuctions },
-  { name: "limited_auctions", call: limitedAuctions },
   { name: "auctionsNFT", call:auctionFraktalNFT},
   { name: "singleAuction", call: getSingleAuction}
 ];

@@ -1,19 +1,22 @@
 import { utils } from 'ethers';
-import { getSubgraphData } from './graphQueries';
+import {getSubgraphAuction, getSubgraphData} from './graphQueries';
 
 const { create, CID } = require('ipfs-http-client');
 
 let infuraAuth;
 if (process.env.NEXT_PUBLIC_INFURA_PROJECT_ID !== undefined && process.env.NEXT_PUBLIC_INFURA_PROJECT_SECRET !== undefined) {
-  infuraAuth = 'Basic ' + Buffer.from(process.env.NEXT_PUBLIC_INFURA_PROJECT_ID + ':' + process.env.NEXT_PUBLIC_INFURA_PROJECT_SECRET).toString('base64')
+  infuraAuth = {
+    headers: {
+      Authorization: 'Basic ' + Buffer.from(process.env.NEXT_PUBLIC_INFURA_PROJECT_ID + ':' + process.env.NEXT_PUBLIC_INFURA_PROJECT_SECRET).toString('base64')
+    }
+  }
 }
+
 const infuraConfig = {
   host: 'ipfs.infura.io',
   port: 5001,
   protocol: 'https',
-  headers: {
-    Authorization: infuraAuth
-  }
+  ...infuraAuth
 };
 const ipfsClient = create(infuraConfig);
 
@@ -225,4 +228,55 @@ export async function createListedAuction(data) {
   }
 }
 
-export {infuraConfig}
+/**
+ * Map Fixed Price
+ * @param data
+ */
+async function mapFixedPrice(data) {
+  let dataOnSale;
+  if (data?.listItems?.length != undefined) {
+    dataOnSale = data?.listItems?.filter(x => {
+      return x.fraktal.status == "open";
+    });
+  }
+
+  let objects = await Promise.all(
+      dataOnSale.map(x => {
+        let res = createListed(x);
+        if (typeof res !== "undefined") {
+          return res;
+        }
+      })
+  );
+  return objects;
+}
+
+/**
+ * Map Auction To Fraktal
+ * @param auctionData
+ * @returns {Promise<any[]>}
+ */
+async function mapAuctionToFraktal(auctionData) {
+  let auctionDataHash = [];
+  await Promise.all(auctionData?.auctions.map(async x => {
+    let _hash = await getSubgraphAuction("auctionsNFT", x.tokenAddress);
+
+    const itm = {
+      "id":`${x.tokenAddress}-${x.sellerNonce}`,
+      "hash":_hash.fraktalNft.hash
+    };
+
+    auctionDataHash.push(itm);
+  }));
+  let auctionItems = [];
+  await Promise.all(auctionData?.auctions.map(async (auction, idx) => {
+        let hash = auctionDataHash.filter(e=>e.id == `${auction.tokenAddress}-${auction.sellerNonce}`);
+        Object.assign(auction, {"hash":hash[0].hash});
+        const item = await createListedAuction(auction);
+        auctionItems.push(item);
+      }
+  ));
+  return auctionItems;
+}
+
+export {infuraConfig, mapFixedPrice, mapAuctionToFraktal}
