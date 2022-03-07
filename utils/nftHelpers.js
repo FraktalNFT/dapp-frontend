@@ -54,7 +54,7 @@ function toBase32(value) {
   return cid.toV1().toBaseEncodedString('base32');
 }
 
-async function fetchNftMetadata(hash) {
+export async function fetchNftMetadata(hash) {
   if (hash.startsWith('ipfs://Qm')) {
     hash = hash.slice(7)
   }
