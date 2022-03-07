@@ -189,10 +189,7 @@ const NFTTab = forwardRef(({subgraphMethod, sort, orderBy, mapping, additionalQu
             } else if (type === HIGHEST_PRICE) {
                 setOrderDirection(ORDER_DESC);
                 setRefresh(true);
-            } else if (type == NEWLY_LISTED) {
-                setOrderDirection(ORDER_DESC);
-                setRefresh(true);
-            }
+            } 
         }
     }));
 
