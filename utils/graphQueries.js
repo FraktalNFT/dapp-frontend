@@ -54,7 +54,7 @@ const getFraktalByAddress = gql`
         winner
         value
         votes
-        timestamp
+        created
       }
       revenues {
         id
