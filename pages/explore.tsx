@@ -313,6 +313,17 @@ const NFTTab = forwardRef(({subgraphMethod, sort, orderBy, mapping, additionalQu
                     </Grid>
                 </InfiniteScroll>
             )}
+            {!loading && nftItems?.length <= 0 && (
+                <VStack>
+                    <Text className="medium-16">Whoops, no NFTs are for sale.</Text>
+                    <Text className="medium-16">
+                        Check back later or list your own!
+                    </Text>
+                    <NextLink href={MINT_NFT}>
+                        <FrakButton mt="1.6rem !important">Mint NFT</FrakButton>
+                    </NextLink>
+                </VStack>
+            )}
         </>
     );
 });
