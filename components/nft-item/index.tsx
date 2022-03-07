@@ -71,19 +71,12 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     useEffect(() => {
       if (item) {
         getListingAmount(account, item.id, provider, marketAddress).then(
-          (amount: BigNumber) => {
-            if (amount.gt(0)) {
-              setIsListed(true);
-            } else {
-              setIsListed(false);
-            }
-          }
-        );
+          (amount: BigNumber) => setIsListed(amount.gt(0)));
       }
     }, []);
 
-    const priceParsed = (price) => {
-      return roundUp(price, 3);
+    const priceParsed = (_price) => {
+      return roundUp(_price, 3);
     };
 
     const unList = async () => {
