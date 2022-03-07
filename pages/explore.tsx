@@ -1,7 +1,7 @@
 /**
  * Chakra UI
  */
-import { useState, useEffect } from "react";
+ import { useState, useEffect } from "react";
 import { Flex, Grid, Spacer, Text, VStack } from "@chakra-ui/layout";
 import {
   MenuButton,
@@ -11,6 +11,9 @@ import {
   MenuItem,
   Box,
   Spinner,
+  Tab,
+  Tabs,
+  TabList
 } from "@chakra-ui/react";
 
 /**
@@ -34,22 +37,28 @@ import { fetchNftMetadata } from "../utils/nftHelpers";
 
 /**
  * Sorting
+ * 
+ * Consider adding sorting options as a property of listing options. e.g.:
+ * listingOptions => [{type, label, filter, sorters: [] }, ...]
  */
  const sortingOptions = [
-  { prop: "price", dir: "asc", label: "Lowest Price"},
-  { prop: "price", dir: "desc", label: "Highest Price"},
-  { prop: "createdAt", dir: "desc", label: "Newly Listed"},
-  { prop: "holders", dir: "desc", label: "Popular"},
+  { prop: "price", dir: "asc", label: "Lowest Price", entity: "FIXED"},
+  { prop: "price", dir: "desc", label: "Highest Price", entity: "FIXED"},
+  { prop: "price", dir: "asc", label: "Lowest Reserve", entity: "AUCTION"},
+  { prop: "price", dir: "desc", label: "Highest Reserve", entity: "AUCTION"}
+  // { prop: "createdAt", dir: "desc", label: "Newly Listed"},
+  // { prop: "holders", dir: "desc", label: "Popular"},
 ]
+
+const entityTypes = ["FIXED", "AUCTION"]
 
 /**
  * Filters
  * @type {string}
  */
 const listingOptions = [
-  { label: "All Listings", filter: (item) => true},
-  { label: "Auctions", filter: (item) => item.hasOwnProperty("end")},
-  { label: "Fixed Price", filter: (item) => !item.hasOwnProperty("end")},
+  { type: "FIXED", label: "Fixed Price",  filter: (item) => !item.hasOwnProperty("end")},
+  { type: "AUCTION", label: "Auctions", filter: (item) => item.hasOwnProperty("end")},
 ]
 
 const hasNonZeroReservePrice = ({price}) => (!!Number(price))
@@ -73,6 +82,10 @@ const Marketplace: React.FC = () => {
   const [listingOptionId, setListingOptionId] = useState(0)
   const [loading, setLoading] = useState(true)
   const [hasMore, setHasMore] = useState(false)
+  const [auctionItems, setAuctionItems] = useState([])
+  const [fixedItems, setFixedItems] = useState([])
+  const [filteredSortingOptions, setFilteredSortingOptions] = useState(sortingOptions.slice(0,1))
+
   // Pagination
   // const [limit, setLimit] = useState(15)
   // const [offset, setOffset] = useState(0)
@@ -101,10 +114,8 @@ const Marketplace: React.FC = () => {
       
       setNftItems(items)
     }
-
     updateItems(sortingOptionId, listingOptionId)
   }, [sortingOptionId, listingOptionId])
-  
 
   useEffect(() => {
     const getAll = async function () {
@@ -113,26 +124,27 @@ const Marketplace: React.FC = () => {
       setLoading(false)
     }
 
-    getAll()
+    getAll().catch(console.error)
   },[])
 
-  const getItems = async () => {
-    try {
-      const NOW = Math.ceil(Date.now() / 1000);
-      const { auctions = [] } = await getSubgraphData("auctions");
+  /**
+   * Updates the filtered sorting options
+   */
+  useEffect(() => {
+    const entityType = entityTypes[listingOptionId]
+    const _filteredSortingOptions = sortingOptions.filter(o => (o.entity === entityType))
+    setFilteredSortingOptions(_filteredSortingOptions)
+    
+    const listingOptionIdMap = {
+      "FIXED": fixedItems,
+      "AUCTION": auctionItems
+    }
 
-      const activeAuctions = auctions
-        .filter(hasNonZeroReservePrice)
-        .filter(x => Number(x.end) - NOW)
+    setNftItems(listingOptionIdMap[entityType])
+  }, [listingOptionId])
 
-      // gets 100 nfts ordered by createdAt (desc)
-      const { listItems } = await getSubgraphData("listed_items");
-      // this goes in the graphql query
-      const listings = listItems
-        .filter(nft => (nft.fraktal.status == "open"))
-
-      const allListings = await Promise.all(activeAuctions.concat(listings)
-      .filter(nft => nft.fraktal.hash != "")
+  const cleanNftList = async (items) => {
+    return Promise.all(items.filter((nft) => nft.fraktal.hash != "")
       .map((nft, idx) => {
         const { hash } = nft.fraktal
         if(hash.startsWith('Qm')) {
@@ -146,9 +158,31 @@ const Marketplace: React.FC = () => {
       .map(async nft => {
         const meta = await fetchNftMetadata(nft.fraktal.hash)
         return {...nft, ...meta}
-      }))
+      })
+    )
+  }
 
-      setNftItems(allListings)
+  const getItems = async () => {
+    try {
+      const NOW = Math.ceil(Date.now() / 1000);
+      const { auctions = [] } = await getSubgraphData("auctions");
+
+      const activeAuctions = auctions
+        .filter(hasNonZeroReservePrice)
+        .filter(x => Number(x.end) - NOW)
+
+      const cleanAuctionItems = await cleanNftList(activeAuctions)
+      setAuctionItems(cleanAuctionItems)
+
+      // gets 100 nfts ordered by createdAt (desc)
+      const { listItems } = await getSubgraphData("listed_items");
+
+      const listings = listItems
+        .filter(nft => (nft.fraktal.status == "open"))
+
+      const cleanFixedItems = await cleanNftList(listings)
+      setFixedItems(cleanFixedItems)
+
     } catch (err) {
       console.error(err)
     }
@@ -175,6 +209,18 @@ const Marketplace: React.FC = () => {
           <Text className="semi-48" marginEnd="2rem">
             Marketplace
           </Text>
+          <Tabs isFitted defaultIndex={0} size="lg" align="start" variant="enclosed" alignSelf="end" flexGrow={1}>
+            <TabList mb="1em">
+            {
+                listingOptions.map(({label}, idx) => (
+                  <Tab
+                    key={`listing-type-${idx}`}
+                    onClick={() => setListingOptionId(idx)}
+                  >{label}</Tab>
+                ))
+              }
+            </TabList>
+          </Tabs>
           <Menu closeOnSelect={true}>
             <MenuButton
               as={Button}
@@ -187,41 +233,15 @@ const Marketplace: React.FC = () => {
               fontWeight="bold"
               transition="all 0.2s"
             >
-              Sort: {sortingOptions[sortingOptionId].label}
+              Sort: {filteredSortingOptions[sortingOptionId].label}
             </MenuButton>
             <MenuList>
             {
-                sortingOptions.map(({label}, idx) => (
+                // Subset of sorting options based off selecting listing type
+                filteredSortingOptions.map(({label}, idx) => (
                   <MenuItem 
                     key={`sort-${idx}`}  
                     onClick={() => setSortingOptionId(idx)}
-                  >
-                    {label}
-                  </MenuItem>
-                ))
-              }
-            </MenuList>
-          </Menu>
-          <Menu closeOnSelect={true}>
-            <MenuButton
-              as={Button}
-              alignSelf="center"
-              fontSize="12"
-              bg="transparent"
-              height="5rem"
-              width="18rem"
-              rightIcon={<FiChevronDown />}
-              fontWeight="bold"
-              transition="all 0.2s"
-            >
-              Listing: {listingOptions[listingOptionId].label}
-            </MenuButton>
-            <MenuList>
-              {
-                listingOptions.map(({label}, idx) => (
-                  <MenuItem 
-                    key={`listing-type-${idx}`}
-                    onClick={() => setListingOptionId(idx)}
                   >
                     {label}
                   </MenuItem>
@@ -291,7 +311,6 @@ const Marketplace: React.FC = () => {
                           </Anchor>
                           )
                       }
-                      
                     })}
                   </Grid>
                 </InfiniteScroll>
