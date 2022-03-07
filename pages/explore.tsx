@@ -91,14 +91,30 @@ const Marketplace: React.FC = () => {
   // const [offset, setOffset] = useState(0)
   // const [orderDirection, setOrderDirection] = useState("desc")
 
+  useEffect(() => {
+    const getAll = async function () {
+      setLoading(true)
+      await getItems()
+      setLoading(false)
+    }
+
+    getAll().catch(console.error)
+  }, [])
+
    /**
   * Sort select handler
   * @param {number} id selected sorting option index
   */
   useEffect(() => {
     const updateItems = (sid: number, lid: number) => {
+      const listingOptionIdMap = {
+        "FIXED": fixedItems,
+        "AUCTION": auctionItems
+      }
+
       // Filter first to reduce sorting
-      const items = [...nftItems].filter(listingOptions[lid].filter)
+      const _items = listingOptionIdMap[entityType]
+      const items = [..._items].filter(listingOptions[lid].filter)
 
       // Sorting
       const {prop, dir} = sortingOptions[sid]
@@ -114,34 +130,13 @@ const Marketplace: React.FC = () => {
       
       setNftItems(items)
     }
-    updateItems(sortingOptionId, listingOptionId)
-  }, [sortingOptionId, listingOptionId])
 
-  useEffect(() => {
-    const getAll = async function () {
-      setLoading(true)
-      await getItems()
-      setLoading(false)
-    }
-
-    getAll().catch(console.error)
-  },[])
-
-  /**
-   * Updates the filtered sorting options
-   */
-  useEffect(() => {
     const entityType = entityTypes[listingOptionId]
     const _filteredSortingOptions = sortingOptions.filter(o => (o.entity === entityType))
     setFilteredSortingOptions(_filteredSortingOptions)
-    
-    const listingOptionIdMap = {
-      "FIXED": fixedItems,
-      "AUCTION": auctionItems
-    }
 
-    setNftItems(listingOptionIdMap[entityType])
-  }, [listingOptionId])
+    updateItems(sortingOptionId, listingOptionId)
+  }, [auctionItems, fixedItems, sortingOptionId, listingOptionId])
 
   const cleanNftList = async (items) => {
     return Promise.all(items.filter((nft) => nft.fraktal.hash != "")
@@ -189,15 +184,15 @@ const Marketplace: React.FC = () => {
   };
 
   // Store NFT Items in Session Storage
-  useEffect(() => {
-    const result = nftItems.filter(canSelfCheck);
+  // useEffect(() => {
+  //   const result = nftItems.filter(canSelfCheck);
 
-    const stringedNFTItems = JSON.stringify(result);
-    if(stringedNFTItems.length){
-      window.sessionStorage.setItem("nftitems", stringedNFTItems);
-    }
+  //   const stringedNFTItems = JSON.stringify(result);
+  //   if(stringedNFTItems.length){
+  //     window.sessionStorage.setItem("nftitems", stringedNFTItems);
+  //   }
     
-  }, [nftItems]);
+  // }, [nftItems]);
 
   return (
     <>
