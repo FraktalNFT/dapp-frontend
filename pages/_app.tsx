@@ -81,7 +81,7 @@ const customTheme = extendTheme({
  * @see https://nextjs.org/docs/advanced-features/measuring-performance
  */
 export function reportWebVitals(metric) {
-  console.log(metric);
+  //console.log(metric);
 }
 
 /**

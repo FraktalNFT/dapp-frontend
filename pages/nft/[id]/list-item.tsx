@@ -148,7 +148,6 @@ export default function ListNFTView() {
     const fei = utils.parseEther(totalAmount);
     const wei = utils.parseEther(totalPrice);
     if(isAuction){
-      console.log('Auction');
       //listAuctionItem(tokenAddress,amount,price,provider,marketAddress)
       listItemAuction(
         nftObject.id,
@@ -165,7 +164,6 @@ export default function ListNFTView() {
       })
     }
     else{
-        console.log('List item');
       const weiPerFrak = (wei.mul(utils.parseEther("1.0"))).div(fei);
       // console.log(`Total price: ${weiPerFrak.toString()}, fei: ${fei.toString()}`);
       listItem(
