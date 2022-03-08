@@ -10,6 +10,9 @@ const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9
 
 // https://api.thegraph.com/subgraphs/name/drhongos/fraktalrinkeby // hosted
 
+export const LIMITED_ITEMS = "limited_items";
+export const LIMITED_AUCTIONS = "limited_auctions";
+
 const creator_query = gql`
   query($id: ID!) {
     fraktalNfts(where: { creator: $id }) {
@@ -471,13 +474,15 @@ const calls = [
   { name: "bought", call: user_bought_query },
   { name: "offers", call: user_offers_query },
   { name: "listed_items", call: listedItems },
-  { name: "limited_items", call: limitedItems },
+  { name: LIMITED_ITEMS, call: limitedItems },
   { name: "listed_items_by_fraktal_id", call: listedItemsByFraktalId },
   { name: "fraktal", call: fraktalId_query },
   { name: "fraktions", call: fraktions_query },
   { name: "fraktal_owners", call: fraktalOwners },
-  { name: "limited_auctions", call: limitedAuctions },
+  { name: LIMITED_AUCTIONS, call: limitedAuctions },
 ];
+
+
 
 
 const listedAuctions = gql`

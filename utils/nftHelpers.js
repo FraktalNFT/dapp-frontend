@@ -236,7 +236,7 @@ export async function createListedAuction(data) {
  */
 async function mapFixedPrice(data) {
   let dataOnSale;
-  if (data?.listItems?.length != undefined) {
+  if (data?.listItems?.length !== undefined) {
     dataOnSale = data?.listItems?.filter(x => {
       return x.fraktal.status == "open";
     });
