@@ -55,6 +55,10 @@ function toBase32(value) {
 }
 
 async function fetchNftMetadata(hash) {
+  const stored = JSON.parse(window.localStorage.getItem(hash));
+  if(stored){
+    return stored;
+  }
   if (hash.startsWith('ipfs://Qm')) {
     hash = hash.slice(7)
   }
@@ -70,6 +74,7 @@ async function fetchNftMetadata(hash) {
     let res = await fetch(hash);
     if (res) {
       let result = res.json();
+      window.localStorage.setItem(hash,JSON.stringify(result));
       return result;
     }
   }
