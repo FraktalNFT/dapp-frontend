@@ -64,7 +64,7 @@ const RewardsPage = () => {
                     <HStack spacing={10} divider={<StackDivider borderColor='#9F66E3' />}>
                         <Box><Text className="fraktalTotal">1 000 000.00 FRAK</Text></Box>
                         <Box>
-                            <a href={"https://app.uniswap.org/"} target="_blank">
+                            <a href={"https://app.uniswap.org/#/swap?outputCurrency=0x1f81f8f262714cc932141c7C79495B481eF27258&chain=mainnet"} target="_blank">
                                 <FrakButton px="50px">Buy Frak</FrakButton>
                             </a>
                         </Box>
@@ -79,7 +79,7 @@ const RewardsPage = () => {
                 </Stack>
             </Box>
             <Box>
-                <a href={"https://docs.fraktal.io/fraktal-governance-token-frak/airdrop"} target="_blank">
+                <a href={"https://docs.fraktal.io/fraktal-governance-token-frak/staking-frak"} target="_blank">
                     <FrakButton
                         color="#000"
                         border="2px solid #000"

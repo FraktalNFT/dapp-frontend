@@ -53,7 +53,6 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
 
     const priceParsed = (price) => {
       return roundUp((utils.formatEther(price) * 100000) / 100000, 3);
-      // return Math.round(utils.formatEther(price) * 100000) / 100000;
     };
 
     let amountString = '';

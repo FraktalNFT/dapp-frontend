@@ -58,8 +58,9 @@ const FrakButton2 = forwardRef<
               fontSize: '14px',
               maxWidth: '50px',
               padding: '4px',
+              wordWrap: 'initial',
               position: 'relative',
-              marginRight: `110px`,
+              marginRight: `130px`,
               boxSizing: `content-box`,
               transform: `translateX(2px) translateY(-2px)`,
             }}

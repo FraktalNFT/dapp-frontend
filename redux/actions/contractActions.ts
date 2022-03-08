@@ -37,18 +37,18 @@ export const REJECT_OFFER = 'REJECT_OFFER';
 
 export const CLAIM_NFT = 'CLAIM_NFT';
 
-export type ActionOpts = { workflow?: Workflow };
+export type ActionOpts = { workflow?: Workflow, custom?: any };
 
 export const callContract = (
   transactionType,
   obj,
-  { workflow }: ActionOpts = {}
+  opts: ActionOpts = {}
 ) => {
   return {
     obj: obj,
     transactionType,
     type: CALL_CONTRACT,
-    workflow,
+    ...opts,
   };
 };
 
@@ -56,14 +56,14 @@ export const rejectContract = (
   transactionType,
   obj,
   buttonAction?: any,
-  { workflow }: ActionOpts = {}
+  opts: ActionOpts = {}
 ) => {
   return {
     obj: obj,
     transactionType,
     buttonAction,
     type: REJECTED_CONTRACT,
-    workflow,
+    ...opts,
   };
 };
 
@@ -71,14 +71,14 @@ export const approvedTransaction = (
   transactionType,
   obj,
   tokenAddress?: string,
-  { workflow }: ActionOpts = {}
+  opts: ActionOpts = {}
 ) => {
   return {
     obj: obj,
     transactionType,
     tokenAddress,
     type: APPROVED_TRANSACTION,
-    workflow,
+    ...opts,
   };
 };
 

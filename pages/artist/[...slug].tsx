@@ -22,7 +22,7 @@ export default function ArtistView() {
   const [loading, setIsLoading] = useState<boolean>(false);
   const [artist_Address, setArtist_Address] = useState("");
   const [inputAddress, setInputAddress] = useState("");
-  
+
   function searchHandle(e){
     e.preventDefault();
     if(e.target.value !== ""){
@@ -71,7 +71,7 @@ export default function ArtistView() {
       </Head>
       <Heading sx={{ fontSize: `36px`, marginBottom: `1rem` }}>
         {artistAddress}
-        <div className={styles_Search.searchContainer}>
+    {/*    <div className={styles_Search.searchContainer}>
           <input
             placeholder={"Search ENS or ETH address "}
             className={styles_Search.searchInput}
@@ -86,8 +86,8 @@ export default function ArtistView() {
                 <Image src="/search.svg" />
               </NextLink>
           }
-          
-        </div>
+
+        </div> */}
       </Heading>
       {!loading && nftItems.length > 0 && (
         <>
