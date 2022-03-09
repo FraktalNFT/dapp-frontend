@@ -6,7 +6,7 @@ const options = {method: 'GET'};
 
 
 export const assetsInWallet = (address) => {
-  const data = fetch(`https://rinkeby-api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=0&limit=20`, options)
+  const data = fetch(`https://rinkeby-api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=0&limit=50`, options)
     .then(response => response.json())
     .then(data => {
       return data;
