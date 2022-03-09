@@ -35,10 +35,8 @@ import InfiniteScroll from "react-infinite-scroll-component";
  * Utils
  */
 
-import { FrakCard } from "../types";
 import { BigNumber, utils } from "ethers";
 import { getSubgraphData, LIMITED_ITEMS, LIMITED_AUCTIONS } from "../utils/graphQueries";
-import { createListed, createListedAuction } from "../utils/nftHelpers";
 
 /**
  * FRAKTAL Components
@@ -92,7 +90,6 @@ const Marketplace: React.FC = () => {
      * First loading
      */
     useEffect(() => {
-        console.log('USE EFFECT NULL');
         setLoading(true);
         getData();
     }, []);
@@ -101,7 +98,6 @@ const Marketplace: React.FC = () => {
      * useEffect
      */
     useEffect(()=>{
-        console.log('USE EFFECT REFRESH');
         if (refresh === true) {
             setHasMore(false);
             setLoading(true);
@@ -110,7 +106,6 @@ const Marketplace: React.FC = () => {
     }, [refresh]);
 
   useEffect(() => {
-      console.log('USE EFFECT QUERY', router);
       if (refresh === false && router.query.query !== undefined) {
           setLoading(true);
         //  setQueryString(router.query.query)
@@ -152,14 +147,13 @@ const Marketplace: React.FC = () => {
         setSubgraphMethod(LIMITED_ITEMS);
         setOrderBy(SORT_FIXED_PRICE);
     } else {
+        removeFilter(1);
         setSubgraphMethod(LIMITED_AUCTIONS);
         setOrderBy(SORT_AUCTION_PRICE);
         let curTimestamp = Math.round(Date.now() / 1000);
         setAdditionalQueryParams({endTime: curTimestamp})
     }
-    setOffset(0);
-    setNftItems([]);
-    setRefresh(true);
+    removeFilter(index);
   }
 
   /**
@@ -215,11 +209,11 @@ const Marketplace: React.FC = () => {
   /**
   * Remove Search Filter
   */
-  const removeFilter = () => {
+  const removeFilter = (tab = null) => {
     router.push(EXPLORE, "", { shallow: true }).then( () => {
         setOffset(0);
         setNftItems([]);
-        setTabIndex(0);
+        setTabIndex(tab);
         setQueryString("");
         setRefresh(true);
     });
