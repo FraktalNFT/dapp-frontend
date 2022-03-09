@@ -37,11 +37,11 @@ import {
 
 //tested
 const factoryAbi = [
-  "function mint(string urlIpfs, uint16 majority, string _name, string _symbol)",
-  "function importERC721(address _tokenAddress, uint256 _tokenId, uint16 majority)",
-  "function importERC1155(address _tokenAddress, uint256 _tokenId, uint16 majority)",
-  "function claimERC721(uint256 _tokenId)",
-  "function claimERC1155(uint256 _tokenId)",
+  'function mint(string urlIpfs, uint16 majority)',
+  'function importERC721(address _tokenAddress, uint256 _tokenId, uint16 majority)',
+  'function importERC1155(address _tokenAddress, uint256 _tokenId, uint16 majority)',
+  'function claimERC721(uint256 _tokenId)',
+  'function claimERC1155(uint256 _tokenId)',
 ];
 const marketAbi = [
   'function importFraktal(address tokenAddress, uint256 fraktionsIndex)',
@@ -88,23 +88,6 @@ const revenuesAbi = [
   'function release() public',
   'function totalShares() external view returns (uint256)',
 ];
-
-const erc165Abi = [
-  "function supportsInterface(bytes4 interfaceID) external view returns (bool)"
-]
-
-const erc721Abi = [
-  "function tokenURI(uint256 _tokenId) external view returns (string)",
-];
-const erc1155Abi = [
-  "function uri(uint256 _id) external view returns (string memory)"
-];
-
-const airdropABI = [
-  "function claim(uint256 amount,bytes32[] calldata merkleProof,address listedToken) external",
-  "function hasClaim(address) external"
-];
-
 
 // TODO
 const transferAbi = [
@@ -279,39 +262,6 @@ export async function getParticipantContribution(
   );
   return nonce;
 }
-export async function getERC721URI(tokenAddress, id, provider) {
-  console.log({tokenAddress, id, provider});
-  
-  const customContract = new Contract(tokenAddress, erc721Abi, provider);
-  let uri = await customContract.tokenURI(id);
-  return uri;
-}
-export async function getERC1155URI(tokenAddress, id, provider) {
-  console.log({tokenAddress, id, provider});
-  
-  const customContract = new Contract(tokenAddress, erc1155Abi, provider);
-  let uri = await customContract.uri(id);
-  return uri;
-}
-export async function getNftContractType(tokenAddress,provider){
-  const customContract = new Contract(tokenAddress, erc165Abi, provider);
-  const ERC1155InterfaceId = "0xd9b67a26";
-  const ERC721InterfaceId = "0x80ac58cd";
-
-  const isErc721 = await customContract.supportsInterface(ERC721InterfaceId);
-  if(isErc721){
-    return "ERC721";
-  }
-  const isErc1155 = await customContract.supportsInterface(ERC1155InterfaceId);
-  if(isErc1155){
-    return "ERC1155";
-  }
-
-  console.log({isErc721,isErc1155});
-  
-
-  return "Unknown Contract Type";
-}
 
 // State functions
 ///////////////////////////////////////////////////////////
@@ -421,7 +371,7 @@ export async function createNFT(
   const signer = await loadSigner(provider);
   const customContract = new Contract(contractAddress, factoryAbi, signer);
   try {
-    let tx = await customContract.mint(hash, defaultMajority,"","");
+    let tx = await customContract.mint(hash, defaultMajority);
     store.dispatch(callContract(MINT_NFT, tx, opts));
     let receipt = await awaitTokenAddress(tx);
     if (!receipt?.error) {
@@ -487,7 +437,7 @@ export async function importERC721(
   opts?: ActionOpts
 ) {
   const signer = await loadSigner(provider);
-  const override = { gasLimit: 5000000 };
+  const override = { gasLimit: 1000000 };
   const customContract = new Contract(factoryAddress, factoryAbi, signer);
   try {
     let tx = await customContract.importERC721(
@@ -892,36 +842,6 @@ export async function unlistAuctionItem(
     store.dispatch(
       approvedTransaction(UNLIST_AUCTION_NFT, tx, tokenAddress, opts)
     );
-  }
-  return receipt;
-}
-
-export async function hadClaimedAirdrop(
-  provider,
-  airdropAddress,
-  opts?: ActionOpts
-) {
-  const signer = await loadSigner(provider);
-  const customContract = new Contract(airdropAddress, airdropABI, signer);
-  let tx = await customContract.hasClaim();
-  let receipt = await processTx(tx);
-  if (!receipt?.error) {
-  }
-  return receipt;
-}
-export async function claimAirdrop(
-  amount,
-  merkleProof,
-  listedTokenAddress,
-  provider,
-  airdropAddress,
-  opts?: ActionOpts
-) {
-  const signer = await loadSigner(provider);
-  const customContract = new Contract(airdropAddress, airdropABI, signer);
-  let tx = await customContract.claim(amount, merkleProof, listedTokenAddress);
-  let receipt = await processTx(tx);
-  if (!receipt?.error) {
   }
   return receipt;
 }

@@ -4,12 +4,11 @@ const { CID } = require("ipfs-http-client");
 
 //const APIURL = 'https://api.studio.thegraph.com/query/21128/marketplaceperformance/0.0.1';
 //const AUCTIONAPI = 'https://api.studio.thegraph.com/query/21128/marketplaceperformance/0.0.1';
-const APIURL = 'https://api.studio.thegraph.com/query/16828/testnetfraktal/0.0.2';
-const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/testnetfraktal/0.0.2';
+const APIURL = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9';
+const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9';
 // const APIURL = 'https://gateway.testnet.thegraph.com/api/a2ae030e27fc11191339a53e73cea9c2/subgraphs/id/0x98e7910e754abd41ace110c23d679333779c2ff9-1'
 
 // https://api.thegraph.com/subgraphs/name/drhongos/fraktalrinkeby // hosted
-const AIRDROPAPI = 'https://api.looksrare.org/graphql';
 
 export const LIMITED_ITEMS = "limited_items";
 export const LIMITED_AUCTIONS = "limited_auctions";
@@ -556,23 +555,3 @@ export const getSubgraphAuction = async (call, id, options = null) => {
     return err;
   }
 };
-
-export const getAddressAirdrop = async (id, options = null) =>{
-  let callGql = gql`
-    query Airdrop($id: Address!) {
-      airdrop(address:$id) {
-        proof
-        amount
-      }
-    }
-  `;
-  try {
-    const data = await request(AIRDROPAPI, callGql, { id, ...options });
-    // console.log('data for:',id,' found',data)
-    return data;
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error("error", err);
-    return err;
-  }
-}
