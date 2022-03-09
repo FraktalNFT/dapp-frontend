@@ -12,14 +12,14 @@ export const contracts = [ // old ones
 ]
 export const marketContracts = [
   {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
-  {providerChainId:4, address:'0x1421ba6B13955102F0EB92fcB819e97bc1D00578'}, // proxy
+  {providerChainId:4, address:'0x1379cf637fc4cf09D89CDc9131C38DD4dd15D1c7'}, // proxy
   // {providerChainId:4, address:'0x2EaA5E7A501eFA561B775aEE95eeF6a113bDd0e4'}, // 
   // {providerChainId:4, address:'0xD71CB14bB50C39D090083C6c3be934AF2b435fEB'}, // proxy
   // {providerChainId:4, address:'0xDD301042351A08512b5E728154B1B3E81908A628'}, logic
 ]
 export const factoryContracts = [
   {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
-  {providerChainId:4, address:'0xec6cA84e13E013A3F8C2D62A9030a01234CB9bF3'},
+  {providerChainId:4, address:'0x9c27b4310F128Fdb6cfE6b2eA32Af3774Bf6778e'},
   // {providerChainId:4, address:'0xd8646ea0064538ec100881893d98537f611c53bc'},
   // {providerChainId:4, address:'0xA64E2EF06B06FFd77Abec0FCb375Fb368ABEF06e'},
   // {providerChainId:4, address:'0x7edb6a54D10B4e3039Fd11D1A59582a6294a6ffE'},
@@ -27,7 +27,23 @@ export const factoryContracts = [
 
 export const airdropContract = [
   {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
-  {providerChainId:4, address:'0x67a6335543b4295aA7D8165B3Cf906c7F36bcDFe'},
+  {providerChainId:4, address:'0xdA64d4c447476Ef26FD929d63Ec8f1C81C267854'},
+  // {providerChainId:4, address:'0x67a6335543b4295aA7D8165B3Cf906c7F36bcDFe'},
+]
+
+export const feeSharingContract = [
+  {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+  {providerChainId:4, address:'0xe398a2Cfa41440e7d33bbdC76f0a65C9Ca3D8373'},
+]
+
+export const tradingRewardsContract = [
+  {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+  {providerChainId:4, address:'0x92E52AF0D07b1d4cE0DA9041C1a2eC164c75174e'},
+]
+
+export const lpStakingContract = [
+  {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+  {providerChainId:4, address:'0x85F625355a5DeCebb5F1609c7197597F3B125411'},
 ]
 
 export const networkNames = {
