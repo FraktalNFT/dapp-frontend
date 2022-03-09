@@ -2,15 +2,11 @@ import { gql, request } from "graphql-request";
 import { utils } from "ethers";
 const { CID } = require("ipfs-http-client");
 
-// const APIURL = 'https://api.studio.thegraph.com/query/101/fraktal2rinkeby/v0.2.18';
-//const APIURL = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9';
 const APIURL = 'https://api.studio.thegraph.com/query/21128/test/0.3.6';
-// const APIURL = 'https://gateway.testnet.thegraph.com/api/a2ae030e27fc11191339a53e73cea9c2/subgraphs/id/0x98e7910e754abd41ace110c23d679333779c2ff9-1'
-//const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/oldfraktal/0.7.9';
 const AUCTIONAPI = 'https://api.studio.thegraph.com/query/21128/test/0.3.6';
 
-// const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/testnetfraktalauction/0.4';
-// https://api.thegraph.com/subgraphs/name/drhongos/fraktalrinkeby // hosted
+export const LIMITED_ITEMS = "limited_items";
+export const LIMITED_AUCTIONS = "limited_auctions";
 
 const creator_query = gql`
   query($id: ID!) {
@@ -377,6 +373,7 @@ const fraktalId_query = gql`
   }
 `;
 
+
 const limitedItems = gql`
   query($limit: Int!, $offset: Int!, $orderBy: String!, $orderDirection: String!) {
     listItems(first: $limit, skip: $offset, where: { amount_gt: 0 }, orderBy: $orderBy, orderDirection: $orderDirection) {
@@ -443,6 +440,35 @@ const listedItemsByFraktalId = gql`
         }
       }
     }
+  }
+`;
+
+const limitedAuctions = gql`
+  query($limit: Int!, $offset: Int!, $endTime: Int!, $orderDirection: String!) {
+    auctions(first: $limit, skip: $offset, orderBy: reservePrice, orderDirection: $orderDirection, where: { endTime_gt: $endTime, reservePrice_gt: 0 }) {
+      seller {
+        id
+      }
+      tokenAddress
+      reservePrice
+      amountOfShare
+      endTime
+      sellerNonce
+      participants
+      fraktal {
+          id
+          hash
+          marketId
+          createdAt
+          status
+          fraktions {
+            amount
+          }
+          creator {
+            id
+          }
+        }      
+      }
   }
 `;
 
@@ -559,6 +585,7 @@ const searchItems = gql`
     }
   }
 `;
+
 const calls = [
   { name: "account_fraktions", call: account_fraktions_query },
   { name: "marketid_fraktal", call: marketid_query },
@@ -573,42 +600,14 @@ const calls = [
   { name: "bought", call: user_bought_query },
   { name: "offers", call: user_offers_query },
   { name: "listed_items", call: listedItems },
-  { name: "limited_items", call: limitedItems },
+  { name: LIMITED_ITEMS, call: limitedItems },
   { name: "listed_items_by_fraktal_id", call: listedItemsByFraktalId },
   { name: "fraktal", call: fraktalId_query },
   { name: "fraktions", call: fraktions_query },
   { name: "fraktal_owners", call: fraktalOwners },
+  { name: LIMITED_AUCTIONS, call: limitedAuctions },
   { name: "search_items", call: searchItems },
 ];
-
-const limitedAuctions = gql`
-  query($limit: Int!, $offset: Int!, $endTime: Int!, $orderDirection: String!) {
-    auctions(first: $limit, skip: $offset, orderBy: reservePrice, orderDirection: $orderDirection, where: { endTime_gt: $endTime, reservePrice_gt: 0 }) {
-      seller {
-        id
-      }
-      tokenAddress
-      reservePrice
-      amountOfShare
-      endTime
-      sellerNonce
-      participants
-      fraktal {
-          id
-          hash
-          marketId
-          createdAt
-          status
-          fraktions {
-            amount
-          }
-          creator {
-            id
-          }
-        }      
-      }
-  }
-`;
 
 const listedAuctions = gql`
   query {
@@ -652,7 +651,6 @@ query($id: ID!) {
 
 const auctionCalls = [
   { name: "auctions", call: listedAuctions },
-  { name: "limited_auctions", call: limitedAuctions },
   { name: "auctionsNFT", call:auctionFraktalNFT},
   { name: "singleAuction", call: getSingleAuction}
 ];

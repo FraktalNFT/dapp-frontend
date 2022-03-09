@@ -65,7 +65,7 @@ async function mapNotForSale(listedItems) {
  */
 async function getItems(query, options = []) {
     if (query.length < 2) {
-        return options;
+        return [];
     }
     const searchData = await getSubgraphData("search_items", "", {
         name: "'" + query + "'" + ':*'
@@ -94,6 +94,10 @@ async function getItems(query, options = []) {
         auctions: auctionsObjects,
         notForSale: notForSale
     }
+}
+
+async function orderSearch() {
+
 }
 
 export {getItems, mapAuctions, mapFraktion, mapListed, mapNotForSale}
