@@ -61,7 +61,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const [isListed, setIsListed] = useState(false);
     const { fraktions, fraktals } = useUserContext();
-    const { account, provider, marketAddress } = useWeb3Context();
+    const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
 
     const canFrak =
       item && !!(fraktals || []).find((fraktion) => fraktion.id === item.id);
@@ -134,7 +134,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
         await claimERC1155(
             item.marketId,
             provider,
-            marketAddress,
+            factoryAddress,
             actionOpts
         ).then((response) => {
           console.log(response)
