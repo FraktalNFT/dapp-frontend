@@ -2,8 +2,8 @@ import { gql, request } from "graphql-request";
 import { utils } from "ethers";
 const { CID } = require("ipfs-http-client");
 
-const APIURL = 'https://api.studio.thegraph.com/query/21128/test/0.3.6';
-const AUCTIONAPI = 'https://api.studio.thegraph.com/query/21128/test/0.3.6';
+const APIURL = 'https://api.studio.thegraph.com/query/16828/testnetfraktal/0.0.2';
+const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/testnetfraktal/0.0.2';
 
 export const LIMITED_ITEMS = "limited_items";
 export const LIMITED_AUCTIONS = "limited_auctions";
