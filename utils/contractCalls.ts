@@ -1,6 +1,3 @@
-// TODO:
-// sintetize all functions (or view vs state)
-
 import { Contract } from '@ethersproject/contracts';
 import { loadSigner, processTx, awaitTokenAddress } from './helpers';
 import { useMintingContext } from '@/contexts/NFTIsMintingContext';
@@ -37,56 +34,56 @@ import {
 
 //tested
 const factoryAbi = [
-  'function mint(string urlIpfs, uint16 majority)',
-  'function importERC721(address _tokenAddress, uint256 _tokenId, uint16 majority)',
-  'function importERC1155(address _tokenAddress, uint256 _tokenId, uint16 majority)',
-  'function claimERC721(uint256 _tokenId)',
-  'function claimERC1155(uint256 _tokenId)',
+    'function mint(string urlIpfs, uint16 majority, string _name, string _symbol)',
+    'function importERC721(address _tokenAddress, uint256 _tokenId, uint16 majority)',
+    'function importERC1155(address _tokenAddress, uint256 _tokenId, uint16 majority)',
+    'function claimERC721(uint256 _tokenId)',
+    'function claimERC1155(uint256 _tokenId)',
 ];
 const marketAbi = [
-  'function importFraktal(address tokenAddress, uint256 fraktionsIndex)',
-  'function rescueEth()',
-  'function buyFraktions(address from, address tokenAddress, uint256 _numberOfShares) payable',
-  'function claimFraktal(address tokenAddress)',
-  'function voteOffer(address offerer, address tokenAddress)',
-  'function makeOffer(address tokenAddress, uint256 _value) payable',
-  'function listItem(address _tokenAddress,uint256 _price,uint256 _numberOfShares) external returns (bool)',
-  'function unlistItem(address tokenAddress)',
-  'function maxPriceRegistered(address) view returns (uint256)',
-  'function exportFraktal(address tokenAddress)',
-  'function rejectOffer(address from, address to, address tokenAddress) external',
-  'function redeemAuctionSeller(address _tokenAddress,address _seller,uint256 _sellerNonce) external',
-  'function redeemAuctionParticipant(address _tokenAddress,address _seller,uint256 _sellerNonce) external',
-  'function participateAuction(address tokenAddress,address seller,uint256 sellerNonce) external payable',
-  'function listItemAuction(address _tokenAddress,uint256 _reservePrice,uint256 _numberOfShares) external returns (uint256)',
-  'function unlistAuctionItem(address tokenAddress,uint256 sellerNonce) external',
-  'function auctionReserve(address, uint256) public view returns (uint256)',
-  'function participantContribution(address, uint256, address) public view returns (uint256)',
-  'function auctionListings(address, address, uint256) public view returns (address, uint256, uint256, uint256)',
-  'function getListingAmount(address _listOwner, address tokenAddress) external view returns (uint256)',
+    'function importFraktal(address tokenAddress, uint256 fraktionsIndex)',
+    'function rescueEth()',
+    'function buyFraktions(address from, address tokenAddress, uint256 _numberOfShares) payable',
+    'function claimFraktal(address tokenAddress)',
+    'function voteOffer(address offerer, address tokenAddress)',
+    'function makeOffer(address tokenAddress, uint256 _value) payable',
+    'function listItem(address _tokenAddress,uint256 _price,uint256 _numberOfShares, string _name) external returns (bool)',
+    'function unlistItem(address tokenAddress)',
+    'function maxPriceRegistered(address) view returns (uint256)',
+    'function exportFraktal(address tokenAddress)',
+    'function rejectOffer(address from, address to, address tokenAddress) external',
+    'function redeemAuctionSeller(address _tokenAddress,address _seller,uint256 _sellerNonce) external',
+    'function redeemAuctionParticipant(address _tokenAddress,address _seller,uint256 _sellerNonce) external',
+    'function participateAuction(address tokenAddress,address seller,uint256 sellerNonce) external payable',
+    'function listItemAuction(address _tokenAddress,uint256 _reservePrice,uint256 _numberOfShares, string _name) external returns (uint256)',
+    'function unlistAuctionItem(address tokenAddress,uint256 sellerNonce) external',
+    'function auctionReserve(address, uint256) public view returns (uint256)',
+    'function participantContribution(address, uint256, address) public view returns (uint256)',
+    'function auctionListings(address, address, uint256) public view returns (address, uint256, uint256, uint256)',
+    'function getListingAmount(address _listOwner, address tokenAddress) external view returns (uint256)',
 ];
 const tokenAbi = [
-  'function isApprovedForAll(address account,address operator) external view returns (bool)',
-  'function makeSafeTransfer(address _to,uint256 _tokenId,uint256 _subId,uint256 _amount)',
-  'function getLockedShares(uint256 index, address who) public view returns(uint)',
-  'function getFraktionsIndex() public view returns (uint256)',
-  'function getLockedToTotal(uint256 index, address who) public view returns(uint)',
-  'function fraktionalize(uint256 _tokenId)',
-  'function defraktionalize() public',
-  'function setApprovalForAll(address operator, bool approved)',
-  'function unlockSharesTransfer(address from, address _to)',
-  'function lockSharesTransfer(address from, uint numShares, address _to)',
-  'function createRevenuePayment(address _marketAddress) payable',
-  'function balanceOf(address account, uint256 id) external view returns (uint256)',
-  'function majority() public view returns (uint)',
-  'function fraktionsIndex() public view returns (uint256)',
-  'function indexUsed(uint256) view returns (bool)',
+    'function isApprovedForAll(address account,address operator) external view returns (bool)',
+    'function makeSafeTransfer(address _to,uint256 _tokenId,uint256 _subId,uint256 _amount)',
+    'function getLockedShares(uint256 index, address who) public view returns(uint)',
+    'function getFraktionsIndex() public view returns (uint256)',
+    'function getLockedToTotal(uint256 index, address who) public view returns(uint)',
+    'function fraktionalize(uint256 _tokenId)',
+    'function defraktionalize() public',
+    'function setApprovalForAll(address operator, bool approved)',
+    'function unlockSharesTransfer(address from, address _to)',
+    'function lockSharesTransfer(address from, uint numShares, address _to)',
+    'function createRevenuePayment(address _marketAddress) payable',
+    'function balanceOf(address account, uint256 id) external view returns (uint256)',
+    'function majority() public view returns (uint)',
+    'function fraktionsIndex() public view returns (uint256)',
+    'function indexUsed(uint256) view returns (bool)',
 ];
 const revenuesAbi = [
-  'function shares(address account) external view returns (uint256)',
-  'function released(address account) public view returns (uint256)',
-  'function release() public',
-  'function totalShares() external view returns (uint256)',
+    'function shares(address account) external view returns (uint256)',
+    'function released(address account) public view returns (uint256)',
+    'function release() public',
+    'function totalShares() external view returns (uint256)',
 ];
 
 // TODO
@@ -328,7 +325,6 @@ export async function defraktionalize(provider, contract) {
 }
 
 export async function approveMarket(to, provider, contract, opts?: ActionOpts) {
-  console.log('Contract', contract);
   const signer = await loadSigner(provider);
   const customContract = new Contract(contract, tokenAbi, signer);
   try {
@@ -371,7 +367,7 @@ export async function createNFT(
   const signer = await loadSigner(provider);
   const customContract = new Contract(contractAddress, factoryAbi, signer);
   try {
-    let tx = await customContract.mint(hash, defaultMajority);
+    let tx = await customContract.mint(hash, defaultMajority, "", "");
     store.dispatch(callContract(MINT_NFT, tx, opts));
     let receipt = await awaitTokenAddress(tx);
     if (!receipt?.error) {
@@ -496,18 +492,14 @@ export async function listItem(
   price,
   provider,
   marketAddress,
+  name,
   opts?: ActionOpts
 ) {
   const override = { gasLimit: 300000 };
   const signer = await loadSigner(provider);
   const customContract = new Contract(marketAddress, marketAbi, signer);
   try {
-    let tx = await customContract.listItem(
-      tokenAddress,
-      price,
-      amount,
-      override
-    );
+    let tx = await customContract.listItem(tokenAddress, price, amount, name, override);
     store.dispatch(callContract(LISTING_NFT, tx, opts));
     let receipt = await processTx(tx);
     if (!receipt?.error) {
@@ -806,6 +798,7 @@ export async function listItemAuction(
   numberOfShares,
   provider,
   marketAddress,
+  name,
   opts?: ActionOpts
 ) {
   const signer = await loadSigner(provider);
@@ -814,7 +807,8 @@ export async function listItemAuction(
     let tx = await customContract.listItemAuction(
       tokenAddress,
       reservePrice,
-      numberOfShares
+      numberOfShares,
+      name
     );
     store.dispatch(callContract(LISTING_NFT, tx, opts));
     let receipt = await processTx(tx);

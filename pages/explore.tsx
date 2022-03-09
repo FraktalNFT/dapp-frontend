@@ -14,8 +14,9 @@ import {
   Tab,
   Tabs,
   TabList,
-  TabPanels,
-  TabPanel,
+  Tag,
+  TagLabel,
+  TagCloseButton,
 } from "@chakra-ui/react";
 
 /**
@@ -23,6 +24,7 @@ import {
  */
 import Head from "next/head";
 import NextLink from "next/link";
+import { useRouter } from 'next/router';
 /**
  * Icons
  */
@@ -36,6 +38,22 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { FrakCard } from "../types";
 import { BigNumber, utils } from "ethers";
 import { getSubgraphData, LIMITED_ITEMS, LIMITED_AUCTIONS } from "../utils/graphQueries";
+import { createListed, createListedAuction } from "../utils/nftHelpers";
+
+/**
+ * FRAKTAL Components
+ */
+import Anchor from '@/components/anchor';
+import FrakButton from "@/components/button";
+import NFTItem from "../components/nft-item";
+import NFTAuctionItem from "@/components/nft-auction-item";
+import {MY_NFTS, MINT_NFT, EXPLORE} from "@/constants/routes";
+import Search from "@/components/search";
+
+/**
+ * SEARCH Utils
+ */
+import {getItems, mapAuctions, mapListed} from '@/utils/search';
 import { mapFixedPrice, mapAuctionToFraktal } from "../utils/nftHelpers";
 /**
  * Filters
@@ -51,16 +69,10 @@ const ORDER_ASC = 'asc';
 const SORT_TYPES = [LOWEST_PRICE, HIGHEST_PRICE];
 const SORT_FIXED_PRICE = 'price';
 const SORT_AUCTION_PRICE = "reservePrice";
-/**
- * FRAKTAL Components
- */
-import NFTItem from "../components/nft-item";
-import NFTAuctionItem from "@/components/nft-auction-item";
-import FrakButton from "../components/button";
-import Anchor from '@/components/anchor';
-import {MY_NFTS, MINT_NFT} from "@/constants/routes";
+
 
 const Marketplace: React.FC = () => {
+  const router = useRouter();
   const [orderBy, setOrderBy] = useState(SORT_FIXED_PRICE);
   const [tabIndex, setTabIndex] = useState(0)
   const [sortName, setSortName] = useState(HIGHEST_PRICE);
@@ -73,24 +85,38 @@ const Marketplace: React.FC = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false);
+  const [queryString, setQueryString] = useState('');
   const [additionalQueryParams, setAdditionalQueryParams] = useState({});
 
     /**
      * First loading
      */
     useEffect(() => {
+        console.log('USE EFFECT NULL');
         setLoading(true);
         getData();
     }, []);
 
-  /**
-  * handleSortSelect
-  * @param {string} item
-  */
-  const handleSortSelect = (item: string) => {
-     setSortName(item);
-     changeOrder(item)
-  };
+    /**
+     * useEffect
+     */
+    useEffect(()=>{
+        console.log('USE EFFECT REFRESH');
+        if (refresh === true) {
+            setHasMore(false);
+            setLoading(true);
+            getData();
+        }
+    }, [refresh]);
+
+  useEffect(() => {
+      console.log('USE EFFECT QUERY', router);
+      if (refresh === false && router.query.query !== undefined) {
+          setLoading(true);
+        //  setQueryString(router.query.query)
+          getData();
+      }
+  }, [router.query]);
 
   /**
    * changeOrder
@@ -108,17 +134,14 @@ const Marketplace: React.FC = () => {
       }
   }
 
-  /**
-  * useEffect
-  */
-  useEffect(()=>{
-    if (refresh === true) {
-        setHasMore(false);
-        setLoading(true);
-        getData();
-    }
-  }, [refresh]);
-
+    /**
+     * handleSortSelect
+     * @param {string} item
+     */
+    const handleSortSelect = (item: string) => {
+        setSortName(item);
+        changeOrder(item)
+    };
    /**
      * handleTabsChange
      * @param index
@@ -143,13 +166,39 @@ const Marketplace: React.FC = () => {
    * getData
   */
   async function getData() {
-    const data = await getSubgraphData(subgraphMethod, "", {
+      const queryParams = new URLSearchParams(window.location.search);
+      const query = queryParams.get("query");
+      setQueryString(query);
+      if (query) {
+          setTabIndex(null);
+          const result = await getItems(query);
+          let nfts = [];
+          if (result.auctions) {
+              nfts = [...result.auctions, ...nfts];
+          }
+          if (result.fixedPrice) {
+              nfts = [...result.fixedPrice, ...nfts];
+          }
+
+          setNftItems(nfts);
+          setLoading(false);
+          setHasMore(true);
+          setRefresh(false);
+          return;
+      }
+
+     const data = await getSubgraphData(subgraphMethod, "", {
         limit: limit,
         offset: offset,
         orderDirection: orderDirection,
         orderBy: orderBy,
         ...additionalQueryParams
     });
+
+  /*  if (data?.listItems?.length == 0 && data.auctions.length == 0) {
+          setHasMore(false);
+          return;
+    }*/
 
     let mappedItems = data.listItems !== undefined ? await mapFixedPrice(data) : await mapAuctionToFraktal(data);
     if (mappedItems?.length > 0) {
@@ -162,6 +211,19 @@ const Marketplace: React.FC = () => {
     }
     setLoading(false);
    }
+
+  /**
+  * Remove Search Filter
+  */
+  const removeFilter = () => {
+    router.push(EXPLORE, "", { shallow: true }).then( () => {
+        setOffset(0);
+        setNftItems([]);
+        setTabIndex(0);
+        setQueryString("");
+        setRefresh(true);
+    });
+  };
 
   return (
     <>
@@ -193,7 +255,7 @@ const Marketplace: React.FC = () => {
             >
               Sort: {sortName}
             </MenuButton>
-            <MenuList>
+            <MenuList zIndex={2}>
                 {
                     SORT_TYPES.map((sortName) => (
                         <MenuItem onClick={() => handleSortSelect(sortName)}>
@@ -210,15 +272,37 @@ const Marketplace: React.FC = () => {
             </NextLink>
           </Box>
         </Flex>
-        <Tabs width="100%" index={tabIndex}  onChange={handleTabsChange}  isFitted variant='enclosed' size='lg' align="center" >
-            <NFTItems getData={getData} hasMore={hasMore} nftItems={nftItems} loading={loading}/>
+        <Search marginBottom="10px" width="100%"/>
+        <div style={{marginTop:"20px", width:"100%"}}>
+         {queryString && (<>
+              <Text  marginBottom="10px">Search results for:
+                  <Tag
+                      marginLeft="5px"
+                      size="lg"
+                      borderRadius='full'
+                      variant='solid'
+                      background="rgba(195, 135, 255, 0.7)"
+                  >
+                      <TagLabel>{queryString}</TagLabel>
+                      <TagCloseButton onClick={removeFilter} />
+                  </Tag></Text>
+        </>)}
+        </div>
+          <Tabs width="100%" index={tabIndex} onChange={handleTabsChange} isFitted variant='enclosed' size='lg' align="center" >
+            <NFTItems
+                removeFilter={removeFilter}
+                queryString={queryString}
+                getData={getData}
+                hasMore={hasMore}
+                nftItems={nftItems}
+                loading={loading}/>
         </Tabs>
       </VStack>
     </>
   );
 };
 
-const NFTItems = ({getData, hasMore, loading, nftItems}) => {
+const NFTItems = ({getData, hasMore, loading, nftItems, queryString, removeFilter}) => {
 
     /**
      * renderNFTItem
@@ -266,9 +350,11 @@ const NFTItems = ({getData, hasMore, loading, nftItems}) => {
 
     return (
         <>
+
             {loading && (
                 <Loading/>
             )}
+
             {!loading && (
                 <InfiniteScroll
                     dataLength={nftItems?.length}

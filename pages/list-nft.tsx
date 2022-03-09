@@ -228,58 +228,53 @@ const MintPage = (props) => {
     const fei = utils.parseEther(totalAmount.toString());
     const weiPerFrak = wei.mul(utils.parseEther('1.0')).div(fei);
 
-    // const weiPerFrak = utils.parseEther(totalPrice.toString()).div(utils.parseUnits(totalAmount.toString()));
-    // console.log("price",weiPerFrak.toString());
-
     listItem(
       tokenMintedAddress,
       fei, //shares
       weiPerFrak, //price
       provider,
       marketAddress,
+      name,
       actionOpts
-    )
-      .then(() => {
-        setTimeout(() => {
-          if (tokenMintedAddress) {
-            router.push(resolveNFTRoute(tokenMintedAddress), null, {
-              scroll: false,
-            });
-          } else {
-            router.push(EXPLORE, null, { scroll: false });
-          }
-        }, 1000);
-      })
-      .catch((error) => {
-        mintNFTRejected(error, listNewItem);
-      });
+    ).then(() => {
+            setTimeout(() => {
+                if (tokenMintedAddress) {
+                    router.push(resolveNFTRoute(tokenMintedAddress), null, {
+                        scroll: false,
+                    });
+                } else {
+                    router.push(EXPLORE, null, { scroll: false });
+                }
+            }, 1000);
+        })
+        .catch((error) => {
+            mintNFTRejected(error, listNewItem);
+        });
   }
-  async function listNewAuctionItem() {
-    //TODO - REMOVE CONSOLE LOG
-    console.log('Auction');
 
+  async function listNewAuctionItem() {
     listItemAuction(
       tokenMintedAddress,
       utils.parseUnits(totalPrice),
       utils.parseUnits(totalAmount),
       provider,
       marketAddress,
-      actionOpts
-    )
-      .then(() => {
-        setTimeout(() => {
-          if (tokenMintedAddress) {
-            router.push(resolveNFTRoute(tokenMintedAddress), null, {
-              scroll: false,
-            });
-          } else {
-            router.push(EXPLORE, null, { scroll: false });
-          }
-        }, 1000);
-      })
-      .catch((error) => {
-        mintNFTRejected(error, listNewAuctionItem);
-      });
+      name,
+      actionOpts,
+    ).then(() => {
+            setTimeout(() => {
+                if (tokenMintedAddress) {
+                    router.push(resolveNFTRoute(tokenMintedAddress), null, {
+                        scroll: false,
+                    });
+                } else {
+                    router.push(EXPLORE, null, { scroll: false });
+                }
+            }, 1000);
+        })
+        .catch((error) => {
+            mintNFTRejected(error, listNewAuctionItem);
+        });
   }
 
   useEffect(() => {
