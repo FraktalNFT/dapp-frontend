@@ -147,7 +147,6 @@ const Marketplace: React.FC = () => {
         setSubgraphMethod(LIMITED_ITEMS);
         setOrderBy(SORT_FIXED_PRICE);
     } else {
-        removeFilter(1);
         setSubgraphMethod(LIMITED_AUCTIONS);
         setOrderBy(SORT_AUCTION_PRICE);
         let curTimestamp = Math.round(Date.now() / 1000);
