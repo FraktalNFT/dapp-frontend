@@ -13,6 +13,7 @@ import {
   removeAmount,
 } from '../../redux/actions/contractActions';
 import { roundUp } from '../../utils/math';
+import { useLoadingScreenHandler } from 'hooks/useLoadingScreen';
 
 interface listedItemProps {
   amount: number;
@@ -35,6 +36,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
     const [isReady, setIsReady] = useState(false);
     const [amountToBuy, setAmountToBuy] = useState(0);
     const [buying, setBuying] = useState(false);
+    const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
     const toPay = () => {
       const fei = utils.parseEther(amountToBuy.toString());
@@ -83,6 +85,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
         tx.then(() => {
           setBuying(false);
           setAmountToBuy(0);
+          closeLoadingModalAfterDelay()
         }).catch((error) => {
           buyFraktionsRejected(error, onBuy);
         });

@@ -28,8 +28,9 @@ import { useWeb3Context } from '../../contexts/Web3Context';
 import { getListingAmount, unlistItem, claimERC721, claimERC1155 } from '../../utils/contractCalls';
 import toast from 'react-hot-toast';
 import { roundUp } from '../../utils/math';
-import {ActionOpts} from "../../redux/actions/contractActions";
 import {Workflow} from "../../types/workflow";
+import { connect } from 'react-redux';
+import { useLoadingScreenHandler } from 'hooks/useLoadingScreen';
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
@@ -62,6 +63,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const [isListed, setIsListed] = useState(false);
     const { fraktions, fraktals } = useUserContext();
     const { account, provider, marketAddress } = useWeb3Context();
+    const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
     const canFrak =
       item && !!(fraktals || []).find((fraktion) => fraktion.id === item.id);
@@ -89,6 +91,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const unList = async () => {
       toast('Unlisting...');
       await unlistItem(item.id, provider, marketAddress).then(() => {
+        closeLoadingModalAfterDelay()
         toast.success('Fraktion Unlisted');
         setIsListed(!isListed);
       });
@@ -137,7 +140,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
             marketAddress,
             actionOpts
         ).then((response) => {
-          console.log(response)
+          closeLoadingModalAfterDelay()
         });
     };
 
@@ -270,4 +273,4 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
   }
 );
 
-export default NFTItem;
+export default NFTItem

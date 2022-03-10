@@ -19,6 +19,7 @@ import {
   CLAIMING_FRAKTIONS_PROFIT,
   rejectContract,
 } from '../../redux/actions/contractActions';
+import { useLoadingScreenHandler } from 'hooks/useLoadingScreen';
 
 interface offerItemProps {
   account: string;
@@ -42,6 +43,7 @@ export default function OfferDetail({
   const [fraktionsLocked, setFraktionsLocked] = useState(false);
   const [isOfferer, setIsOfferer] = useState<boolean>(false);
   console.log({ offerItem, tokenAddress });
+  const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
   useEffect(() => {
     async function getData() {
@@ -93,7 +95,7 @@ export default function OfferDetail({
       tokenAddress,
       provider,
       marketAddress
-    );
+    ).then(res => closeLoadingModalAfterDelay());
   }
 
   /**
@@ -108,7 +110,8 @@ export default function OfferDetail({
       marketAddress
     ).catch((e) => {
       store.dispatch(rejectContract(VOTING_BUYOUTS, e, voteOnOffer));
-    });
+    }).then((res) => closeLoadingModalAfterDelay());
+    
   }
 
   async function approveContract() {
@@ -140,7 +143,7 @@ export default function OfferDetail({
         store.dispatch(
           rejectContract(CLAIMING_FRAKTIONS_PROFIT, error, claimFraktal)
         );
-      });
+      }).then(res => closeLoadingModalAfterDelay());
     } catch (e) {
       console.error('There has been an error: ', e);
     }

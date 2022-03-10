@@ -3,11 +3,8 @@ TODO::
 
 BUGS:
 
-<<<<<<< HEAD
-=======
 
 
->>>>>>> modified addresses and check for a new user
   CONTRACTS:
   ------------------------------------------------------------------------------------------------
   - User can unlock and keep voting, but result is taken from total locked attribute
