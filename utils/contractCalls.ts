@@ -370,6 +370,7 @@ export async function createNFT(
     let tx = await customContract.mint(hash, defaultMajority, "", "");
     store.dispatch(callContract(MINT_NFT, tx, opts));
     let receipt = await awaitTokenAddress(tx);
+    
     if (!receipt?.error) {
       store.dispatch(approvedTransaction(MINT_NFT, tx, receipt, opts));
     }

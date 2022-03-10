@@ -9,7 +9,10 @@ import {
   exportFraktal,
   getIndexUsed,
 } from '../../utils/contractCalls';
+
 import { Workflow } from 'types/workflow';
+import { connect } from 'react-redux';
+import { useLoadingScreenHandler } from 'hooks/useLoadingScreen';
 
 const UserOwnership = ({
   fraktions,
@@ -23,6 +26,7 @@ const UserOwnership = ({
   marketId,
   factoryApproved,
 }) => {
+  const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
   async function claimNFT() {
     const actionOpts = { workflow: Workflow.CLAIM_NFT };
     // this requires the factory to be approved
@@ -44,6 +48,7 @@ const UserOwnership = ({
     // }
     if (tx || isApproved) {
       await exportFraktal(tokenAddress, provider, marketAddress);
+      closeLoadingModalAfterDelay()
       // defraktionalize leaves the nft in the market!!!
       // can claim (etherscan) ANYONE!
     }
@@ -70,6 +75,7 @@ const UserOwnership = ({
         actionOpts
       );
     }
+    closeLoadingModalAfterDelay()
   }
 
   useEffect(() => {
@@ -193,4 +199,5 @@ const UserOwnership = ({
     </div>
   );
 };
-export default UserOwnership;
+
+export default UserOwnership
