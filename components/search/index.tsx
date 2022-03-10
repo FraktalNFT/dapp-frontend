@@ -12,8 +12,6 @@ import {  HStack} from "@chakra-ui/react";
  */
 import SelectSearch from 'react-select-search';
 import {useENSAddress} from "@/components/useENSAddress";
-import {getSubgraphData} from "@/utils/graphQueries";
-import {createListed, createObject, createListedAuction} from "@/utils/nftHelpers";
 import {useRouter} from "next/router";
 import {resolveAuctionNFTRoute, resolveNFTRoute} from "@/constants/routes";
 
@@ -36,33 +34,30 @@ import {EXPLORE} from "@/constants/routes";
  * @constructor
  */
 const Search = (props) => {
-    const {queryString} = props;
+    const {queryString, addFilter} = props;
     //const [isENSAddressValid, ethAddressFromENS] = useENSAddress(inputAddress);
     const [inputAddress, setInputAddress] = useState("");
     const router = useRouter();
     const [searchQuery, setSearchQuery] = useState("");
     const [displayOptions, setDisplayOptions] = useState('auto');
     const options = [ ];
+    const [results, setResults] = useState([]);
 
     const handleFilter = (items) => {
         return (searchValue) => {
-            if (searchValue.length === 0) {
-                return options;
+            if (searchValue.length === 0 || items === undefined) {
+                return results;
             }
             const updatedItems = items.map((list) => {
                 const newItems = list.items.filter((item) => {
                     if (item !== undefined) {
                         return item.name;
                     }
-                    /*if (list.name == SEARCH_LISTED_ITEMS) {
-                        return item.name.toLowerCase().includes(searchValue.toLowerCase());
-                    } else {
-                        return item.name;
-                    }*/
                 });
 
                 return { ...list, items: newItems };
             });
+            setResults(updatedItems);
             return updatedItems;
         };
     };
@@ -116,8 +111,14 @@ const Search = (props) => {
      * @returns {Promise<any>}
      */
     async function getSearchItems(query) {
-      const results = await getItems(query, options);
-        return [
+      if (searchQuery == query) {
+          return;
+      }
+      const results = await getItems(query, {
+          limit: 20,
+          offset: 0
+      });
+      return [
             {
                 name: SEARCH_LISTED_ITEMS,
                 type: 'group',
@@ -139,14 +140,9 @@ const Search = (props) => {
     const onKeyUp = (event) => {
         if (event.keyCode == 13) {
             setDisplayOptions("never");
-            router.push(
-                {
-                    pathname: EXPLORE,
-                    query: {
-                        query:searchQuery
-                    }
-                }
-            );
+            addFilter(searchQuery).then(() => {
+            //    setDisplayOptions("auto");
+            });
         }
     };
 

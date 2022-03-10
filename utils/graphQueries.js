@@ -2,11 +2,17 @@ import { gql, request } from "graphql-request";
 import { utils } from "ethers";
 const { CID } = require("ipfs-http-client");
 
-const APIURL = 'https://api.studio.thegraph.com/query/16828/testnetfraktal/0.0.2';
-const AUCTIONAPI = 'https://api.studio.thegraph.com/query/16828/testnetfraktal/0.0.2';
+const APIURL =
+    process.env.NEXT_PUBLIC_GRAPHQL_URL ? process.env.NEXT_PUBLIC_GRAPHQL_URL
+        : 'https://api.studio.thegraph.com/query/16828/testnetfraktal/0.0.2';
+
+const AUCTIONAPI =
+    process.env.NEXT_PUBLIC_GRAPHQL_URL ? process.env.NEXT_PUBLIC_GRAPHQL_URL
+        : 'https://api.studio.thegraph.com/query/16828/testnetfraktal/0.0.2';
 
 export const LIMITED_ITEMS = "limited_items";
 export const LIMITED_AUCTIONS = "limited_auctions";
+export const SEARCH_ITEMS = "search_items";
 
 const creator_query = gql`
   query($id: ID!) {
@@ -415,6 +421,7 @@ const all_nfts = gql`
     }
   }
 `;
+
 const listedItemsByFraktalId = gql`
   query($id: ID!) {
     listItems(where: { fraktal: $id }) {
@@ -473,8 +480,8 @@ const limitedAuctions = gql`
 `;
 
 const searchItems = gql`
-  query($name: String!) {
-    fraktalSearch(text: $name) {
+  query($name: String!, $limit: Int!, $offset: Int!) {
+    fraktalSearch(text: $name, first: $limit, skip: $offset) {
       id
       name
       price
@@ -557,7 +564,7 @@ const searchItems = gql`
           createdAt
         }
     }
-    auctionSearch(text: $name) {
+    auctionSearch(text: $name, first: $limit, skip: $offset) {
         id
         name
         seller {
@@ -606,7 +613,7 @@ const calls = [
   { name: "fraktions", call: fraktions_query },
   { name: "fraktal_owners", call: fraktalOwners },
   { name: LIMITED_AUCTIONS, call: limitedAuctions },
-  { name: "search_items", call: searchItems },
+  { name: SEARCH_ITEMS, call: searchItems },
 ];
 
 const listedAuctions = gql`
@@ -661,7 +668,6 @@ export const getSubgraphData = async (call, id, options = null) => {
   });
   try {
     const data = await request(APIURL, callGql.call, { id, ...options });
-    // console.log('data for:',id,' found',data)
     return data;
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -675,7 +681,6 @@ export const getSubgraphAuction = async (call, id, options = null) => {
   });
   try {
     const data = await request(AUCTIONAPI, callGql.call, { id, ...options });
-    // console.log('data for:',id,' found',data)
     return data;
   } catch (err) {
     // eslint-disable-next-line no-console
