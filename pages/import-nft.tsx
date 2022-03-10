@@ -466,7 +466,7 @@ function ImportNFTPage() {
                       cursor: `pointer`,
                     }}
                     onClick={() =>
-                      setIsIntentedForListing(!isIntendedForListing)
+                      setIsIntentedForListing(true)
                     }
                   ></Box>
                 )}
@@ -483,7 +483,7 @@ function ImportNFTPage() {
                       cursor: `pointer`,
                     }}
                     onClick={() =>
-                      setIsIntentedForListing(!isIntendedForListing)
+                      setIsIntentedForListing(true)
                     }
                   ></Box>
                 )}
@@ -496,7 +496,7 @@ function ImportNFTPage() {
                   _hover={{
                     cursor: `pointer`,
                   }}
-                  onClick={() => setIsIntentedForListing(!isIntendedForListing)}
+                  onClick={() => setIsIntentedForListing(true)}
                 >
                   Sell Fraktions
                 </Text>
