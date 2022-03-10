@@ -9,14 +9,16 @@ import { useWeb3Context } from "../../contexts/Web3Context";
  * REDUX
  */
 import {connect} from 'react-redux';
-import {callContract, rejectContract, approvedTransaction, DEPOSIT_REVENUE} from '../../redux/actions/contractActions';
+import {callContract, rejectContract, approvedTransaction, DEPOSIT_REVENUE, closeModal} from '../../redux/actions/contractActions';
+import { useLoadingScreenHandler } from "hooks/useLoadingScreen";
 
 const RevenuesList = (props) => {
-  const {revenuesCreated, tokenAddress, rejectDepositRevenue, depositRevenueApproved} = props;
+  const {revenuesCreated, tokenAddress, rejectDepositRevenue, depositRevenueApproved, closeModal} = props;
   const { account, provider, marketAddress } = useWeb3Context();
   const [revenueValue, setRevenueValue] = useState(0);
   const [isCreating, setIsCreating] = useState(false);
   const [valueSetter, setValueSetter] = useState(false);
+  const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
   // const totalValue = (x) => utils.parseEther((x).toString());
   async function launchRevenuePayment() {
@@ -24,6 +26,7 @@ const RevenuesList = (props) => {
     let valueIn = utils.parseEther(revenueValue.toString()); //+0.000000000001
     try {
       const tx = await createRevenuePayment(valueIn, provider, tokenAddress, marketAddress);
+      closeLoadingModalAfterDelay()
     } catch (error) {
       rejectDepositRevenue(error, launchRevenuePayment);
       console.error("creating revenue failed, reason: ", error);
@@ -172,4 +175,5 @@ const mapDispatchToProps = (dispatch) => {
         },
     }
 };
+
 export default connect(mapStateToProps, mapDispatchToProps)(RevenuesList);

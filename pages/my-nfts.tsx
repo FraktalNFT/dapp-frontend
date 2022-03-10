@@ -45,6 +45,7 @@ import {
   getParticipantContribution,
   getAuctionListings,
 } from '../utils/contractCalls';
+import { useLoadingScreenHandler } from '../hooks/useLoadingScreen'
 
 import { EXPLORE } from '@/constants/routes';
 
@@ -58,6 +59,7 @@ export default function MyNFTsView() {
   const [userAccount, setUserAccount] = useState(null);
   const [refresh, setRefresh] = useState(false);
   const { isMinting, setIsMinting } = useMintingContext();
+  const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
   const refreshPage = () => {
     setRefresh(!refresh);
@@ -101,6 +103,7 @@ export default function MyNFTsView() {
           isClosable: true,
         });
         refreshPage();
+        closeLoadingModalAfterDelay()
       })
       .catch((e) => {
         toast({
@@ -174,6 +177,7 @@ export default function MyNFTsView() {
           isClosable: true,
         });
         refreshPage();
+        closeLoadingModalAfterDelay()
       })
       .catch((e) => {
         toast({
