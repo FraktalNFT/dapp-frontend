@@ -212,7 +212,7 @@ export default function MyNFTsView() {
         }
       );
       auctionData = auctionData?.auctions?.filter(
-        (x) => x.seller == account?.toLocaleLowerCase()
+        (x) => x.seller.id == account?.toLocaleLowerCase()
       );
 
       let auctionDataHash = [];
@@ -229,7 +229,6 @@ export default function MyNFTsView() {
           }
         })
       );
-
       let auctionItems = [];
       await Promise.all(
         auctionData?.map(async (auction, idx) => {
