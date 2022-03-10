@@ -213,15 +213,16 @@ export async function createListedAuction(data) {
   try {
     let nftMetadata = await fetchNftMetadata(data.hash);
     if (nftMetadata) {
+      const seller = typeof data.seller === "object" ? data.seller.id : data.seller;
       return {
         value: nftMetadata.name,
-        link: `/nft/${data.seller}-${data.sellerNonce}/auction`,
+        link: `/nft/${seller}-${data.sellerNonce}/auction`,
         amountOfShare: data.amountOfShare,
         endTime: data.endTime,
         hash: data.hash,
         price: data.reservePrice,
         reservePrice: data.reservePrice,
-        seller: typeof data.seller === "object" ? data.seller.id : data.seller,
+        seller: seller,
         sellerNonce: data.sellerNonce,
         tokenAddress: data.tokenAddress,
         name: nftMetadata.name,

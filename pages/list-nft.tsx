@@ -46,7 +46,7 @@ import {
 } from '../redux/actions/contractActions';
 const MAX_FRACTIONS = 10000;
 
-import { EXPLORE, IMPORT_NFT, resolveNFTRoute } from '@/constants/routes';
+import {EXPLORE, IMPORT_NFT, resolveAuctionNFTRoute, resolveNFTRoute} from '@/constants/routes';
 import { Workflow } from 'types/workflow';
 
 /**
