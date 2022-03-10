@@ -179,12 +179,6 @@ const Marketplace: React.FC = () => {
             if (sortName == LOWEST_PRICE) return parseFloat(a.price) > parseFloat(b.price) ? 1 : -1
             if (sortName == HIGHEST_PRICE) return parseFloat(a.price) < parseFloat(b.price) ? 1 : -1
           });
-
-         // setNftItems([...nftItems, ...mappedItems]);
-         // setOffset(offset + limit);
-         // setLoading(false);
-        //  setHasMore(true);
-         // setRefresh(false);
     } else {
         const data = await getSubgraphData(subgraphMethod, "", {
               limit: limit,
