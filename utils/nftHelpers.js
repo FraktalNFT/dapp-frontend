@@ -219,6 +219,7 @@ export async function createListedAuction(data) {
         amountOfShare: data.amountOfShare,
         endTime: data.endTime,
         hash: data.hash,
+        price: data.reservePrice,
         reservePrice: data.reservePrice,
         seller: typeof data.seller === "object" ? data.seller.id : data.seller,
         sellerNonce: data.sellerNonce,
