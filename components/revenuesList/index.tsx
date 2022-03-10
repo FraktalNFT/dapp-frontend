@@ -9,7 +9,7 @@ import { useWeb3Context } from "../../contexts/Web3Context";
  * REDUX
  */
 import {connect} from 'react-redux';
-import {callContract, rejectContract, approvedTransaction, DEPOSIT_REVENUE, closeModal} from '../../redux/actions/contractActions';
+import {callContract, rejectContract, approvedTransaction, DEPOSIT_REVENUE} from '../../redux/actions/contractActions';
 import { useLoadingScreenHandler } from "hooks/useLoadingScreen";
 
 const RevenuesList = (props) => {

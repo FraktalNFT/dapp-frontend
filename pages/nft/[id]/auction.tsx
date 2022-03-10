@@ -18,13 +18,9 @@ import { createListedAuction } from "utils/nftHelpers";
 import { introspectionFromSchema } from "graphql";
 import Custom404 from "../../404";
 import {EXPLORE} from "@/constants/routes";
-import {connect} from "react-redux";
-import {
-  closeModal
-} from "../../../redux/actions/contractActions";
 import { useLoadingScreenHandler } from "hooks/useLoadingScreen";
 
-function AuctionNFTView({router, closeModal}) {
+function AuctionNFTView({router}) {
 
   const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
   const [index, setIndex] = useState();
