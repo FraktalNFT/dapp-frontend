@@ -44,11 +44,16 @@ import {
   rejectContract,
   closeModal,
 } from '../redux/actions/contractActions';
-const { create } = require('ipfs-http-client');
 const MAX_FRACTIONS = 10000;
 
 import { EXPLORE, IMPORT_NFT, resolveNFTRoute } from '@/constants/routes';
 import { Workflow } from 'types/workflow';
+
+/**
+ * INFURA
+ */
+const { create } = require('ipfs-http-client');
+import {infuraConfig} from '@/utils/nftHelpers';
 
 const actionOpts = { workflow: Workflow.MINT_NFT };
 
@@ -80,12 +85,7 @@ const MintPage = (props) => {
 
   // FUNCTIONS FOR MINTING
   useEffect(() => {
-    const ipfsClient = create({
-      host: 'ipfs.infura.io',
-      port: '5001',
-      protocol: 'https',
-    });
-    setIpfsNode(ipfsClient);
+    setIpfsNode(create(infuraConfig));
   }, []);
 
   async function uploadAndPin(data) {
@@ -247,15 +247,13 @@ const MintPage = (props) => {
     const fei = utils.parseEther(totalAmount.toString());
     const weiPerFrak = wei.mul(utils.parseEther('1.0')).div(fei);
 
-    // const weiPerFrak = utils.parseEther(totalPrice.toString()).div(utils.parseUnits(totalAmount.toString()));
-    // console.log("price",weiPerFrak.toString());
-
     listItem(
       tokenMintedAddress,
       fei, //shares
       weiPerFrak, //price
       provider,
       marketAddress,
+      name,
       actionOpts
     )
       .then(() => {
@@ -265,10 +263,8 @@ const MintPage = (props) => {
         mintNFTRejected(error, listNewItem);
       });
   }
-  async function listNewAuctionItem() {
-    //TODO - REMOVE CONSOLE LOG
-    console.log('Auction');
 
+  async function listNewAuctionItem() {
     listItemAuction(
       tokenMintedAddress,
       utils.parseUnits(totalPrice),
@@ -450,8 +446,8 @@ const MintPage = (props) => {
                   onChange={(e) => setIsAuction(!isAuction)}
                 >
                   <TabList mb="1em">
-                    <Tab>Fixed Price</Tab>
-                    <Tab>Auction</Tab>
+                    <Tab _selected={{ fontSize: '1.8rem', color: 'white', background: '#405466', borderRadius: '16px 0 0 16px', fontWeight: 700 }}>Fixed Price</Tab>
+                    <Tab _selected={{ fontSize: '1.8rem', color: 'white', background: '#405466', borderRadius: '0 16px 16px 0', fontWeight: 700 }}>Auction</Tab>
                   </TabList>
                   <TabPanels>
                     <TabPanel>

@@ -509,8 +509,8 @@ function ImportNFTPage() {
                     onChange={(e) => setIsAuction(!isAuction)}
                   >
                     <TabList mb="1em">
-                      <Tab>Fixed Price</Tab>
-                      <Tab>Auction</Tab>
+                      <Tab _selected={{ fontSize: '1.8rem', color: 'white', background: '#405466', borderRadius: '16px 0 0 16px', fontWeight: 700 }}>Fixed Price</Tab>
+                      <Tab _selected={{ fontSize: '1.8rem', color: 'white', background: '#405466', borderRadius: '0 16px 16px 0', fontWeight: 700 }}>Auction</Tab>
                     </TabList>
                     <TabPanels>
                       <TabPanel>

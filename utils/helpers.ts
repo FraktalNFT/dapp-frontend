@@ -104,7 +104,6 @@ export async function processTx(tx){
     receipt = {error: `Error: ${e}`}
   }
   console.log('Transaction receipt');
-  console.log(receipt);
   return receipt;
 }
 

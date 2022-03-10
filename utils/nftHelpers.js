@@ -1,12 +1,24 @@
-const { create, CID } = require('ipfs-http-client');
 import { utils } from 'ethers';
-import { getSubgraphData } from './graphQueries';
+import {getSubgraphAuction, getSubgraphData} from './graphQueries';
 
-const ipfsClient = create({
+const { create, CID } = require('ipfs-http-client');
+
+let infuraAuth;
+if (process.env.NEXT_PUBLIC_INFURA_PROJECT_ID !== undefined && process.env.NEXT_PUBLIC_INFURA_PROJECT_SECRET !== undefined) {
+  infuraAuth = {
+    headers: {
+      Authorization: 'Basic ' + Buffer.from(process.env.NEXT_PUBLIC_INFURA_PROJECT_ID + ':' + process.env.NEXT_PUBLIC_INFURA_PROJECT_SECRET).toString('base64')
+    }
+  }
+}
+
+const infuraConfig = {
   host: 'ipfs.infura.io',
-  port: '5001',
+  port: 5001,
   protocol: 'https',
-});
+  ...infuraAuth
+};
+const ipfsClient = create(infuraConfig);
 
 // Convert Binary Into JSON
 const binArrayToJson = function (binArray) {
@@ -130,6 +142,7 @@ export async function createObject(data) {
         createdAt: data.nft.createdAt,
         status: data.nft.status,
         name: nftMetadata.name,
+        value: nftMetadata.name,
         description: nftMetadata.description,
         imageURL: checkImageCID(nftMetadata.image),
       };
@@ -174,6 +187,7 @@ export async function createListed(data) {
     let nftMetadata = await fetchNftMetadata(data.fraktal.hash);
     if (nftMetadata) {
       return {
+        link: `/nft/${data.fraktal.id}/details`,
         creator: data.fraktal.creator.id,
         marketId: data.fraktal.marketId,
         createdAt: data.fraktal.createdAt,
@@ -185,6 +199,7 @@ export async function createListed(data) {
         amount: data.amount,
         seller: data.seller.id,
         name: nftMetadata.name,
+        value: nftMetadata.name,
         description: nftMetadata.description,
         imageURL: checkImageCID(nftMetadata.image),
       };
@@ -199,11 +214,14 @@ export async function createListedAuction(data) {
     let nftMetadata = await fetchNftMetadata(data.hash);
     if (nftMetadata) {
       return {
+        value: nftMetadata.name,
+        link: `/nft/${data.seller}-${data.sellerNonce}/auction`,
         amountOfShare: data.amountOfShare,
         endTime: data.endTime,
         hash: data.hash,
+        price: data.reservePrice,
         reservePrice: data.reservePrice,
-        seller: data.seller,
+        seller: typeof data.seller === "object" ? data.seller.id : data.seller,
         sellerNonce: data.sellerNonce,
         tokenAddress: data.tokenAddress,
         name: nftMetadata.name,
@@ -215,3 +233,56 @@ export async function createListedAuction(data) {
     return { error: `Error: ${err}` };
   }
 }
+
+/**
+ * Map Fixed Price
+ * @param data
+ */
+async function mapFixedPrice(data) {
+  let dataOnSale;
+  if (data?.listItems?.length !== undefined) {
+    dataOnSale = data?.listItems?.filter(x => {
+      return x.fraktal.status == "open";
+    });
+  }
+
+  let objects = await Promise.all(
+      dataOnSale.map(x => {
+        let res = createListed(x);
+        if (typeof res !== "undefined") {
+          return res;
+        }
+      }).filter(notUndefined => notUndefined !== undefined)
+  );
+  return objects;
+}
+
+/**
+ * Map Auction To Fraktal
+ * @param auctionData
+ * @returns {Promise<any[]>}
+ */
+async function mapAuctionToFraktal(auctionData) {
+  let auctionDataHash = [];
+  await Promise.all(auctionData?.auctions.map(async x => {
+    let _hash = await getSubgraphAuction("auctionsNFT", x.tokenAddress);
+
+    const itm = {
+      "id":`${x.tokenAddress}-${x.sellerNonce}`,
+      "hash":_hash.fraktalNft.hash
+    };
+
+    auctionDataHash.push(itm);
+  }));
+  let auctionItems = [];
+  await Promise.all(auctionData?.auctions.map(async (auction, idx) => {
+        let hash = auctionDataHash.filter(e=>e.id == `${auction.tokenAddress}-${auction.sellerNonce}`);
+        Object.assign(auction, {"hash":hash[0].hash});
+        const item = await createListedAuction(auction);
+        auctionItems.push(item);
+      }
+  ).filter(notUndefined => notUndefined !== undefined));
+  return auctionItems;
+}
+
+export {infuraConfig, mapFixedPrice, mapAuctionToFraktal}
