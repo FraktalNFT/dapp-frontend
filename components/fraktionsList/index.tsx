@@ -29,7 +29,7 @@ const FraktionsList=(({fraktionsListed, tokenAddress, marketAddress, provider}) 
       Fraktions
       <FrakButton
         onClick={() =>
-          console.log('fffffffffffffffffff')
+          console.log('Button click')
         }
         title="Make sure to check that the NFT you are buying Fraktions of is authentic"
       >
