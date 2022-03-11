@@ -41,6 +41,7 @@ const FraktionsList=(({nftObject, fraktionsListed, tokenAddress, marketAddress, 
   async function validateNFT() {
     setValidationState(true);
     const response = await validateAsset(nftObject.collateral.id, 1);
+    console.log('response', response)
     setValidationState(false);
     if (response.success === false) {
         setMessage("NFT is not valid");
