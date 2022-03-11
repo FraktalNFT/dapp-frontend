@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
-import NextLink from 'next/link';
+import React, { forwardRef, useState, useEffect } from 'react';
+/**
+ * Chakra UI
+ */
 import { Image } from '@chakra-ui/image';
 import {
   Box,
@@ -11,7 +13,7 @@ import {
   Tag,
   TagLabel,
 } from '@chakra-ui/react';
-import React, { forwardRef } from 'react';
+
 import {
   Flex,
   Spacer,
@@ -19,18 +21,28 @@ import {
   HTMLChakraProps,
   chakra,
 } from '@chakra-ui/react';
+/**
+ * Next
+ */
+import { useRouter } from "next/router";
+import NextLink from 'next/link';
+/***
+ * Component
+ */
 import { FrakCard } from '../../types';
 import { motion, isValidMotionProp, HTMLMotionProps } from 'framer-motion';
 import FrakButton from '../../components/button';
 import { useUserContext } from '@/contexts/userContext';
 import { BigNumber, utils } from 'ethers';
 import { useWeb3Context } from '../../contexts/Web3Context';
-import { getListingAmount, unlistItem, claimERC721, claimERC1155 } from '../../utils/contractCalls';
+import {getListingAmount, unlistItem, claimERC721, claimERC1155, approveMarket} from '../../utils/contractCalls';
 import toast from 'react-hot-toast';
 import { roundUp } from '../../utils/math';
 import {Workflow} from "../../types/workflow";
 import { connect } from 'react-redux';
 import { useLoadingScreenHandler } from 'hooks/useLoadingScreen';
+import store from "../../redux/store";
+import {MY_NFTS} from "@/constants/routes";
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
@@ -58,11 +70,12 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     },
     ref
   ) => {
+    const router = useRouter();
     const [isVisible, setIsVisible] = useState(false);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const [isListed, setIsListed] = useState(false);
     const { fraktions, fraktals } = useUserContext();
-    const { account, provider, marketAddress } = useWeb3Context();
+    const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
     const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
     const canFrak =
@@ -108,11 +121,6 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     } else {
       showAmount = '';
     }
-
-    // useEffect(() => {
-    //   setIsImageLoaded(false);
-    // }, []);
-
     const onImageLoad = (ms: number) => {
       setTimeout(() => {
         setIsImageLoaded(true);
@@ -134,14 +142,22 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const withdrawNFT = async (item, event) => {
         const actionOpts = { workflow: Workflow.CLAIM_NFT };
         event.stopPropagation();
-        await claimERC1155(
-            item.marketId,
-            provider,
-            marketAddress,
-            actionOpts
-        ).then((response) => {
-          closeLoadingModalAfterDelay()
-        });
+        await approveMarket(factoryAddress, provider, item.id, actionOpts);
+        if (item.collateral.type == 'ERC721') {
+          await claimERC721(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
+            closeLoadingModalAfterDelay();
+            setTimeout(() => {
+              router.reload()
+            }, 2500);
+          });
+        } else {
+          await claimERC1155(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
+            closeLoadingModalAfterDelay();
+            setTimeout(() => {
+              router.reload()
+            }, 2500);
+          });
+        }
     };
 
     return (
@@ -240,7 +256,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 )}
               </Flex>
 
-              {canFrak && (
+              {canFrak && item.collateral && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={`nft/${item.id}/details?frak=1`}>
                     <FrakButton size="sm">Frak it</FrakButton>

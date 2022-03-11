@@ -94,6 +94,9 @@ export const UserContextProviderFC = ({ children }) => {
           "wallet",
           account.toLocaleLowerCase()
         );
+
+        console.log('fobjects', fobjects)
+
         if (fobjects && fobjects.users.length) {
           // balance retrieval
           let userBalance = fobjects.users[0].balance;
@@ -181,6 +184,7 @@ export const UserContextProviderFC = ({ children }) => {
           } else {
             nftObjectsClean = nftObjects;
           }
+
 
           setFraktals(fraktalsClean);
           

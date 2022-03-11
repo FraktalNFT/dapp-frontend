@@ -253,6 +253,10 @@ const user_wallet_query = gql`
         creator {
           id
         }
+        collateral {
+          id 
+          type
+        }
       }
       fraktions(where: { amount_gt: 0 }) {
         amount

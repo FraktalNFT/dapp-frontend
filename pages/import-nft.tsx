@@ -85,6 +85,9 @@ function ImportNFTPage() {
 
   const [isAuction, setIsAuction] = useState(false);
 
+  /**
+   * Approve Factory
+   */
   async function approveForFactory() {
     if (tokenToImport && tokenToImport.id) {
       let res = await approveMarket(
@@ -127,20 +130,25 @@ function ImportNFTPage() {
       });
   }
 
+  /**
+   * Import NFT
+   */
   async function importNFT() {
     let address;
     if (typeof tokenToImport === 'undefined') {
       alert('No Token Selected');
       return null;
     }
+    console.log('schema', tokenToImport?.token_schema)
     if (tokenToImport?.token_schema === 'ERC721') {
       address = await importERC721(
-        parseInt(tokenToImport?.tokenId),
+        BigInt(tokenToImport?.tokenId),
         tokenToImport?.id,
         provider,
         factoryAddress,
         actionOpts
       ).catch((error) => {
+        console.log('error', error)
         store.dispatch(
           rejectContract(IMPORT_NFT, error, importNFT, actionOpts)
         );
@@ -148,12 +156,13 @@ function ImportNFTPage() {
     }
     if (tokenToImport?.token_schema === 'ERC1155') {
       address = await importERC1155(
-        parseInt(tokenToImport?.tokenId),
+        BigInt(tokenToImport?.tokenId),
         tokenToImport?.id,
         provider,
         factoryAddress,
         actionOpts
       ).catch((error) => {
+        console.log('error', error)
         store.dispatch(
           rejectContract(IMPORT_NFT, error, importNFT, actionOpts)
         );
@@ -171,12 +180,18 @@ function ImportNFTPage() {
     }
   }
 
+  /**
+   * Use effect if NFT is imported
+   */
   useEffect(() => {
     if (isNFTImported) {
       approveForMarket();
     }
   }, [isNFTImported, tokenMintedAddress]);
 
+  /**
+   * Import Fraktal to Market
+   */
   async function importFraktalToMarket() {
     let tokenID = 0;
     let isUsed = true;
@@ -212,6 +227,9 @@ function ImportNFTPage() {
     }
   }
 
+  /**
+   * List new item
+   */
   async function listNewItem() {
     const wei = utils.parseEther(totalPrice.toString());
     const fei = utils.parseEther(totalAmount.toString());
@@ -238,6 +256,9 @@ function ImportNFTPage() {
       });
   }
 
+  /**
+   * List new Auction Imp
+   */
   async function listNewAuctionItem() {
     const response = await listItemAuction(
       tokenMintedAddress,
