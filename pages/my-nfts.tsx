@@ -391,14 +391,14 @@ export default function MyNFTsView() {
     if (done) {
       if (item.token_schema == 'ERC721') {
         res = await importERC721(
-          parseInt(item.tokenId),
+            BigInt(item.tokenId),
           item.id,
           provider,
           factoryAddress
         );
       } else {
         res = await importERC1155(
-          parseInt(item.tokenId),
+            BigInt(item.tokenId),
           item.id,
           provider,
           factoryAddress
