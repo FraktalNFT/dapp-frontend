@@ -19,6 +19,30 @@ export const factoryContracts = [
     {providerChainId:4, address:  process.env.NEXT_PUBLIC_RINKEBY_FACTORY_CONTRACT
           ? process.env.NEXT_PUBLIC_RINKEBY_FACTORY_CONTRACT : '0x9c27b4310F128Fdb6cfE6b2eA32Af3774Bf6778e'},
 ]
+export const fraktalTokenContracts = [
+    {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+    {providerChainId:4, address:'0x468065C8B00C7cB3cd6B9fD76dAe9dD49e1C30e0'},
+];
+export const lpTokenContracts = [
+    {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+    {providerChainId:4, address:'0x9A18671771a15CA42442F0970852670A3972A789'},
+];
+export const airdropContract = [
+    {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+    {providerChainId:4, address:'0xdA64d4c447476Ef26FD929d63Ec8f1C81C267854'},
+];
+export const lpStakingContracts = [
+    {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+    {providerChainId:4, address:'0x85F625355a5DeCebb5F1609c7197597F3B125411'},
+]
+export const tradingRewardsContracts = [
+    {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+    {providerChainId:4, address:'0x92E52AF0D07b1d4cE0DA9041C1a2eC164c75174e'},
+]
+export const feeSharingContracts = [
+    {providerChainId:1, address:'0x0000000000000000000000000000000000000000'},
+    {providerChainId:4, address:'0xe398a2Cfa41440e7d33bbdC76f0a65C9Ca3D8373'},
+]
 
 export const networkNames = {
   1: "ETH Mainnet",

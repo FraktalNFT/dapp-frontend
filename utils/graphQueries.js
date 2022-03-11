@@ -10,6 +10,8 @@ const AUCTIONAPI =
     process.env.NEXT_PUBLIC_GRAPHQL_URL ? process.env.NEXT_PUBLIC_GRAPHQL_URL
         : 'https://api.studio.thegraph.com/query/16828/testnetfraktal/0.0.2';
 
+const AIRDROPAPI = 'https://api.looksrare.org/graphql';
+
 export const LIMITED_ITEMS = "limited_items";
 export const LIMITED_AUCTIONS = "limited_auctions";
 export const SEARCH_ITEMS = "search_items";
@@ -692,3 +694,23 @@ export const getSubgraphAuction = async (call, id, options = null) => {
     return err;
   }
 };
+
+export const getAddressAirdrop = async (id, options = null) =>{
+  let callGql = gql`
+    query Airdrop($id: Address!) {
+      airdrop(address:$id) {
+        proof
+        amount
+      }
+    }
+  `;
+  try {
+    const data = await request(AIRDROPAPI, callGql, { id, ...options });
+    // console.log('data for:',id,' found',data)
+    return data;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("error", err);
+    return err;
+  }
+}

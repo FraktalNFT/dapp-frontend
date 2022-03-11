@@ -2,6 +2,7 @@ import { Contract } from '@ethersproject/contracts';
 import { loadSigner, processTx, awaitTokenAddress } from './helpers';
 import { useMintingContext } from '@/contexts/NFTIsMintingContext';
 import { BigNumber, ethers, utils } from 'ethers';
+import {LARGEST_UINT256} from './constants';
 import store from '../redux/store';
 import {
   ActionOpts,
@@ -84,6 +85,34 @@ const revenuesAbi = [
     'function released(address account) public view returns (uint256)',
     'function release() public',
     'function totalShares() external view returns (uint256)',
+];
+const airdropABI = [
+  'function claim(uint256,bytes32[],address) external',
+  'function canClaim(address,uint256,bytes32[]) external view returns (bool)'
+];
+const lpStakingABI = [
+  'function deposit(uint256) external',
+  'function harvest() external',
+  'function withdraw(uint256) external',
+  'function calculatePendingRewards(address) external view returns (uint256)',
+  'function userInfo(address user) external view returns (uint256,uint256)'
+];
+const tradingRewardsABI = [
+  'function canClaim(address,uint256,bytes32[]) external view returns (bool,uint256)',
+  'function claim(uint256,bytes32[]) external'
+];
+const feeSharingABI = [
+  'function deposit(uint256,bool) external',
+  'function harvest() external',
+  'function calculatePendingRewards(address) external view returns (uint256)',
+  'function withdraw(uint256,bool) external',
+  'function withdrawAll(bool) external',
+  'function userInfo(address user) external view returns (uint256,uint256,uint256)'
+];
+const erc20ABI = [
+  'function balanceOf(address account) external view returns (uint256)',
+  'function allowance(address owner, address spender) external view returns (uint256)',
+  'function approve(address spender, uint256 amount) external returns (bool)'
 ];
 
 // TODO
@@ -838,5 +867,268 @@ export async function unlistAuctionItem(
       approvedTransaction(UNLIST_AUCTION_NFT, tx, tokenAddress, opts)
     );
   }
+  return receipt;
+}
+
+// const airdropABI = [
+//   'function claim(uint256,bytes32[],address) external',
+//   'function canClaim(address,uint256,bytes32[]) external view returns (bool)'
+// ];
+export async function claimAirdrop(
+  amount,
+  merkleProof,
+  listedTokenAddress,
+  provider,
+  airdropAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(airdropAddress, airdropABI, signer);
+  let tx = await customContract.claim(amount,merkleProof,listedTokenAddress);
+  let receipt = await processTx(tx);
+  return receipt;
+}
+export async function canClaimAirdrop(
+  userAddress,
+  amount,
+  merkleProof,
+  provider,
+  airdropAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(airdropAddress, airdropABI, signer);
+  let tx = await customContract.canClaim(userAddress,amount,merkleProof);
+  return tx;
+}
+
+
+// const lpStakingABI = [
+//   'function deposit(uint256) external',
+//   'function harvest() external',
+//   'function withdraw(uint256) external',
+//   'function calculatePendingRewards(address) external view returns (uint256)'
+//    'function userInfo(address user) external view returns (uint256,uint256)'
+// ];
+
+export async function lpStakingUserInfo(
+  userAddress,
+  provider,
+  lpStakingAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(lpStakingAddress, lpStakingABI, signer);
+  let tx = await customContract.userInfo(userAddress);
+  return tx;
+}
+export async function lpStakingHarvest(
+  provider,
+  lpStakingAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(lpStakingAddress, lpStakingABI, signer);
+  let tx = await customContract.harvest();
+  let receipt = await processTx(tx);
+  return receipt;
+}
+export async function lpStakingWithdraw(
+  amount,
+  provider,
+  lpStakingAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(lpStakingAddress, lpStakingABI, signer);
+  let tx = await customContract.withdraw(amount);
+  let receipt = await processTx(tx);
+  return receipt;
+}
+export async function lpStakingCalculateRewards(
+  userAddress,
+  provider,
+  lpStakingAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(lpStakingAddress, lpStakingABI, signer);
+  let tx = await customContract.calculatePendingRewards(userAddress);
+  return tx;
+}
+
+export async function lpStakingDeposit(
+  amount,
+  provider,
+  lpStakingAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(lpStakingAddress, lpStakingABI, signer);
+  let tx = await customContract.deposit(amount);
+  let receipt = await processTx(tx);
+  return receipt;
+}
+
+
+// const tradingRewardsABI = [
+//   'function canClaim(address,uint256,bytes32[]) external view returns (bool,uint256)',
+//   'function claim(uint256,bytes32[]) external'
+// ];
+
+export async function tradingRewardsCanClaim(
+  userAddress,
+  amount,
+  merkleProof,
+  provider,
+  tradingRewardsAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(tradingRewardsAddress, tradingRewardsABI, signer);
+  let tx = await customContract.canClaim(userAddress,amount,merkleProof);
+  return tx;
+}
+
+export async function tradingRewardsClaim(
+  amount,
+  merkleProof,
+  provider,
+  tradingRewardsAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(tradingRewardsAddress, tradingRewardsABI, signer);
+  let tx = await customContract.claim(amount,merkleProof);
+  let receipt = await processTx(tx);
+  return receipt;
+}
+
+
+// const feeSharingABI = [
+//   'function deposit(uint256,bool) external',
+//   'function harvest() external',
+//   'function calculatePendingRewards(address) external view returns (uint256)',
+//   'function withdraw(uint256,bool) external',
+//   'function withdrawAll(bool) external'
+  // 'function userInfo(address) external return (uint256,uint256,uint256)'
+// ];
+
+export async function feeSharingUserInfo(
+  userAddress,
+  provider,
+  feeSharingAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(feeSharingAddress, feeSharingABI, signer);
+  let tx = await customContract.userInfo(userAddress);
+  return tx;
+}
+export async function feeSharingDeposit(
+  amount,
+  claimReward,
+  provider,
+  feeSharingAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(feeSharingAddress, feeSharingABI, signer);
+  let tx = await customContract.deposit(amount,claimReward);
+  let receipt = await processTx(tx);
+  return receipt;
+}
+
+export async function feeSharingHarvest(
+  provider,
+  feeSharingAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(feeSharingAddress, feeSharingABI, signer);
+  let tx = await customContract.harvest();
+  let receipt = await processTx(tx);
+  return receipt;
+}
+
+export async function feeSharingCalculatePendingRewards(
+  userAddress,
+  provider,
+  feeSharingAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(feeSharingAddress, feeSharingABI, signer);
+  let tx = await customContract.calculatePendingRewards(userAddress);
+  return tx;
+}
+
+export async function feeSharingWithdraw(
+  amount,
+  claimReward,
+  provider,
+  feeSharingAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(feeSharingAddress, feeSharingABI, signer);
+  let tx = await customContract.withdraw(amount,claimReward);
+  let receipt = await processTx(tx);
+  return receipt;
+}
+
+export async function feeSharingWithdrawAll(
+  claimReward,
+  provider,
+  feeSharingAddress,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(feeSharingAddress, feeSharingABI, signer);
+  let tx = await customContract.withdrawAll(claimReward);
+  let receipt = await processTx(tx);
+  return receipt;
+}
+
+// const erc20ABI = [
+//   'function balanceOf(address account) external view returns (uint256)',
+//   'function allowance(address owner, address spender) external view returns (uint256)',
+//   'function approve(address spender, uint256 amount) external returns (bool)'
+// ];
+export async function erc20BalanceOf(
+  userAddress,
+  provider,
+  erc20Address,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(erc20Address, erc20ABI, signer);
+  let tx = await customContract.balanceOf(userAddress);
+  return tx;
+}
+
+export async function erc20Allowance(
+  userAddress,
+  spenderAddress,
+  provider,
+  erc20Address,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(erc20Address, erc20ABI, signer);
+  let tx = await customContract.allowance(userAddress, spenderAddress);
+  return tx;
+}
+
+export async function erc20Approve(
+  spenderAddress,
+  provider,
+  erc20Address,
+  opts?: ActionOpts
+) {
+  const signer = await loadSigner(provider);
+  const customContract = new Contract(erc20Address, erc20ABI, signer);
+  let tx = await customContract.approve(spenderAddress, LARGEST_UINT256);
+  let receipt = await processTx(tx);
   return receipt;
 }

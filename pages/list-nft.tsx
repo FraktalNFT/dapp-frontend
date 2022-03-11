@@ -246,7 +246,7 @@ const MintPage = (props) => {
     const wei = utils.parseEther(totalPrice.toString());
     const fei = utils.parseEther(totalAmount.toString());
     const weiPerFrak = wei.mul(utils.parseEther('1.0')).div(fei);
-
+    window?.localStorage.setItem(`firstMinted-${account}`, tokenMintedAddress.toString());
     listItem(
       tokenMintedAddress,
       fei, //shares
@@ -265,6 +265,7 @@ const MintPage = (props) => {
   }
 
   async function listNewAuctionItem() {
+    window?.localStorage.setItem(`firstMinted-${account}`, tokenMintedAddress.toString());
     listItemAuction(
       tokenMintedAddress,
       utils.parseUnits(totalPrice),

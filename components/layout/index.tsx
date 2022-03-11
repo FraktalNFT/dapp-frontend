@@ -31,15 +31,21 @@ import AirdropBanner from '../airdropBanner';
  */
 import { CREATE_NFT } from '@/constants/routes';
 import { useUserContext } from '@/contexts/userContext';
+import { claimAirdrop } from '@/utils/contractCalls';
+import { getAddressAirdrop } from '@/utils/graphQueries';
+import {utils} from 'ethers'
 
 import LoadScreens from '../load-screens';
 
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { providerChainId, connectWeb3 } = useWeb3Context();
+  const { providerChainId, connectWeb3, provider, airdropAddress, account } = useWeb3Context();
   const { walletAssets } = useUserContext();
   const router = useRouter();
   const toast = useToast();
   const [isMobile, setIsMobile] = useState(false);
+  const [canClaim,setCanClaim] = useState<Boolean>(false);
+  const [airdropAmount,setAirdropAmount] = useState<string>("0");
+  const [proof,setProof] = useState<Array<string>>(null);
   const isValid = useMemo(
     () => [4].includes(providerChainId),
     [providerChainId]
@@ -49,6 +55,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const listNFTToClaimId = 'listNFT';
   const claimToastId = 'claim';
   const learnToastId = 'learn';
+  const notEligible = 'notEligible'
 
   useEffect(() => {
     const width = window?.innerWidth;
@@ -58,7 +65,49 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   }, []);
 
+  const getAirdrop = async (userAddress) =>{
+    const data = await getAddressAirdrop(userAddress);
+    if(data.airdrop!=null){
+      setAirdropAmount(data.airdrop.amount);
+      setProof(data.airdrop.proof);
+    }
+    return data;
+  }
+
+  const userClaimAirdrop = async () => {
+    await claimAirdrop(airdropAmount,proof,window?.localStorage.getItem(`firstMinted-${account}`),provider,airdropAddress);
+  }
+
+  function parseTier(amount){
+    console.log(amount);
+    switch(amount){
+        case 10000:
+            return "7900";
+         case 4540:
+             return "3160";
+         case 2450:
+             return "2370";
+         case 1500:
+             return "1580";
+         case 2450:
+             return "2370";
+         case 1200:
+             return "790";
+         case 800:
+             return "474";
+         case 400:
+             return "316";
+         case 200:
+             return "252";
+         case 125:
+             return "126";
+    }
+    return 0;
+ }
+
   useEffect(() => {
+    console.log(window?.localStorage.getItem(`firstMinted-${account}`));
+    
     if (!isValid && !toast.isActive(airdropConnectToWalletId)) {
       const title = 'FRAKs airdrop is live';
       const subtitle = 'Connect your wallet to check if you are eligible.';
@@ -84,18 +133,41 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   }, [isValid]);
 
-  const showAirdropBanners = () => {
+  const showAirdropBanners = async () => {
     if (!isValid || window?.localStorage.getItem('userClaimed') == 'true') {
       return;
     }
-
     toast.closeAll();
-    if (
-      walletAssets == null ||
-      (walletAssets.length == 0 && !toast.isActive(listNFTToClaimId))
-    ) {
-      const title = 'Congrats, you have received 100 000 FRAK';
+    const airdropData = await getAirdrop(account);
+    if(airdropData.airdrop==null && (window?.localStorage.getItem('userClaimed') == null)){
+      toast.closeAll();
+      toast({
+        id: notEligible,
+        position: 'top',
+        duration: null,
+        render: () => (
+          <AirdropBanner
+            icon=""
+            onClick={async () => {
+              toast.closeAll();
+              window?.localStorage.setItem('userClaimed', 'true');
+              openLearnMore();
+            }}
+            buttonText={'Close'}
+            title={"Not eligible to claim.."}
+            subtitle={""}
+          />
+        ),
+      });
+    }
+    else if (airdropData.airdrop!= null &&
+      (window?.localStorage.getItem(`firstMinted-${account}`) == null ||
+      (walletAssets?.length == 0 && !toast.isActive(listNFTToClaimId))
+    )) {
+      const eligibleFrak = parseTier(Number(utils.formatEther(airdropData.airdrop.amount)));
+      const title = `Congrats, you have received ${eligibleFrak} FRAK`;
       const subtitle = 'List an NFT to claim.';
+      toast.closeAll();
       toast({
         id: listNFTToClaimId,
         position: 'top',
@@ -103,7 +175,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
         render: () => (
           <AirdropBanner
             icon="🎁"
-            onClick={() => {
+            onClick={async () => {
               router.push(CREATE_NFT, null, { scroll: false });
               toast.close(listNFTToClaimId);
             }}
@@ -113,7 +185,13 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
           />
         ),
       });
-    } else if (!toast.isActive(claimToastId)) {
+    } else if (!toast.isActive(claimToastId)  && (window?.localStorage.getItem('userClaimed') == null)) {
+      console.log(window?.localStorage.getItem('userClaimed'));
+
+
+      const eligibleFrak = parseTier(Number(utils.formatEther(airdropData.airdrop.amount)));
+      const title = `Claim ${eligibleFrak} FRAK`;
+      
       toast({
         id: claimToastId,
         position: 'top',
@@ -121,13 +199,14 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
         render: () => (
           <AirdropBanner
             icon="🙌"
-            onClick={() => {
+            onClick={async () => {
               toast.close(claimToastId);
+              await userClaimAirdrop();
               window?.localStorage.setItem('userClaimed', 'true');
               openLearnMore();
             }}
             buttonText={'Claim'}
-            title={'Claim 100 000 FRAK'}
+            title={title}
           />
         ),
       });
