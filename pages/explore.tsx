@@ -246,8 +246,8 @@ const Marketplace: React.FC = () => {
           </Text>
           <Tabs paddingTop="15px" width="40%" index={tabIndex} onChange={handleTabsChange} isFitted variant='enclosed' size='lg' align="center" >
             <TabList mb='1em' borderBottom="1px solid #E0E0E0">
-                <Tab _selected={{ color: '#985CFF', borderColor:  '#985CFF'}}>{FIXED_PRICE_TYPE}</Tab>
-                <Tab _selected={{ color: '#985CFF', borderColor:  '#985CFF'}}>{AUCTIONS_TYPE}</Tab>
+                <Tab _selected={{ color: 'white', background: '#405466', borderRadius: '16px 0 0 16px', fontWeight: 700 }}>{FIXED_PRICE_TYPE}</Tab>
+                <Tab _selected={{ color: 'white', background: '#405466', borderRadius: '0 16px 16px 0', fontWeight: 700 }}>{AUCTIONS_TYPE}</Tab>
             </TabList>
           </Tabs>
           <Menu closeOnSelect={true}>
@@ -275,7 +275,7 @@ const Marketplace: React.FC = () => {
             </MenuList>
           </Menu>
           <Spacer />
-          <Menu closeOnSelect={true}>
+          {/*<Menu closeOnSelect={true}>
                 <MenuButton
                     as={Button}
                     alignSelf="center"
@@ -299,7 +299,7 @@ const Marketplace: React.FC = () => {
                     }
                 </MenuList>
           </Menu>
-          <Spacer/>
+          <Spacer/>*/}
           <Box sx={{ display: `flex`, gap: `16px` }}>
             <NextLink href="/my-nfts#yourFraktions">
               <FrakButton>Sell Fraktions</FrakButton>
