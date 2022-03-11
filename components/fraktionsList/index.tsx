@@ -1,7 +1,11 @@
-import { Box, Center, StackProps, Text, VStack, HStack } from "@chakra-ui/layout";
-import React, { forwardRef, useState, useEffect } from "react";
+import React from "react";
 import FraktionsDetail from '../fraktionsDetail';
 import FrakButton from '../../components/button4'
+import {
+  Icon,
+  Tooltip
+} from '@chakra-ui/react';
+import { AiOutlineInfoCircle } from 'react-icons/ai';
 
 // if account has fraktions.. display info to list?
 
@@ -27,14 +31,32 @@ const FraktionsList=(({fraktionsListed, tokenAddress, marketAddress, provider}) 
       justifyContent: "space-between"
     }}>
       Fraktions
+      <div>
       <FrakButton
         onClick={() =>
           console.log('Button click')
         }
-        title="Make sure to check that the NFT you are buying Fraktions of is authentic"
       >
         Verify On Opensea
       </FrakButton>
+      <Tooltip
+        border=" 1px solid #00C49D"
+        borderRadius="4px"
+        boxShadow="none"
+        padding="8px"
+        fontSize="14px"
+        bg="#fff"
+        color="#656464"
+        placement="top"
+        label="Make sure to check that the NFT you are buying Fraktions of is authentic."
+        offset={[0, 20]}
+      >
+        <span style={{ cursor: 'pointer', paddingLeft: 4 }}>
+          <Icon as={AiOutlineInfoCircle} w={10} h={10} color="#00C49D" />
+        </span>
+      </Tooltip>
+      </div>
+      
     </div>
       {fraktionsListed && fraktionsListed.length ?
         <div>
