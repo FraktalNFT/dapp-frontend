@@ -182,6 +182,7 @@ export const UserContextProviderFC = ({ children }) => {
             nftObjectsClean = nftObjects;
           }
 
+
           setFraktals(fraktalsClean);
           
           setFraktions(fraktionsObjectsClean);

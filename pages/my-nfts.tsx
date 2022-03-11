@@ -145,8 +145,6 @@ export default function MyNFTsView() {
       success = false;
     }
 
-    // console.log(auctionReserve.toString(),">",auction[1].toString()," is ", success);
-
     return success;
   };
 
@@ -352,21 +350,6 @@ export default function MyNFTsView() {
     window?.localStorage.setItem('mintingNFTs', nftLocalDataString);
   }, [fraktals]);
 
-  // useEffect(() => {
-  //   if (account) {
-  //     console.log("account", account);
-  //   }
-  //   if (fraktals) {
-  //     console.log("fraktals", fraktals);
-  //   }
-  //   if (fraktions) {
-  //     console.log("fraktions", fraktions);
-  //   }
-  //   if (nfts) {
-  //     console.log("nfts", nfts);
-  //   }
-  // }, [account, fraktals, fraktions, nfts, balance]);
-
   useEffect(() => {
     if (window) {
       if (!window?.localStorage.getItem('mintingNFTs')) {
@@ -399,7 +382,6 @@ export default function MyNFTsView() {
       provider,
       item.id
     );
-    // console.log('is approved?',approved)
     if (!approved) {
       done = await approveContract(factoryAddress, item.id);
     } else {
@@ -431,7 +413,6 @@ export default function MyNFTsView() {
     let res;
     let done;
     let approved = await getApproved(account, marketAddress, provider, item.id);
-    // console.log('is approved?',approved)
     if (!approved) {
       done = await approveContract(marketAddress, item.id);
     } else {

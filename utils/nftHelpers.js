@@ -165,6 +165,9 @@ export async function createObject2(data) {
       createdAt: data.createdAt,
       status: data.status,
     };
+    if (data.collateral) {
+      object.collateral = data.collateral;
+    }
     if (nftMetadata && nftMetadata.name) {
       object.name = nftMetadata.name;
     }

@@ -196,6 +196,16 @@ const UserOwnership = ({
           </FrakButton>
         </div>
       )}
+      <div>
+        You own this NFT
+        {collateral && collateral.id && (
+            <FrakButton onClick={() => claimNFT()}>Claim NFT</FrakButton>
+        )}
+        <br />
+        <FrakButton onClick={() => importFraktalToMarket()}>
+          FRAK IT
+        </FrakButton>
+      </div>
     </div>
   );
 };
