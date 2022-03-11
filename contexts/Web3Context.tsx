@@ -11,7 +11,7 @@ import { provider } from "web3-core";
 import Web3Modal, { IProviderOptions } from "web3modal";
 import { getRPCUrl } from "../utils/helpers";
 import Web3 from "web3";
-import { marketContracts, factoryContracts } from '../utils/constants';
+import { marketContracts, factoryContracts, airdropContract, lpStakingContracts, tradingRewardsContracts, feeSharingContracts, fraktalTokenContracts, lpTokenContracts } from '../utils/constants';
 
 type Web3ContextType = {
   account: null | string;
@@ -19,6 +19,12 @@ type Web3ContextType = {
   providerChainId: null | number;
   factoryAddress: null | string;
   marketAddress: null | string;
+  airdropAddress: null | string;
+  lpStakingAddress: null | string;
+  tradingRewardsAddress: null | string;
+  feeSharingAddress: null | string;
+  fraktalTokenAddress: null | string;
+  lpTokenAddress: null | string;
 };
 
 const Web3Context = createContext<
@@ -29,6 +35,12 @@ const Web3Context = createContext<
   providerChainId: null,
   factoryAddress: null,
   marketAddress: null,
+  airdropAddress: null,
+  lpStakingAddress: null,
+  tradingRewardsAddress: null,
+  feeSharingAddress: null,
+  fraktalTokenAddress: null,
+  lpTokenAddress: null,
   loading: false,
   connectWeb3: () => {},
 });
@@ -58,13 +70,19 @@ const web3Modal =
   });
 
 const Web3ContextProvider: React.FC = ({ children }) => {
-  const [{ account, providerChainId, provider, marketAddress, factoryAddress }, setWeb3State] =
+  const [{ account, providerChainId, provider, marketAddress, factoryAddress, airdropAddress, lpStakingAddress, tradingRewardsAddress, feeSharingAddress, fraktalTokenAddress, lpTokenAddress}, setWeb3State] =
     useState<Web3ContextType>({
       account: null,
       provider: null,
       providerChainId: null,
       factoryAddress: null,
       marketAddress: null,
+      airdropAddress: null,
+      lpStakingAddress: null,
+      tradingRewardsAddress: null,
+      feeSharingAddress: null,
+      fraktalTokenAddress: null,
+      lpTokenAddress: null
     });
 
   const [loading, setLoading] = useState(true);
@@ -83,6 +101,12 @@ const Web3ContextProvider: React.FC = ({ children }) => {
           const chainId = parseInt(prov.chainId, 16);
           const marketChainAddress = marketContracts.find(x=>x.providerChainId === chainId).address; // contract specific providerChainId
           const factoryChainAddress = factoryContracts.find(x=>x.providerChainId === chainId).address; // contract specific providerChainId
+          const airdropChainAddress = airdropContract.find(x=>x.providerChainId === chainId).address;
+          const lpStakingChainAddress = lpStakingContracts.find(x=>x.providerChainId === chainId).address;
+          const tradingRewardsChainAddress = tradingRewardsContracts.find(x=>x.providerChainId === chainId).address;
+          const feeSharingChainAddress = feeSharingContracts.find(x=>x.providerChainId === chainId).address;
+          const fraktalTokenChainAddress = fraktalTokenContracts.find(x=>x.providerChainId === chainId).address;
+          const lpTokenChainAddress = lpTokenContracts.find(x=>x.providerChainId === chainId).address;
           const account = initialCall
             ? await provider.getSigner().getAddress()
             : null;
@@ -95,6 +119,12 @@ const Web3ContextProvider: React.FC = ({ children }) => {
             account: account || webState.account,
             marketAddress: marketChainAddress,
             factoryAddress: factoryChainAddress,
+            airdropAddress: airdropChainAddress,
+            lpStakingAddress: lpStakingChainAddress,
+            tradingRewardsAddress: tradingRewardsChainAddress,
+            feeSharingAddress: feeSharingChainAddress,
+            fraktalTokenAddress: fraktalTokenChainAddress,
+            lpTokenAddress: lpTokenChainAddress
           }));
         }
       } catch (err) {
@@ -123,7 +153,7 @@ const Web3ContextProvider: React.FC = ({ children }) => {
 
   return (
     <Web3Context.Provider
-      value={{ account, providerChainId, provider, loading, connectWeb3, marketAddress, factoryAddress }}
+      value={{ account, providerChainId, provider, loading, connectWeb3, marketAddress, factoryAddress, airdropAddress, lpStakingAddress, tradingRewardsAddress, feeSharingAddress, fraktalTokenAddress, lpTokenAddress }}
     >
       {children}
     </Web3Context.Provider>
