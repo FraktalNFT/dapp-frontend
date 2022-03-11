@@ -1,5 +1,5 @@
 import {createListed, createListedAuction, createObject} from "@/utils/nftHelpers";
-import {getSubgraphData} from "@/utils/graphQueries";
+import {getSubgraphData, SEARCH_ITEMS} from "@/utils/graphQueries";
 
 //TODO - REFACTOR
 async function mapListed(listedItems) {
@@ -67,8 +67,9 @@ async function getItems(query, options = []) {
     if (query.length < 2) {
         return [];
     }
-    const searchData = await getSubgraphData("search_items", "", {
-        name: "'" + query + "'" + ':*'
+    const searchData = await getSubgraphData(SEARCH_ITEMS, "", {
+        name: "'" + query + "'" + ':*',
+        ...options
     });
     let listedObjects = [];
     let notForSale = [];
@@ -94,10 +95,6 @@ async function getItems(query, options = []) {
         auctions: auctionsObjects,
         notForSale: notForSale
     }
-}
-
-async function orderSearch() {
-
 }
 
 export {getItems, mapAuctions, mapFraktion, mapListed, mapNotForSale}

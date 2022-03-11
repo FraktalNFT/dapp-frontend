@@ -2,6 +2,7 @@ import FrakButton4 from '@/components/button4';
 import ListCardAuction from '@/components/listCardAuction';
 import NFTImportCardOS from '@/components/nft-importcard-opensea';
 import NFTCard from '@/components/nftCard';
+import { connect } from 'react-redux';
 
 import {
   CREATE_NFT,
@@ -37,10 +38,10 @@ import {
   IMPORT_NFT,
   LISTING_NFT,
   rejectContract,
+  closeModal,
 } from '../redux/actions/contractActions';
 
 import store from '../redux/store';
-
 import {
   approveMarket,
   getIndexUsed,
@@ -55,7 +56,7 @@ const MAX_FRACTIONS = 10000;
 
 const actionOpts = { workflow: Workflow.IMPORT_NFT };
 
-export default function ImportNFTPage() {
+function ImportNFTPage() {
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
   const { fraktals, fraktions, nfts, balance } = useUserContext();
 
@@ -84,6 +85,9 @@ export default function ImportNFTPage() {
 
   const [isAuction, setIsAuction] = useState(false);
 
+  /**
+   * Approve Factory
+   */
   async function approveForFactory() {
     if (tokenToImport && tokenToImport.id) {
       let res = await approveMarket(
@@ -126,20 +130,25 @@ export default function ImportNFTPage() {
       });
   }
 
+  /**
+   * Import NFT
+   */
   async function importNFT() {
     let address;
     if (typeof tokenToImport === 'undefined') {
       alert('No Token Selected');
       return null;
     }
+    console.log('schema', tokenToImport?.token_schema)
     if (tokenToImport?.token_schema === 'ERC721') {
       address = await importERC721(
-        parseInt(tokenToImport?.tokenId),
+        BigInt(tokenToImport?.tokenId),
         tokenToImport?.id,
         provider,
         factoryAddress,
         actionOpts
       ).catch((error) => {
+        console.log('error', error)
         store.dispatch(
           rejectContract(IMPORT_NFT, error, importNFT, actionOpts)
         );
@@ -147,12 +156,13 @@ export default function ImportNFTPage() {
     }
     if (tokenToImport?.token_schema === 'ERC1155') {
       address = await importERC1155(
-        parseInt(tokenToImport?.tokenId),
+        BigInt(tokenToImport?.tokenId),
         tokenToImport?.id,
         provider,
         factoryAddress,
         actionOpts
       ).catch((error) => {
+        console.log('error', error)
         store.dispatch(
           rejectContract(IMPORT_NFT, error, importNFT, actionOpts)
         );
@@ -163,18 +173,25 @@ export default function ImportNFTPage() {
       setIsNFTImported(true);
       if (!isIntendedForListing) {
         setTimeout(() => {
+          closeModal()
           router.push(resolveNFTRoute(address));
-        }, 1000);
+        }, 2000);
       }
     }
   }
 
+  /**
+   * Use effect if NFT is imported
+   */
   useEffect(() => {
     if (isNFTImported) {
       approveForMarket();
     }
   }, [isNFTImported, tokenMintedAddress]);
 
+  /**
+   * Import Fraktal to Market
+   */
   async function importFraktalToMarket() {
     let tokenID = 0;
     let isUsed = true;
@@ -210,6 +227,9 @@ export default function ImportNFTPage() {
     }
   }
 
+  /**
+   * List new item
+   */
   async function listNewItem() {
     const wei = utils.parseEther(totalPrice.toString());
     const fei = utils.parseEther(totalAmount.toString());
@@ -225,8 +245,9 @@ export default function ImportNFTPage() {
       .then((receipt) => {
         setIsNFTListed(true);
         setTimeout(() => {
+          closeModal()
           router.push(resolveNFTRoute(tokenMintedAddress));
-        }, 1000);
+        }, 2000);
       })
       .catch((error) => {
         store.dispatch(
@@ -235,6 +256,9 @@ export default function ImportNFTPage() {
       });
   }
 
+  /**
+   * List new Auction Imp
+   */
   async function listNewAuctionItem() {
     const response = await listItemAuction(
       tokenMintedAddress,
@@ -247,8 +271,9 @@ export default function ImportNFTPage() {
       .then((receipt) => {
         setIsNFTListed(true);
         setTimeout(() => {
+          closeModal()
           router.push(resolveAuctionNFTRoute(tokenMintedAddress));
-        }, 1000);
+        }, 2000);
       })
       .catch((error) => {
         store.dispatch(
@@ -462,7 +487,7 @@ export default function ImportNFTPage() {
                       cursor: `pointer`,
                     }}
                     onClick={() =>
-                      setIsIntentedForListing(!isIntendedForListing)
+                      setIsIntentedForListing(true)
                     }
                   ></Box>
                 )}
@@ -479,7 +504,7 @@ export default function ImportNFTPage() {
                       cursor: `pointer`,
                     }}
                     onClick={() =>
-                      setIsIntentedForListing(!isIntendedForListing)
+                      setIsIntentedForListing(true)
                     }
                   ></Box>
                 )}
@@ -492,7 +517,7 @@ export default function ImportNFTPage() {
                   _hover={{
                     cursor: `pointer`,
                   }}
-                  onClick={() => setIsIntentedForListing(!isIntendedForListing)}
+                  onClick={() => setIsIntentedForListing(true)}
                 >
                   Sell Fraktions
                 </Text>
@@ -591,3 +616,13 @@ export default function ImportNFTPage() {
     </>
   );
 }
+
+const mapStateToProps = (state) => ({});
+const mapDispatchToProps = (dispatch) => {
+  return {
+    closeModal: () => {
+      dispatch(closeModal())
+    }
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(ImportNFTPage);

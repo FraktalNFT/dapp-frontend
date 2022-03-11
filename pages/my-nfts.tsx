@@ -45,6 +45,7 @@ import {
   getParticipantContribution,
   getAuctionListings,
 } from '../utils/contractCalls';
+import { useLoadingScreenHandler } from '../hooks/useLoadingScreen'
 
 import { EXPLORE } from '@/constants/routes';
 
@@ -58,6 +59,7 @@ export default function MyNFTsView() {
   const [userAccount, setUserAccount] = useState(null);
   const [refresh, setRefresh] = useState(false);
   const { isMinting, setIsMinting } = useMintingContext();
+  const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
   const refreshPage = () => {
     setRefresh(!refresh);
@@ -101,6 +103,7 @@ export default function MyNFTsView() {
           isClosable: true,
         });
         refreshPage();
+        closeLoadingModalAfterDelay()
       })
       .catch((e) => {
         toast({
@@ -142,8 +145,6 @@ export default function MyNFTsView() {
       success = false;
     }
 
-    // console.log(auctionReserve.toString(),">",auction[1].toString()," is ", success);
-
     return success;
   };
 
@@ -174,6 +175,7 @@ export default function MyNFTsView() {
           isClosable: true,
         });
         refreshPage();
+        closeLoadingModalAfterDelay()
       })
       .catch((e) => {
         toast({
@@ -208,7 +210,7 @@ export default function MyNFTsView() {
         }
       );
       auctionData = auctionData?.auctions?.filter(
-        (x) => x.seller == account?.toLocaleLowerCase()
+        (x) => x.seller.id == account?.toLocaleLowerCase()
       );
 
       let auctionDataHash = [];
@@ -225,7 +227,6 @@ export default function MyNFTsView() {
           }
         })
       );
-
       let auctionItems = [];
       await Promise.all(
         auctionData?.map(async (auction, idx) => {
@@ -349,21 +350,6 @@ export default function MyNFTsView() {
     window?.localStorage.setItem('mintingNFTs', nftLocalDataString);
   }, [fraktals]);
 
-  // useEffect(() => {
-  //   if (account) {
-  //     console.log("account", account);
-  //   }
-  //   if (fraktals) {
-  //     console.log("fraktals", fraktals);
-  //   }
-  //   if (fraktions) {
-  //     console.log("fraktions", fraktions);
-  //   }
-  //   if (nfts) {
-  //     console.log("nfts", nfts);
-  //   }
-  // }, [account, fraktals, fraktions, nfts, balance]);
-
   useEffect(() => {
     if (window) {
       if (!window?.localStorage.getItem('mintingNFTs')) {
@@ -396,7 +382,6 @@ export default function MyNFTsView() {
       provider,
       item.id
     );
-    // console.log('is approved?',approved)
     if (!approved) {
       done = await approveContract(factoryAddress, item.id);
     } else {
@@ -406,14 +391,14 @@ export default function MyNFTsView() {
     if (done) {
       if (item.token_schema == 'ERC721') {
         res = await importERC721(
-          parseInt(item.tokenId),
+            BigInt(item.tokenId),
           item.id,
           provider,
           factoryAddress
         );
       } else {
         res = await importERC1155(
-          parseInt(item.tokenId),
+            BigInt(item.tokenId),
           item.id,
           provider,
           factoryAddress
@@ -428,7 +413,6 @@ export default function MyNFTsView() {
     let res;
     let done;
     let approved = await getApproved(account, marketAddress, provider, item.id);
-    // console.log('is approved?',approved)
     if (!approved) {
       done = await approveContract(marketAddress, item.id);
     } else {

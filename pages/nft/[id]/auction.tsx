@@ -18,6 +18,7 @@ import { createListedAuction } from "utils/nftHelpers";
 import { introspectionFromSchema } from "graphql";
 import Custom404 from "../../404";
 import {EXPLORE} from "@/constants/routes";
+import { useLoadingScreenHandler } from "hooks/useLoadingScreen";
 
 function AuctionNFTView({router}) {
 
@@ -30,6 +31,7 @@ function AuctionNFTView({router}) {
   const [refresh,setRefresh] = useState(true);
   const [completed,setCompleted] = useState(false);
   const toast = useToast();
+  const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
   const auctionReserve = async (seller, sellerNonce) =>{
     if(provider) {
@@ -59,14 +61,16 @@ function AuctionNFTView({router}) {
 
     try {
       const tx = await participateAuction(tokenAddress,seller,sellerNonce,weiVal,provider,marketAddress)
-      .then((e)=>console.log(e)
-      );
+      .then((e)=> {
+        closeLoadingModalAfterDelay()
+      });
       toast({
         title: `Contributed ${contribute.toString()} ETH` ,
         status: 'success',
         duration: 2000,
         isClosable: true,
       })
+      
       refreshPage();
     } catch (error) {
       toast({
@@ -112,7 +116,6 @@ function AuctionNFTView({router}) {
       });
 
       const item = await createListedAuction(obj.auction);
-      console.log('ITEM', item)
       Object.assign(obj.auction,{
         "hash":_hash.fraktalNft.hash,
         "name":item.name,
@@ -279,4 +282,5 @@ function AuctionNFTView({router}) {
   }
 }
 
-export default withRouter(AuctionNFTView)
+export default withRouter(AuctionNFTView);
+

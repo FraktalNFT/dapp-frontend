@@ -9,10 +9,13 @@ import { makeOffer, getMajority } from "../../utils/contractCalls";
 import { Text } from "@chakra-ui/react";
 import {connect} from "react-redux";
 import {
-    addAmount, OFFERING_BUYOUT, rejectContract,
-    removeAmount
+  addAmount,
+  OFFERING_BUYOUT,
+  rejectContract,
+  removeAmount
 } from "../../redux/actions/contractActions";
 import { roundUp } from "../../utils/math";
+import { useLoadingScreenHandler } from "hooks/useLoadingScreen";
 
 const BuyOutCard = ({
   account,
@@ -27,13 +30,14 @@ const BuyOutCard = ({
   itemStatus,
   addEthAmount,
   removeEthAmount,
-  buyOutRejected
+  buyOutRejected,
 }) => {
   const [isReady, setIsReady] = useState(false);
   const [valueToOffer, setValueToOffer] = useState("0");
   const [offering, setOffering] = useState(false);
   const [userIsOfferer, setUserIsOfferer] = useState(false);
   const [majority, setMajority] = useState(0);
+  const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
   // functions for the offers!
   //claim Fraktal
@@ -75,6 +79,7 @@ const BuyOutCard = ({
         provider,
         marketAddress
       );
+      closeLoadingModalAfterDelay()
       setOffering(false);
       setValueToOffer("0");
     } catch (err) {
@@ -199,7 +204,7 @@ const BuyOutCard = ({
             </HStack>
           </VStack>
           {userIsOfferer && (
-            <FrakButton onClick={onOffer}>Removing Buy-out Offer</FrakButton>
+            <FrakButton onClick={onOffer}>Removing Offer</FrakButton>
           )}
           {!userIsOfferer && (
             <Stack
