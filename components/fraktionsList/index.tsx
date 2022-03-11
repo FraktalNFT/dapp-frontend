@@ -36,14 +36,16 @@ const FraktionsList=(({nftObject, fraktionsListed, tokenAddress, marketAddress, 
   const [opeaSeaURL, setOpeaSeaURL] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [message, setMessage] = useState("");
-  const [validationState, setValidationState] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
 
   async function validateNFT() {
-    setValidationState(true);
-    const response = await validateAsset(nftObject.collateral.id, 1);
-    console.log('response', response)
-    setValidationState(false);
-    if (response.success === false) {
+    setIsValidating(true);
+    let response;
+    if (nftObject.collateral !== undefined) {
+        response = await validateAsset(nftObject.collateral.id, 1);
+    }
+    setIsValidating(false);
+    if (response === undefined || response.success === false) {
         setMessage("NFT is not valid");
         setOpenModal(true);
     } else if (response.permalink !== undefined) {
@@ -80,7 +82,7 @@ const FraktionsList=(({nftObject, fraktionsListed, tokenAddress, marketAddress, 
             Fraktions
             <div>
               <FrakButton
-                  disabled={validationState}
+                  disabled={isValidating}
                   onClick={() =>
                       validateNFT()
                   }
@@ -140,9 +142,6 @@ const ModalOpenSeaValidation = ({nftObject, opeaSeaURL, openModal, setOpenModal,
   }
 
   const isValidated = () => {
-    if (validationState == "OK") {
-      return true;
-    }
   }
 
   return (
