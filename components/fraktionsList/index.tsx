@@ -1,7 +1,7 @@
 import { Box, Center, StackProps, Text, VStack, HStack } from "@chakra-ui/layout";
 import React, { forwardRef, useState, useEffect } from "react";
 import FraktionsDetail from '../fraktionsDetail';
-import { utils } from "ethers";
+import FrakButton from '../../components/button4'
 
 // if account has fraktions.. display info to list?
 
@@ -22,8 +22,20 @@ const FraktionsList=(({fraktionsListed, tokenAddress, marketAddress, provider}) 
       fontWeight:'bold',
       fontFamily:'Inter',
       fontSize:'24px',
-      lineHeight:'29px'
-    }}>Fraktions</div>
+      lineHeight:'29px',
+      display: "flex",
+      justifyContent: "space-between"
+    }}>
+      Fraktions
+      <FrakButton
+        onClick={() =>
+          console.log('fffffffffffffffffff')
+        }
+        title="Make sure to check that the NFT you are buying Fraktions of is authentic"
+      >
+        Verify On Opensea
+      </FrakButton>
+    </div>
       {fraktionsListed && fraktionsListed.length ?
         <div>
           {fraktionsListed.map(x=>{
