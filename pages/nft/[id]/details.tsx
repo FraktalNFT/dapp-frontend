@@ -404,6 +404,7 @@ export default function DetailsView() {
             </div>
             {nftObject && nftObject.status == "open" ? (
               <FraktionsList
+                nftObject={nftObject}
                 fraktionsListed={fraktionsListed}
                 tokenAddress={tokenAddress}
                 marketAddress={marketAddress}
