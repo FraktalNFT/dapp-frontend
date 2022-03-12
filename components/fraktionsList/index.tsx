@@ -42,7 +42,16 @@ const FraktionsList=(({nftObject, fraktionsListed, tokenAddress, marketAddress, 
     setIsValidating(true);
     let response;
     if (nftObject.collateral !== undefined) {
-        response = await validateAsset(nftObject.collateral.id, 1);
+        let contract, tokeId;
+        if (nftObject.collateral.id.includes("-")) {
+            const native = nftObject.collateral.id.split("-");
+            contract = native[0];
+            tokeId = native[1];
+        } else {
+            contract = nftObject.collateral.id;
+            tokeId = 1;
+        }
+        response = await validateAsset(contract, tokeId);
     }
     setIsValidating(false);
     if (response === undefined || response.success === false) {

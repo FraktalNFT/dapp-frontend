@@ -23,5 +23,4 @@ export const validateAsset = (contract, tokenId) => {
     return data;
 }
 
-
 // function to parse this output to nftObjects
