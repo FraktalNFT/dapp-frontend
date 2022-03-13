@@ -642,7 +642,11 @@ const auctionFraktalNFT = gql`
   query($id: ID!) {
     fraktalNft(id:$id) {
       hash
-  }
+      collateral {
+        id
+        type
+      }
+    }
   }
 `;
 
