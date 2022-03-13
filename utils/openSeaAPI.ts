@@ -3,6 +3,10 @@ const options = {method: 'GET'};
 const ASSET_METHOD = 'asset';
 const ASSETS_METHOD = 'assets';
 
+/**
+ * Open Sea assets
+ * @param address
+ */
 export const assetsInWallet = (address) => {
   const data = fetch(apiURL + `assets?owner=${address}&order_direction=desc&offset=0&limit=20`, options)
     .then(response => response.json())
@@ -13,6 +17,11 @@ export const assetsInWallet = (address) => {
   return data;
 }
 
+/**
+ * Validate asset
+ * @param contract
+ * @param tokenId
+ */
 export const validateAsset = (contract, tokenId) => {
     const data = fetch(apiURL +  ASSET_METHOD + `/` + contract + '/' + tokenId, options)
         .then(response => response.json())
@@ -22,5 +31,3 @@ export const validateAsset = (contract, tokenId) => {
         .catch(err => console.error(err));
     return data;
 }
-
-// function to parse this output to nftObjects

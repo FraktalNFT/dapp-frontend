@@ -2,75 +2,16 @@
  * React
  */
 import React, {useEffect, useState}  from "react";
-/**
- * Chakra
- *
- */
-import {
-  Link,
-  Text,
-  Icon,
-  Tooltip,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-} from '@chakra-ui/react';
+
 import FraktionsDetail from '../fraktionsDetail';
-/**
- * Component
- */
-import FrakButton from '../../components/button4'
-/**
- * Icons
- */
-import { AiOutlineInfoCircle } from 'react-icons/ai';
-import {validateAsset} from "@/utils/openSeaAPI";
+
+import VerifyNFT from "@/components/verifyNFT";
 // if account has fraktions.. display info to list?
 
 const FraktionsList=(({nftObject, fraktionsListed, tokenAddress, marketAddress, provider}) => {
 
-  const [opeaSeaURL, setOpeaSeaURL] = useState("");
-  const [openModal, setOpenModal] = useState(false);
-  const [message, setMessage] = useState("");
-  const [isValidating, setIsValidating] = useState(false);
-
-  async function validateNFT() {
-    setIsValidating(true);
-    let response;
-    if (nftObject.collateral !== undefined) {
-        let contract, tokeId;
-        if (nftObject.collateral.id.includes("-")) {
-            const native = nftObject.collateral.id.split("-");
-            contract = native[0];
-            tokeId = native[1];
-        } else {
-            contract = nftObject.collateral.id;
-            tokeId = 1;
-        }
-        response = await validateAsset(contract, tokeId);
-    }
-    setIsValidating(false);
-    if (response === undefined || response.success === false) {
-        setMessage("NFT is not valid");
-        setOpenModal(true);
-    } else if (response.permalink !== undefined) {
-        setOpeaSeaURL(response.permalink);
-        window.open(response.permalink, '_blank');
-    }
-  }
-
   return(
       <>
-        <ModalOpenSeaValidation
-            nftObject={nftObject}
-            message={message}
-            opeaSeaURL={opeaSeaURL}
-            openModal={openModal}
-            setOpenModal={setOpenModal}  />
         <div style={{
           borderRadius:'4px',
           borderWidth:'1px',
@@ -89,33 +30,7 @@ const FraktionsList=(({nftObject, fraktionsListed, tokenAddress, marketAddress, 
             justifyContent: "space-between"
           }}>
             Fraktions
-            <div>
-              <FrakButton
-                  disabled={isValidating}
-                  onClick={() =>
-                      validateNFT()
-                  }
-              >
-                Verify On Opensea
-              </FrakButton>
-              <Tooltip
-                  border=" 1px solid #00C49D"
-                  borderRadius="4px"
-                  boxShadow="none"
-                  padding="8px"
-                  fontSize="14px"
-                  bg="#fff"
-                  color="#656464"
-                  placement="top"
-                  label="Make sure to check that the NFT you are buying Fraktions of is authentic."
-                  offset={[0, 20]}
-              >
-        <span style={{ cursor: 'pointer', paddingLeft: 4 }}>
-          <Icon as={AiOutlineInfoCircle} w={10} h={10} color="#00C49D" />
-        </span>
-              </Tooltip>
-            </div>
-
+          <VerifyNFT nftObject={nftObject}/>
           </div>
           {fraktionsListed && fraktionsListed.length ?
               <div>
@@ -144,33 +59,5 @@ const FraktionsList=(({nftObject, fraktionsListed, tokenAddress, marketAddress, 
 
 })
 
-const ModalOpenSeaValidation = ({nftObject, opeaSeaURL, openModal, setOpenModal, message}) => {
-
-  const closeModal = () => {
-    setOpenModal(false);
-  }
-
-  const isValidated = () => {
-  }
-
-  return (
-      <Modal isOpen={openModal} onClose={closeModal}>
-        <ModalOverlay />
-        <ModalContent
-            textAlign={'center'}
-            maxWidth={400}
-            padding={'60px 0'}
-            borderRadius={15}
-            boxShadow={'0px 7px 20px rgba(0, 0, 0, 0.35)'}
-        >
-          <ModalHeader>{nftObject.name}</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-              <Text color="rgba(255, 0, 0, 1);">{message}</Text>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-  );
-}
 
 export default FraktionsList;
