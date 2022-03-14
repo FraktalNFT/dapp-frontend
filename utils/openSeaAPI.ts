@@ -3,7 +3,7 @@ const apiURL = getOpenSeaApi(parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID))
 const options = {
     method: 'GET',
     headers: {
-        'X-API-KEY': process.env.NEXT_PUBLIC_OPEASEA_API_KEY
+        'X-API-KEY': process.env.NEXT_PUBLIC_OPEASEA_API_KEY ? process.env.NEXT_PUBLIC_OPEASEA_API_KEY : ''
     }
 };
 const ASSET_METHOD = 'asset';
