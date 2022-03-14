@@ -13,6 +13,7 @@ import RevenuesDetail from "../revenuesDetail";
 import FrakButton2 from "../button2";
 import { utils } from "ethers";
 import { getSubgraphData } from "../../utils/graphQueries";
+import {getExplorerUrl} from "@/utils/helpers";
 
 // if account has fraktions.. display info to list?
 
@@ -108,7 +109,7 @@ export default function FraktionOwners(props) {
                       sx={{ color: `hsla(224, 86%, 51%, 1)` }}
                       _hover={{ cursor: `pointer` }}
                     >
-                      <a href={`https://etherscan.io/address/${user.owner.id}`}>
+                      <a href={getExplorerUrl(parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID)) + `address/${user.owner.id}`}>
                         {shortAddress}
                       </a>
                     </Text>
