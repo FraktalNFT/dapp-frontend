@@ -75,7 +75,6 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
 
         if (userShares) {
           setShares(userShares);
-          console.log({ userShares });
         }
         if (userReleased) {
           setReleased(userReleased / 10 ** 18);

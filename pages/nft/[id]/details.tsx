@@ -11,7 +11,7 @@ import UserOwnership from "../../../components/userOwnership";
 import BuyOutCard from "../../../components/buyOutCard";
 import FraktionOwners from "../../../components/fraktionOwners";
 import { Image } from "@chakra-ui/image";
-import { shortenHash, timezone } from "../../../utils/helpers";
+import {getExplorerUrl, shortenHash, timezone} from "../../../utils/helpers";
 import { getSubgraphData } from "../../../utils/graphQueries";
 import { createObject2 } from "../../../utils/nftHelpers";
 import { useWeb3Context } from "../../../contexts/Web3Context";
@@ -30,8 +30,6 @@ import {EXPLORE} from "@/constants/routes";
 // import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
 // import Modal from '../../../components/modal';
 
-
-const etherscanAddress = "https://rinkeby.etherscan.io/address/";
 
 export default function DetailsView() {
   const router = useRouter();
@@ -108,8 +106,6 @@ export default function DetailsView() {
       });
       if (revenuesValid) {
         setRevenues(revenuesValid);
-        console.log({revenuesValid});
-        
       }
     }
   }
@@ -340,7 +336,7 @@ export default function DetailsView() {
                       lineHeight: "19px",
                     }}
                   >
-                    <a href={etherscanAddress+nftObject.id+"/"}>{nftObject ? shortenHash(nftObject.id) : "loading"}</a>
+                    <a href={getExplorerUrl(parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID)) + 'address/' +nftObject.id+"/"}>{nftObject ? shortenHash(nftObject.id) : "loading"}</a>
                   </div>
               </VStack>
               </HStack>

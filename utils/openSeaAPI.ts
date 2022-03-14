@@ -1,5 +1,11 @@
-const apiURL = process.env.NEXT_PUBLIC_OPENSEA_API ? process.env.NEXT_PUBLIC_OPENSEA_API : 'https://rinkeby-api.opensea.io/api/v1/';
-const options = {method: 'GET'};
+import {getOpenSeaApi} from "@/utils/helpers";
+const apiURL = getOpenSeaApi(parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID));
+const options = {
+    method: 'GET',
+    headers: {
+        'X-API-KEY': process.env.NEXT_PUBLIC_OPEASEA_API_KEY
+    }
+};
 const ASSET_METHOD = 'asset';
 const ASSETS_METHOD = 'assets';
 

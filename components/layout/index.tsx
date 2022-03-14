@@ -46,8 +46,9 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [canClaim,setCanClaim] = useState<Boolean>(false);
   const [airdropAmount,setAirdropAmount] = useState<string>("0");
   const [proof,setProof] = useState<Array<string>>(null);
+
   const isValid = useMemo(
-    () => [4].includes(providerChainId),
+    () => [parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID)].includes(providerChainId),
     [providerChainId]
   );
 
@@ -79,7 +80,6 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   }
 
   function parseTier(amount){
-    console.log(amount);
     switch(amount){
         case 10000:
             return "7900";
@@ -106,8 +106,6 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
  }
 
   useEffect(() => {
-    console.log(window?.localStorage.getItem(`firstMinted-${account}`));
-    
     if (!isValid && !toast.isActive(airdropConnectToWalletId)) {
       const title = 'FRAKs airdrop is live';
       const subtitle = 'Connect your wallet to check if you are eligible.';
@@ -139,7 +137,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
     toast.closeAll();
     const airdropData = await getAirdrop(account);
-    if(airdropData.airdrop==null && (window?.localStorage.getItem('userClaimed') == null)){
+    if(airdropData.airdrop==null && (window?.localStorage.getItem('userClaimed') == null)) {
       toast.closeAll();
       toast({
         id: notEligible,
@@ -186,8 +184,6 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
         ),
       });
     } else if (!toast.isActive(claimToastId)  && (window?.localStorage.getItem('userClaimed') == null)) {
-      console.log(window?.localStorage.getItem('userClaimed'));
-
 
       const eligibleFrak = parseTier(Number(utils.formatEther(airdropData.airdrop.amount)));
       const title = `Claim ${eligibleFrak} FRAK`;

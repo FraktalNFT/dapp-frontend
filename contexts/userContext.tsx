@@ -89,14 +89,11 @@ export const UserContextProviderFC = ({ children }) => {
         let nftObjectsClean;
 
         let openseaAssets = await assetsInWallet(account);
-        console.log('opensea assets', openseaAssets)
         setWalletAssets(openseaAssets.assets);
         let fobjects = await getSubgraphData(
           "wallet",
           account.toLocaleLowerCase()
         );
-
-        console.log('fobjects', fobjects)
 
         if (fobjects && fobjects.users.length) {
           // balance retrieval

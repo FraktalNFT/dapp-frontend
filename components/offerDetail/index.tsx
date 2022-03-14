@@ -42,7 +42,6 @@ export default function OfferDetail({
 }) {
   const [fraktionsLocked, setFraktionsLocked] = useState(false);
   const [isOfferer, setIsOfferer] = useState<boolean>(false);
-  console.log({ offerItem, tokenAddress });
   const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
   useEffect(() => {
@@ -51,7 +50,6 @@ export default function OfferDetail({
         let lockedStr = await getLocked(account, tokenAddress, provider);
         let lockedNum = Number(lockedStr);
         let locked = !!lockedNum; //change truty to boolean
-        console.log(lockedStr, lockedNum, locked);
 
         setFraktionsLocked(locked);
       }

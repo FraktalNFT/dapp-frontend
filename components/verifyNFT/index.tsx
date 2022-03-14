@@ -32,7 +32,6 @@ import { AiOutlineInfoCircle } from 'react-icons/ai';
 import {validateAsset} from "@/utils/openSeaAPI";
 
 const VerifyNFT =(({nftObject}) => {
-    console.log('NFTOBJect', nftObject)
     const [opeaSeaURL, setOpeaSeaURL] = useState("");
     const [openModal, setOpenModal] = useState(false);
     const [message, setMessage] = useState("");
