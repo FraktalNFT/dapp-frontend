@@ -22,13 +22,13 @@ import {
 
 
 export const timezone = (timestamp) => {return new Date(timestamp*1000).toLocaleDateString("en-US")}
-export const getNetworkName = (chainId: number) => networkNames[chainId || 1];
-export const getNetworkLabel = (chainId: number) => networkLabels[chainId || 1];
-export const getRPCUrl = (chainId: number) => chainUrls[chainId || 1].rpc;
+export const getNetworkName = (chainId: number) => networkNames[chainId || 4];
+export const getNetworkLabel = (chainId: number) => networkLabels[chainId || 4];
+export const getRPCUrl = (chainId: number) => chainUrls[chainId || 4].rpc;
 export const getExplorerUrl = (chainId: number) =>
-  (chainUrls[chainId] || chainUrls[1]).explorer;
+  (chainUrls[chainId] || chainUrls[4]).explorer;
 export const getOpenSeaApi = (chainId: number) =>
-    (chainUrls[chainId] || chainUrls[1]).openSeaApi;
+    (chainUrls[chainId] || chainUrls[4]).openSeaApi;
 
 export const getNetworkCurrency = chainId =>
   networkCurrencies[chainId] || { name: "Unknown", symbol: "Unknown" };
