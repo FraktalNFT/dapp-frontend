@@ -14,6 +14,8 @@ import {
   rejectContract,
 } from '../../redux/actions/contractActions';
 import store from '../../redux/store';
+import {connect} from "react-redux";
+import { useLoadingScreenHandler } from 'hooks/useLoadingScreen';
 
 interface revenueItemProps {
   value: number;
@@ -43,6 +45,7 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
     const [isClaiming, setIsClaiming] = useState(false);
     const [isApproved, setIsApproved] = useState(false);
     const [isApproving, setIsApproving] = useState(false);
+    const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
     // const buyout = true;
 
@@ -72,7 +75,6 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
 
         if (userShares) {
           setShares(userShares);
-          console.log({ userShares });
         }
         if (userReleased) {
           setReleased(userReleased / 10 ** 18);
@@ -101,6 +103,8 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
       try {
         release(provider, revenueAddress, tokenAddress).catch((e) => {
           store.dispatch(rejectContract(CLAIMING_REVENUE, e, revenueClaiming));
+        }).then((e) => {
+          closeLoadingModalAfterDelay()
         });
       } catch (e) {
         console.error('There has been an error - Claiming Revenue: ', e);

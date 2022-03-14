@@ -1,3 +1,11 @@
+/**
+ * React
+ */
+
+import React from 'react';
+/**
+ * Chakra
+ */
 import {
   Flex,
   Box,
@@ -13,7 +21,10 @@ import {
   ModalBody,
   ModalCloseButton,
 } from '@chakra-ui/react';
-
+/**
+ * Redux
+ */
+import { connect } from 'react-redux';
 import {
   closeModal,
   BUYING_FRAKTIONS,
@@ -22,14 +33,22 @@ import {
   REJECTED_STATUS,
   PENDING_STATUS,
 } from '../../redux/actions/contractActions';
-import { motion } from 'framer-motion';
-import { connect } from 'react-redux';
-import styles from './loaders.module.css';
-import { useRouter } from 'next/router';
-import React from 'react';
+/**
+ * Next
+ */
 
-//TODO - CHANGE TO process.env.NEXT_PUBLIC_BLOCK_EXPLORER
-const BLOCK_EXPLORER = 'https://rinkeby.etherscan.io/tx/';
+import { useRouter } from 'next/router';
+/**
+ * Styles
+ *
+ *
+ */
+import styles from './loaders.module.css';
+import { motion } from 'framer-motion';
+/**
+ * Helpers
+ */
+import {getExplorerUrl} from "@/utils/helpers";
 
 /**
  * Load Screen
@@ -173,7 +192,7 @@ const LoadScreen = (props) => {
 
             {contractTransaction.tx && (
               <Link
-                href={BLOCK_EXPLORER + contractTransaction.tx}
+                href={getExplorerUrl(parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID)) + 'tx/' + contractTransaction.tx}
                 isExternal
                 fontSize="15px"
                 lineHeight="18px"

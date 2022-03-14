@@ -18,6 +18,8 @@ import { createListedAuction } from "utils/nftHelpers";
 import { introspectionFromSchema } from "graphql";
 import Custom404 from "../../404";
 import {EXPLORE} from "@/constants/routes";
+import { useLoadingScreenHandler } from "hooks/useLoadingScreen";
+import VerifyNFT from "@/components/verifyNFT";
 
 function AuctionNFTView({router}) {
 
@@ -30,6 +32,7 @@ function AuctionNFTView({router}) {
   const [refresh,setRefresh] = useState(true);
   const [completed,setCompleted] = useState(false);
   const toast = useToast();
+  const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
   const auctionReserve = async (seller, sellerNonce) =>{
     if(provider) {
@@ -59,14 +62,16 @@ function AuctionNFTView({router}) {
 
     try {
       const tx = await participateAuction(tokenAddress,seller,sellerNonce,weiVal,provider,marketAddress)
-      .then((e)=>console.log(e)
-      );
+      .then((e)=> {
+        closeLoadingModalAfterDelay()
+      });
       toast({
         title: `Contributed ${contribute.toString()} ETH` ,
         status: 'success',
         duration: 2000,
         isClosable: true,
       })
+      
       refreshPage();
     } catch (error) {
       toast({
@@ -100,24 +105,23 @@ function AuctionNFTView({router}) {
       }
 
       let obj = await getSubgraphAuction('singleAuction', index);
-
       if(obj?.auction == null){
         setError(true);
         return;
       }
 
-      let _hash = await getSubgraphAuction("auctionsNFT",obj.auction.tokenAddress);
+      let _hash = await getSubgraphAuction("auctionsNFT", obj.auction.tokenAddress);
       Object.assign(obj.auction,{
         "hash":_hash.fraktalNft.hash,
       });
 
       const item = await createListedAuction(obj.auction);
-      console.log('ITEM', item)
       Object.assign(obj.auction,{
         "hash":_hash.fraktalNft.hash,
         "name":item.name,
         "imageURL":item.imageURL,
-        "seller": item.seller
+        "seller": item.seller,
+        "collateral": _hash.collateral
       });
 
       if(obj) {
@@ -233,6 +237,8 @@ function AuctionNFTView({router}) {
               <div className={styles.cardText}>
                 {nftObject?`${utils.formatUnits(nftObject.amountOfShare)}/10,000 Fraktions (${Number(utils.formatUnits(nftObject.amountOfShare))/100}% of max. supply)`:'loading'}
               </div>
+              {nftObject && <VerifyNFT nftObject={nftObject}/>}
+
             </div>
           </div>
           {nftObject&&<div className={styles.auctionCard}>
@@ -279,4 +285,5 @@ function AuctionNFTView({router}) {
   }
 }
 
-export default withRouter(AuctionNFTView)
+export default withRouter(AuctionNFTView);
+

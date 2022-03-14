@@ -280,7 +280,7 @@ const loadingScreenReducer = (state = initState, action) => {
       }
       break;
     case Workflow.MINT_NFT:
-      loadingScreenObject.totalStep = 4;
+      loadingScreenObject.totalStep = action.custom?.totalStep ?? 4;
       switch (action.transactionType) {
         case MINT_NFT:
           loadingScreenObject.step = 1;

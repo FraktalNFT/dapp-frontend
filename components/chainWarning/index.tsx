@@ -1,13 +1,18 @@
 import { utils } from "ethers";
 import { Flex } from "@chakra-ui/layout";
+
+import {getNetworkName} from "../../utils/helpers";
+
 const ChainWarning: React.FC = () => {
+
   const switchChainOnMetaMask = async (): Promise<boolean> => {
     try {
+      console.log('CHAINID', process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID)
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
         params: [
           {
-            chainId: utils.hexValue(4),
+            chainId: utils.hexValue(parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID)),
           },
         ],
       });
@@ -55,7 +60,7 @@ const ChainWarning: React.FC = () => {
             margin: "0px 4px",
           }}
         >
-          Click here to switch to Rinkeby.
+          Click here to switch to {getNetworkName(parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID))}.
         </div>
       </div>
     </Flex>
