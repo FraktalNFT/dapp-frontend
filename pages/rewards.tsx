@@ -100,8 +100,8 @@ const RewardsPage = () => {
                 setUnclaimedLP(_lpPendingRewards);
             }
         }
-        
-        
+
+
         getData();
     },[loading,account])
 
@@ -110,9 +110,6 @@ const RewardsPage = () => {
             <VStack spacing={5}>
                 <Box>
                     <h2 className="fraktalHeading">Total FRAK in Wallet</h2>
-                </Box>
-                <Box>
-                    <h4 className="fraktalHeading">(This page is not functional on testnet)</h4>
                 </Box>
                 <Box>
                     <HStack spacing={10} divider={<StackDivider borderColor='#9F66E3' />}>
@@ -127,7 +124,7 @@ const RewardsPage = () => {
             </VStack>
             <Box>
                 <Stack direction={['column', 'row']} spacing={30}>
-                    <Staking totalStaked={stakedFrak} unclaimedRewards={unclaimedFrakStaking} 
+                    <Staking totalStaked={stakedFrak} unclaimedRewards={unclaimedFrakStaking}
                     provider={provider} feeSharingAddress={feeSharingAddress}
                     account={account} fraktalTokenAddress={fraktalTokenAddress}
                     />
@@ -136,7 +133,7 @@ const RewardsPage = () => {
                     tradingRewardsAmount={tradingRewardsAmount} tradingRewardsMerkleProof={tradingRewardsMerkle}
                     />
                     <LiquidityPool totalStaked={stakedLP} unclaimedRewards={unclaimedLPStaking}
-                    provider={provider} 
+                    provider={provider}
                     account={account}
                     lpStakingAddress={lpStakingAddress} lpTokenAddress={lpTokenAddress}
                     />
@@ -183,7 +180,7 @@ const StakePanels = ({totalStaked, currency, provider, account,
             const formattedAmount = utils.parseEther(stakeAmount.toString());
             await lpStakingDeposit(formattedAmount.toString(),provider,lpStakingAddress);
         }
-        
+
     };
 
     const onSetAmountToStake = (d) => {
@@ -209,7 +206,7 @@ const StakePanels = ({totalStaked, currency, provider, account,
     const onSetAmountToUnstake = (d) => {
         if (d > 0 && parseInt(d) && d <= totalStaked) {
             console.log(d);
-            
+
             setUnstakeAmount(d);
             return setUnstakeIsReady(true);
         }
@@ -254,7 +251,7 @@ const Staking = ({totalStaked, unclaimedRewards, provider, feeSharingAddress, ac
         <TabsCard
             labelTooltip="Deposit your FRAK and start earning ETH from transaction fees. Unstake at any time."
             title="Staking">
-            <StakePanels  totalStaked={totalStaked} currency={currency} 
+            <StakePanels  totalStaked={totalStaked} currency={currency}
             account={account} provider={provider} feeSharingAddress={feeSharingAddress}
             fraktalTokenAddress={fraktalTokenAddress}
             lpStakingAddress={""} lpTokenAddress={""}
@@ -267,7 +264,7 @@ const Staking = ({totalStaked, unclaimedRewards, provider, feeSharingAddress, ac
                         apy={"500"}/>
                 </VStack>
                 <VStack spacing={5}>
-                    <ClaimRewards currency="ETH" unclaimedRewards={unclaimedRewards} 
+                    <ClaimRewards currency="ETH" unclaimedRewards={unclaimedRewards}
                     type={"staking"} provider={provider} feeSharingAddress={feeSharingAddress}
                     lpStakingAddress={""} tradingRewardsAddress={""}
                     tradingRewardsAmount={""} tradingRewardsMerkleProof={""}
@@ -318,7 +315,7 @@ const Trading = ({unclaimedRewards, nextDistribution, account ,provider, trading
                 </VStack>
                 <VStack spacing={5}>
                     <ClaimRewards currency={currency} unclaimedRewards={unclaimedRewards}
-                    provider={provider} 
+                    provider={provider}
                     type={"trading"} tradingRewardsAddress={tradingRewardsAddress} lpStakingAddress={""} feeSharingAddress={""}
                     tradingRewardsAmount={tradingRewardsAmount} tradingRewardsMerkleProof={tradingRewardsMerkleProof}
                     />
@@ -355,7 +352,7 @@ const LiquidityPool = ({totalStaked, unclaimedRewards,account, provider, lpStaki
                 </VStack>
                 <VStack spacing={5}>
                     <ClaimRewards currency={'FRAK'} unclaimedRewards={unclaimedRewards}
-                    provider={provider} 
+                    provider={provider}
                     type={"lp"} tradingRewardsAddress={""} lpStakingAddress={lpStakingAddress} feeSharingAddress={""}
                     tradingRewardsAmount={""} tradingRewardsMerkleProof={""}
                     />
@@ -393,7 +390,7 @@ const ClaimRewards = ({currency, unclaimedRewards, type, provider, feeSharingAdd
         if(type === "lp"){
             await lpStakingHarvest(provider,lpStakingAddress)
             console.log("Claim LP");
-            
+
         }
     };
 
