@@ -7,6 +7,7 @@ const ChainWarning: React.FC = () => {
 
   const switchChainOnMetaMask = async (): Promise<boolean> => {
     try {
+      console.log('CHAINID', process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID)
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
         params: [
