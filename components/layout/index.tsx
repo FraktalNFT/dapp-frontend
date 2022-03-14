@@ -187,7 +187,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
 
       const eligibleFrak = parseTier(Number(utils.formatEther(airdropData.airdrop.amount)));
       const title = `Claim ${eligibleFrak} FRAK`;
-      
+
       toast({
         id: claimToastId,
         position: 'top',
@@ -231,7 +231,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
             toast.close(learnToastId);
             window?.localStorage.setItem('userReadDoc', 'true');
             window.open(
-              'https://docs.fraktal.io/fraktal-governance-token-frak/airdrop',
+              'https://docs.fraktal.io/fraktal-governance-token-frak/trading-rewards',
               '_blank'
             );
           }}
