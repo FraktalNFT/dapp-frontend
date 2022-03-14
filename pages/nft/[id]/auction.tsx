@@ -19,6 +19,7 @@ import { introspectionFromSchema } from "graphql";
 import Custom404 from "../../404";
 import {EXPLORE} from "@/constants/routes";
 import { useLoadingScreenHandler } from "hooks/useLoadingScreen";
+import VerifyNFT from "@/components/verifyNFT";
 
 function AuctionNFTView({router}) {
 
@@ -104,13 +105,12 @@ function AuctionNFTView({router}) {
       }
 
       let obj = await getSubgraphAuction('singleAuction', index);
-
       if(obj?.auction == null){
         setError(true);
         return;
       }
 
-      let _hash = await getSubgraphAuction("auctionsNFT",obj.auction.tokenAddress);
+      let _hash = await getSubgraphAuction("auctionsNFT", obj.auction.tokenAddress);
       Object.assign(obj.auction,{
         "hash":_hash.fraktalNft.hash,
       });
@@ -120,7 +120,8 @@ function AuctionNFTView({router}) {
         "hash":_hash.fraktalNft.hash,
         "name":item.name,
         "imageURL":item.imageURL,
-        "seller": item.seller
+        "seller": item.seller,
+        "collateral": _hash.collateral
       });
 
       if(obj) {
@@ -236,6 +237,8 @@ function AuctionNFTView({router}) {
               <div className={styles.cardText}>
                 {nftObject?`${utils.formatUnits(nftObject.amountOfShare)}/10,000 Fraktions (${Number(utils.formatUnits(nftObject.amountOfShare))/100}% of max. supply)`:'loading'}
               </div>
+              {nftObject && <VerifyNFT nftObject={nftObject}/>}
+
             </div>
           </div>
           {nftObject&&<div className={styles.auctionCard}>
