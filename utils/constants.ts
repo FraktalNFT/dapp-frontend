@@ -28,7 +28,7 @@ export const lpTokenContracts = [
     {providerChainId:4, address:'0x9A18671771a15CA42442F0970852670A3972A789'},
 ];
 export const airdropContract = [
-    {providerChainId:1, address:'0x3CAf9755CE1b3db4eCF6498058E4cC5AD98446E9'},
+    {providerChainId:1, address:'0x1b5c29F1221B6F57f9D699d5772B632142B60Df8'},
     {providerChainId:4, address:'0xdA64d4c447476Ef26FD929d63Ec8f1C81C267854'},
 ];
 export const lpStakingContracts = [

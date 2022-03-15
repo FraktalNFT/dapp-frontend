@@ -48,7 +48,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [proof,setProof] = useState<Array<string>>(null);
 
   const isValid = useMemo(
-    () => [parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID)].includes(providerChainId),
+    () => [parseInt("1")].includes(providerChainId),
     [providerChainId]
   );
 
@@ -136,6 +136,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
       return;
     }
     toast.closeAll();
+    const listedToken = window?.localStorage.getItem(`firstMinted-${account}`);
     const airdropData = await getAirdrop(account);
     if(airdropData.airdrop==null && (window?.localStorage.getItem('userClaimed') == null)) {
       toast.closeAll();
@@ -159,8 +160,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
       });
     }
     else if (airdropData.airdrop!= null &&
-      (window?.localStorage.getItem(`firstMinted-${account}`) == null ||
-      (walletAssets?.length == 0 && !toast.isActive(listNFTToClaimId))
+      (window?.localStorage.getItem(`firstMinted-${account}`) == null 
     )) {
       const eligibleFrak = parseTier(Number(utils.formatEther(airdropData.airdrop.amount)));
       const title = `Congrats, you have received ${eligibleFrak} FRAK`;
@@ -183,7 +183,11 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
           />
         ),
       });
-    } else if (!toast.isActive(claimToastId)  && (window?.localStorage.getItem('userClaimed') == null)) {
+    }
+    else if (!toast.isActive(claimToastId)  
+    && (window?.localStorage.getItem('userClaimed') == null)
+    && (listedToken != null)
+    ) {
 
       const eligibleFrak = parseTier(Number(utils.formatEther(airdropData.airdrop.amount)));
       const title = `Claim ${eligibleFrak} FRAK`;
