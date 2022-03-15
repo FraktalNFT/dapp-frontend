@@ -52,7 +52,10 @@ import {
   listItemAuction,
 } from '../utils/contractCalls';
 
-const MAX_FRACTIONS = 10000;
+/**
+ * Constants
+ */
+import {MAX_FRAKTIONS} from "@/utils/constants";
 
 const actionOpts = { workflow: Workflow.IMPORT_NFT };
 
@@ -550,7 +553,7 @@ function ImportNFTPage() {
                           totalAmount={totalAmount}
                           setTotalAmount={setTotalAmount}
                           listingProcess={false}
-                          maxFraktions={MAX_FRACTIONS}
+                          maxFraktions={MAX_FRAKTIONS}
                         />
                       </TabPanel>
                       <TabPanel>
@@ -560,7 +563,7 @@ function ImportNFTPage() {
                           totalAmount={totalAmount}
                           setTotalAmount={setTotalAmount}
                           listingProcess={false}
-                          maxFraktions={MAX_FRACTIONS}
+                          maxFraktions={MAX_FRAKTIONS}
                         />
                       </TabPanel>
                     </TabPanels>

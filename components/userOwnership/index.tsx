@@ -1,6 +1,18 @@
-import { VStack, HStack } from '@chakra-ui/layout';
+/**
+ * React
+ */
 import React, { useEffect } from 'react';
-import FrakButton from '../button';
+/**
+ * Chakra
+ */
+import { VStack, HStack } from '@chakra-ui/layout';
+/**
+ * Frakal Components
+ */
+import FrakButton from '@/components/button';
+/**
+ * Contracts Calls
+ */
 import {
   importFraktal,
   approveMarket,
@@ -8,11 +20,16 @@ import {
   claimERC1155,
   exportFraktal,
   getIndexUsed,
-} from '../../utils/contractCalls';
-
+} from '@/utils/contractCalls';
+/**
+ * Workflow
+ */
 import { Workflow } from 'types/workflow';
-import { connect } from 'react-redux';
 import { useLoadingScreenHandler } from 'hooks/useLoadingScreen';
+/**
+ * Constants
+ */
+import {MAX_FRAKTIONS} from "@/utils/constants";
 
 const UserOwnership = ({
   fraktions,
@@ -64,7 +81,6 @@ const UserOwnership = ({
     while (isUsed == true) {
       index += 1;
       isUsed = await getIndexUsed(index, provider, tokenAddress);
-      // console.log('testint index = ',index,' and is Used: ',isUsed)
     }
     if (isUsed == false) {
       await importFraktal(
@@ -164,7 +180,7 @@ const UserOwnership = ({
             </VStack>
           </HStack>
 
-          {fraktions == 10000 ? (
+          {fraktions == MAX_FRAKTIONS ? (
             <FrakButton onClick={() => defraktionalization()}>
               DeFrak
             </FrakButton>
@@ -196,16 +212,6 @@ const UserOwnership = ({
           </FrakButton>
         </div>
       )}
-      <div>
-        You own this NFT
-        {collateral && collateral.id && (
-            <FrakButton onClick={() => claimNFT()}>Claim NFT</FrakButton>
-        )}
-        <br />
-        <FrakButton onClick={() => importFraktalToMarket()}>
-          FRAK IT
-        </FrakButton>
-      </div>
     </div>
   );
 };
