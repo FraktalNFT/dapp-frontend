@@ -195,12 +195,13 @@ export default function DetailsView() {
     await claimAirdrop(airdropAmount,proof,window?.localStorage.getItem(`firstMinted-${account}`),provider,airdropAddress);
   }
 
-  const toastClaimAirdrop = () => {
+  const toastClaimAirdrop = async () => {
     const listedToken = window?.localStorage.getItem(`firstMinted-${account}`);
+    await getAirdrop(account);
     if((window?.localStorage.getItem('userClaimed') == null)
     && (listedToken != null)){
+      toast.closeAll();
       const title = `Claim FRAK!`;
-      
       toast({
         id: claimToastId,
         position: 'top',
@@ -229,6 +230,7 @@ export default function DetailsView() {
     ) {
       return;
     }
+    toast.closeAll();
     toast({
       id: learnToastId,
       position: 'top',
@@ -280,7 +282,6 @@ export default function DetailsView() {
         setIsLoading(false);
       }
     }
-    toastClaimAirdrop();
     getAllData();
   }, [
     isPageReady,
@@ -291,6 +292,10 @@ export default function DetailsView() {
     nftObject,
     marketAddress,
   ]);
+
+  useEffect(()=>{
+    toastClaimAirdrop();
+  },[])
 
   async function callUnlistItem() {
     let tx = await unlistItem(tokenAddress, provider, marketAddress);
