@@ -136,7 +136,8 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
       return;
     }
     toast.closeAll();
-    const airdropData = await getAirdrop(account);
+    const listedToken = window?.localStorage.getItem(`firstMinted-${account}`);
+    const airdropData = await getAirdrop("0x77DD52c08F4aAA9dA42ED1bF2e738B8969Ab980F");
     if(airdropData.airdrop==null && (window?.localStorage.getItem('userClaimed') == null)) {
       toast.closeAll();
       toast({
@@ -183,7 +184,11 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
           />
         ),
       });
-    } else if (!toast.isActive(claimToastId)  && (window?.localStorage.getItem('userClaimed') == null)) {
+    }
+    else if (!toast.isActive(claimToastId)  
+    && (window?.localStorage.getItem('userClaimed') == null)
+    && (listedToken != null)
+    ) {
 
       const eligibleFrak = parseTier(Number(utils.formatEther(airdropData.airdrop.amount)));
       const title = `Claim ${eligibleFrak} FRAK`;
