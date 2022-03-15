@@ -160,7 +160,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
       });
     }
     else if (airdropData.airdrop!= null &&
-      (window?.localStorage.getItem(`firstMinted-${account}`) == null 
+      (window?.localStorage.getItem(`firstMinted-${account}`) == null
     )) {
       const eligibleFrak = parseTier(Number(utils.formatEther(airdropData.airdrop.amount)));
       const title = `Congrats, you have received ${eligibleFrak} FRAK`;
@@ -184,13 +184,13 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
         ),
       });
     }
-    else if (!toast.isActive(claimToastId)  
+    else if (!toast.isActive(claimToastId)
     && (window?.localStorage.getItem('userClaimed') == null)
     && (listedToken != null)
     ) {
 
       const eligibleFrak = parseTier(Number(utils.formatEther(airdropData.airdrop.amount)));
-      const title = `Claim ${eligibleFrak} FRAK`;
+      const title = `Claim ${eligibleFrak} FRAK. *It make take up to 10 Minutes before you can claim.`;
 
       toast({
         id: claimToastId,
