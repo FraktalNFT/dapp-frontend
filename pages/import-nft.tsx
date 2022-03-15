@@ -88,10 +88,12 @@ import {getSubgraphData} from "@/utils/graphQueries";
 import InfiniteScrollNft from "@/components/infiniteScrollNft";
 
 const MAX_FRACTIONS = 10000;
+
 const actionOpts = { workflow: Workflow.IMPORT_NFT };
 
 function ImportNFTPage() {
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
+  const { fraktals, fraktions, nfts, balance } = useUserContext();
 
   const router = useRouter();
 
@@ -152,20 +154,20 @@ function ImportNFTPage() {
       custom: 'fraktions',
     };
     let response = await approveMarket(
-        marketAddress,
-        provider,
-        tokenMintedAddress,
-        _actionsOpts
+      marketAddress,
+      provider,
+      tokenMintedAddress,
+      _actionsOpts
     )
-        .then((receipt) => {
-          setIsMarketApproved(true);
-          importFraktalToMarket();
-        })
-        .catch((error) => {
-          store.dispatch(
-              rejectContract(APPROVE_TOKEN, error, approveForMarket, _actionsOpts)
-          );
-        });
+      .then((receipt) => {
+        setIsMarketApproved(true);
+        importFraktalToMarket();
+      })
+      .catch((error) => {
+        store.dispatch(
+          rejectContract(APPROVE_TOKEN, error, approveForMarket, _actionsOpts)
+        );
+      });
   }
 
   /**
@@ -177,31 +179,32 @@ function ImportNFTPage() {
       alert('No Token Selected');
       return null;
     }
+    console.log('schema', tokenToImport?.token_schema)
     if (tokenToImport?.token_schema === 'ERC721') {
       address = await importERC721(
-          BigInt(tokenToImport?.tokenId),
-          tokenToImport?.id,
-          provider,
-          factoryAddress,
-          actionOpts
+        BigInt(tokenToImport?.tokenId),
+        tokenToImport?.id,
+        provider,
+        factoryAddress,
+        actionOpts
       ).catch((error) => {
         console.log('error', error)
         store.dispatch(
-            rejectContract(IMPORT_NFT, error, importNFT, actionOpts)
+          rejectContract(IMPORT_NFT, error, importNFT, actionOpts)
         );
       });
     }
     if (tokenToImport?.token_schema === 'ERC1155') {
       address = await importERC1155(
-          BigInt(tokenToImport?.tokenId),
-          tokenToImport?.id,
-          provider,
-          factoryAddress,
-          actionOpts
+        BigInt(tokenToImport?.tokenId),
+        tokenToImport?.id,
+        provider,
+        factoryAddress,
+        actionOpts
       ).catch((error) => {
         console.log('error', error)
         store.dispatch(
-            rejectContract(IMPORT_NFT, error, importNFT, actionOpts)
+          rejectContract(IMPORT_NFT, error, importNFT, actionOpts)
         );
       });
     }
@@ -241,26 +244,26 @@ function ImportNFTPage() {
 
     if (isUsed == false) {
       const response = await importFraktal(
-          tokenMintedAddress,
-          tokenID,
-          provider,
-          marketAddress,
-          actionOpts
+        tokenMintedAddress,
+        tokenID,
+        provider,
+        marketAddress,
+        actionOpts
       )
-          .then((receipt) => {
-            setIsFraktionsAllowed(true);
-            listFraktions();
-          })
-          .catch((error) => {
-            store.dispatch(
-                rejectContract(
-                    IMPORT_FRAKTAL,
-                    error,
-                    importFraktalToMarket,
-                    actionOpts
-                )
-            );
-          });
+        .then((receipt) => {
+          setIsFraktionsAllowed(true);
+          listFraktions();
+        })
+        .catch((error) => {
+          store.dispatch(
+            rejectContract(
+              IMPORT_FRAKTAL,
+              error,
+              importFraktalToMarket,
+              actionOpts
+            )
+          );
+        });
     }
   }
 
@@ -279,26 +282,26 @@ function ImportNFTPage() {
     const fei = utils.parseEther(totalAmount.toString());
     const weiPerFrak = wei.mul(utils.parseEther('1.0')).div(fei);
     const response = await listItem(
-        tokenMintedAddress,
-        fei, // amount of fraktions to list
-        weiPerFrak, // price per fraktal
-        provider,
-        marketAddress,
-        actionOpts
+      tokenMintedAddress,
+      fei, // amount of fraktions to list
+      weiPerFrak, // price per fraktal
+      provider,
+      marketAddress,
+      actionOpts
     )
-        .then((receipt) => {
-          setIsNFTListed(true);
-          airdropCheck(tokenMintedAddress);
-          setTimeout(() => {
-            closeModal()
-            router.push(resolveNFTRoute(tokenMintedAddress));
-          }, 2000);
-        })
-        .catch((error) => {
-          store.dispatch(
-              rejectContract(LISTING_NFT, error, listNewItem, actionOpts)
-          );
-        });
+      .then((receipt) => {
+        setIsNFTListed(true);
+        airdropCheck(tokenMintedAddress);
+        setTimeout(() => {
+          closeModal()
+          router.push(resolveNFTRoute(tokenMintedAddress));
+        }, 2000);
+      })
+      .catch((error) => {
+        store.dispatch(
+          rejectContract(LISTING_NFT, error, listNewItem, actionOpts)
+        );
+      });
   }
 
   /**
@@ -306,26 +309,26 @@ function ImportNFTPage() {
    */
   async function listNewAuctionItem() {
     const response = await listItemAuction(
-        tokenMintedAddress,
-        utils.parseUnits(totalPrice),
-        utils.parseUnits(totalAmount),
-        provider,
-        marketAddress,
-        actionOpts
+      tokenMintedAddress,
+      utils.parseUnits(totalPrice),
+      utils.parseUnits(totalAmount),
+      provider,
+      marketAddress,
+      actionOpts
     )
-        .then((receipt) => {
-          setIsNFTListed(true);
-          airdropCheck(tokenMintedAddress);
-          setTimeout(() => {
-            closeModal()
-            router.push(resolveAuctionNFTRoute(tokenMintedAddress));
-          }, 2000);
-        })
-        .catch((error) => {
-          store.dispatch(
-              rejectContract(LISTING_NFT, error, listItemAuction, actionOpts)
-          );
-        });
+      .then((receipt) => {
+        setIsNFTListed(true);
+        airdropCheck(tokenMintedAddress);
+        setTimeout(() => {
+          closeModal()
+          router.push(resolveAuctionNFTRoute(tokenMintedAddress));
+        }, 2000);
+      })
+      .catch((error) => {
+        store.dispatch(
+          rejectContract(LISTING_NFT, error, listItemAuction, actionOpts)
+        );
+      });
   }
 
   const listFraktions = async () => {
@@ -707,61 +710,61 @@ function ImportNFTPage() {
                     )}
                   </div>
 
-                  <Box
-                      sx={{
-                        display: `flex`,
-                        flexFlow: `row wrap`,
-                        gap: `12px`,
-                        width: `clamp(150px, 200%, 90ch)`,
-                        marginTop: `1rem`,
-                      }}
-                  >
-                    <FrakButton4
-                        status={!isFactoryApproved ? 'open' : 'done'}
-                        onClick={() => {
-                          approveForFactory();
-                        }}
-                    >
-                      1. Approve NFT
-                    </FrakButton4>{' '}
-                    <FrakButton4
-                        status={!isNFTImported ? 'open' : 'done'}
-                        onClick={() => {
-                          importNFT();
-                        }}
-                    >
-                      2. Frak It
-                    </FrakButton4>{' '}
-                    <FrakButton4
-                        status={!isMarketApproved ? 'open' : 'done'}
-                        onClick={() => {
-                          approveForMarket();
-                        }}
-                    >
-                      3. Approve Fraktions
-                    </FrakButton4>{' '}
-                    <FrakButton4
-                        status={!isFraktionsAllowed ? 'open' : 'done'}
-                        onClick={() => {
-                          importFraktalToMarket();
-                        }}
-                    >
-                      4. Transfer Fraktions
-                    </FrakButton4>{' '}
-                    <FrakButton4
-                        status={!isNFTListed ? 'open' : 'done'}
-                        onClick={() => {
-                          listFraktions();
-                        }}
-                    >
-                      5. List Fraktions
-                    </FrakButton4>
-                  </Box>
-                </Box>
-              </Grid>
-            </>
-        )}
-      </>
+              <Box
+                sx={{
+                  display: `flex`,
+                  flexFlow: `row wrap`,
+                  gap: `12px`,
+                  width: `clamp(150px, 200%, 90ch)`,
+                  marginTop: `1rem`,
+                }}
+              >
+                <FrakButton4
+                  status={!isFactoryApproved ? 'open' : 'done'}
+                  onClick={() => {
+                    approveForFactory();
+                  }}
+                >
+                  1. Approve NFT
+                </FrakButton4>{' '}
+                <FrakButton4
+                  status={!isNFTImported ? 'open' : 'done'}
+                  onClick={() => {
+                    importNFT();
+                  }}
+                >
+                  2. Frak It
+                </FrakButton4>{' '}
+                <FrakButton4
+                  status={!isMarketApproved ? 'open' : 'done'}
+                  onClick={() => {
+                    approveForMarket();
+                  }}
+                >
+                  3. Approve Fraktions
+                </FrakButton4>{' '}
+                <FrakButton4
+                  status={!isFraktionsAllowed ? 'open' : 'done'}
+                  onClick={() => {
+                    importFraktalToMarket();
+                  }}
+                >
+                  4. Transfer Fraktions
+                </FrakButton4>{' '}
+                <FrakButton4
+                  status={!isNFTListed ? 'open' : 'done'}
+                  onClick={() => {
+                    listFraktions();
+                  }}
+                >
+                  5. List Fraktions
+                </FrakButton4>
+              </Box>
+            </Box>
+          </Grid>
+        </>
+      )}
+    </>
   );
 }
 

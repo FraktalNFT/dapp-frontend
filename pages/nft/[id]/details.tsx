@@ -3,7 +3,7 @@ import { Text } from "@chakra-ui/react";
 import { BigNumber, utils } from "ethers";
 import FrakButton from "../../../components/button";
 import styles from "./auction.module.css";
-import { HStack, VStack, Box, Stack, Spinner } from "@chakra-ui/react";
+import { HStack, VStack, Box, Stack, Spinner, useToast } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import FraktionsList from "../../../components/fraktionsList";
 import RevenuesList from "../../../components/revenuesList";
@@ -12,9 +12,10 @@ import BuyOutCard from "../../../components/buyOutCard";
 import FraktionOwners from "../../../components/fraktionOwners";
 import { Image } from "@chakra-ui/image";
 import {getExplorerUrl, shortenHash, timezone} from "../../../utils/helpers";
-import { getSubgraphData } from "../../../utils/graphQueries";
+import { getSubgraphData,getAddressAirdrop } from "../../../utils/graphQueries";
 import { createObject2 } from "../../../utils/nftHelpers";
 import { useWeb3Context } from "../../../contexts/Web3Context";
+import AirdropBanner from '../../../components/airdropBanner';
 import {
   getBalanceFraktions,
   getMinimumOffer,
@@ -23,6 +24,7 @@ import {
   getFraktionsIndex,
   claimFraktalSold,
   isFraktalOwner,
+  claimAirdrop,
 } from "../../../utils/contractCalls";
 import { useRouter } from "next/router";
 import LoadScreen from '../../../components/load-screens';
@@ -33,7 +35,7 @@ import {EXPLORE} from "@/constants/routes";
 
 export default function DetailsView() {
   const router = useRouter();
-  const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
+  const { account, provider, marketAddress, factoryAddress,airdropAddress } = useWeb3Context();
   const [offers, setOffers] = useState();
   const [minOffer, setMinOffer] = useState<BigNumber>(BigNumber.from(0));
   const [nftObject, setNftObject] = useState({});
@@ -54,6 +56,15 @@ export default function DetailsView() {
   // use callbacks
 
   const [isLoading, setIsLoading] = useState(true);
+  const [airdropAmount,setAirdropAmount] = useState<string>("0");
+  const [proof,setProof] = useState<Array<string>>(null);
+
+
+  const airdropConnectToWalletId = 'connectToWallet';
+  const listNFTToClaimId = 'listNFT';
+  const claimToastId = 'claim';
+  const learnToastId = 'learn';
+  const notEligible = 'notEligible'
 
   useEffect(() => {
     if (router.isReady) {
@@ -171,10 +182,84 @@ export default function DetailsView() {
     }
   }
 
+  const getAirdrop = async (userAddress) =>{
+    const data = await getAddressAirdrop(userAddress);
+    if(data.airdrop!=null){
+      setAirdropAmount(data.airdrop.amount);
+      setProof(data.airdrop.proof);
+    }
+    return data;
+  }
+
+  const userClaimAirdrop = async () => {
+    const airdropData = await getAirdrop(account);
+    await claimAirdrop(airdropData.airdrop.amount,airdropData.airdrop.proof,window?.localStorage.getItem(`firstMinted-${account}`),provider,airdropAddress);
+  }
+
+  const toastClaimAirdrop = async () => {
+    const listedToken = window?.localStorage.getItem(`firstMinted-${account}`);
+    if((window?.localStorage.getItem('userClaimed') == null)
+    && (listedToken != null)){
+      toast.closeAll();
+      const title = `Claim FRAK!`;
+      toast({
+        id: claimToastId,
+        position: 'top',
+        duration: null,
+        render: () => (
+          <AirdropBanner
+            icon="🙌"
+            onClick={async () => {
+              toast.close(claimToastId);
+              await userClaimAirdrop()
+              .then(()=>{
+                window?.localStorage.setItem('userClaimed', 'true');
+              });
+              openLearnMore();
+            }}
+            buttonText={'Claim'}
+            title={title}
+          />
+        ),
+      });
+    }
+  }
+
+  const openLearnMore = () => {
+    if (
+      toast.isActive(learnToastId) ||
+      window?.localStorage.getItem('userReadDoc') == 'true'
+    ) {
+      return;
+    }
+    toast.closeAll();
+    toast({
+      id: learnToastId,
+      position: 'top',
+      duration: null,
+      render: () => (
+        <AirdropBanner
+          icon="⛽️"
+          onClick={() => {
+            toast.close(learnToastId);
+            window?.localStorage.setItem('userReadDoc', 'true');
+            window.open(
+              'https://docs.fraktal.io/fraktal-governance-token-frak/airdrop',
+              '_blank'
+            );
+          }}
+          buttonText={'Learn More'}
+          title={'Earn FRAK to offset gas costs'}
+        />
+      ),
+    });
+  };
+
   const [fraktionsGot, setFraktionsGot] = useState(false);
   const [fraktalsGot, setFraktalsGot] = useState(false);
   const [offersGot, setOffersGot] = useState(false);
   const [contractDataGot, setContractDataGot] = useState(false);
+  const toast = useToast();
 
 
   useEffect(() => {
@@ -209,6 +294,10 @@ export default function DetailsView() {
     nftObject,
     marketAddress,
   ]);
+
+  useEffect(()=>{
+    toastClaimAirdrop();
+  },[])
 
   async function callUnlistItem() {
     let tx = await unlistItem(tokenAddress, provider, marketAddress);

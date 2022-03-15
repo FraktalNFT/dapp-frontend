@@ -242,11 +242,17 @@ const MintPage = (props) => {
     // console.log(`price:${totalPrice},amount:${totalAmount}`);
   });
 
+  const airdropCheck = () => {
+    const id = `firstMinted-${account}`;
+    if( window?.localStorage.getItem(id) == null){
+      window?.localStorage.setItem(id, tokenMintedAddress.toString());
+    }
+  }
+
   async function listNewItem() {
     const wei = utils.parseEther(totalPrice.toString());
     const fei = utils.parseEther(totalAmount.toString());
     const weiPerFrak = wei.mul(utils.parseEther('1.0')).div(fei);
-    window?.localStorage.setItem(`firstMinted-${account}`, tokenMintedAddress.toString());
     listItem(
       tokenMintedAddress,
       fei, //shares
@@ -257,7 +263,8 @@ const MintPage = (props) => {
       actionOpts
     )
       .then(() => {
-        redirectToNewNFT(tokenMintedAddress)
+        airdropCheck();
+        redirectToNewNFT(tokenMintedAddress);
       })
       .catch((error) => {
         mintNFTRejected(error, listNewItem);
@@ -265,7 +272,6 @@ const MintPage = (props) => {
   }
 
   async function listNewAuctionItem() {
-    window?.localStorage.setItem(`firstMinted-${account}`, tokenMintedAddress.toString());
     listItemAuction(
       tokenMintedAddress,
       utils.parseUnits(totalPrice),
@@ -275,6 +281,7 @@ const MintPage = (props) => {
       actionOpts
     )
       .then(() => {
+        airdropCheck();
         redirectToNewNFT(tokenMintedAddress)
       })
       .catch((error) => {

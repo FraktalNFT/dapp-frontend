@@ -674,7 +674,7 @@ export default function MyNFTsView() {
           gains={Math.round(balance * 1000) / 1000}
         />
       </Box>
-      <Flex w="100%" paddingTop="64px">
+    {/* <Flex w="100%" paddingTop="64px">
         <div className={styles.header}>Your Wallet NFTs</div>
         <Spacer />
       </Flex>
@@ -723,7 +723,7 @@ export default function MyNFTsView() {
         <Center height="104px" width="100%" borderRadius="24" bgColor="#F9F9F9">
           <Spinner size="xl" />
         </Center>
-      )}
+      )} */}
     </VStack>
   );
 }

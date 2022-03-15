@@ -48,7 +48,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [proof,setProof] = useState<Array<string>>(null);
 
   const isValid = useMemo(
-    () => [parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID)].includes(providerChainId),
+    () => [parseInt("1")].includes(providerChainId),
     [providerChainId]
   );
 
@@ -75,8 +75,8 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
     return data;
   }
 
-  const userClaimAirdrop = async () => {
-    await claimAirdrop(airdropAmount,proof,window?.localStorage.getItem(`firstMinted-${account}`),provider,airdropAddress);
+  const userClaimAirdrop = async (_amount,_proof) => {
+    await claimAirdrop(_amount,_proof,window?.localStorage.getItem(`firstMinted-${account}`),provider,airdropAddress);
   }
 
   function parseTier(amount){
@@ -136,6 +136,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
       return;
     }
     toast.closeAll();
+    const listedToken = window?.localStorage.getItem(`firstMinted-${account}`);
     const airdropData = await getAirdrop(account);
     if(airdropData.airdrop==null && (window?.localStorage.getItem('userClaimed') == null)) {
       toast.closeAll();
@@ -159,8 +160,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
       });
     }
     else if (airdropData.airdrop!= null &&
-      (window?.localStorage.getItem(`firstMinted-${account}`) == null ||
-      (walletAssets?.length == 0 && !toast.isActive(listNFTToClaimId))
+      (window?.localStorage.getItem(`firstMinted-${account}`) == null
     )) {
       const eligibleFrak = parseTier(Number(utils.formatEther(airdropData.airdrop.amount)));
       const title = `Congrats, you have received ${eligibleFrak} FRAK`;
@@ -183,11 +183,15 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
           />
         ),
       });
-    } else if (!toast.isActive(claimToastId)  && (window?.localStorage.getItem('userClaimed') == null)) {
+    }
+    else if (!toast.isActive(claimToastId)
+    && (window?.localStorage.getItem('userClaimed') == null)
+    && (listedToken != null)
+    ) {
 
       const eligibleFrak = parseTier(Number(utils.formatEther(airdropData.airdrop.amount)));
-      const title = `Claim ${eligibleFrak} FRAK`;
-      
+      const title = `Claim ${eligibleFrak} FRAK. *It make take up to 10 Minutes before you can claim.`;
+
       toast({
         id: claimToastId,
         position: 'top',
@@ -197,7 +201,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
             icon="🙌"
             onClick={async () => {
               toast.close(claimToastId);
-              await userClaimAirdrop();
+              await userClaimAirdrop(airdropData.airdrop.amount,airdropData.airdrop.proof);
               window?.localStorage.setItem('userClaimed', 'true');
               openLearnMore();
             }}
@@ -231,7 +235,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
             toast.close(learnToastId);
             window?.localStorage.setItem('userReadDoc', 'true');
             window.open(
-              'https://docs.fraktal.io/fraktal-governance-token-frak/airdrop',
+              'https://docs.fraktal.io/fraktal-governance-token-frak/trading-rewards',
               '_blank'
             );
           }}
