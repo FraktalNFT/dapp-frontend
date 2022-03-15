@@ -75,7 +75,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
     return data;
   }
 
-  const userClaimAirdrop = async () => {
+  const userClaimAirdrop = async (_amount,_proof) => {
     await claimAirdrop(airdropAmount,proof,window?.localStorage.getItem(`firstMinted-${account}`),provider,airdropAddress);
   }
 
@@ -201,7 +201,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
             icon="🙌"
             onClick={async () => {
               toast.close(claimToastId);
-              await userClaimAirdrop();
+              await userClaimAirdrop(airdropData.airdrop.amount,airdropData.airdrop.proof);
               window?.localStorage.setItem('userClaimed', 'true');
               openLearnMore();
             }}

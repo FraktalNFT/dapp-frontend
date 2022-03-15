@@ -192,12 +192,12 @@ export default function DetailsView() {
   }
 
   const userClaimAirdrop = async () => {
-    await claimAirdrop(airdropAmount,proof,window?.localStorage.getItem(`firstMinted-${account}`),provider,airdropAddress);
+    const airdropData = await getAirdrop(account);
+    await claimAirdrop(airdropData.airdrop.amount,airdropData.airdrop.proof,window?.localStorage.getItem(`firstMinted-${account}`),provider,airdropAddress);
   }
 
   const toastClaimAirdrop = async () => {
     const listedToken = window?.localStorage.getItem(`firstMinted-${account}`);
-    await getAirdrop(account);
     if((window?.localStorage.getItem('userClaimed') == null)
     && (listedToken != null)){
       toast.closeAll();
@@ -211,8 +211,10 @@ export default function DetailsView() {
             icon="🙌"
             onClick={async () => {
               toast.close(claimToastId);
-              await userClaimAirdrop();
-              window?.localStorage.setItem('userClaimed', 'true');
+              await userClaimAirdrop()
+              .then(()=>{
+                window?.localStorage.setItem('userClaimed', 'true');
+              });
               openLearnMore();
             }}
             buttonText={'Claim'}
