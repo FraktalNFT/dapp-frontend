@@ -71,7 +71,7 @@ const RewardsPage = () => {
 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate()+1);
-    tomorrow.setHours(24, 0, 0, 0);
+    tomorrow.setHours(09, 0, 0, 0);
 
     useEffect(() => {
         async function getData(){
