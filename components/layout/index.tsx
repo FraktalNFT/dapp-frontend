@@ -48,7 +48,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [proof,setProof] = useState<Array<string>>(null);
 
   const isValid = useMemo(
-    () => [parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID)].includes(providerChainId),
+    () => [parseInt("1")].includes(providerChainId),
     [providerChainId]
   );
 
@@ -160,8 +160,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
       });
     }
     else if (airdropData.airdrop!= null &&
-      (window?.localStorage.getItem(`firstMinted-${account}`) == null ||
-      (walletAssets?.length == 0 && !toast.isActive(listNFTToClaimId))
+      (window?.localStorage.getItem(`firstMinted-${account}`) == null 
     )) {
       const eligibleFrak = parseTier(Number(utils.formatEther(airdropData.airdrop.amount)));
       const title = `Congrats, you have received ${eligibleFrak} FRAK`;
