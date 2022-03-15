@@ -46,7 +46,7 @@ import {
 } from '../redux/actions/contractActions';
 const MAX_FRACTIONS = 10000;
 
-import {EXPLORE, IMPORT_NFT, resolveAuctionNFTRoute, resolveNFTRoute} from '@/constants/routes';
+import {EXPLORE, IMPORT_NFTS, resolveAuctionNFTRoute, resolveNFTRoute} from '@/constants/routes';
 import { Workflow } from 'types/workflow';
 
 /**
@@ -380,7 +380,7 @@ const MintPage = (props) => {
               borderRadius="25"
               padding="5"
               _hover={{ bg: 'black', textColor: 'white' }}
-              onClick={() => router.push(IMPORT_NFT, null, { scroll: false })}
+              onClick={() => router.push(IMPORT_NFTS, null, { scroll: false })}
             >
               Import NFT
             </Link>

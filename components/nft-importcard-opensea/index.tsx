@@ -19,7 +19,6 @@ interface NFTItemProps extends StackProps {
 
 const NFTImportCardOS = forwardRef<HTMLDivElement, NFTItemProps>(
   ({ item, onClick }, ref) => {
-
     return (
       <VStack
         cursor='pointer'
