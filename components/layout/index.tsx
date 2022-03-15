@@ -48,7 +48,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [proof,setProof] = useState<Array<string>>(null);
 
   const isValid = useMemo(
-    () => [parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID)].includes(providerChainId),
+    () => [parseInt("1")].includes(providerChainId),
     [providerChainId]
   );
 
