@@ -93,7 +93,6 @@ const actionOpts = { workflow: Workflow.IMPORT_NFT };
 
 function ImportNFTPage() {
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
-  const { fraktals, fraktions, nfts, balance } = useUserContext();
 
   const router = useRouter();
 
