@@ -4,7 +4,7 @@ import FrakButton from "../button";
 import { useWeb3Context } from "../../contexts/Web3Context";
 import { shortenHash } from "../../utils/helpers";
 import { useRouter } from "next/router";
-import {ARTISTS, CREATE_NFT, EXPLORE, LANDING, IMPORT_NFT, REWARDS} from "@/constants/routes";
+import {ARTISTS, CREATE_NFT, EXPLORE, LANDING, IMPORT_NFTS, REWARDS} from "@/constants/routes";
 
 const Header = () => {
   const router = useRouter();
@@ -51,7 +51,7 @@ const Header = () => {
           </NextLink>
           <NextLink href={CREATE_NFT}>
                     {router.pathname === CREATE_NFT ||
-                    router.pathname === IMPORT_NFT ? (
+                    router.pathname === IMPORT_NFTS ? (
                 <Link
                   className="semi-16"
                   borderRadius="25"

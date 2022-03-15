@@ -1,3 +1,6 @@
+/**
+ * React
+ */
 import {
   createContext,
   useCallback,
@@ -5,9 +8,15 @@ import {
   useEffect,
   useState,
 } from "react";
+/**
+ * Utils
+ */
 import { useWeb3Context } from "./Web3Context";
 import { assetsInWallet } from "../utils/openSeaAPI";
 import { getSubgraphData } from "../utils/graphQueries";
+/**
+ * Helpers
+ */
 import {
   createObject,
   createObject2,
@@ -49,9 +58,7 @@ export const UserContextProviderFC = ({ children }) => {
   const [nfts, setNFTs] = useState(null);
   const [walletAssets, setWalletAssets] = useState(null);
   const [balance, setBalance] = useState(null);
-
   const [loading, setLoading] = useState<boolean>(false);
-
   const { account } = useWeb3Context();
 
   useEffect(() => {
@@ -88,7 +95,11 @@ export const UserContextProviderFC = ({ children }) => {
         let totalAddresses: null | string[];
         let nftObjectsClean;
 
-        let openseaAssets = await assetsInWallet(account);
+        let openseaAssets = await assetsInWallet(account, {
+          limit: 20,
+          offset: 0
+        });
+
         setWalletAssets(openseaAssets.assets);
         let fobjects = await getSubgraphData(
           "wallet",

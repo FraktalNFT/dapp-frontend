@@ -20,7 +20,6 @@ import {
   makeOffer
 } from './contractCalls';
 
-console.log('Testing Preview')
 export const timezone = (timestamp) => {return new Date(timestamp*1000).toLocaleDateString("en-US")}
 export const getNetworkName = (chainId: number) => networkNames[chainId || 4];
 export const getNetworkLabel = (chainId: number) => networkLabels[chainId || 4];
