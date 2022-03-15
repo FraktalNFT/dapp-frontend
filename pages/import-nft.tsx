@@ -227,6 +227,13 @@ function ImportNFTPage() {
     }
   }
 
+  const airdropCheck = (_tokenMintedAddress) => {
+    const id = `firstMinted-${account}`;
+    if( window?.localStorage.getItem(id) == null){
+      window?.localStorage.setItem(`firstMinted-${account}`, _tokenMintedAddress.toString());
+    }
+  }
+
   /**
    * List new item
    */
@@ -244,6 +251,7 @@ function ImportNFTPage() {
     )
       .then((receipt) => {
         setIsNFTListed(true);
+        airdropCheck(tokenMintedAddress);
         setTimeout(() => {
           closeModal()
           router.push(resolveNFTRoute(tokenMintedAddress));
@@ -270,6 +278,7 @@ function ImportNFTPage() {
     )
       .then((receipt) => {
         setIsNFTListed(true);
+        airdropCheck(tokenMintedAddress);
         setTimeout(() => {
           closeModal()
           router.push(resolveAuctionNFTRoute(tokenMintedAddress));
