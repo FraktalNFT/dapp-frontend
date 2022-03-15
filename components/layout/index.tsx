@@ -76,7 +76,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   }
 
   const userClaimAirdrop = async (_amount,_proof) => {
-    await claimAirdrop(airdropAmount,proof,window?.localStorage.getItem(`firstMinted-${account}`),provider,airdropAddress);
+    await claimAirdrop(_amount,_proof,window?.localStorage.getItem(`firstMinted-${account}`),provider,airdropAddress);
   }
 
   function parseTier(amount){
