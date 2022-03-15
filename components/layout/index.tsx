@@ -137,7 +137,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
     toast.closeAll();
     const listedToken = window?.localStorage.getItem(`firstMinted-${account}`);
-    const airdropData = await getAirdrop("0x77DD52c08F4aAA9dA42ED1bF2e738B8969Ab980F");
+    const airdropData = await getAirdrop(account);
     if(airdropData.airdrop==null && (window?.localStorage.getItem('userClaimed') == null)) {
       toast.closeAll();
       toast({
