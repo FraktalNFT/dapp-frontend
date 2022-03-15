@@ -201,7 +201,7 @@ export default function DetailsView() {
     if((window?.localStorage.getItem('userClaimed') == null)
     && (listedToken != null)){
       toast.closeAll();
-      const title = `Claim FRAK!`;
+      const title = `Claim FRAK! *It make take up to 10 Minutes before you can claim.`;
       toast({
         id: claimToastId,
         position: 'top',
