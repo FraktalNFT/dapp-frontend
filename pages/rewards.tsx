@@ -261,7 +261,7 @@ const Staking = ({totalStaked, unclaimedRewards, provider, feeSharingAddress, ac
                     <Staked
                         currency={currency}
                         token={totalStaked}
-                        apy={"500"}/>
+                        apy={"-"}/>
                 </VStack>
                 <VStack spacing={5}>
                     <ClaimRewards currency="ETH" unclaimedRewards={unclaimedRewards}
@@ -348,7 +348,7 @@ const LiquidityPool = ({totalStaked, unclaimedRewards,account, provider, lpStaki
                   <Staked
                       currency="LP Tokens"
                       token={totalStaked}
-                      apy={56.21}/>
+                      apy={"-"} />
                 </VStack>
                 <VStack spacing={5}>
                     <ClaimRewards currency={'FRAK'} unclaimedRewards={unclaimedRewards}
@@ -371,7 +371,7 @@ const Staked = ({apy, token, currency}) => {
             <Box>
                 <Text className={styles.stakedQuantity}>{token} {currency}</Text>
             </Box>
-            <Box>
+           <Box>
                 <Text className={styles.apr}>{apy}% APY</Text>
             </Box>
         </>
