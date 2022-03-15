@@ -245,7 +245,7 @@ const MintPage = (props) => {
   const airdropCheck = () => {
     const id = `firstMinted-${account}`;
     if( window?.localStorage.getItem(id) == null){
-      window?.localStorage.setItem(`firstMinted-${account}`, tokenMintedAddress.toString());
+      window?.localStorage.setItem(id, tokenMintedAddress.toString());
     }
   }
 
