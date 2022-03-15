@@ -184,7 +184,7 @@ const StakePanels = ({totalStaked, currency, provider, account,
     };
 
     const onSetAmountToStake = (d) => {
-        if (d > 0 && parseInt(d)) {
+        if (d > 0 && parseFloat(d)) {
             setStakeAmount(d);
             return setStakeIsReady(true);
         }
@@ -204,7 +204,7 @@ const StakePanels = ({totalStaked, currency, provider, account,
     };
 
     const onSetAmountToUnstake = (d) => {
-        if (d > 0 && parseInt(d) && d <= totalStaked) {
+        if (d > 0 && parseFloat(d) && d <= totalStaked) {
             console.log(d);
 
             setUnstakeAmount(d);
