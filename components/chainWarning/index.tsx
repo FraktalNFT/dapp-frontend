@@ -1,13 +1,12 @@
 import { utils } from "ethers";
 import { Flex } from "@chakra-ui/layout";
 
-import {getNetworkName} from "../../utils/helpers";
+import {getNetworkName} from "@/utils/helpers";
 
 const ChainWarning: React.FC = () => {
 
   const switchChainOnMetaMask = async (): Promise<boolean> => {
     try {
-      console.log('CHAINID', process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID)
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
         params: [

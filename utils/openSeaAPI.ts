@@ -13,8 +13,10 @@ const ASSETS_METHOD = 'assets';
  * Open Sea assets
  * @param address
  */
-export const assetsInWallet = (address) => {
-  const data = fetch(apiURL + `assets?owner=${address}&order_direction=desc&offset=0&limit=20`, options)
+export const assetsInWallet = (address, params = {}) => {
+  let url;
+  url = apiURL + `assets?owner=${address}&order_direction=desc&offset=${params.offset}&limit=${params.limit}`;
+  const data = fetch(url, options)
     .then(response => response.json())
     .then(data => {
       return data;
