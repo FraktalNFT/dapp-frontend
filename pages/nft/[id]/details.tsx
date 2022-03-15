@@ -136,25 +136,26 @@ export default function DetailsView() {
   async function getContractData() {
     if (tokenAddress && account && provider) {
       try {
-        let userBalance = await getBalanceFraktions(
-          account,
-          provider,
-          tokenAddress
-        );
         let index = await getFraktionsIndex(provider, tokenAddress);
+        let isOwner = await isFraktalOwner(account, provider, tokenAddress);
+        let userBalance = await getBalanceFraktions(
+            account,
+            provider,
+            tokenAddress,
+            index
+        );
         let marketApproved = await getApproved(
-          account,
-          marketAddress,
-          provider,
-          tokenAddress
+            account,
+            marketAddress,
+            provider,
+            tokenAddress
         );
         let factoryApproved = await getApproved(
-          account,
-          factoryAddress,
-          provider,
-          tokenAddress
+            account,
+            factoryAddress,
+            provider,
+            tokenAddress
         );
-        let isOwner = await isFraktalOwner(account, provider, tokenAddress);
         setFraktionsIndex(index);
         setFraktionsApproved(marketApproved);
         setFactoryApproved(factoryApproved);
@@ -260,7 +261,6 @@ export default function DetailsView() {
   const [offersGot, setOffersGot] = useState(false);
   const [contractDataGot, setContractDataGot] = useState(false);
   const toast = useToast();
-
 
   useEffect(() => {
     async function getAllData() {

@@ -13,9 +13,6 @@ import { useWeb3Context } from '../../../contexts/Web3Context';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 import {
   listItem,
-  // lockShares,
-  // transferToken,
-  // unlockShares,
   unlistItem,
   fraktionalize,
   defraktionalize,
@@ -23,6 +20,7 @@ import {
   getApproved,
   getBalanceFraktions,
   listItemAuction,
+  getFraktionsIndex,
 } from '../../../utils/contractCalls';
 import { useRouter } from 'next/router';
 
@@ -122,9 +120,9 @@ export default function ListNFTView() {
           if(obj && obj.fraktalNfts){
             let nftObjects = await createObject2(obj.fraktalNfts[0])
             if(nftObjects && account ){
-              setNftObject(nftObjects)
-              // console.log('nftObjects',nftObjects)
-              let userBalance = await getBalanceFraktions(account, provider, nftObjects.id)
+              setNftObject(nftObjects);
+              const index = await getFraktionsIndex(provider, tokenAddress);
+              let userBalance = await getBalanceFraktions(account, provider, nftObjects.id, index)
               setFraktions(userBalance);
             }
           }

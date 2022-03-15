@@ -198,12 +198,11 @@ export async function getFraktionsIndex(provider, tokenContract) {
     return 'not Fraktal';
   }
 }
-export async function getBalanceFraktions(account, provider, tokenContract) {
-  const customContract = new Contract(tokenContract, tokenAbi, provider);
-  let index = await customContract.getFraktionsIndex();
-  let balanceOfId: BigNumber = await customContract.balanceOf(account, index);
-  balanceOfId = balanceOfId.div(utils.parseEther('1'));
-  return balanceOfId.toNumber();
+export async function getBalanceFraktions(account, provider, tokenContract, index) {
+   const customContract = new Contract(tokenContract, tokenAbi, provider);
+   let balanceOfId: BigNumber = await customContract.balanceOf(account, index);
+   balanceOfId = balanceOfId.div(utils.parseEther('1'));
+   return balanceOfId.toNumber();
 }
 export async function isFraktalOwner(account, provider, tokenContract) {
   const customContract = new Contract(tokenContract, tokenAbi, provider);

@@ -46,7 +46,6 @@ import { Workflow } from 'types/workflow';
 /**
  * Context
  */
-import { useUserContext } from '@/contexts/userContext';
 import { useWeb3Context } from '@/contexts/Web3Context';
 /**
  * Redux Actions
@@ -87,7 +86,10 @@ import {getSubgraphData} from "@/utils/graphQueries";
  */
 import InfiniteScrollNft from "@/components/infiniteScrollNft";
 
-const MAX_FRACTIONS = 10000;
+/**
+ * Constants
+ */
+import {MAX_FRAKTIONS} from "@/utils/constants";
 
 const actionOpts = { workflow: Workflow.IMPORT_NFT };
 
@@ -691,7 +693,7 @@ function ImportNFTPage() {
                                   totalAmount={totalAmount}
                                   setTotalAmount={setTotalAmount}
                                   listingProcess={false}
-                                  maxFraktions={MAX_FRACTIONS}
+                                  maxFraktions={MAX_FRAKTIONS}
                               />
                             </TabPanel>
                             <TabPanel>
@@ -701,7 +703,7 @@ function ImportNFTPage() {
                                   totalAmount={totalAmount}
                                   setTotalAmount={setTotalAmount}
                                   listingProcess={false}
-                                  maxFraktions={MAX_FRACTIONS}
+                                  maxFraktions={MAX_FRAKTIONS}
                               />
                             </TabPanel>
                           </TabPanels>

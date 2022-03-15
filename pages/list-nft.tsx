@@ -44,7 +44,10 @@ import {
   rejectContract,
   closeModal,
 } from '../redux/actions/contractActions';
-const MAX_FRACTIONS = 10000;
+/**
+ * Constants
+ */
+import {MAX_FRAKTIONS} from "@/utils/constants";
 
 import {EXPLORE, IMPORT_NFTS, resolveAuctionNFTRoute, resolveNFTRoute} from '@/constants/routes';
 import { Workflow } from 'types/workflow';
@@ -192,7 +195,7 @@ const MintPage = (props) => {
   const fraktalReady =
     minted &&
     totalAmount > 0 &&
-    totalAmount <= MAX_FRACTIONS &&
+    totalAmount <= MAX_FRAKTIONS &&
     totalPrice > 0 &&
     isApproved &&
     fraktionalized;
@@ -465,7 +468,7 @@ const MintPage = (props) => {
                         totalAmount={totalAmount}
                         setTotalAmount={setTotalAmount}
                         listingProcess={listingProcess}
-                        maxFraktions={MAX_FRACTIONS}
+                        maxFraktions={MAX_FRAKTIONS}
                       />
                     </TabPanel>
                     <TabPanel>
@@ -475,7 +478,7 @@ const MintPage = (props) => {
                         totalAmount={totalAmount}
                         setTotalAmount={setTotalAmount}
                         listingProcess={listingProcess}
-                        maxFraktions={MAX_FRACTIONS}
+                        maxFraktions={MAX_FRAKTIONS}
                       />
                     </TabPanel>
                   </TabPanels>
