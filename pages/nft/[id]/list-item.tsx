@@ -89,46 +89,48 @@ export default function ListNFTView() {
     async function getData() {
       const pathname = router.asPath;
       const args = pathname.split('/');
-    const tokenAddress = args[2];
-    setIndex(args[2]);
-    if(account){
-      // previously was account-index
-      // let hexIndex = indexNumber.toString(16);
-      let listingString = `${account.toLocaleLowerCase()}-${tokenAddress}`;
-      let listing = await getSubgraphData('listed_itemsId', listingString);
-      // console.log('results ',listing)
-      if(listing && listing.listItems.length > 0){
-        setUpdating(true)
-        setLocked(true)
-        setTransferred(true)
-        setUnlocked(true)
-        // let ownedFraktions = listing.listItems[0].fraktal.fraktions.find(x=> x.owner.id === account.toLocaleLowerCase())
-        // setFraktions(ownedFraktions.amount)
-        let nftObject = await createListed(listing.listItems[0])
-        if(nftObject && account){
-          setNftObject(nftObject)
-          let parsedPrice = nftObject.price
-          let settedPrice = parseFloat(parsedPrice)*parseFloat(nftObject.amount)
-          setTotalPrice(Math.round(settedPrice*100)/100)
-          setTotalAmount(nftObject.amount)
-          }else {
-            setFraktions(0)
-          }
-        // nftObject gets 2 different inputs (id is different for listed items)
-        } else {
-          let obj = await getSubgraphData('marketid_fraktal',index)
-          if(obj && obj.fraktalNfts){
-            let nftObjects = await createObject2(obj.fraktalNfts[0])
-            if(nftObjects && account ){
-              setNftObject(nftObjects);
-              const index = await getFraktionsIndex(provider, tokenAddress);
-              let userBalance = await getBalanceFraktions(account, provider, nftObjects.id, index)
-              setFraktions(userBalance);
+      const tokenAddress = args[2];
+      if(account && args[2] !== "[id]" && typeof args[2] !== "undefined") {
+        console.log('WTF',  args[2])
+        setIndex(args[2]);
+        console.log('WTF',  args[2])
+        // previously was account-index
+        // let hexIndex = indexNumber.toString(16);
+        let listingString = `${account.toLocaleLowerCase()}-${tokenAddress}`;
+        let listing = await getSubgraphData('listed_itemsId', listingString);
+        // console.log('results ',listing)
+        if(listing && listing.listItems.length > 0) {
+          setUpdating(true)
+          setLocked(true)
+          setTransferred(true)
+          setUnlocked(true)
+          // let ownedFraktions = listing.listItems[0].fraktal.fraktions.find(x=> x.owner.id === account.toLocaleLowerCase())
+          // setFraktions(ownedFraktions.amount)
+          let nftObject = await createListed(listing.listItems[0])
+          if(nftObject && account){
+            setNftObject(nftObject)
+            let parsedPrice = nftObject.price
+            let settedPrice = parseFloat(parsedPrice)*parseFloat(nftObject.amount)
+            setTotalPrice(Math.round(settedPrice*100)/100)
+            setTotalAmount(nftObject.amount)
+            }else {
+              setFraktions(0)
+            }
+          // nftObject gets 2 different inputs (id is different for listed items)
+          } else {
+            let obj = await getSubgraphData('marketid_fraktal', args[2])
+            if(obj && obj.fraktalNfts) {
+              let nftObjects = await createObject2(obj.fraktalNfts[0])
+              if(nftObjects && account ){
+                setNftObject(nftObjects);
+                const fraktionIndex = await getFraktionsIndex(provider, nftObjects.id);
+                let userBalance = await getBalanceFraktions(account, provider, nftObjects.id, fraktionIndex)
+                setFraktions(userBalance);
+              }
             }
           }
         }
       }
-    }
     getData();
   },[index, account])
 
@@ -146,13 +148,14 @@ export default function ListNFTView() {
     const fei = utils.parseEther(totalAmount);
     const wei = utils.parseEther(totalPrice);
     if(isAuction){
-      //listAuctionItem(tokenAddress,amount,price,provider,marketAddress)
       listItemAuction(
         nftObject.id,
         wei,//price
         fei,//shares
         provider,
-        marketAddress).then(()=>{
+        marketAddress,
+        nftObject.name
+      ).then(()=>{
           setInterval(() => {
               router.push(EXPLORE, null, {scroll: false})
           }, 1000);
@@ -163,13 +166,14 @@ export default function ListNFTView() {
     }
     else{
       const weiPerFrak = (wei.mul(utils.parseEther("1.0"))).div(fei);
-      // console.log(`Total price: ${weiPerFrak.toString()}, fei: ${fei.toString()}`);
       listItem(
         nftObject.id,
         fei,//shares
         weiPerFrak,//price
         provider,
-        marketAddress).then(()=>{
+        marketAddress,
+        nftObject.name
+      ).then(()=>{
           setInterval(() => {
               router.push(EXPLORE, null, {scroll: false})
           }, 1000);

@@ -75,7 +75,6 @@ export default function DetailsView() {
         setArgs(pathname.split("/"));
         setIsPageReady(false);
       } while (args[2] === "[id]" || typeof args[2] === "undefined");
-      // console.log('setting ready to true with:',args[2])
       setIsPageReady(true);
     }
   }, [router]);
