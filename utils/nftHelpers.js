@@ -148,8 +148,6 @@ export async function createObject(data) {
       };
     }
   } catch {
-    //TODO - REMOVE THE CONSOLE.log
-    console.log('Error fetching ', data);
     return null;
   }
 }
@@ -283,7 +281,9 @@ async function mapAuctionToFraktal(auctionData) {
         let hash = auctionDataHash.filter(e=>e.id == `${auction.tokenAddress}-${auction.sellerNonce}`);
         Object.assign(auction, {"hash":hash[0].hash});
         const item = await createListedAuction(auction);
-        auctionItems.push(item);
+        if (!item.error) {
+          auctionItems.push(item);
+        }
       }
   ).filter(notUndefined => notUndefined !== undefined));
   return auctionItems;
