@@ -111,7 +111,7 @@ export const UserContextProviderFC = ({ children }) => {
           userBalanceFormatted = parseFloat(userBalance) / 10 ** 18;
           // Fraktions retrieval
           let validFraktions = fobjects.users[0].fraktions.filter(x => {
-            return true;
+            return x != null;
           });
 
           fraktionsObjects = await Promise.all(
