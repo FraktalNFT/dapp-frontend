@@ -148,8 +148,6 @@ export async function createObject(data) {
       };
     }
   } catch {
-    //TODO - REMOVE THE CONSOLE.log
-    console.log('Error fetching ', data);
     return null;
   }
 }
