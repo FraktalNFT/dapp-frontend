@@ -186,7 +186,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 }
               >
                 <Image
-                  src={'https://image.fraktal.io/?height=350&image=' + imageURL}
+                  src={'https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL)}
                   width="100%"
                   height="100%"
                   objectFit="cover"
