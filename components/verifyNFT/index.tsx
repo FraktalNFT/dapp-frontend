@@ -40,6 +40,7 @@ const VerifyNFT =(({nftObject}) => {
     async function validateNFT() {
         setIsValidating(true);
         let response;
+        console.log('nft', nftObject)
         if (nftObject.collateral !== undefined) {
             let contract, tokeId;
             if (nftObject.collateral.id.includes("-")) {

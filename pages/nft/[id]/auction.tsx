@@ -109,11 +109,13 @@ function AuctionNFTView({router}) {
         setError(true);
         return;
       }
+      console.log('single', obj)
 
       let _hash = await getSubgraphAuction("auctionsNFT", obj.auction.tokenAddress);
       Object.assign(obj.auction,{
         "hash":_hash.fraktalNft.hash,
       });
+    console.log('_hash', _hash)
 
       const item = await createListedAuction(obj.auction);
       Object.assign(obj.auction,{
@@ -121,10 +123,12 @@ function AuctionNFTView({router}) {
         "name":item.name,
         "imageURL":item.imageURL,
         "seller": item.seller,
-        "collateral": _hash.collateral
+        "collateral": _hash.fraktalNft.collateral
       });
+    console.log('auction', obj.auction)
 
-      if(obj) {
+
+    if(obj) {
         setNftObject(obj.auction);
         const objReserve = await auctionReserve(obj.auction.seller, obj.auction.sellerNonce);
         setCurrentReserve(Number(utils.formatEther(objReserve)));
