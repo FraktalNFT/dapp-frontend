@@ -58,7 +58,10 @@ function toBase32(value) {
 }
 
 async function fetchNftMetadata(hash) {
-  if (hash.startsWith('ipfs://Qm')) {
+  if (hash.startsWith('ipfs://ipfs/Qm')) {
+    hash = hash.slice(12)
+  }
+  else if (hash.startsWith('ipfs://Qm')) {
     hash = hash.slice(7)
   }
   if (hash.startsWith('Qm')) {
@@ -144,7 +147,7 @@ export async function createObject(data) {
         name: nftMetadata.name,
         value: nftMetadata.name,
         description: nftMetadata.description,
-        imageURL: checkImageCID(nftMetadata.image),
+        imageURL: checkImageCID(nftMetadata.image || nftMetadata.imageUrl),
       };
     }
   } catch {
@@ -166,14 +169,18 @@ export async function createObject2(data) {
     if (data.collateral) {
       object.collateral = data.collateral;
     }
-    if (nftMetadata && nftMetadata.name) {
-      object.name = nftMetadata.name;
-    }
-    if (nftMetadata && nftMetadata.description) {
-      object.description = nftMetadata.description;
-    }
-    if (nftMetadata && nftMetadata.image) {
-      object.imageURL = checkImageCID(nftMetadata.image);
+    if (nftMetadata) {
+      if (nftMetadata.name) {
+        object.name = nftMetadata.name;
+      }
+      if (nftMetadata.description) {
+        object.description = nftMetadata.description;
+      }
+      if (nftMetadata.image) {
+        object.imageURL = checkImageCID(nftMetadata.image);
+      } else if (nftMetadata.imageUrl) {
+        object.imageURL = checkImageCID(nftMetadata.imageUrl);
+      }
     }
     return object;
   } catch {
@@ -202,7 +209,7 @@ export async function createListed(data) {
         name: nftMetadata.name,
         value: nftMetadata.name,
         description: nftMetadata.description,
-        imageURL: checkImageCID(nftMetadata.image),
+        imageURL: checkImageCID(nftMetadata.image || nftMetadata.imageUrl),
       };
     }
   } catch (err) {
@@ -228,7 +235,7 @@ export async function createListedAuction(data) {
         tokenAddress: data.tokenAddress,
         name: nftMetadata.name,
         description: nftMetadata.description,
-        imageURL: checkImageCID(nftMetadata.image),
+        imageURL: checkImageCID(nftMetadata.image || nftMetadata.imageUrl),
       };
     }
   } catch (err) {

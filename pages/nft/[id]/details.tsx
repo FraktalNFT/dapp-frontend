@@ -27,12 +27,7 @@ import {
   claimAirdrop,
 } from "../../../utils/contractCalls";
 import { useRouter } from "next/router";
-import LoadScreen from '../../../components/load-screens';
 import {EXPLORE} from "@/constants/routes";
-// import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
-// import Modal from '../../../components/modal';
-
-
 export default function DetailsView() {
   const router = useRouter();
   const { account, provider, marketAddress, factoryAddress,airdropAddress } = useWeb3Context();
