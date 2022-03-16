@@ -5,11 +5,11 @@ import Link from "next/link";
 import { BigNumber, utils } from "ethers";
 import { Image } from "@chakra-ui/image";
 import styles from "./auction.module.css";
-import FrakButton from '../../../components/button';
-import {shortenHash, timezone, getParams} from '../../../utils/helpers';
-import { getSubgraphData } from '../../../utils/graphQueries';
-import { createObject2, createListed } from '../../../utils/nftHelpers';
-import { useWeb3Context } from '../../../contexts/Web3Context';
+import FrakButton from '@/components/button';
+import {shortenHash, timezone, getParams} from '@/utils/helpers';
+import { getSubgraphData } from '@/utils/graphQueries';
+import { createObject2, createListed } from '@/utils/nftHelpers';
+import { useWeb3Context } from '@/contexts/Web3Context';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 import {
   listItem,
@@ -21,11 +21,11 @@ import {
   getBalanceFraktions,
   listItemAuction,
   getFraktionsIndex,
-} from '../../../utils/contractCalls';
+} from '@/utils/contractCalls';
 import { useRouter } from 'next/router';
 
-import store from '../../../redux/store';
-import {LISTING_NFT, rejectContract} from "../../../redux/actions/contractActions";
+import store from '@/redux/store';
+import {LISTING_NFT, rejectContract} from "@/redux/actions/contractActions";
 import LoadScreen from '../../../components/load-screens';
 
 import {EXPLORE, MY_NFTS} from "@/constants/routes";
@@ -91,9 +91,7 @@ export default function ListNFTView() {
       const args = pathname.split('/');
       const tokenAddress = args[2];
       if(account && args[2] !== "[id]" && typeof args[2] !== "undefined") {
-        console.log('WTF',  args[2])
         setIndex(args[2]);
-        console.log('WTF',  args[2])
         // previously was account-index
         // let hexIndex = indexNumber.toString(16);
         let listingString = `${account.toLocaleLowerCase()}-${tokenAddress}`;

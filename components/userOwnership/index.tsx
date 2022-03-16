@@ -3,9 +3,14 @@
  */
 import React, { useEffect } from 'react';
 /**
+ * Next
+ */
+
+import {useRouter} from "next/router";
+/**
  * Chakra
  */
-import { VStack, HStack } from '@chakra-ui/layout';
+import { VStack, HStack, Text } from '@chakra-ui/layout';
 /**
  * Frakal Components
  */
@@ -43,7 +48,10 @@ const UserOwnership = ({
   marketId,
   factoryApproved,
 }) => {
-  const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
+  const { closeLoadingModalAfterDelay } = useLoadingScreenHandler();
+
+  const router = useRouter();
+
   async function claimNFT() {
     const actionOpts = { workflow: Workflow.CLAIM_NFT };
     // this requires the factory to be approved
@@ -56,6 +64,10 @@ const UserOwnership = ({
     } else {
       await claimERC1155(marketId, provider, factoryAddress, actionOpts);
     }
+    closeLoadingModalAfterDelay();
+    setTimeout(() => {
+      router.reload()
+    }, 2500);
   }
 
   async function defraktionalization() {
@@ -63,11 +75,17 @@ const UserOwnership = ({
     // if(!isApproved){
     //   tx = await approveMarket(marketAddress, provider, tokenAddress)
     // }
+    console.log(collateral)
     if (tx || isApproved) {
       await exportFraktal(tokenAddress, provider, marketAddress);
-      closeLoadingModalAfterDelay()
-      // defraktionalize leaves the nft in the market!!!
-      // can claim (etherscan) ANYONE!
+      if (collateral) {
+        await claimNFT();
+      } else {
+        closeLoadingModalAfterDelay();
+        setTimeout(() => {
+          router.reload()
+        }, 2500);
+      }
     }
   }
 
@@ -91,7 +109,10 @@ const UserOwnership = ({
         actionOpts
       );
     }
-    closeLoadingModalAfterDelay()
+    closeLoadingModalAfterDelay();
+    setTimeout(() => {
+      router.reload()
+    }, 2500);
   }
 
   useEffect(() => {
@@ -181,9 +202,11 @@ const UserOwnership = ({
           </HStack>
 
           {fraktions == MAX_FRAKTIONS ? (
-            <FrakButton onClick={() => defraktionalization()}>
-              DeFrak
-            </FrakButton>
+            <HStack>
+              <FrakButton onClick={() => defraktionalization()}>
+                DeFrak
+              </FrakButton>
+            </HStack>
           ) : (
             <div
               style={{
@@ -201,16 +224,17 @@ const UserOwnership = ({
           )}
         </div>
       ) : (
-        <div>
-          You own this NFT
-          {collateral && collateral.id && (
-            <FrakButton onClick={() => claimNFT()}>Claim NFT</FrakButton>
-          )}
-          <br />
-          <FrakButton onClick={() => importFraktalToMarket()}>
-            FRAK IT
-          </FrakButton>
-        </div>
+        <VStack>
+          <Text>You own this NFT</Text>
+            <HStack>
+            {collateral && collateral.id && (
+              <FrakButton onClick={() => claimNFT()}>Claim NFT</FrakButton>
+            )}
+            <FrakButton onClick={() => importFraktalToMarket()}>
+              FRAK IT
+            </FrakButton>
+          </HStack>
+        </VStack>
       )}
     </div>
   );
