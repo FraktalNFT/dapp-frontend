@@ -5,17 +5,14 @@ import Link from "next/link";
 import { BigNumber, utils } from "ethers";
 import { Image } from "@chakra-ui/image";
 import styles from "./auction.module.css";
-import FrakButton from '../../../components/button';
-import {shortenHash, timezone, getParams} from '../../../utils/helpers';
-import { getSubgraphData } from '../../../utils/graphQueries';
-import { createObject2, createListed } from '../../../utils/nftHelpers';
-import { useWeb3Context } from '../../../contexts/Web3Context';
+import FrakButton from '@/components/button';
+import {shortenHash, timezone, getParams} from '@/utils/helpers';
+import { getSubgraphData } from '@/utils/graphQueries';
+import { createObject2, createListed } from '@/utils/nftHelpers';
+import { useWeb3Context } from '@/contexts/Web3Context';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 import {
   listItem,
-  // lockShares,
-  // transferToken,
-  // unlockShares,
   unlistItem,
   fraktionalize,
   defraktionalize,
@@ -23,11 +20,12 @@ import {
   getApproved,
   getBalanceFraktions,
   listItemAuction,
-} from '../../../utils/contractCalls';
+  getFraktionsIndex,
+} from '@/utils/contractCalls';
 import { useRouter } from 'next/router';
 
-import store from '../../../redux/store';
-import {LISTING_NFT, rejectContract} from "../../../redux/actions/contractActions";
+import store from '@/redux/store';
+import {LISTING_NFT, rejectContract} from "@/redux/actions/contractActions";
 import LoadScreen from '../../../components/load-screens';
 
 import {EXPLORE, MY_NFTS} from "@/constants/routes";
@@ -91,46 +89,46 @@ export default function ListNFTView() {
     async function getData() {
       const pathname = router.asPath;
       const args = pathname.split('/');
-    const tokenAddress = args[2];
-    setIndex(args[2]);
-    if(account){
-      // previously was account-index
-      // let hexIndex = indexNumber.toString(16);
-      let listingString = `${account.toLocaleLowerCase()}-${tokenAddress}`;
-      let listing = await getSubgraphData('listed_itemsId', listingString);
-      // console.log('results ',listing)
-      if(listing && listing.listItems.length > 0){
-        setUpdating(true)
-        setLocked(true)
-        setTransferred(true)
-        setUnlocked(true)
-        // let ownedFraktions = listing.listItems[0].fraktal.fraktions.find(x=> x.owner.id === account.toLocaleLowerCase())
-        // setFraktions(ownedFraktions.amount)
-        let nftObject = await createListed(listing.listItems[0])
-        if(nftObject && account){
-          setNftObject(nftObject)
-          let parsedPrice = nftObject.price
-          let settedPrice = parseFloat(parsedPrice)*parseFloat(nftObject.amount)
-          setTotalPrice(Math.round(settedPrice*100)/100)
-          setTotalAmount(nftObject.amount)
-          }else {
-            setFraktions(0)
-          }
-        // nftObject gets 2 different inputs (id is different for listed items)
-        } else {
-          let obj = await getSubgraphData('marketid_fraktal',index)
-          if(obj && obj.fraktalNfts){
-            let nftObjects = await createObject2(obj.fraktalNfts[0])
-            if(nftObjects && account ){
-              setNftObject(nftObjects)
-              // console.log('nftObjects',nftObjects)
-              let userBalance = await getBalanceFraktions(account, provider, nftObjects.id)
-              setFraktions(userBalance);
+      const tokenAddress = args[2];
+      if(account && args[2] !== "[id]" && typeof args[2] !== "undefined") {
+        setIndex(args[2]);
+        // previously was account-index
+        // let hexIndex = indexNumber.toString(16);
+        let listingString = `${account.toLocaleLowerCase()}-${tokenAddress}`;
+        let listing = await getSubgraphData('listed_itemsId', listingString);
+        // console.log('results ',listing)
+        if(listing && listing.listItems.length > 0) {
+          setUpdating(true)
+          setLocked(true)
+          setTransferred(true)
+          setUnlocked(true)
+          // let ownedFraktions = listing.listItems[0].fraktal.fraktions.find(x=> x.owner.id === account.toLocaleLowerCase())
+          // setFraktions(ownedFraktions.amount)
+          let nftObject = await createListed(listing.listItems[0])
+          if(nftObject && account){
+            setNftObject(nftObject)
+            let parsedPrice = nftObject.price
+            let settedPrice = parseFloat(parsedPrice)*parseFloat(nftObject.amount)
+            setTotalPrice(Math.round(settedPrice*100)/100)
+            setTotalAmount(nftObject.amount)
+            }else {
+              setFraktions(0)
+            }
+          // nftObject gets 2 different inputs (id is different for listed items)
+          } else {
+            let obj = await getSubgraphData('marketid_fraktal', args[2])
+            if(obj && obj.fraktalNfts) {
+              let nftObjects = await createObject2(obj.fraktalNfts[0])
+              if(nftObjects && account ){
+                setNftObject(nftObjects);
+                const fraktionIndex = await getFraktionsIndex(provider, nftObjects.id);
+                let userBalance = await getBalanceFraktions(account, provider, nftObjects.id, fraktionIndex)
+                setFraktions(userBalance);
+              }
             }
           }
         }
       }
-    }
     getData();
   },[index, account])
 
@@ -148,13 +146,14 @@ export default function ListNFTView() {
     const fei = utils.parseEther(totalAmount);
     const wei = utils.parseEther(totalPrice);
     if(isAuction){
-      //listAuctionItem(tokenAddress,amount,price,provider,marketAddress)
       listItemAuction(
         nftObject.id,
         wei,//price
         fei,//shares
         provider,
-        marketAddress).then(()=>{
+        marketAddress,
+        nftObject.name
+      ).then(()=>{
           setInterval(() => {
               router.push(EXPLORE, null, {scroll: false})
           }, 1000);
@@ -165,13 +164,14 @@ export default function ListNFTView() {
     }
     else{
       const weiPerFrak = (wei.mul(utils.parseEther("1.0"))).div(fei);
-      // console.log(`Total price: ${weiPerFrak.toString()}, fei: ${fei.toString()}`);
       listItem(
         nftObject.id,
         fei,//shares
         weiPerFrak,//price
         provider,
-        marketAddress).then(()=>{
+        marketAddress,
+        nftObject.name
+      ).then(()=>{
           setInterval(() => {
               router.push(EXPLORE, null, {scroll: false})
           }, 1000);

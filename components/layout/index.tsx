@@ -48,7 +48,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [proof,setProof] = useState<Array<string>>(null);
 
   const isValid = useMemo(
-    () => [parseInt("1")].includes(providerChainId),
+    () => [parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID)].includes(providerChainId),
     [providerChainId]
   );
 
@@ -190,7 +190,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
     ) {
 
       const eligibleFrak = parseTier(Number(utils.formatEther(airdropData.airdrop.amount)));
-      const title = `Claim ${eligibleFrak} FRAK. *It make take up to 10 Minutes before you can claim.`;
+      const title = `Claim ${eligibleFrak} FRAK. *Claiming Possible From 12:00 UTC`;
 
       toast({
         id: claimToastId,

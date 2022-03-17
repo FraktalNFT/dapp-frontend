@@ -27,12 +27,7 @@ import {
   claimAirdrop,
 } from "../../../utils/contractCalls";
 import { useRouter } from "next/router";
-import LoadScreen from '../../../components/load-screens';
 import {EXPLORE} from "@/constants/routes";
-// import { CONNECT_BUTTON_CLASSNAME } from "web3modal";
-// import Modal from '../../../components/modal';
-
-
 export default function DetailsView() {
   const router = useRouter();
   const { account, provider, marketAddress, factoryAddress,airdropAddress } = useWeb3Context();
@@ -75,7 +70,6 @@ export default function DetailsView() {
         setArgs(pathname.split("/"));
         setIsPageReady(false);
       } while (args[2] === "[id]" || typeof args[2] === "undefined");
-      // console.log('setting ready to true with:',args[2])
       setIsPageReady(true);
     }
   }, [router]);
@@ -136,25 +130,26 @@ export default function DetailsView() {
   async function getContractData() {
     if (tokenAddress && account && provider) {
       try {
-        let userBalance = await getBalanceFraktions(
-          account,
-          provider,
-          tokenAddress
-        );
         let index = await getFraktionsIndex(provider, tokenAddress);
+        let isOwner = await isFraktalOwner(account, provider, tokenAddress);
+        let userBalance = await getBalanceFraktions(
+            account,
+            provider,
+            tokenAddress,
+            index
+        );
         let marketApproved = await getApproved(
-          account,
-          marketAddress,
-          provider,
-          tokenAddress
+            account,
+            marketAddress,
+            provider,
+            tokenAddress
         );
         let factoryApproved = await getApproved(
-          account,
-          factoryAddress,
-          provider,
-          tokenAddress
+            account,
+            factoryAddress,
+            provider,
+            tokenAddress
         );
-        let isOwner = await isFraktalOwner(account, provider, tokenAddress);
         setFraktionsIndex(index);
         setFraktionsApproved(marketApproved);
         setFactoryApproved(factoryApproved);
@@ -260,7 +255,6 @@ export default function DetailsView() {
   const [offersGot, setOffersGot] = useState(false);
   const [contractDataGot, setContractDataGot] = useState(false);
   const toast = useToast();
-
 
   useEffect(() => {
     async function getAllData() {

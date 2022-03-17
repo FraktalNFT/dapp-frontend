@@ -237,7 +237,9 @@ export default function MyNFTsView() {
           if (hash[0] != undefined) {
             Object.assign(auction, { hash: hash[0].hash });
             const item = await createListedAuction(auction);
-            auctionItems.push(item);
+            if (!item.error) {
+              auctionItems.push(item);
+            }
           }
         })
       );
@@ -314,7 +316,6 @@ export default function MyNFTsView() {
       );
 
       auctionItems = auctionItems.sort((a, b) => b.endTime - a.endTime);
-
       await Promise.all(
         auctionItems.map(async (i) => {
           try {

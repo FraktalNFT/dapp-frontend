@@ -52,7 +52,7 @@ import Search from "@/components/search";
  * SEARCH Utils
  */
 import {getItems} from '@/utils/search';
-import { mapFixedPrice, mapAuctionToFraktal } from "../utils/nftHelpers";
+import { mapFixedPrice, mapAuctionToFraktal } from "@/utils/nftHelpers";
 /**
  * Filters
  * @type {string}

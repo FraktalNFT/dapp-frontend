@@ -121,10 +121,11 @@ function AuctionNFTView({router}) {
         "name":item.name,
         "imageURL":item.imageURL,
         "seller": item.seller,
-        "collateral": _hash.collateral
+        "collateral": _hash.fraktalNft.collateral
       });
 
-      if(obj) {
+
+    if(obj) {
         setNftObject(obj.auction);
         const objReserve = await auctionReserve(obj.auction.seller, obj.auction.sellerNonce);
         setCurrentReserve(Number(utils.formatEther(objReserve)));
