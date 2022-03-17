@@ -1152,3 +1152,29 @@ export async function erc20Approve(
   let receipt = await processTx(tx);
   return receipt;
 }
+
+
+
+const lpABI = [
+  'function getReserves() external view returns (uint112,uint112,uint32)'
+]
+
+export async function getAPY(
+  provider,
+  opts?: ActionOpts
+) {
+  console.log("calling");
+  
+  const signer = await loadSigner(provider);
+  const customContract = new Contract("0x2763f944fc85CAEECD559F0f0a4667A68256144d", lpABI, signer);
+  let tx = await customContract.getReserves();
+
+  const frak:string = utils.formatEther(tx[0]);
+
+  const blocksPerYear = 31622400/15;
+  const frakPerYear = blocksPerYear*50;
+  const apy  = Math.round(frakPerYear/Number(frak) *100);
+  
+
+  return apy;
+}
