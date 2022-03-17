@@ -201,6 +201,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
             icon="🙌"
             onClick={async () => {
               toast.close(claimToastId);
+              router.push("/claim", null, {scroll: false});
               await userClaimAirdrop(airdropData.airdrop.amount,airdropData.airdrop.proof);
               window?.localStorage.setItem('userClaimed', 'true');
               openLearnMore();
