@@ -901,7 +901,6 @@ export async function claimAirdrop3160(
 ) {
   
   const signer = await loadSigner(provider);
-  console.log({provider,airdropAddress, airdropABI, signer});
   const customContract = new Contract("0x273437BaD2C50c0582FD97b7bd68dbF06F747334", airdropABI, signer);
   let tx = await customContract.claim(amount,merkleProof,listedTokenAddress);
   let receipt = await processTx(tx);
