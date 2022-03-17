@@ -1173,7 +1173,7 @@ export async function getAPY(
 
   const blocksPerYear = 31622400/15;
   const frakPerYear = blocksPerYear*50;
-  const apy  = Math.round(frakPerYear/Number(frak) *100);
+  const apy  = Math.round(frakPerYear/(Number(frak)*2) *100);
   
 
   return apy;
