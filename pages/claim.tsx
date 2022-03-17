@@ -4,7 +4,7 @@ import Head from "next/head";
 import { useWeb3Context } from "../contexts/Web3Context";
 import { useRouter } from "next/router";
 import { useENSAddress } from 'components/useENSAddress';
-import { claimAirdrop } from '@/utils/contractCalls';
+import { claimAirdrop,claimAirdrop3160 } from '@/utils/contractCalls';
 import { getAddressAirdrop } from '@/utils/graphQueries';
 
 export default function ArtistsView() {
@@ -60,7 +60,15 @@ export default function ArtistsView() {
 
   const userClaimAirdrop = async (_amount,_proof,_listedToken) => {
       try{
-        await claimAirdrop(_amount,_proof,_listedToken,provider,airdropAddress);
+        console.log("Amount :",_amount);
+        
+        if(_amount=="4540010700000000000000"){
+          await claimAirdrop3160(_amount,_proof,_listedToken,provider,airdropAddress);
+          
+        }else{
+          await claimAirdrop(_amount,_proof,_listedToken,provider,airdropAddress);
+        }
+        
       }
       catch(error){
         toast({
