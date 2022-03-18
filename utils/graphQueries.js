@@ -6,10 +6,6 @@ const APIURL =
     process.env.NEXT_PUBLIC_GRAPHQL_URL ? process.env.NEXT_PUBLIC_GRAPHQL_URL
         : 'https://api.studio.thegraph.com/query/21128/marketplaceperformance/0.0.4';
 
-const AUCTIONAPI =
-    process.env.NEXT_PUBLIC_GRAPHQL_URL ? process.env.NEXT_PUBLIC_GRAPHQL_URL
-        : 'https://api.studio.thegraph.com/query/21128/marketplaceperformance/0.0.4';
-
 const AIRDROPAPI = 'https://api.looksrare.org/graphql';
 
 export const LIMITED_ITEMS = "limited_items";
@@ -677,7 +673,7 @@ export const getSubgraphData = async (call, id, options = null) => {
     return x.name == call;
   });
   try {
-    const data = await request(AUCTIONAPI, callGql.call, { id, ...options });
+    const data = await request(APIURL, callGql.call, { id, ...options });
     return data;
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -692,7 +688,7 @@ export const getSubgraphAuction = async (call, id, options = null) => {
     return x.name == call;
   });
   try {
-    const data = await request(AUCTIONAPI, callGql.call, { id, ...options });
+    const data = await request(APIURL, callGql.call, { id, ...options });
     return data;
   } catch (err) {
     if (err.response.data) {
@@ -704,8 +700,8 @@ export const getSubgraphAuction = async (call, id, options = null) => {
 
 export const getAddressAirdrop = async (id, options = null) =>{
   let callGql = gql`
-    query Airdrop($id: Address!, subgraphError: allow) {
-      airdrop(address:$id) {
+    query Airdrop($id: Address!) {
+      airdrop(address:$id, subgraphError: allow) {
         proof
         amount
       }
