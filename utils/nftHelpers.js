@@ -43,7 +43,7 @@ function checkImageCID(cid) {
     try {
       let cidv1 = toBase32(correctedCid);
     } catch (e) {
-      return 'https://ipfs.io/ipfs/' +splitted[1];
+      return 'https://ipfs.io/ipfs/' + splitted[1];
     }
     return `https://${cidv1}.ipfs.dweb.link`;
   } else if (cid.startsWith('Qm')) {
@@ -120,7 +120,6 @@ export async function createOpenSeaObject(data) {
     }
     return response;
   } catch (e) {
-    console.log('error in createOpenSeaObject', e);
     return null;
   }
 }

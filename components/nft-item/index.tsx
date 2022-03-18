@@ -185,7 +185,11 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                     : inVisibleStyle /* toggle visibility */
                 }
               >
-                <NFTMedia/>
+                {imageURL && <NFTMedia
+                    type={'fit'}
+                    imageURL={imageURL}
+                    setIsImageLoaded={setIsImageLoaded}/>
+                }
               </Box>
               {!isImageLoaded && (
                 <Box

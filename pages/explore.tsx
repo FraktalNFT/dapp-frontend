@@ -76,7 +76,7 @@ const Marketplace: React.FC = () => {
   const [sortName, setSortName] = useState(HIGHEST_PRICE);
   const [subgraphMethod, setSubgraphMethod] = useState(LIMITED_ITEMS);
 
-  const [limit, setLimit] = useState(300);
+  const [limit, setLimit] = useState(15);
   const [offset, setOffset] = useState(0);
   const [nftItems, setNftItems] = useState([]);
   const [orderDirection, setOrderDirection] = useState(ORDER_DESC);
@@ -180,7 +180,6 @@ const Marketplace: React.FC = () => {
             if (sortName == HIGHEST_PRICE) return parseFloat(a.price) < parseFloat(b.price) ? 1 : -1
           });
     } else {
-          console.log(limit)
         const data = await getSubgraphData(subgraphMethod, "", {
               limit: limit,
               offset: offset,
@@ -188,7 +187,6 @@ const Marketplace: React.FC = () => {
               orderBy: orderBy,
               ...additionalQueryParams
         });
-         // / console.log('data', data)
         mappedItems = data.listItems !== undefined ? await mapFixedPrice(data) : await mapAuctionToFraktal(data);
     }
 
