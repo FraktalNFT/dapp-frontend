@@ -43,6 +43,7 @@ import { connect } from 'react-redux';
 import { useLoadingScreenHandler } from 'hooks/useLoadingScreen';
 import store from "../../redux/store";
 import {MY_NFTS} from "@/constants/routes";
+import NFTMedia from "@/components/media";
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
@@ -121,11 +122,6 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     } else {
       showAmount = '';
     }
-    const onImageLoad = (ms: number) => {
-      setTimeout(() => {
-        setIsImageLoaded(true);
-      }, ms);
-    };
 
     setTimeout(() => {
       setIsVisible(true);
@@ -160,6 +156,10 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
         }
     };
 
+    const renderMedia = () => {
+
+    }
+
     return (
       <>
         {isVisible && (
@@ -185,20 +185,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                     : inVisibleStyle /* toggle visibility */
                 }
               >
-                <Image
-                  src={'https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL)}
-                  width="100%"
-                  height="100%"
-                  objectFit="cover"
-                  margin-left="auto"
-                  margin-right="auto"
-                  display="flex"
-                  sx={{
-                    objectFit: `cover`,
-                  }}
-                  style={{ verticalAlign: 'middle' }}
-                  onLoad={() => onImageLoad(5)}
-                />
+                <NFTMedia/>
               </Box>
               {!isImageLoaded && (
                 <Box

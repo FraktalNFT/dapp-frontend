@@ -4,11 +4,11 @@ const { CID } = require("ipfs-http-client");
 
 const APIURL =
     process.env.NEXT_PUBLIC_GRAPHQL_URL ? process.env.NEXT_PUBLIC_GRAPHQL_URL
-        : 'https://api.studio.thegraph.com/query/16828/fraktal/0.0.9';
+        : 'https://api.studio.thegraph.com/query/21128/marketplaceperformance/0.0.4';
 
 const AUCTIONAPI =
     process.env.NEXT_PUBLIC_GRAPHQL_URL ? process.env.NEXT_PUBLIC_GRAPHQL_URL
-        : 'https://api.studio.thegraph.com/query/16828/fraktal/0.0.9';
+        : 'https://api.studio.thegraph.com/query/21128/marketplaceperformance/0.0.4';
 
 const AIRDROPAPI = 'https://api.looksrare.org/graphql';
 
@@ -388,7 +388,7 @@ const fraktalId_query = gql`
 
 const limitedItems = gql`
   query($limit: Int!, $offset: Int!, $orderBy: String!, $orderDirection: String!) {
-    listItems(first: $limit, skip: $offset, where: { amount_gt: 0 }, orderBy: $orderBy, orderDirection: $orderDirection) {
+    listItems(first: $limit, skip: $offset, where: { amount_gt: 0 }, orderBy: $orderBy, orderDirection: $orderDirection, subgraphError: allow) {
       id
       name
       price
@@ -458,7 +458,7 @@ const listedItemsByFraktalId = gql`
 
 const limitedAuctions = gql`
   query($limit: Int!, $offset: Int!, $endTime: Int!, $orderDirection: String!) {
-    auctions(first: $limit, skip: $offset, orderBy: reservePrice, orderDirection: $orderDirection, where: { endTime_gt: $endTime, reservePrice_gt: 0 }) {
+    auctions(first: $limit, skip: $offset, orderBy: reservePrice, orderDirection: $orderDirection, where: { endTime_gt: $endTime, reservePrice_gt: 0 }, subgraphError: allow) {
       seller {
         id
       }
@@ -677,11 +677,13 @@ export const getSubgraphData = async (call, id, options = null) => {
     return x.name == call;
   });
   try {
-    const data = await request(APIURL, callGql.call, { id, ...options });
+    const data = await request(AUCTIONAPI, callGql.call, { id, ...options });
     return data;
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.error("error", err);
+    if (err.response.data) {
+      return err.response.data;
+    }
     return err;
   }
 };
@@ -693,8 +695,9 @@ export const getSubgraphAuction = async (call, id, options = null) => {
     const data = await request(AUCTIONAPI, callGql.call, { id, ...options });
     return data;
   } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error("error", err);
+    if (err.response.data) {
+      return err.response.data;
+    }
     return err;
   }
 };
