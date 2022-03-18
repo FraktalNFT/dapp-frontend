@@ -704,7 +704,7 @@ export const getSubgraphAuction = async (call, id, options = null) => {
 
 export const getAddressAirdrop = async (id, options = null) =>{
   let callGql = gql`
-    query Airdrop($id: Address!, subgraphError: allow) {
+    query Airdrop($id: Address!) {
       airdrop(address:$id) {
         proof
         amount
