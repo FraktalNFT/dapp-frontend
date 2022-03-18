@@ -57,11 +57,11 @@ import {
   LISTING_NFT,
   rejectContract,
   closeModal,
-} from '../redux/actions/contractActions';
+} from '@/redux/actions/contractActions';
 /**
  * Redux
  */
-import store from '../redux/store';
+import store from '@/redux/store';
 /**
  * Contracts Calls
  */
@@ -94,10 +94,10 @@ import {MAX_FRAKTIONS} from "@/utils/constants";
 const actionOpts = { workflow: Workflow.IMPORT_NFT };
 
 function ImportNFTPage() {
-  const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
 
   const router = useRouter();
 
+  const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [noNFTs, setNoNFTs] = useState<boolean>(false);
   const [nfts, setNFTs] = useState([]);
@@ -371,7 +371,6 @@ function ImportNFTPage() {
 
     if (openseaAssets && openseaAssets.assets && openseaAssets.assets.length === 0) {
       setHasMore(false);
-      console.log('NO OPENSEA?')
       return;
     }
 

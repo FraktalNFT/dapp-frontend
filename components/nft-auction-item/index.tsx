@@ -62,14 +62,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const [isVisible, setIsVisible] = useState(false);
     const [timerOpacity, setTimerOpacity] = useState(0);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
-    const { fraktions } = useUserContext();
     const [ended, setEnded] = useState(false);
-
-    // const canList = item && !! (fraktions || []).find(fraktion => fraktion.id === item.id);
-
-    // useEffect(() => {
-    //   setIsImageLoaded(false);
-    // }, []);
 
     const onImageLoad = (ms: number) => {
       setTimeout(() => {

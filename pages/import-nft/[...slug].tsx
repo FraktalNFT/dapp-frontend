@@ -46,7 +46,6 @@ import { Workflow } from 'types/workflow';
 /**
  * Context
  */
-import { useUserContext } from '@/contexts/userContext';
 import { useWeb3Context } from '@/contexts/Web3Context';
 /**
  * Redux Actions

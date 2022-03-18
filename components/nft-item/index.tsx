@@ -43,6 +43,7 @@ import { connect } from 'react-redux';
 import { useLoadingScreenHandler } from 'hooks/useLoadingScreen';
 import store from "../../redux/store";
 import {MY_NFTS} from "@/constants/routes";
+import {useWalletContext} from "@/contexts/WalletAssets";
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
@@ -53,6 +54,8 @@ interface NFTItemProps extends StackProps {
   CTAText?: string;
   wait?: number;
   height?: string;
+  canFrak?: any;
+  canList?: any;
 }
 
 const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
@@ -67,6 +70,8 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
       CTAText,
       wait,
       height = '35rem',
+      canFrak = () => {},
+      canList = () => {},
     },
     ref
   ) => {
@@ -74,14 +79,8 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const [isVisible, setIsVisible] = useState(false);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const [isListed, setIsListed] = useState(false);
-    const { fraktions, fraktals } = useUserContext();
     const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
     const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
-
-    const canFrak =
-      item && !!(fraktals || []).find((fraktion) => fraktion.id === item.id);
-    const canList =
-      item && !!(fraktions || []).find((fraktion) => fraktion.id === item.id);
 
     useEffect(() => {
       if (item) {
@@ -256,7 +255,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 )}
               </Flex>
 
-              {canFrak && item.collateral && (
+              {canFrak(item) && item.collateral && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={`nft/${item.id}/details?frak=1`}>
                     <FrakButton size="sm">Frak it</FrakButton>
@@ -265,7 +264,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 </Box>
               )}
 
-              {canList && isListed && (
+              {canList(item) && isListed && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={'my-nfts'} scroll={false}>
                     <FrakButton size="sm" onClick={unList}>
@@ -274,7 +273,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                   </NextLink>
                 </Box>
               )}
-              {canList && !isListed && (
+              {canList(item) && !isListed && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={`nft/${item.marketId}/list-item`}>
                     <FrakButton size="sm">Sell Fraktions</FrakButton>

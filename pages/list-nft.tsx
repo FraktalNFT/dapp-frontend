@@ -17,7 +17,6 @@ import {
 import { useEffect, useState } from 'react';
 import { Image as ImageComponent } from '@chakra-ui/image';
 import { useWeb3Context } from '../contexts/Web3Context';
-import { useUserContext } from '../contexts/userContext';
 import { utils } from 'ethers';
 import {
   createNFT,
