@@ -81,7 +81,7 @@ export const UserContextProviderFC = ({ children }) => {
   const fetchNFTs = useCallback(
     // if user not in subgraph, fails to complete and show other nfts !!
     async () => {
-      try {
+   /*   try {
         //TODO - REMOVE THIS
         setLoading(true);
         let totalNFTs = [];
@@ -203,7 +203,7 @@ export const UserContextProviderFC = ({ children }) => {
         console.error(err.message);
       } finally {
         setLoading(false);
-      }
+      }*/
     },
     [account]
   );

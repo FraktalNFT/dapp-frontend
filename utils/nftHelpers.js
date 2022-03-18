@@ -1,5 +1,6 @@
 import { utils } from 'ethers';
 import {getSubgraphAuction, getSubgraphData} from './graphQueries';
+import axios from "axios";
 
 const { create, CID } = require('ipfs-http-client');
 
@@ -71,7 +72,7 @@ async function fetchNftMetadata(hash) {
     }
     return chunks;
   } else {
-    let res = await fetch(hash);
+    let res = await fetch(hash, {mode: 'no-cors'});
     if (res) {
       let result = res.json();
       return result;
@@ -139,9 +140,7 @@ export async function createObject(data) {
         id: data.nft.id,
         creator: data.nft.creator.id,
         marketId: data.nft.marketId,
-        // balances: data.nft.fraktions,
         userBalance: data.amount,
-        // price:,
         createdAt: data.nft.createdAt,
         status: data.nft.status,
         name: nftMetadata.name,

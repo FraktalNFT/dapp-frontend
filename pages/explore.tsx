@@ -36,7 +36,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
  */
 
 import { BigNumber, utils } from "ethers";
-import { getSubgraphData, LIMITED_ITEMS, LIMITED_AUCTIONS } from "../utils/graphQueries";
+import { getSubgraphData, LIMITED_ITEMS, LIMITED_AUCTIONS } from "@/utils/graphQueries";
 
 /**
  * FRAKTAL Components

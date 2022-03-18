@@ -31,11 +31,11 @@ import {
 /**
  * NFT HELPER
  */
-import { createObject2, createListed } from "../utils/nftHelpers";
+import { createObject2, createListed } from "@/utils/nftHelpers";
 /**
  * API GRAPH QUERY
  */
-import {getSubgraphData} from "../utils/graphQueries";
+import {getSubgraphData} from "@/utils/graphQueries";
 /**
  * FRAKTAL Components
  */
