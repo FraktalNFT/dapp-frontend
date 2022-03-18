@@ -40,7 +40,11 @@ function checkImageCID(cid) {
   } else if (cid.startsWith('ipfs://')) {
     let splitted = cid.split('ipfs://');
     correctedCid = splitted[1];
-    let cidv1 = toBase32(correctedCid);
+    try {
+      let cidv1 = toBase32(correctedCid);
+    } catch (e) {
+      return 'https://ipfs.io/ipfs/' +splitted[1];
+    }
     return `https://${cidv1}.ipfs.dweb.link`;
   } else if (cid.startsWith('Qm')) {
     correctedCid = cid;
@@ -71,7 +75,7 @@ async function fetchNftMetadata(hash) {
     }
     return chunks;
   } else {
-    let res = await fetch(hash);
+    let res = await fetch(hash, {mode: 'no-cors'});
     if (res) {
       let result = res.json();
       return result;
