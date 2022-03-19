@@ -61,7 +61,7 @@ import {EXPLORE} from "@/constants/routes";
  */
 export default function DetailsView() {
   const router = useRouter();
-  const { account, provider, marketAddress, factoryAddress,airdropAddress } = useWeb3Context();
+  const { account, provider, marketAddress, factoryAddress, airdropAddress } = useWeb3Context();
   const [offers, setOffers] = useState();
   const [minOffer, setMinOffer] = useState<BigNumber>(BigNumber.from(0));
   const [nftObject, setNftObject] = useState({});
@@ -83,8 +83,8 @@ export default function DetailsView() {
   // use callbacks
 
   const [isLoading, setIsLoading] = useState(true);
-  const [airdropAmount,setAirdropAmount] = useState<string>("0");
-  const [proof,setProof] = useState<Array<string>>(null);
+  const [airdropAmount, setAirdropAmount] = useState<string>("0");
+  const [proof, setProof] = useState<Array<string>>(null);
 
 
   const airdropConnectToWalletId = 'connectToWallet';
@@ -364,7 +364,7 @@ export default function DetailsView() {
               </Link>
               <NFTMedia
                 setIsImageLoaded={setIsImageLoaded}
-                type={'fit'}
+                type='details'
                 imageURL={nftObject.imageURL}
               />
               <HStack justifyContent="space-between" marginTop="16px">

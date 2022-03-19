@@ -5,19 +5,19 @@ const NFTMedia = ({imageURL, setIsImageLoaded, type}) => {
 
 
     const onImageLoad = (ms: number) => {
-        setTimeout(() => {
-            setIsImageLoaded(true);
-        }, ms);
+        setIsImageLoaded(true);
     };
 
-    const isVideo = (imageURL) => {
-        console.log('imageUrl', imageURL)
+    const isVideo = (imageURL: string) => {
         if (!imageURL) {
             return null;
         }
-        setIsImageLoaded(true);
         const fileExtension = imageURL.split('.').pop();
-        return fileExtension === 'mp4';
+        if (fileExtension !== 'mp4') {
+            return false;
+        }
+        setIsImageLoaded(true);
+        return true;
     }
 
     return (

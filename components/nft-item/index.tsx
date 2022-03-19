@@ -29,33 +29,34 @@ import NextLink from 'next/link';
 /***
  * Component
  */
-import { FrakCard } from '../../types';
-import { motion, isValidMotionProp, HTMLMotionProps } from 'framer-motion';
-import FrakButton from '../../components/button';
+import FrakButton from '@/components/button';
+/**
+ * Context
+ */
 import { useUserContext } from '@/contexts/userContext';
+import { useWeb3Context } from '@/contexts/Web3Context';
 import { BigNumber, utils } from 'ethers';
-import { useWeb3Context } from '../../contexts/Web3Context';
-import {getListingAmount, unlistItem, claimERC721, claimERC1155, approveMarket} from '../../utils/contractCalls';
+/**
+ * Contracts
+ */
+import {getListingAmount, unlistItem, claimERC721, claimERC1155, approveMarket} from '@/utils/contractCalls';
 import toast from 'react-hot-toast';
-import { roundUp } from '../../utils/math';
-import {Workflow} from "../../types/workflow";
-import { connect } from 'react-redux';
+import { roundUp } from '@/utils/math';
+import {Workflow} from "@/types/workflow";
 import { useLoadingScreenHandler } from 'hooks/useLoadingScreen';
-import store from "../../redux/store";
+import store from "@/redux/store";
 import {MY_NFTS} from "@/constants/routes";
 import NFTMedia from "@/components/media";
 
-interface NFTItemProps extends StackProps {
-  item: FrakCard;
-  name: string;
-  amount: string;
-  price: number;
-  imageURL: string;
-  CTAText?: string;
-  wait?: number;
-  height?: string;
-}
+/**
+ * Types
+ */
 
+import { FrakCard } from '../../types';
+
+/**
+ * NFTItem
+ */
 const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
   (
     {
@@ -155,10 +156,6 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
           });
         }
     };
-
-    const renderMedia = () => {
-
-    }
 
     return (
       <>
@@ -280,4 +277,15 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
   }
 );
 
-export default NFTItem
+interface NFTItemProps extends StackProps {
+  item: FrakCard;
+  name: string;
+  amount: string;
+  price: number;
+  imageURL: string;
+  CTAText?: string;
+  wait?: number;
+  height?: string;
+}
+
+export default NFTItem;

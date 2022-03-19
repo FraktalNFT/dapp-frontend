@@ -43,7 +43,10 @@ function checkImageCID(cid) {
     try {
       let cidv1 = toBase32(correctedCid);
     } catch (e) {
-      return 'https://ipfs.io/ipfs/' + splitted[1];
+      if (!splitted[1].startsWith('ipfs/')) {
+        splitted[1] = 'ipfs/' + splitted[1];
+      }
+      return 'https://ipfs.io/' + splitted[1];
     }
     return `https://${cidv1}.ipfs.dweb.link`;
   } else if (cid.startsWith('Qm')) {
@@ -64,9 +67,10 @@ function toBase32(value) {
 async function fetchNftMetadata(hash) {
   if (hash.startsWith('ipfs://ipfs/Qm')) {
     hash = hash.slice(12)
-  }
-  else if (hash.startsWith('ipfs://Qm')) {
+  } else if (hash.startsWith('ipfs://Qm')) {
     hash = hash.slice(7)
+  } else if (hash.startsWith('ipfs://ba')) {
+    hash ='https://ipfs.io/ipfs/' + hash.slice(7);
   }
   if (hash.startsWith('Qm')) {
     let chunks;

@@ -189,7 +189,6 @@ function ImportNFTPage() {
         factoryAddress,
         actionOpts
       ).catch((error) => {
-        console.log('error', error)
         store.dispatch(
           rejectContract(IMPORT_NFT, error, importNFT, actionOpts)
         );
@@ -203,7 +202,6 @@ function ImportNFTPage() {
         factoryAddress,
         actionOpts
       ).catch((error) => {
-        console.log('error', error)
         store.dispatch(
           rejectContract(IMPORT_NFT, error, importNFT, actionOpts)
         );
@@ -371,7 +369,6 @@ function ImportNFTPage() {
 
     if (openseaAssets && openseaAssets.assets && openseaAssets.assets.length === 0) {
       setHasMore(false);
-      console.log('NO OPENSEA?')
       return;
     }
 
