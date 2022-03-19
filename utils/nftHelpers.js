@@ -65,6 +65,10 @@ function toBase32(value) {
 }
 
 async function fetchNftMetadata(hash) {
+  if(window?.localStorage.getItem(JSON.stringify(hash))){
+    return JSON.parse(window?.localStorage.getItem(JSON.stringify(hash)));
+  }
+  console.log("Fetching new");
   if (hash.startsWith('ipfs://ipfs/Qm')) {
     hash = hash.slice(12)
   } else if (hash.startsWith('ipfs://Qm')) {
@@ -77,11 +81,13 @@ async function fetchNftMetadata(hash) {
     for await (const chunk of ipfsClient.cat(hash)) {
       chunks = binArrayToJson(chunk);
     }
+    window?.localStorage.setItem(JSON.stringify(hash), JSON.stringify(chunks));
     return chunks;
   } else {
     let res = await fetch(hash, {mode: 'no-cors'});
     if (res) {
       let result = res.json();
+      window?.localStorage.setItem(JSON.stringify(hash), JSON.stringify(result));
       return result;
     }
   }
