@@ -137,24 +137,27 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     };
 
     const withdrawNFT = async (item, event) => {
-        const actionOpts = { workflow: Workflow.CLAIM_NFT };
         event.stopPropagation();
-        await approveMarket(factoryAddress, provider, item.id, actionOpts);
-        if (item.collateral.type == 'ERC721') {
-          await claimERC721(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
-            closeLoadingModalAfterDelay();
-            setTimeout(() => {
-              router.reload()
-            }, 2500);
-          });
-        } else {
-          await claimERC1155(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
-            closeLoadingModalAfterDelay();
-            setTimeout(() => {
-              router.reload()
-            }, 2500);
-          });
+        const actionOpts = { workflow: Workflow.CLAIM_NFT };
+        const receipt = await approveMarket(factoryAddress, provider, item.id, actionOpts);
+        if (!receipt?.error) {
+          if (item.collateral.type == 'ERC721') {
+            await claimERC721(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
+              closeLoadingModalAfterDelay();
+              setTimeout(() => {
+                router.reload()
+              }, 2500);
+            });
+          } else {
+            await claimERC1155(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
+              closeLoadingModalAfterDelay();
+              setTimeout(() => {
+                router.reload()
+              }, 2500);
+            });
+          }
         }
+
     };
 
     return (
