@@ -1,25 +1,57 @@
-import { HStack, VStack } from "@chakra-ui/layout";
-import { useToast } from '@chakra-ui/react'
+/**
+ * React
+ */
 import React, {useEffect, useState} from "react";
+/**
+ * Chakra
+ */
+import { VStack } from "@chakra-ui/layout";
+import { Image } from "@chakra-ui/image";
+import { useToast } from '@chakra-ui/react'
+/**
+ * Next
+ */
 import {withRouter} from 'next/router';
 import Head from "next/head";
 import Link from "next/link";
+/**
+ * Utils
+ */
 import { BigNumber } from "ethers";
-import { Image } from "@chakra-ui/image";
 import styles from "./auction.module.css";
-import {shortenHash, timezone, getParams} from '../../../utils/helpers';
-import {getSubgraphData, getSubgraphAuction } from '../../../utils/graphQueries';
-import { createObject } from "utils/nftHelpers";
-import Countdown,{zeroPad} from 'react-countdown';
+/**
+ * Utils
+ */
+import {shortenHash} from '@/utils/helpers';
+import {getSubgraphAuction } from '@/utils/graphQueries';
+import { createListedAuction } from "@/utils/nftHelpers";
 import { utils } from "ethers";
+/**
+ * Countdown
+ */
+import Countdown, {zeroPad} from 'react-countdown';
+/**
+ * Contracts
+ */
 import { participateAuction, getAuctionReserve } from "utils/contractCalls";
+/**
+ * Contexts
+ */
 import { useWeb3Context } from "@/contexts/Web3Context";
-import { createListedAuction } from "utils/nftHelpers";
-import { introspectionFromSchema } from "graphql";
 import Custom404 from "../../404";
 import {EXPLORE} from "@/constants/routes";
 import { useLoadingScreenHandler } from "hooks/useLoadingScreen";
+
+/**
+ * Components
+ */
 import VerifyNFT from "@/components/verifyNFT";
+
+/**
+ * Auction NFT View
+ * @param router
+ * @constructor
+ */
 
 function AuctionNFTView({router}) {
 
@@ -124,7 +156,6 @@ function AuctionNFTView({router}) {
         "collateral": _hash.fraktalNft.collateral
       });
 
-
     if(obj) {
         setNftObject(obj.auction);
         const objReserve = await auctionReserve(obj.auction.seller, obj.auction.sellerNonce);
@@ -210,7 +241,7 @@ function AuctionNFTView({router}) {
         <VStack spacing="32px" marginTop="40px" align="flex-center">
           <div>
               <Image
-              src={nftObject?nftObject.imageURL:exampleNFT.imageURL}
+              src={'https://image.fraktal.io/?height=650&image=' + encodeURIComponent(nftObject?nftObject.imageURL:exampleNFT.imageURL)}
 
               w="100%"
               style={{ borderRadius: "4px 4px 0px 0px" }}

@@ -12,7 +12,7 @@ import InfiniteScrollNft from "@/components/infiniteScrollNft";
 import {useWeb3Context} from "@/contexts/Web3Context";
 import {assetsInWallet} from "@/utils/openSeaAPI";
 import {getSubgraphData} from "@/utils/graphQueries";
-import {createObject, createObject2, createOpenSeaObject} from "@/utils/nftHelpers";
+import {createObject, createOpenSeaObject} from "@/utils/nftHelpers";
 
 /**
  * MyNFTWallet
@@ -73,7 +73,7 @@ const MyNFTWallet = () => {
 
            fraktionsObjects = await Promise.all(
                validFraktions.map(x => {
-                   return createObject(x);
+                   return createObject(x.nft);
                })
            );
 
@@ -87,7 +87,7 @@ const MyNFTWallet = () => {
 
            let userFraktalObjects = await Promise.all(
                userFraktalsFetched.map(x => {
-                   return createObject2(x);
+                   return createObject(x.nft);
                })
            );
 
