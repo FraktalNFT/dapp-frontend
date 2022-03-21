@@ -4,11 +4,11 @@ const { CID } = require("ipfs-http-client");
 
 const APIURL =
     process.env.NEXT_PUBLIC_GRAPHQL_URL ? process.env.NEXT_PUBLIC_GRAPHQL_URL
-        : 'https://api.studio.thegraph.com/query/16828/fraktal/0.1.2';
+        : 'https://api.studio.thegraph.com/query/18518/fraktalmarket/0.27';
 
 const AUCTIONAPI =
     process.env.NEXT_PUBLIC_GRAPHQL_URL ? process.env.NEXT_PUBLIC_GRAPHQL_URL
-        : 'https://api.studio.thegraph.com/query/16828/fraktal/0.1.2';
+        : 'https://api.studio.thegraph.com/query/18518/fraktalmarket/0.27';
 
 const AIRDROPAPI = 'https://api.looksrare.org/graphql';
 
