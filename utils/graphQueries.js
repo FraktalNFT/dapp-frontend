@@ -195,6 +195,11 @@ const listedItems = gql`
         creator {
           id
         }
+        collateral {
+          id
+          type
+          tokenId
+        }
       }
     }
   }

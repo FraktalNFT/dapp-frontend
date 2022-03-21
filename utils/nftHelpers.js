@@ -63,7 +63,7 @@ export async function createObject(data) {
   if (data.hasOwnProperty('nft') && data.creator === undefined || data.marketId === undefined) {
     data = data.nft;
   }
-  const tokenId = data.collateral !== null ? data.collateral.tokenId : "1";
+  const tokenId = (data.collateral !== null && data.collateral !== undefined)  ? data.collateral.tokenId : "1";
   try {
     const nftMetadata = await getNftMetadata(data.id, tokenId);
     let object = {
@@ -101,7 +101,7 @@ export async function createObject(data) {
 
 export async function createListed(data) {
   try {
-    const tokenId = data.fraktal.collateral !== null ? data.fraktal.collateral.tokenId : "1";
+    const tokenId = (data.fraktal.collateral !== null && data.fraktal.collateral !== undefined) ? data.fraktal.collateral.tokenId : "1";
     const nftMetadata = await getNftMetadata(data.fraktal.id, tokenId);
     if (nftMetadata) {
       return {
@@ -129,7 +129,7 @@ export async function createListed(data) {
 }
 
 export async function createListedAuction(data) {
-  const tokenId = data.collateral !== null ? data.collateral.tokenId : "1";
+  const tokenId = (data.collateral !== null && data.collateral !== undefined) ? data.collateral.tokenId : "1";
   try {
     const nftMetadata = await getNftMetadata(data.tokenAddress, tokenId);
     if (nftMetadata) {
