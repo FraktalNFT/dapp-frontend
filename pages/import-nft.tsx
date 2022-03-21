@@ -123,7 +123,7 @@ function ImportNFTPage() {
   /**
    * Pagination
    */
-  const [limit, setLimit] = useState(15);
+  const [limit, setLimit] = useState(100);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   /**
@@ -180,7 +180,6 @@ function ImportNFTPage() {
       alert('No Token Selected');
       return null;
     }
-    console.log('schema', tokenToImport?.token_schema)
     if (tokenToImport?.token_schema === 'ERC721') {
       address = await importERC721(
         BigInt(tokenToImport?.tokenId),
@@ -399,7 +398,7 @@ function ImportNFTPage() {
 
       let userFraktalObjects = await Promise.all(
           userFraktalsFetched.map(x => {
-            return createObject(x.nft);
+            return createObject(x);
           })
       );
 
@@ -420,6 +419,7 @@ function ImportNFTPage() {
       totalAddresses = userFraktalAddresses.concat(userFraktionsAddreses);
     }
 
+//    console.log('assets', openseaAssets.assets.length)
     if (
         openseaAssets &&
         openseaAssets.assets &&
@@ -442,18 +442,22 @@ function ImportNFTPage() {
       }
 
       // NFTs filtering
+  //    console.log('totalAddresses', totalAddresses)
+   //   console.log('total', totalNFTs)
       let nftsFiltered = totalNFTs.map(x => {
         if (!totalAddresses.includes(x.asset_contract.address)) {
           return x;
         }
       });
 
+     // console.log('nftsFiltered', nftsFiltered)
       let nftObjects = await Promise.all(
           nftsFiltered.map(x => {
+       //     console.log('x', x)
             return createOpenSeaObject(x);
           })
       );
-
+    //console.log('nftObjects', nftObjects)
       if (nftObjects) {
         nftObjectsClean = nftObjects.filter(x => {
           return x != null && x.imageURL.length;
@@ -464,13 +468,13 @@ function ImportNFTPage() {
       setHasMore(true);
       setNFTs([...nfts, ...nftObjectsClean]);
       setOffset(limit + offset);
+      setIsLoading(false);
     }
   }
 
   const fetchNFTs = useCallback(
       async () => {
         getData()
-        setIsLoading(false);
       },
       [account]
   );
