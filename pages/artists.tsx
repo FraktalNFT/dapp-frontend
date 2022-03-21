@@ -61,7 +61,7 @@ export default function ArtistsView() {
       }); // list the first NFT in the list of 'nfts this artist made'
       let fraktalsSamplesObjects = await Promise.all(
         fraktalSamples.map(x => {
-          return createObject(x.nft);
+          return createObject(x);
         })
       );
       let artistObjects = getArtistsObjects(
@@ -113,7 +113,7 @@ export default function ArtistsView() {
         }); // list the first NFT in the list of 'nfts this artist made'
         let fraktalsSamplesObjects = await Promise.all(
           fraktalSamples.map(x => {
-            return createObject(x.nft);
+            return createObject(x);
           })
         );
         let artistsObj = getArtistsObjects(noImporters, fraktalsSamplesObjects);
