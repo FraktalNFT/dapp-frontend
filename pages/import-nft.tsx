@@ -77,7 +77,7 @@ import {
 /**
  * Utils
  */
-import {createObject, createObject2, createOpenSeaObject} from "@/utils/nftHelpers";
+import {createObject, createOpenSeaObject} from "@/utils/nftHelpers";
 import {assetsInWallet} from "@/utils/openSeaAPI";
 import {getSubgraphData} from "@/utils/graphQueries";
 
@@ -385,7 +385,7 @@ function ImportNFTPage() {
 
       fraktionsObjects = await Promise.all(
           validFraktions.map(x => {
-            return createObject(x);
+            return createObject(x.nft);
           })
       );
 
@@ -399,7 +399,7 @@ function ImportNFTPage() {
 
       let userFraktalObjects = await Promise.all(
           userFraktalsFetched.map(x => {
-            return createObject2(x);
+            return createObject(x.nft);
           })
       );
 

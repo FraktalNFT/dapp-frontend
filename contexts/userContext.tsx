@@ -19,7 +19,6 @@ import { getSubgraphData } from "../utils/graphQueries";
  */
 import {
   createObject,
-  createObject2,
   createOpenSeaObject,
 } from "../utils/nftHelpers";
 
@@ -130,7 +129,7 @@ export const UserContextProviderFC = ({ children }) => {
 
           let userFraktalObjects = await Promise.all(
             userFraktalsFetched.map(x => {
-              return createObject2(x);
+              return createObject(x);
             })
           );
 

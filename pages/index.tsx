@@ -6,13 +6,11 @@ import {useEffect, useState} from "react";
  * NEXT
  */
 import { useRouter } from "next/router";
-import NextLink from "next/link";
 /**
  * ICONS
  */
-import { AiOutlineStock } from 'react-icons/ai';
 import { FaCoins } from 'react-icons/fa';
-import { GiCrackedShield, GiProfit } from 'react-icons/gi';
+import { GiProfit } from 'react-icons/gi';
 
 /**
  * CHAKRA UI
@@ -31,11 +29,11 @@ import {
 /**
  * NFT HELPER
  */
-import { createObject2, createListed } from "../utils/nftHelpers";
+import { createListed } from "@/utils/nftHelpers";
 /**
  * API GRAPH QUERY
  */
-import {getSubgraphData} from "../utils/graphQueries";
+import {getSubgraphData} from "@/utils/graphQueries";
 /**
  * FRAKTAL Components
  */

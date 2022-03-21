@@ -35,7 +35,7 @@ import styles from "./auction.module.css";
  */
 import {getExplorerUrl, shortenHash, timezone} from "@/utils/helpers";
 import { getSubgraphData,getAddressAirdrop } from "@/utils/graphQueries";
-import { createObject2 } from "@/utils/nftHelpers";
+import {createObject } from "@/utils/nftHelpers";
 /**
  * Contexts
  */
@@ -123,7 +123,7 @@ export default function DetailsView() {
       fraktalFetch.fraktalNfts &&
       fraktalFetch.fraktalNfts[0]
     ) {
-      let nftObjects = await createObject2(fraktalFetch.fraktalNfts[0]);
+      let nftObjects = await createObject(fraktalFetch.fraktalNfts[0]);
       if (nftObjects) {
         let investorsWBalance = nftObjects.balances.filter(x => {
           return parseInt(x.amount) > 0;
