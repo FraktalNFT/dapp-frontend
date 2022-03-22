@@ -93,7 +93,7 @@ export const UserContextProviderFC = ({ children }) => {
         let totalAddresses: null | string[];
         let nftObjectsClean;
 
-        let openseaAssets = await assetsInWallet(account, {
+        let openseaAssets = await assetsInWallet( account, {
           limit: 60,
           offset: 0
         });
@@ -101,7 +101,7 @@ export const UserContextProviderFC = ({ children }) => {
         setWalletAssets(openseaAssets.assets);
         let fobjects = await getSubgraphData(
           "wallet",
-          account.toLocaleLowerCase()
+            account?.toLocaleLowerCase()
         );
 
         if (fobjects && fobjects.users.length) {
@@ -135,7 +135,7 @@ export const UserContextProviderFC = ({ children }) => {
 
           if (userFraktalObjects) {
             fraktalsClean = userFraktalObjects.filter(x => {
-              return x != null && x.imageURL.length;
+              return x != null && x.imageURL;
             });
           }
 
@@ -186,7 +186,7 @@ export const UserContextProviderFC = ({ children }) => {
 
           if (nftObjects) {
             nftObjectsClean = nftObjects.filter(x => {
-              return x != null && x.imageURL.length;
+              return x != null && x.imageURL;
             });
           } else {
             nftObjectsClean = nftObjects;
@@ -199,7 +199,7 @@ export const UserContextProviderFC = ({ children }) => {
         }
         //TODO: detect account and states change > refresh
       } catch (err) {
-        console.error(err.message);
+        console.error(err);
       } finally {
         setLoading(false);
       }

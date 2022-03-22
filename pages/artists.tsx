@@ -27,6 +27,7 @@ export default function ArtistsView() {
   const { marketAddress, factoryAddress, loading } = useWeb3Context();
   const [artistAddress, setArtistAddress] = useState("");
   const [inputAddress, setInputAddress] = useState("");
+  const [isENSAddressValid, ethAddressFromENS] = useENSAddress(inputAddress)
 
   const handleSortSelect = (item: string) => {
     setSortType(item);
@@ -95,7 +96,6 @@ export default function ArtistsView() {
       setArtistAddress(address_Artist);
     }
   }
-  const [isENSAddressValid, ethAddressFromENS] = useENSAddress(inputAddress)
 
   useEffect(() => {
     const fetchInitialArtists = async () => {
