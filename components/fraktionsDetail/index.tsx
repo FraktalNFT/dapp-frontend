@@ -68,10 +68,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
       return roundUp((utils.formatEther(price) * 100000) / 100000, 3);
     };
 
-    let amountString = '';
-
-    let feiString = '';
-    amountString = utils.formatEther(parseUnits(amount.toString(), 'wei'));
+    let amountString =  utils.formatEther(parseUnits(amount.toString(), 'wei'));
 
     //  if(BigNumber.from(amount).lt(utils.parseEther("0.01"))){
     //   amountString = utils.formatEther(parseUnits(amount.toString(),"wei"));
@@ -84,6 +81,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
     async function onBuy() {
       setBuying(true);
       try {
+        setIsReady(false);
         addFraktionAmount(amountToBuy);
         let tx = buyFraktions(
           seller,
@@ -94,22 +92,23 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
           marketAddress
         );
         tx.then(() => {
-          setBuying(false);
           setAmountToBuy(0);
           closeLoadingModalAfterDelay()
         }).catch((error) => {
-          setBuying(false);
           buyFraktionsRejected(error, onBuy);
+        }).finally(() => {
+           setBuying(false);
+           setIsReady(true);
         });
       } catch (err) {
         setBuying(false);
+        setIsReady(true);
         buyFraktionsRejected(err, onBuy);
-        console.error('Error', err);
       }
     }
 
     function onSetAmount(d) {
-      if (parseInt(d) && parseInt(d) <= parseInt(amountString)) {
+      if (parseInt(d) && parseInt(d) > 0 && parseInt(d) <= parseInt(amountString)) {
         setAmountToBuy(d);
         setIsReady(true);
       } else {
@@ -151,9 +150,7 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
               color: '#000000',
             }}
           >
-            {/* {utils.formatEther(amount)} */}
             {amountString}
-            {/* {amount.toLocaleString()} */}
           </div>
 
           <div

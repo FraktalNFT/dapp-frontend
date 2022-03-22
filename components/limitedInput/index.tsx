@@ -65,7 +65,8 @@ const LimitedInput = forwardRef<
                     }}
                     onChange={(num) => {
                         setFunction(num);
-                        (num > maxFraktions) ? setColor("red") : setColor("#000");
+                      //  console.log(num, maxFraktions)
+                        (parseInt(num) > parseInt(maxFraktions)) ? setColor("red") : setColor("#000");
                     }}
                 >
                     <NumberInputField
