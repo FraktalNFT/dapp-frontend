@@ -37,7 +37,6 @@ const FrakButton2 = forwardRef<
           placeholder={inputPlaceholder ? inputPlaceholder : null}
           _focus={{ outline: 'none' }}
           style={{
-            //background:"#EFEFEF",
             textAlign: 'right',
             color: '#000000',
             fontWeight: 500,
