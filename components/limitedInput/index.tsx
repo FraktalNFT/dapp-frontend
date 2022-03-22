@@ -5,13 +5,20 @@ import { forwardRef, useState } from 'react';
 /**
  * ChakraUI
  */
-import { Button, ButtonProps } from '@chakra-ui/button';
 import {
     NumberInput,
     NumberInputField,
     Text
 } from '@chakra-ui/react';
+import { ButtonProps } from '@chakra-ui/button';
+/**
+ * Components
+ */
+import FraktalButton from "@/components/fraktalButton";
 
+/**
+ * LimitedInput Component
+ */
 const LimitedInput = forwardRef<
     HTMLButtonElement,
     ButtonProps & {
@@ -58,11 +65,7 @@ const LimitedInput = forwardRef<
                     }}
                     onChange={(num) => {
                         setFunction(num);
-                        if (num > maxFraktions) {
-                            setColor("red");
-                        } else {
-                            setColor("#000");
-                        }
+                        (num > maxFraktions) ? setColor("red") : setColor("#000");
                     }}
                 >
                     <NumberInputField
@@ -93,35 +96,13 @@ const LimitedInput = forwardRef<
                         {currency ? currency : null}
                     </Text>
                 </div>
-                <Button
-                    disabled={!isReady}
-                    background={isReady ? '#405466' : '#A7A7A7'}
-                    color={'white.900'}
+                <FraktalButton
+                    isReady={isReady}
                     onClick={onClick}
-                    sx={{
-                        borderRadius: `0px 16px 16px 0px`,
-                        borderTop: `2px solid #405466`,
-                        borderRight: `2px solid #405466`,
-                        borderBottom: `2px solid #405466`,
-                        fontSize: '1.8rem',
-                        height: `38px`,
-                        width: `100px`,
-                        transform: `translateX(2px) translateY(-2px)`,
-                        boxSizing: `content-box`,
-                        position: `absolute`,
-                        right: `0`,
-                        top: `0`,
-                        padding: `0`,
-                    }}
-                    _hover={{ background: 'black.900', color: 'white.900' }}
-                    _active={{ background: 'black.900', color: 'white.900' }}
-                    _disabled={{
-                        background: '#A7A7A7 !important',
-                    }}
                     {...rest}
                 >
                     {children}
-                </Button>
+                </FraktalButton>
             </div>
         );
     }

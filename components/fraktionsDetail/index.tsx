@@ -98,9 +98,11 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
           setAmountToBuy(0);
           closeLoadingModalAfterDelay()
         }).catch((error) => {
+          setBuying(false);
           buyFraktionsRejected(error, onBuy);
         });
       } catch (err) {
+        setBuying(false);
         buyFraktionsRejected(err, onBuy);
         console.error('Error', err);
       }
