@@ -107,8 +107,6 @@ const FraktionsDetail = forwardRef<HTMLDivElement, listedItemProps>(
     }
 
     function onSetAmount(d) {
-        console.log('amount', amountString)
-        console.log('parseInt(d)', parseInt(d))
       if (parseInt(d) && parseInt(d) <= parseInt(amountString)) {
         setAmountToBuy(d);
         setIsReady(true);
