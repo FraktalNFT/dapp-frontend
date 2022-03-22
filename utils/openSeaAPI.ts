@@ -14,8 +14,7 @@ const ASSETS_METHOD = 'assets';
  * @param address
  */
 export const assetsInWallet = (address, params = {}) => {
-  let url;
-  url = apiURL + `assets?owner=${address}&order_direction=desc&offset=${params.offset}&limit=${params.limit}`;
+  const url = apiURL + `assets?owner=${address}&order_direction=desc&offset=${params.offset}&limit=${params.limit}`;
   const data = fetch(url, options)
     .then(response => response.json())
     .then(data => {

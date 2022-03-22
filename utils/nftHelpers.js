@@ -60,7 +60,6 @@ export async function createOpenSeaObject(data) {
 }
 
 export async function createObject(data) {
-  //console.log(data)
   if (data.hasOwnProperty('nft') && data.creator === undefined || data.marketId === undefined) {
     data = data.nft;
   }
