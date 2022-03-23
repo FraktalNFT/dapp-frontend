@@ -1,16 +1,35 @@
-import { HStack, VStack } from "@chakra-ui/layout";
+/**
+ * React
+ */
 import React, {useEffect, useState} from "react";
+/**
+ * Chakra
+ */
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
+import { Image } from "@chakra-ui/image";
+import { VStack } from "@chakra-ui/layout";
+/**
+ * Next
+ */
+import { useRouter } from 'next/router';
 import Head from "next/head";
 import Link from "next/link";
-import { BigNumber, utils } from "ethers";
-import { Image } from "@chakra-ui/image";
 import styles from "./auction.module.css";
+/**
+ * Components
+ */
 import FrakButton from '@/components/button';
-import {shortenHash, timezone, getParams} from '@/utils/helpers';
+/**
+ * Utils
+ */
+import {shortenHash, timezone} from '@/utils/helpers';
 import { getSubgraphData } from '@/utils/graphQueries';
 import { createListed, createObject} from '@/utils/nftHelpers';
+import { BigNumber, utils } from "ethers";
 import { useWeb3Context } from '@/contexts/Web3Context';
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
+/**
+ * Contract Calls
+ */
 import {
   listItem,
   unlistItem,
@@ -22,8 +41,9 @@ import {
   listItemAuction,
   getFraktionsIndex,
 } from '@/utils/contractCalls';
-import { useRouter } from 'next/router';
-
+/**
+ * Redux
+ */
 import store from '@/redux/store';
 import {LISTING_NFT, rejectContract} from "@/redux/actions/contractActions";
 import LoadScreen from '../../../components/load-screens';
@@ -54,13 +74,15 @@ export default function ListNFTView() {
   const [updating, setUpdating] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
   const [prepare, setPrepare] = useState(true);
-  const [isAuction,setIsAuction] = useState(false);
+  const [isAuction, setIsAuction] = useState(false);
+  const [isListing, setIsListing] = useState<boolean>(false);
 
   const fraktalReady = fraktions > 0
     && totalAmount > 0
     && totalAmount <= parseFloat(fraktions)
     && totalPrice > 0
-    && isApproved;
+    && isApproved
+    && isListing === false;
     //&& nftObject.owner === contractAddress.toLocaleLowerCase();
 
   async function getIsApprovedForAll(tokenAddress) {
@@ -142,6 +164,7 @@ export default function ListNFTView() {
     }
   }
   async function listNewItem(){
+    setIsListing(true);
     // console.log(`Total price: ${totalPrice}, totalAmout: ${totalAmount}`);
     const fei = utils.parseEther(totalAmount);
     const wei = utils.parseEther(totalPrice);
@@ -157,9 +180,10 @@ export default function ListNFTView() {
           setInterval(() => {
               router.push(EXPLORE, null, {scroll: false})
           }, 1000);
-
         }).catch(e => {
           store.dispatch(rejectContract(LISTING_NFT, e, listNewItem));
+      }).finally(() => {
+        setIsListing(false);
       })
     }
     else{
@@ -177,6 +201,8 @@ export default function ListNFTView() {
           }, 1000);
         }).catch(e => {
           store.dispatch(rejectContract(LISTING_NFT, e, listNewItem));
+      }).finally(() => {
+        setIsListing(false);
       })
     }
   }
@@ -443,7 +469,7 @@ export default function ListNFTView() {
                     style={{marginTop: '32px'}}
                     onClick={listNewItem}
                     >
-                    {(isAuction)?"List Auction":"List Item"}
+                    {(isAuction)?"List Auction" : "List Item"}
                     </FrakButton>
                   </div>
                 }

@@ -1,29 +1,28 @@
-import { useState, useEffect } from 'react';
-import NextLink from 'next/link';
+/**
+ * React
+ */
+import React, { useState, forwardRef } from 'react';
+
+/**
+ * Chakra
+ */
 import { Image } from '@chakra-ui/image';
 import {
-  Box,
-  StackProps,
-  Text,
-  VStack,
-  BoxProps,
-  Spinner,
   Badge,
+  Box,
+  Button,
+  Flex,
+  VStack,
+  Spinner,
+  StackProps,
+  Spacer,
   Tag,
+  Text,
   TagLabel,
 } from '@chakra-ui/react';
-import React, { forwardRef } from 'react';
-import {
-  Flex,
-  Button,
-  Spacer,
-  forwardRef as fRef,
-  HTMLChakraProps,
-  chakra,
-} from '@chakra-ui/react';
+
 import { FrakCard } from '../../types';
-import { motion, isValidMotionProp, HTMLMotionProps } from 'framer-motion';
-import FrakButton from '../../components/button';
+import FrakButton from '@/components/button';
 import { useUserContext } from '@/contexts/userContext';
 import Countdown, { zeroPad } from 'react-countdown';
 
@@ -39,6 +38,9 @@ interface NFTItemProps extends StackProps {
   reservePriceReached: any;
 }
 
+/**
+ * NFTAuctionItem
+ */
 const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
   (
     {
@@ -56,6 +58,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
       claimFunction,
       unlistFunction,
       reservePriceReached,
+      isClaiming
     },
     ref
   ) => {
@@ -261,6 +264,7 @@ const NFTAuctionItem = forwardRef<HTMLDivElement, NFTItemProps>(
                   )}
                   {item.currentReserve != 0 && !item.isAuctionSuccess && (
                     <FrakButton
+                      disabled={isClaiming}
                       onClick={() =>
                         claimFunction(
                           item.tokenAddress,
