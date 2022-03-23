@@ -1,3 +1,6 @@
+/**
+ * React
+ */
 import {
   createContext,
   useCallback,
@@ -5,12 +8,17 @@ import {
   useEffect,
   useState,
 } from "react";
+/**
+ * Utils
+ */
 import { useWeb3Context } from "./Web3Context";
 import { assetsInWallet } from "../utils/openSeaAPI";
 import { getSubgraphData } from "../utils/graphQueries";
+/**
+ * Helpers
+ */
 import {
   createObject,
-  createObject2,
   createOpenSeaObject,
 } from "../utils/nftHelpers";
 
@@ -20,38 +28,15 @@ type UserContextType = {
   nfts: null | any[];
   balance: number;
 };
-
-// const UserContext = createContext<
-//   UserContextType & { loading: boolean; fetchNFTs: () => void }
-// >({
-//   fraktals: null,
-//   fraktions: null,
-//   nfts: null,
-//   balance: 0,
-//   loading: false,
-//   fetchNFTs: () => {},
-// });
-
 export const UserContext = createContext(null);
 
 export const UserContextProviderFC = ({ children }) => {
-  // const [
-  //   { fraktals, fraktions, nfts, balance },
-  //   setUserState,
-  // ] = useState<UserContextType>({
-  //   fraktals: null,
-  //   fraktions: null,
-  //   nfts: null,
-  //   balance: 0,
-  // });
   const [fraktals, setFraktals] = useState(null);
   const [fraktions, setFraktions] = useState(null);
   const [nfts, setNFTs] = useState(null);
   const [walletAssets, setWalletAssets] = useState(null);
   const [balance, setBalance] = useState(null);
-
   const [loading, setLoading] = useState<boolean>(false);
-
   const { account } = useWeb3Context();
 
   useEffect(() => {
@@ -64,8 +49,6 @@ export const UserContextProviderFC = ({ children }) => {
     if (window && fraktals?.length > 0) {
       const mintingNFTsString = window?.localStorage.getItem('mintingNFTs');
       fraktals?.forEach((fraktal) => {
-        // console.log('id: ', fraktal?.id);
-        // console.log('minting string: ', mintingNFTsString);
         if (fraktal?.id === mintingNFTsString) {
           window?.localStorage.removeItem('mintingNFTs');
         }
@@ -77,6 +60,7 @@ export const UserContextProviderFC = ({ children }) => {
     // if user not in subgraph, fails to complete and show other nfts !!
     async () => {
       try {
+        //TODO - REMOVE THIS
         setLoading(true);
         let totalNFTs = [];
         let nftsERC721_wallet;
@@ -88,11 +72,15 @@ export const UserContextProviderFC = ({ children }) => {
         let totalAddresses: null | string[];
         let nftObjectsClean;
 
-        let openseaAssets = await assetsInWallet(account);
+        let openseaAssets = await assetsInWallet( account, {
+          limit: 60,
+          offset: 0
+        });
+
         setWalletAssets(openseaAssets.assets);
         let fobjects = await getSubgraphData(
           "wallet",
-          account.toLocaleLowerCase()
+            account?.toLocaleLowerCase()
         );
 
         if (fobjects && fobjects.users.length) {
@@ -101,7 +89,7 @@ export const UserContextProviderFC = ({ children }) => {
           userBalanceFormatted = parseFloat(userBalance) / 10 ** 18;
           // Fraktions retrieval
           let validFraktions = fobjects.users[0].fraktions.filter(x => {
-            return x.status != "retrieved";
+            return x != null;
           });
 
           fraktionsObjects = await Promise.all(
@@ -120,13 +108,13 @@ export const UserContextProviderFC = ({ children }) => {
 
           let userFraktalObjects = await Promise.all(
             userFraktalsFetched.map(x => {
-              return createObject2(x);
+              return createObject(x);
             })
           );
 
           if (userFraktalObjects) {
             fraktalsClean = userFraktalObjects.filter(x => {
-              return x != null && x.imageURL.length && x.status != "retrieved";
+              return x != null && x.imageURL;
             });
           }
 
@@ -177,30 +165,20 @@ export const UserContextProviderFC = ({ children }) => {
 
           if (nftObjects) {
             nftObjectsClean = nftObjects.filter(x => {
-              return x != null && x.imageURL.length;
+              return x != null && x.imageURL;
             });
           } else {
             nftObjectsClean = nftObjects;
           }
 
-
           setFraktals(fraktalsClean);
-          
           setFraktions(fraktionsObjectsClean);
-          
           setNFTs(nftObjectsClean);
           setBalance(userBalanceFormatted);
-          // setUserState(userState => ({
-          //   ...userState,
-          //   fraktals: fraktalsClean,
-          //   fraktions: fraktionsObjectsClean,
-          //   nfts: nftObjectsClean,
-          //   balance: userBalanceFormatted,
-          // }));
         }
         //TODO: detect account and states change > refresh
       } catch (err) {
-        console.error(err.message);
+        console.error(err);
       } finally {
         setLoading(false);
       }

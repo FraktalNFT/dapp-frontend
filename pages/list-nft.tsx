@@ -44,9 +44,12 @@ import {
   rejectContract,
   closeModal,
 } from '../redux/actions/contractActions';
-const MAX_FRACTIONS = 10000;
+/**
+ * Constants
+ */
+import {MAX_FRAKTIONS} from "@/utils/constants";
 
-import {EXPLORE, IMPORT_NFT, resolveAuctionNFTRoute, resolveNFTRoute} from '@/constants/routes';
+import {EXPLORE, IMPORT_NFTS, resolveAuctionNFTRoute, resolveNFTRoute} from '@/constants/routes';
 import { Workflow } from 'types/workflow';
 
 /**
@@ -192,7 +195,7 @@ const MintPage = (props) => {
   const fraktalReady =
     minted &&
     totalAmount > 0 &&
-    totalAmount <= MAX_FRACTIONS &&
+    totalAmount <= MAX_FRAKTIONS &&
     totalPrice > 0 &&
     isApproved &&
     fraktionalized;
@@ -242,11 +245,17 @@ const MintPage = (props) => {
     // console.log(`price:${totalPrice},amount:${totalAmount}`);
   });
 
+  const airdropCheck = () => {
+    const id = `firstMinted-${account}`;
+    if( window?.localStorage.getItem(id) == null){
+      window?.localStorage.setItem(id, tokenMintedAddress.toString());
+    }
+  }
+
   async function listNewItem() {
     const wei = utils.parseEther(totalPrice.toString());
     const fei = utils.parseEther(totalAmount.toString());
     const weiPerFrak = wei.mul(utils.parseEther('1.0')).div(fei);
-    window?.localStorage.setItem(`firstMinted-${account}`, tokenMintedAddress.toString());
     listItem(
       tokenMintedAddress,
       fei, //shares
@@ -257,7 +266,8 @@ const MintPage = (props) => {
       actionOpts
     )
       .then(() => {
-        redirectToNewNFT(tokenMintedAddress)
+        airdropCheck();
+        redirectToNewNFT(tokenMintedAddress);
       })
       .catch((error) => {
         mintNFTRejected(error, listNewItem);
@@ -265,7 +275,6 @@ const MintPage = (props) => {
   }
 
   async function listNewAuctionItem() {
-    window?.localStorage.setItem(`firstMinted-${account}`, tokenMintedAddress.toString());
     listItemAuction(
       tokenMintedAddress,
       utils.parseUnits(totalPrice),
@@ -275,6 +284,7 @@ const MintPage = (props) => {
       actionOpts
     )
       .then(() => {
+        airdropCheck();
         redirectToNewNFT(tokenMintedAddress)
       })
       .catch((error) => {
@@ -373,7 +383,7 @@ const MintPage = (props) => {
               borderRadius="25"
               padding="5"
               _hover={{ bg: 'black', textColor: 'white' }}
-              onClick={() => router.push(IMPORT_NFT, null, { scroll: false })}
+              onClick={() => router.push(IMPORT_NFTS, null, { scroll: false })}
             >
               Import NFT
             </Link>
@@ -458,7 +468,7 @@ const MintPage = (props) => {
                         totalAmount={totalAmount}
                         setTotalAmount={setTotalAmount}
                         listingProcess={listingProcess}
-                        maxFraktions={MAX_FRACTIONS}
+                        maxFraktions={MAX_FRAKTIONS}
                       />
                     </TabPanel>
                     <TabPanel>
@@ -468,7 +478,7 @@ const MintPage = (props) => {
                         totalAmount={totalAmount}
                         setTotalAmount={setTotalAmount}
                         listingProcess={listingProcess}
-                        maxFraktions={MAX_FRACTIONS}
+                        maxFraktions={MAX_FRAKTIONS}
                       />
                     </TabPanel>
                   </TabPanels>

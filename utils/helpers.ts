@@ -20,15 +20,13 @@ import {
   makeOffer
 } from './contractCalls';
 
-
 export const timezone = (timestamp) => {return new Date(timestamp*1000).toLocaleDateString("en-US")}
 export const getNetworkName = (chainId: number) => networkNames[chainId || 4];
 export const getNetworkLabel = (chainId: number) => networkLabels[chainId || 4];
 export const getRPCUrl = (chainId: number) => chainUrls[chainId || 4].rpc;
-export const getExplorerUrl = (chainId: number) =>
-  (chainUrls[chainId] || chainUrls[4]).explorer;
-export const getOpenSeaApi = (chainId: number) =>
-    (chainUrls[chainId] || chainUrls[4]).openSeaApi;
+export const getExplorerUrl = (chainId: number) =>  (chainUrls[chainId] || chainUrls[4]).explorer;
+export const getOpenSeaApi = (chainId: number) =>  (chainUrls[chainId] || chainUrls[4]).openSeaApi;
+export const getAlchemyApi = (chainId: number) =>  (chainUrls[chainId] || chainUrls[4]).alchemyApi;
 
 export const getNetworkCurrency = chainId =>
   networkCurrencies[chainId] || { name: "Unknown", symbol: "Unknown" };
@@ -106,7 +104,6 @@ export async function processTx(tx){
   } catch(e) {
     receipt = {error: `Error: ${e}`}
   }
-  console.log('Transaction receipt');
   return receipt;
 }
 

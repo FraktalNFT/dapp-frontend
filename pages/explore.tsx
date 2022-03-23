@@ -52,7 +52,7 @@ import Search from "@/components/search";
  * SEARCH Utils
  */
 import {getItems} from '@/utils/search';
-import { mapFixedPrice, mapAuctionToFraktal } from "../utils/nftHelpers";
+import { mapFixedPrice, mapAuctionToFraktal } from "@/utils/nftHelpers";
 /**
  * Filters
  * @type {string}
@@ -319,7 +319,8 @@ const Marketplace: React.FC = () => {
                   >
                       <TagLabel>{queryString}</TagLabel>
                       <TagCloseButton onClick={() => removeFilter(0)} />
-                  </Tag></Text>
+                  </Tag>
+              </Text>
         </>)}
         </div>
         <Tabs width="100%" index={tabIndex} onChange={handleTabsChange} isFitted variant='enclosed' size='lg' align="center" >
@@ -377,7 +378,7 @@ const NFTItems = ({getData, hasMore, loading, nftItems, queryString}) => {
                     key={item.link}
                     href={item.link}
                 >
-                    <NFTItem
+                   <NFTItem
                         name={item.name}
                         amount={item.amount}
                         price={item.price}
@@ -416,7 +417,7 @@ const NFTItems = ({getData, hasMore, loading, nftItems, queryString}) => {
                     >
                         {nftItems.map((item, index) => (
                             <>
-                                {renderNFTItem(item, index)}
+                                { item.imageURL && renderNFTItem(item, index)}
                             </>
                         ))}
                     </Grid>

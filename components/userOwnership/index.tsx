@@ -1,6 +1,23 @@
-import { VStack, HStack } from '@chakra-ui/layout';
+/**
+ * React
+ */
 import React, { useEffect } from 'react';
-import FrakButton from '../button';
+/**
+ * Next
+ */
+
+import {useRouter} from "next/router";
+/**
+ * Chakra
+ */
+import { VStack, HStack, Text } from '@chakra-ui/layout';
+/**
+ * Frakal Components
+ */
+import FrakButton from '@/components/button';
+/**
+ * Contracts Calls
+ */
 import {
   importFraktal,
   approveMarket,
@@ -8,11 +25,16 @@ import {
   claimERC1155,
   exportFraktal,
   getIndexUsed,
-} from '../../utils/contractCalls';
-
+} from '@/utils/contractCalls';
+/**
+ * Workflow
+ */
 import { Workflow } from 'types/workflow';
-import { connect } from 'react-redux';
 import { useLoadingScreenHandler } from 'hooks/useLoadingScreen';
+/**
+ * Constants
+ */
+import {MAX_FRAKTIONS} from "@/utils/constants";
 
 const UserOwnership = ({
   fraktions,
@@ -26,7 +48,10 @@ const UserOwnership = ({
   marketId,
   factoryApproved,
 }) => {
-  const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
+  const { closeLoadingModalAfterDelay } = useLoadingScreenHandler();
+
+  const router = useRouter();
+
   async function claimNFT() {
     const actionOpts = { workflow: Workflow.CLAIM_NFT };
     // this requires the factory to be approved
@@ -39,6 +64,10 @@ const UserOwnership = ({
     } else {
       await claimERC1155(marketId, provider, factoryAddress, actionOpts);
     }
+    closeLoadingModalAfterDelay();
+    setTimeout(() => {
+      router.reload()
+    }, 2500);
   }
 
   async function defraktionalization() {
@@ -48,9 +77,14 @@ const UserOwnership = ({
     // }
     if (tx || isApproved) {
       await exportFraktal(tokenAddress, provider, marketAddress);
-      closeLoadingModalAfterDelay()
-      // defraktionalize leaves the nft in the market!!!
-      // can claim (etherscan) ANYONE!
+      if (collateral) {
+        await claimNFT();
+      } else {
+        closeLoadingModalAfterDelay();
+        setTimeout(() => {
+          router.reload()
+        }, 2500);
+      }
     }
   }
 
@@ -64,7 +98,6 @@ const UserOwnership = ({
     while (isUsed == true) {
       index += 1;
       isUsed = await getIndexUsed(index, provider, tokenAddress);
-      // console.log('testint index = ',index,' and is Used: ',isUsed)
     }
     if (isUsed == false) {
       await importFraktal(
@@ -75,7 +108,10 @@ const UserOwnership = ({
         actionOpts
       );
     }
-    closeLoadingModalAfterDelay()
+    closeLoadingModalAfterDelay();
+    setTimeout(() => {
+      router.reload()
+    }, 2500);
   }
 
   useEffect(() => {
@@ -164,10 +200,12 @@ const UserOwnership = ({
             </VStack>
           </HStack>
 
-          {fraktions == 10000 ? (
-            <FrakButton onClick={() => defraktionalization()}>
-              DeFrak
-            </FrakButton>
+          {fraktions == MAX_FRAKTIONS ? (
+            <HStack>
+              <FrakButton onClick={() => defraktionalization()}>
+                DeFrak
+              </FrakButton>
+            </HStack>
           ) : (
             <div
               style={{
@@ -185,27 +223,18 @@ const UserOwnership = ({
           )}
         </div>
       ) : (
-        <div>
-          You own this NFT
-          {collateral && collateral.id && (
-            <FrakButton onClick={() => claimNFT()}>Claim NFT</FrakButton>
-          )}
-          <br />
-          <FrakButton onClick={() => importFraktalToMarket()}>
-            FRAK IT
-          </FrakButton>
-        </div>
+        <VStack>
+          <Text>You own this NFT</Text>
+            <HStack>
+            {collateral && collateral.id && (
+              <FrakButton onClick={() => claimNFT()}>Claim NFT</FrakButton>
+            )}
+            <FrakButton onClick={() => importFraktalToMarket()}>
+              FRAK IT
+            </FrakButton>
+          </HStack>
+        </VStack>
       )}
-      <div>
-        You own this NFT
-        {collateral && collateral.id && (
-            <FrakButton onClick={() => claimNFT()}>Claim NFT</FrakButton>
-        )}
-        <br />
-        <FrakButton onClick={() => importFraktalToMarket()}>
-          FRAK IT
-        </FrakButton>
-      </div>
     </div>
   );
 };

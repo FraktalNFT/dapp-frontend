@@ -1,4 +1,6 @@
-import WalletConnectProvider from "@walletconnect/web3-provider";
+/**
+ * React
+ */
 import {
   createContext,
   useCallback,
@@ -6,12 +8,27 @@ import {
   useEffect,
   useState,
 } from "react";
+
+import WalletConnectProvider from "@walletconnect/web3-provider";
 import { ethers } from "ethers";
 import { provider } from "web3-core";
 import Web3Modal, { IProviderOptions } from "web3modal";
-import { getRPCUrl } from "../utils/helpers";
 import Web3 from "web3";
-import { marketContracts, factoryContracts, airdropContract, lpStakingContracts, tradingRewardsContracts, feeSharingContracts, fraktalTokenContracts, lpTokenContracts } from '../utils/constants';
+/**
+ * Utils
+ */
+import {
+  marketContracts,
+  factoryContracts,
+  airdropContract,
+  lpStakingContracts,
+  tradingRewardsContracts,
+  feeSharingContracts,
+  fraktalTokenContracts,
+  lpTokenContracts
+} from '@/utils/constants';
+
+import { getRPCUrl } from "@/utils/helpers";
 
 type Web3ContextType = {
   account: null | string;

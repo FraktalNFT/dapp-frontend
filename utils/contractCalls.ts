@@ -198,12 +198,11 @@ export async function getFraktionsIndex(provider, tokenContract) {
     return 'not Fraktal';
   }
 }
-export async function getBalanceFraktions(account, provider, tokenContract) {
-  const customContract = new Contract(tokenContract, tokenAbi, provider);
-  let index = await customContract.getFraktionsIndex();
-  let balanceOfId: BigNumber = await customContract.balanceOf(account, index);
-  balanceOfId = balanceOfId.div(utils.parseEther('1'));
-  return balanceOfId.toNumber();
+export async function getBalanceFraktions(account, provider, tokenContract, index) {
+   const customContract = new Contract(tokenContract, tokenAbi, provider);
+   let balanceOfId: BigNumber = await customContract.balanceOf(account, index);
+   balanceOfId = balanceOfId.div(utils.parseEther('1'));
+   return balanceOfId.toNumber();
 }
 export async function isFraktalOwner(account, provider, tokenContract) {
   const customContract = new Contract(tokenContract, tokenAbi, provider);
@@ -882,12 +881,32 @@ export async function claimAirdrop(
   airdropAddress,
   opts?: ActionOpts
 ) {
+  console.log({amount,merkleProof,listedTokenAddress,provider,airdropAddress});
+  
   const signer = await loadSigner(provider);
+  console.log({provider,airdropAddress, airdropABI, signer});
   const customContract = new Contract(airdropAddress, airdropABI, signer);
   let tx = await customContract.claim(amount,merkleProof,listedTokenAddress);
   let receipt = await processTx(tx);
   return receipt;
 }
+
+export async function claimAirdrop3160(
+  amount,
+  merkleProof,
+  listedTokenAddress,
+  provider,
+  airdropAddress,
+  opts?: ActionOpts
+) {
+  
+  const signer = await loadSigner(provider);
+  const customContract = new Contract("0x273437BaD2C50c0582FD97b7bd68dbF06F747334", airdropABI, signer);
+  let tx = await customContract.claim(amount,merkleProof,listedTokenAddress);
+  let receipt = await processTx(tx);
+  return receipt;
+}
+
 export async function canClaimAirdrop(
   userAddress,
   amount,
@@ -1131,4 +1150,30 @@ export async function erc20Approve(
   let tx = await customContract.approve(spenderAddress, LARGEST_UINT256);
   let receipt = await processTx(tx);
   return receipt;
+}
+
+
+
+const lpABI = [
+  'function getReserves() external view returns (uint112,uint112,uint32)'
+]
+
+export async function getAPY(
+  provider,
+  opts?: ActionOpts
+) {
+  console.log("calling");
+  
+  const signer = await loadSigner(provider);
+  const customContract = new Contract("0x2763f944fc85CAEECD559F0f0a4667A68256144d", lpABI, signer);
+  let tx = await customContract.getReserves();
+
+  const frak:string = utils.formatEther(tx[0]);
+
+  const blocksPerYear = 31622400/15;
+  const frakPerYear = blocksPerYear*50;
+  const apy  = Math.round(frakPerYear/(Number(frak)*2) *100);
+  
+
+  return apy;
 }

@@ -9,7 +9,7 @@ import styles from "../styles/artists.module.css";
 import { Image } from "@chakra-ui/image";
 import { shortenHash } from "../utils/helpers";
 import { getSubgraphData } from "../utils/graphQueries";
-import { createObject2 } from "../utils/nftHelpers";
+import {createObject } from "../utils/nftHelpers";
 import { useWeb3Context } from "../contexts/Web3Context";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ArtistCard from "@/components/artistCard/ArtistCard";
@@ -27,6 +27,7 @@ export default function ArtistsView() {
   const { marketAddress, factoryAddress, loading } = useWeb3Context();
   const [artistAddress, setArtistAddress] = useState("");
   const [inputAddress, setInputAddress] = useState("");
+  const [isENSAddressValid, ethAddressFromENS] = useENSAddress(inputAddress)
 
   const handleSortSelect = (item: string) => {
     setSortType(item);
@@ -61,7 +62,7 @@ export default function ArtistsView() {
       }); // list the first NFT in the list of 'nfts this artist made'
       let fraktalsSamplesObjects = await Promise.all(
         fraktalSamples.map(x => {
-          return createObject2(x);
+          return createObject(x);
         })
       );
       let artistObjects = getArtistsObjects(
@@ -95,7 +96,6 @@ export default function ArtistsView() {
       setArtistAddress(address_Artist);
     }
   }
-  const [isENSAddressValid, ethAddressFromENS] = useENSAddress(inputAddress)
 
   useEffect(() => {
     const fetchInitialArtists = async () => {
@@ -113,7 +113,7 @@ export default function ArtistsView() {
         }); // list the first NFT in the list of 'nfts this artist made'
         let fraktalsSamplesObjects = await Promise.all(
           fraktalSamples.map(x => {
-            return createObject2(x);
+            return createObject(x);
           })
         );
         let artistsObj = getArtistsObjects(noImporters, fraktalsSamplesObjects);

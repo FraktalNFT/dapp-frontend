@@ -1,7 +1,6 @@
 import { utils } from 'ethers';
 import {getSubgraphAuction, getSubgraphData} from './graphQueries';
-
-const { create, CID } = require('ipfs-http-client');
+import {getNftMetadata} from "@/utils/alchemy";
 
 let infuraAuth;
 if (process.env.NEXT_PUBLIC_INFURA_PROJECT_ID !== undefined && process.env.NEXT_PUBLIC_INFURA_PROJECT_SECRET !== undefined) {
@@ -18,63 +17,6 @@ const infuraConfig = {
   protocol: 'https',
   ...infuraAuth
 };
-const ipfsClient = create(infuraConfig);
-
-// Convert Binary Into JSON
-const binArrayToJson = function (binArray) {
-  var str = '';
-  for (var i = 0; i < binArray.length; i++) {
-    str += String.fromCharCode(parseInt(binArray[i]));
-  }
-  return JSON.parse(str);
-};
-
-function checkImageCID(cid) {
-  // this does not handle others than IPFS... correct THAT!
-  let correctedCid;
-  if (cid.startsWith('https://ipfs.io/')) {
-    let splitted = cid.split('https://ipfs.io/ipfs/');
-    correctedCid = splitted[1];
-    let cidv1 = toBase32(correctedCid);
-    return `https://${cidv1}.ipfs.dweb.link`;
-  } else if (cid.startsWith('ipfs://')) {
-    let splitted = cid.split('ipfs://');
-    correctedCid = splitted[1];
-    let cidv1 = toBase32(correctedCid);
-    return `https://${cidv1}.ipfs.dweb.link`;
-  } else if (cid.startsWith('Qm')) {
-    correctedCid = cid;
-    let cidv1 = toBase32(correctedCid);
-    return `https://${cidv1}.ipfs.dweb.link`;
-  } else {
-    return cid;
-  }
-}
-
-function toBase32(value) {
-  // to transform V0 to V1 and use as `https://${cidV1}.ipfs.dweb.link`
-  var cid = new CID(value);
-  return cid.toV1().toBaseEncodedString('base32');
-}
-
-async function fetchNftMetadata(hash) {
-  if (hash.startsWith('ipfs://Qm')) {
-    hash = hash.slice(7)
-  }
-  if (hash.startsWith('Qm')) {
-    let chunks;
-    for await (const chunk of ipfsClient.cat(hash)) {
-      chunks = binArrayToJson(chunk);
-    }
-    return chunks;
-  } else {
-    let res = await fetch(hash);
-    if (res) {
-      let result = res.json();
-      return result;
-    }
-  }
-}
 
 async function getFraktalData(address) {
   let data = await getSubgraphData('fraktal', address);
@@ -113,81 +55,54 @@ export async function createOpenSeaObject(data) {
     }
     return response;
   } catch (e) {
-    console.log('error in createOpenSeaObject', e);
     return null;
   }
 }
 
 export async function createObject(data) {
-  // handle token_schema
-
-  // ERC721 + ipfs(?)
-  // let hashHacked = data.hash.substring(0, data.hash.length - 1)
-  // this should be handled as isERC721? then split tokenId from the end of hash...continue
-  // OR..
-  // read the contract and get the URI, we have the token address and token index
-
-  // and possibly tokenId
-
-  try {
-    let nftMetadata = await fetchNftMetadata(data.nft.hash);
-    if (nftMetadata) {
-      return {
-        id: data.nft.id,
-        creator: data.nft.creator.id,
-        marketId: data.nft.marketId,
-        // balances: data.nft.fraktions,
-        userBalance: data.amount,
-        // price:,
-        createdAt: data.nft.createdAt,
-        status: data.nft.status,
-        name: nftMetadata.name,
-        value: nftMetadata.name,
-        description: nftMetadata.description,
-        imageURL: checkImageCID(nftMetadata.image),
-      };
-    }
-  } catch {
-    //TODO - REMOVE THE CONSOLE.log
-    console.log('Error fetching ', data);
-    return null;
+  if (data.hasOwnProperty('nft') && data.creator === undefined || data.marketId === undefined) {
+    data = data.nft;
   }
-}
-
-export async function createObject2(data) {
+  const tokenId = (data.collateral !== null && data.collateral !== undefined)  ? data.collateral.tokenId : "1";
   try {
-    let nftMetadata = await fetchNftMetadata(data.hash);
+    const nftMetadata = await getNftMetadata(data.id, tokenId);
     let object = {
       id: data.id,
       creator: data.creator.id,
       marketId: data.marketId,
-      balances: data.fraktions,
       createdAt: data.createdAt,
       status: data.status,
     };
+
+    if (data.fraktions) {
+      object.balances = data.fraktions;
+    }
+    if (data.amount) {
+      object.userBalance = data.amount
+    }
     if (data.collateral) {
       object.collateral = data.collateral;
     }
-    if (nftMetadata && nftMetadata.name) {
-      object.name = nftMetadata.name;
+    if (nftMetadata.metadata.name) {
+      object.name = nftMetadata.metadata.name;
     }
-    if (nftMetadata && nftMetadata.description) {
-      object.description = nftMetadata.description;
+    if (nftMetadata.metadata.description) {
+      object.description = nftMetadata.metadata.description;
     }
-    if (nftMetadata && nftMetadata.image) {
-      object.imageURL = checkImageCID(nftMetadata.image);
+    if (nftMetadata.media[0]) {
+      object.imageURL = nftMetadata.media[0].gateway;
     }
     return object;
   } catch {
-    //TODO - REMOVE THE CONSOLE.log
-    console.log('Error fetching 2 ', data.hash);
+    console.log('Error fetching 2 ', data);
     return null;
   }
 }
 
 export async function createListed(data) {
   try {
-    let nftMetadata = await fetchNftMetadata(data.fraktal.hash);
+    const tokenId = (data.fraktal.collateral !== null && data.fraktal.collateral !== undefined) ? data.fraktal.collateral.tokenId : "1";
+    const nftMetadata = await getNftMetadata(data.fraktal.id, tokenId);
     if (nftMetadata) {
       return {
         link: `/nft/${data.fraktal.id}/details`,
@@ -201,24 +116,25 @@ export async function createListed(data) {
         price: utils.formatEther(data.price),
         amount: data.amount,
         seller: data.seller.id,
-        name: nftMetadata.name,
-        value: nftMetadata.name,
-        description: nftMetadata.description,
-        imageURL: checkImageCID(nftMetadata.image),
+        name: nftMetadata.metadata.name,
+        value: nftMetadata.metadata.name,
+        description: nftMetadata.metadata.description,
+        imageURL: nftMetadata.media[0].gateway
       };
     }
   } catch (err) {
+    console.log('err', err)
     return { error: `Error: ${err}` };
   }
 }
 
 export async function createListedAuction(data) {
+  const tokenId = (data.collateral !== null && data.collateral !== undefined) ? data.collateral.tokenId : "1";
   try {
-    let nftMetadata = await fetchNftMetadata(data.hash);
+    const nftMetadata = await getNftMetadata(data.tokenAddress, tokenId);
     if (nftMetadata) {
       const seller = typeof data.seller === "object" ? data.seller.id : data.seller;
       return {
-        value: nftMetadata.name,
         link: `/nft/${seller}-${data.sellerNonce}/auction`,
         amountOfShare: data.amountOfShare,
         endTime: data.endTime,
@@ -228,15 +144,17 @@ export async function createListedAuction(data) {
         seller: seller,
         sellerNonce: data.sellerNonce,
         tokenAddress: data.tokenAddress,
-        name: nftMetadata.name,
-        description: nftMetadata.description,
-        imageURL: checkImageCID(nftMetadata.image),
+        name: nftMetadata.metadata.name,
+        value: nftMetadata.metadata.name,
+        description: nftMetadata.metadata.description,
+        imageURL: nftMetadata.media[0].gateway
       };
     }
   } catch (err) {
     return { error: `Error: ${err}` };
   }
 }
+
 
 /**
  * Map Fixed Price
@@ -283,7 +201,9 @@ async function mapAuctionToFraktal(auctionData) {
         let hash = auctionDataHash.filter(e=>e.id == `${auction.tokenAddress}-${auction.sellerNonce}`);
         Object.assign(auction, {"hash":hash[0].hash});
         const item = await createListedAuction(auction);
-        auctionItems.push(item);
+        if (!item.error) {
+          auctionItems.push(item);
+        }
       }
   ).filter(notUndefined => notUndefined !== undefined));
   return auctionItems;

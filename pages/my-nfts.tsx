@@ -52,14 +52,15 @@ import { EXPLORE } from '@/constants/routes';
 export default function MyNFTsView() {
   const router = useRouter();
   const toast = useToast();
-  const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
-  const { fraktals, fraktions, nfts, balance, loading } = useUserContext();
   const [auctions, setAuctions] = useState(null);
   const [participatedAuctions, setParticipatedAuctions] = useState(null);
   const [userAccount, setUserAccount] = useState(null);
   const [refresh, setRefresh] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
   const { isMinting, setIsMinting } = useMintingContext();
   const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
+  const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
+  const { fraktals, fraktions, nfts, balance, loading } = useUserContext();
 
   const refreshPage = () => {
     setRefresh(!refresh);
@@ -103,7 +104,7 @@ export default function MyNFTsView() {
           isClosable: true,
         });
         refreshPage();
-        closeLoadingModalAfterDelay()
+        closeLoadingModalAfterDelay();
       })
       .catch((e) => {
         toast({
@@ -160,6 +161,7 @@ export default function MyNFTsView() {
   };
 
   const sellerClaimEth = async (tokenAddress, seller, sellerNonce) => {
+    setIsClaiming(true);
     redeemAuctionSeller(
       tokenAddress,
       seller,
@@ -184,8 +186,9 @@ export default function MyNFTsView() {
           duration: 2000,
           isClosable: true,
         });
-        console.log(e);
-      });
+      }).finally(() => {
+      setIsClaiming(false);
+    });
   };
 
   useEffect(() => {
@@ -237,7 +240,9 @@ export default function MyNFTsView() {
           if (hash[0] != undefined) {
             Object.assign(auction, { hash: hash[0].hash });
             const item = await createListedAuction(auction);
-            auctionItems.push(item);
+            if (!item.error) {
+              auctionItems.push(item);
+            }
           }
         })
       );
@@ -314,7 +319,6 @@ export default function MyNFTsView() {
       );
 
       auctionItems = auctionItems.sort((a, b) => b.endTime - a.endTime);
-
       await Promise.all(
         auctionItems.map(async (i) => {
           try {
@@ -640,6 +644,7 @@ export default function MyNFTsView() {
                   href={`/nft/${item.seller}-${item.sellerNonce}/auction`}
                 >
                   <NFTAuctionItem
+                    isClaiming={isClaiming}
                     item={item}
                     name={item.name}
                     amount={utils.formatEther(item?.amountOfShare)}
@@ -674,7 +679,7 @@ export default function MyNFTsView() {
           gains={Math.round(balance * 1000) / 1000}
         />
       </Box>
-      <Flex w="100%" paddingTop="64px">
+    {/* <Flex w="100%" paddingTop="64px">
         <div className={styles.header}>Your Wallet NFTs</div>
         <Spacer />
       </Flex>
@@ -723,7 +728,7 @@ export default function MyNFTsView() {
         <Center height="104px" width="100%" borderRadius="24" bgColor="#F9F9F9">
           <Spinner size="xl" />
         </Center>
-      )}
+      )} */}
     </VStack>
   );
 }

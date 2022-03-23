@@ -1,5 +1,7 @@
 import { BigNumber } from "ethers";
 
+export const MAX_FRAKTIONS = 10000;
+
 export const LARGEST_UINT256 = BigNumber.from(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 );
@@ -89,7 +91,8 @@ export const chainUrls = {
     explorer: "https://etherscan.io/",
     chainId: 1,
     name: networkNames[1],
-    openSeaApi: 'https://api.opensea.io/api/v1/'
+    openSeaApi: 'https://api.opensea.io/api/v1/',
+    alchemyApi: 'https://eth-mainnet.alchemyapi.io/v2/'
   },
   3: {
     rpc: "https://ropsten.infura.io/v3/" + process.env.NEXT_PUBLIC_INFURA_ID,
@@ -102,7 +105,8 @@ export const chainUrls = {
     explorer: "https://rinkeby.etherscan.io/",
     chainId: 4,
     name: networkNames[4],
-    openSeaApi: 'https://rinkeby-api.opensea.io/api/v1/'
+    openSeaApi: 'https://rinkeby-api.opensea.io/api/v1/',
+    alchemyApi: 'https://eth-rinkeby.alchemyapi.io/v2/'
   },
   5: {
     rpc: "https://kovan.infura.io/v3/" + process.env.NEXT_PUBLIC_INFURA_ID,

@@ -29,32 +29,34 @@ import NextLink from 'next/link';
 /***
  * Component
  */
-import { FrakCard } from '../../types';
-import { motion, isValidMotionProp, HTMLMotionProps } from 'framer-motion';
-import FrakButton from '../../components/button';
+import FrakButton from '@/components/button';
+/**
+ * Context
+ */
 import { useUserContext } from '@/contexts/userContext';
+import { useWeb3Context } from '@/contexts/Web3Context';
 import { BigNumber, utils } from 'ethers';
-import { useWeb3Context } from '../../contexts/Web3Context';
-import {getListingAmount, unlistItem, claimERC721, claimERC1155, approveMarket} from '../../utils/contractCalls';
+/**
+ * Contracts
+ */
+import {getListingAmount, unlistItem, claimERC721, claimERC1155, approveMarket} from '@/utils/contractCalls';
 import toast from 'react-hot-toast';
-import { roundUp } from '../../utils/math';
-import {Workflow} from "../../types/workflow";
-import { connect } from 'react-redux';
+import { roundUp } from '@/utils/math';
+import {Workflow} from "@/types/workflow";
 import { useLoadingScreenHandler } from 'hooks/useLoadingScreen';
-import store from "../../redux/store";
+import store from "@/redux/store";
 import {MY_NFTS} from "@/constants/routes";
+import NFTMedia from "@/components/media";
 
-interface NFTItemProps extends StackProps {
-  item: FrakCard;
-  name: string;
-  amount: string;
-  price: number;
-  imageURL: string;
-  CTAText?: string;
-  wait?: number;
-  height?: string;
-}
+/**
+ * Types
+ */
 
+import { FrakCard } from '../../types';
+
+/**
+ * NFTItem
+ */
 const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
   (
     {
@@ -74,12 +76,15 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const [isVisible, setIsVisible] = useState(false);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const [isListed, setIsListed] = useState(false);
+    const [isUnlisting, setIsUnlisting] = useState(false);
+    const [isClaiming, setIsClaiming] = useState(false);
     const { fraktions, fraktals } = useUserContext();
     const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
     const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
     const canFrak =
       item && !!(fraktals || []).find((fraktion) => fraktion.id === item.id);
+
     const canList =
       item && !!(fraktions || []).find((fraktion) => fraktion.id === item.id);
 
@@ -103,10 +108,13 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
 
     const unList = async () => {
       toast('Unlisting...');
+      setIsUnlisting(true);
       await unlistItem(item.id, provider, marketAddress).then(() => {
         closeLoadingModalAfterDelay()
         toast.success('Fraktion Unlisted');
         setIsListed(!isListed);
+      }).finally(() => {
+        setIsUnlisting(false);
       });
     };
 
@@ -121,11 +129,6 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     } else {
       showAmount = '';
     }
-    const onImageLoad = (ms: number) => {
-      setTimeout(() => {
-        setIsImageLoaded(true);
-      }, ms);
-    };
 
     setTimeout(() => {
       setIsVisible(true);
@@ -140,24 +143,38 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     };
 
     const withdrawNFT = async (item, event) => {
-        const actionOpts = { workflow: Workflow.CLAIM_NFT };
         event.stopPropagation();
-        await approveMarket(factoryAddress, provider, item.id, actionOpts);
-        if (item.collateral.type == 'ERC721') {
-          await claimERC721(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
-            closeLoadingModalAfterDelay();
-            setTimeout(() => {
-              router.reload()
-            }, 2500);
-          });
-        } else {
-          await claimERC1155(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
-            closeLoadingModalAfterDelay();
-            setTimeout(() => {
-              router.reload()
-            }, 2500);
-          });
+        setIsClaiming(true);
+        const actionOpts = { workflow: Workflow.CLAIM_NFT };
+        try {
+          const receipt = await approveMarket(factoryAddress, provider, item.id, actionOpts);
+          if (!receipt?.error) {
+            if (item.collateral.type == 'ERC721') {
+              await claimERC721(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
+                closeLoadingModalAfterDelay();
+                setTimeout(() => {
+                  router.reload()
+                }, 2500);
+              }).finally(() => {
+                setIsClaiming(false);
+              });
+            } else {
+              await claimERC1155(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
+                closeLoadingModalAfterDelay();
+                setTimeout(() => {
+                  router.reload()
+                }, 2500);
+              }).finally(() => {
+                setIsClaiming(false);
+              });
+            }
+          }
+        } catch (e) {
+          console.log(e)
+          setIsClaiming(false);
         }
+
+
     };
 
     return (
@@ -185,20 +202,11 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                     : inVisibleStyle /* toggle visibility */
                 }
               >
-                <Image
-                  src={'https://image.fraktal.io/?height=350&image=' + imageURL}
-                  width="100%"
-                  height="100%"
-                  objectFit="cover"
-                  margin-left="auto"
-                  margin-right="auto"
-                  display="flex"
-                  sx={{
-                    objectFit: `cover`,
-                  }}
-                  style={{ verticalAlign: 'middle' }}
-                  onLoad={() => onImageLoad(5)}
-                />
+                {imageURL && <NFTMedia
+                    type={'fit'}
+                    imageURL={imageURL}
+                    setIsImageLoaded={setIsImageLoaded}/>
+                }
               </Box>
               {!isImageLoaded && (
                 <Box
@@ -256,19 +264,25 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 )}
               </Flex>
 
-              {canFrak && item.collateral && (
+              {canFrak && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={`nft/${item.id}/details?frak=1`}>
                     <FrakButton size="sm">Frak it</FrakButton>
                   </NextLink>
-                  <FrakButton marginLeft="10px" size="sm" onClick={(e) => withdrawNFT(item, e)} >Withdraw NFT</FrakButton>
+                  {item.collateral && (
+                      <FrakButton marginLeft="10px"
+                                  size="sm"
+                                  disabled={isClaiming}
+                        onClick={(e) => withdrawNFT(item, e)}
+                      >Withdraw NFT</FrakButton>
+                  )}
                 </Box>
               )}
 
               {canList && isListed && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={'my-nfts'} scroll={false}>
-                    <FrakButton size="sm" onClick={unList}>
+                    <FrakButton disabled={isUnlisting} size="sm" onClick={unList}>
                       Unlist Fraktions
                     </FrakButton>
                   </NextLink>
@@ -289,4 +303,15 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
   }
 );
 
-export default NFTItem
+interface NFTItemProps extends StackProps {
+  item: FrakCard;
+  name: string;
+  amount: string;
+  price: number;
+  imageURL: string;
+  CTAText?: string;
+  wait?: number;
+  height?: string;
+}
+
+export default NFTItem;

@@ -44,7 +44,8 @@ import {
     lpStakingHarvest,lpStakingWithdraw,lpStakingDeposit,lpStakingCalculateRewards, lpStakingUserInfo,
     tradingRewardsCanClaim, tradingRewardsClaim,
     feeSharingDeposit, feeSharingHarvest,feeSharingWithdraw, feeSharingCalculatePendingRewards,feeSharingUserInfo,
-    erc20BalanceOf, erc20Allowance, erc20Approve
+    erc20BalanceOf, erc20Allowance, erc20Approve,
+    getAPY
 } from '@/utils/contractCalls'
 import { useWeb3Context } from '../contexts/Web3Context';
 import {utils} from 'ethers';
@@ -68,10 +69,11 @@ const RewardsPage = () => {
     const [stakedLP, setStakedLP] = useState("0");
     const [unclaimedLPStaking,setUnclaimedLP] = useState("0");
     const [refresh,setRefresh] = useState(false);
+    const [lpAPY, setLpAPY] = useState("");
 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate()+1);
-    tomorrow.setHours(24, 0, 0, 0);
+    tomorrow.setHours(10, 0, 0, 0);
 
     useEffect(() => {
         async function getData(){
@@ -90,7 +92,9 @@ const RewardsPage = () => {
                 const _lpStakingUserInfo = await lpStakingUserInfo(account,provider,lpStakingAddress);
                 const _stakedLp = utils.formatEther(_lpStakingUserInfo[0]);
                 const _lpPendingRewards = utils.formatEther(await lpStakingCalculateRewards(account,provider,lpStakingAddress));
+                const _lpAPY = String(await getAPY(provider));
 
+                setLpAPY(_lpAPY);
                 setFrakBalance(utils.formatEther(balance));
                 setStakedFrak(_stakedFrak)
                 setUnclaimedFrakStaking(_unclaimedFrakStaking);
@@ -136,6 +140,7 @@ const RewardsPage = () => {
                     provider={provider}
                     account={account}
                     lpStakingAddress={lpStakingAddress} lpTokenAddress={lpTokenAddress}
+                    apy={lpAPY}
                     />
                 </Stack>
             </Box>
@@ -184,7 +189,7 @@ const StakePanels = ({totalStaked, currency, provider, account,
     };
 
     const onSetAmountToStake = (d) => {
-        if (d > 0 && parseInt(d)) {
+        if (d > 0 && parseFloat(d)) {
             setStakeAmount(d);
             return setStakeIsReady(true);
         }
@@ -204,7 +209,7 @@ const StakePanels = ({totalStaked, currency, provider, account,
     };
 
     const onSetAmountToUnstake = (d) => {
-        if (d > 0 && parseInt(d) && d <= totalStaked) {
+        if (d > 0 && parseFloat(d) && d <= totalStaked) {
             console.log(d);
 
             setUnstakeAmount(d);
@@ -261,7 +266,7 @@ const Staking = ({totalStaked, unclaimedRewards, provider, feeSharingAddress, ac
                     <Staked
                         currency={currency}
                         token={totalStaked}
-                        apy={"500"}/>
+                        apy={"-"}/>
                 </VStack>
                 <VStack spacing={5}>
                     <ClaimRewards currency="ETH" unclaimedRewards={unclaimedRewards}
@@ -330,8 +335,9 @@ const Trading = ({unclaimedRewards, nextDistribution, account ,provider, trading
  * @returns {any}
  * @constructor
  */
-const LiquidityPool = ({totalStaked, unclaimedRewards,account, provider, lpStakingAddress, lpTokenAddress}) => {
+const LiquidityPool = ({totalStaked, unclaimedRewards, account, provider, lpStakingAddress, lpTokenAddress, apy}) => {
     const currency = 'LPT';
+    
 
     return (
         <TabsCard
@@ -348,7 +354,7 @@ const LiquidityPool = ({totalStaked, unclaimedRewards,account, provider, lpStaki
                   <Staked
                       currency="LP Tokens"
                       token={totalStaked}
-                      apy={56.21}/>
+                      apy={apy} />
                 </VStack>
                 <VStack spacing={5}>
                     <ClaimRewards currency={'FRAK'} unclaimedRewards={unclaimedRewards}
@@ -371,7 +377,7 @@ const Staked = ({apy, token, currency}) => {
             <Box>
                 <Text className={styles.stakedQuantity}>{token} {currency}</Text>
             </Box>
-            <Box>
+           <Box>
                 <Text className={styles.apr}>{apy}% APY</Text>
             </Box>
         </>

@@ -19,7 +19,9 @@
       "@/contexts/*": ["contexts/*"],
       "@/constants/*": ["constants/*"],
       "@/styles/*": ["styles/*"],
-      "@/utils/*": ["utils/*"]
+      "@/utils/*": ["utils/*"],
+      "@/redux/*": ["redux/*"],
+      "@/types/*": ["types/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
