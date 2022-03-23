@@ -25,7 +25,7 @@ import FrakButton4 from '@/components/button4';
 import ListCardAuction from '@/components/listCardAuction';
 import NFTImportCardOS from '@/components/nft-importcard-opensea';
 import NFTCard from '@/components/nftCard';
-import ListCard from '../components/listCard';
+import ListCard from '@/components/listCard';
 /**
  * Redux
  */
@@ -404,7 +404,7 @@ function ImportNFTPage() {
 
       if (userFraktalObjects) {
         fraktalsClean = userFraktalObjects.filter(x => {
-          return x != null && x.imageURL.length && x.status != "retrieved";
+          return x != null && x.imageURL && x.status != "retrieved";
         });
       }
 
@@ -460,7 +460,7 @@ function ImportNFTPage() {
     //console.log('nftObjects', nftObjects)
       if (nftObjects) {
         nftObjectsClean = nftObjects.filter(x => {
-          return x != null && x.imageURL.length;
+          return x != null && x.imageURL;
         });
       } else {
         nftObjectsClean = nftObjects;

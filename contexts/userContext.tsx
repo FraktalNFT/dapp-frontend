@@ -28,30 +28,9 @@ type UserContextType = {
   nfts: null | any[];
   balance: number;
 };
-
-// const UserContext = createContext<
-//   UserContextType & { loading: boolean; fetchNFTs: () => void }
-// >({
-//   fraktals: null,
-//   fraktions: null,
-//   nfts: null,
-//   balance: 0,
-//   loading: false,
-//   fetchNFTs: () => {},
-// });
-
 export const UserContext = createContext(null);
 
 export const UserContextProviderFC = ({ children }) => {
-  // const [
-  //   { fraktals, fraktions, nfts, balance },
-  //   setUserState,
-  // ] = useState<UserContextType>({
-  //   fraktals: null,
-  //   fraktions: null,
-  //   nfts: null,
-  //   balance: 0,
-  // });
   const [fraktals, setFraktals] = useState(null);
   const [fraktions, setFraktions] = useState(null);
   const [nfts, setNFTs] = useState(null);
