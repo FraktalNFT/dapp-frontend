@@ -8,7 +8,7 @@ import FrakButton from "../../components/button";
 import NextLink from "next/link";
 import { shortenHash, getParams } from "../../utils/helpers";
 import { getSubgraphData } from "../../utils/graphQueries";
-import { createObject2 } from "../../utils/nftHelpers";
+import {createObject } from "../../utils/nftHelpers";
 import toast from "react-hot-toast";
 import { useRouter } from "next/router";
 import { Image } from "@chakra-ui/image";
@@ -49,7 +49,7 @@ export default function ArtistView() {
           let objects = await getSubgraphData("creator", address);
           await Promise.all(
             objects.fraktalNfts.map(x => {
-              return createObject2(x);
+              return createObject(x);
             })
           ).then(results => setNftItems(results));
           toast.success("Data fetched");

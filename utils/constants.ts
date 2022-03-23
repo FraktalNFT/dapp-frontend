@@ -91,7 +91,8 @@ export const chainUrls = {
     explorer: "https://etherscan.io/",
     chainId: 1,
     name: networkNames[1],
-    openSeaApi: 'https://api.opensea.io/api/v1/'
+    openSeaApi: 'https://api.opensea.io/api/v1/',
+    alchemyApi: 'https://eth-mainnet.alchemyapi.io/v2/'
   },
   3: {
     rpc: "https://ropsten.infura.io/v3/" + process.env.NEXT_PUBLIC_INFURA_ID,
@@ -104,7 +105,8 @@ export const chainUrls = {
     explorer: "https://rinkeby.etherscan.io/",
     chainId: 4,
     name: networkNames[4],
-    openSeaApi: 'https://rinkeby-api.opensea.io/api/v1/'
+    openSeaApi: 'https://rinkeby-api.opensea.io/api/v1/',
+    alchemyApi: 'https://eth-rinkeby.alchemyapi.io/v2/'
   },
   5: {
     rpc: "https://kovan.infura.io/v3/" + process.env.NEXT_PUBLIC_INFURA_ID,

@@ -13,12 +13,13 @@ import {
  */
 import { useWeb3Context } from "./Web3Context";
 import { assetsInWallet } from "@/utils/openSeaAPI";
+import { getSubgraphData } from "@/utils/graphQueries";
+
 /**
  * Helpers
  */
 import {
   createObject,
-  createObject2,
   createOpenSeaObject,
 } from "@/utils/nftHelpers";
 
@@ -55,7 +56,7 @@ export const UserContextProviderFC = ({ children }) => {
 
         setWalletAssets(openseaAssets.assets);
       } catch (err) {
-       // console.error(err.message);
+        console.error(err.message);
       } finally {
         setLoading(false);
       }

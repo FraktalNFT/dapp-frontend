@@ -98,6 +98,7 @@ export default function FraktionOwners(props) {
                 // let percentOwned = (parseInt(user.amount) / 10000) * 100;
                 return (
                   <Box
+                    key={index}
                     sx={{
                       display: `flex`,
                       alignItems: `center`,

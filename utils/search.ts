@@ -1,5 +1,6 @@
 import {createListed, createListedAuction, createObject} from "@/utils/nftHelpers";
 import {getSubgraphData, SEARCH_ITEMS} from "@/utils/graphQueries";
+import {ethers} from "ethers";
 
 //TODO - REFACTOR
 async function mapListed(listedItems) {
@@ -64,8 +65,13 @@ async function mapNotForSale(listedItems) {
  * @param options
  */
 async function getItems(query, options = []) {
+    const provider = await ethers.providers.getDefaultProvider();
     if (query.length < 2) {
         return [];
+    }
+    if (/\w+\.eth\b/.test(query)) {
+        const ensAddress = await provider.resolveName(query);
+        query = ensAddress;
     }
     const searchData = await getSubgraphData(SEARCH_ITEMS, "", {
         name: "'" + query + "'" + ':*',
@@ -80,6 +86,7 @@ async function getItems(query, options = []) {
     }
     if (searchData?.userSearch !== undefined && searchData?.userSearch.length > 0) {
         //TODO - Validate Creator ID
+
         const creator = query;
         listedObjects = await mapListed(searchData.userSearch[0].listedItems);
         auctionsObjects = await mapAuctions(searchData.userSearch[0].auctionItems);
@@ -89,6 +96,7 @@ async function getItems(query, options = []) {
     if (searchData?.auctionSearch !== undefined && searchData?.auctionSearch.length > 0) {
         auctionsObjects = await mapAuctions(searchData.auctionSearch);
     }
+
 
     return {
         fixedPrice: listedObjects,

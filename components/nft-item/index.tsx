@@ -146,24 +146,29 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     };
 
     const withdrawNFT = async (item, event) => {
-        const actionOpts = { workflow: Workflow.CLAIM_NFT };
         event.stopPropagation();
-        await approveMarket(factoryAddress, provider, item.id, actionOpts);
-        if (item.collateral.type == 'ERC721') {
-          await claimERC721(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
-            closeLoadingModalAfterDelay();
-            setTimeout(() => {
-              router.reload()
-            }, 2500);
-          });
-        } else {
-          await claimERC1155(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
-            closeLoadingModalAfterDelay();
-            setTimeout(() => {
-              router.reload()
-            }, 2500);
-          });
+        const actionOpts = { workflow: Workflow.CLAIM_NFT };
+        const receipt = await approveMarket(factoryAddress, provider, item.id, actionOpts);
+     //   console.log('receipt', receipt)
+        if (!receipt?.error) {
+     //     console.log('item.collateral', receipt)
+          if (item.collateral.type == 'ERC721') {
+            await claimERC721(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
+              closeLoadingModalAfterDelay();
+              setTimeout(() => {
+                router.reload()
+              }, 2500);
+            });
+          } else {
+            await claimERC1155(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
+              closeLoadingModalAfterDelay();
+              setTimeout(() => {
+                router.reload()
+              }, 2500);
+            });
+          }
         }
+
     };
 
     return (
@@ -253,12 +258,12 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 )}
               </Flex>
 
-              {canFrak(item) && item.collateral && (
+              {canFrak(item) && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={`nft/${item.id}/details?frak=1`}>
                     <FrakButton size="sm">Frak it</FrakButton>
                   </NextLink>
-                  <FrakButton marginLeft="10px" size="sm" onClick={(e) => withdrawNFT(item, e)} >Withdraw NFT</FrakButton>
+                  {item.collateral && (<FrakButton marginLeft="10px" size="sm" onClick={(e) => withdrawNFT(item, e)} >Withdraw NFT</FrakButton>)}
                 </Box>
               )}
 

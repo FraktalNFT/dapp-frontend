@@ -1,6 +1,4 @@
 import { gql, request } from "graphql-request";
-import { utils } from "ethers";
-const { CID } = require("ipfs-http-client");
 
 const APIURL =
     process.env.NEXT_PUBLIC_GRAPHQL_URL ? process.env.NEXT_PUBLIC_GRAPHQL_URL
@@ -197,6 +195,11 @@ const listedItems = gql`
         creator {
           id
         }
+        collateral {
+          id
+          type
+          tokenId
+        }
       }
     }
   }
@@ -254,6 +257,7 @@ const user_wallet_query = gql`
         collateral {
           id 
           type
+          tokenId
         }
       }
       fraktions(where: { amount_gt: 0 }) {
@@ -269,6 +273,7 @@ const user_wallet_query = gql`
           collateral {
             id
             type
+            tokenId
           }
           status
         }
@@ -295,6 +300,7 @@ const user_bought_query = gql`
       collateral {
         id
         type
+        tokenId
       }
     }
   }
@@ -320,6 +326,7 @@ const user_offers_query = gql`
           collateral {
             id
             type
+            tokenId
           }
           status
         }
@@ -350,6 +357,7 @@ const fraktalId_query = gql`
       collateral {
         id
         type
+        tokenId
       }
       offers {
         offerer {
@@ -399,6 +407,11 @@ const limitedItems = gql`
         marketId
         createdAt
         status
+        collateral {
+          id
+          type
+          tokenId
+        }
         fraktions {
           amount
         }
@@ -553,6 +566,7 @@ const searchItems = gql`
           collateral {
             id
             type
+            tokenId
           }
           status
         }
@@ -595,29 +609,6 @@ const searchItems = gql`
   }
 `;
 
-const calls = [
-  { name: "account_fraktions", call: account_fraktions_query },
-  { name: "marketid_fraktal", call: marketid_query },
-  { name: "listed_itemsId", call: listedItemsId },
-  { name: "artists", call: creators_review },
-  { name: "firstArtists", call: creators_small_review },
-  { name: "all", call: all_nfts },
-  { name: "creator", call: creator_query },
-  { name: "manage", call: fraktal_fraktions_query },
-  { name: "owned", call: owner_query },
-  { name: "wallet", call: user_wallet_query },
-  { name: "bought", call: user_bought_query },
-  { name: "offers", call: user_offers_query },
-  { name: "listed_items", call: listedItems },
-  { name: LIMITED_ITEMS, call: limitedItems },
-  { name: "listed_items_by_fraktal_id", call: listedItemsByFraktalId },
-  { name: "fraktal", call: fraktalId_query },
-  { name: "fraktions", call: fraktions_query },
-  { name: "fraktal_owners", call: fraktalOwners },
-  { name: LIMITED_AUCTIONS, call: limitedAuctions },
-  { name: SEARCH_ITEMS, call: searchItems },
-];
-
 const listedAuctions = gql`
   query {
     auctions(subgraphError: allow) {
@@ -641,6 +632,7 @@ const auctionFraktalNFT = gql`
       collateral {
         id
         type
+        tokenId
       }
     }
   }
@@ -661,8 +653,27 @@ query($id: ID!) {
 }
 }
 `;
-
-const auctionCalls = [
+const calls = [
+  { name: "account_fraktions", call: account_fraktions_query },
+  { name: "marketid_fraktal", call: marketid_query },
+  { name: "listed_itemsId", call: listedItemsId },
+  { name: "artists", call: creators_review },
+  { name: "firstArtists", call: creators_small_review },
+  { name: "all", call: all_nfts },
+  { name: "creator", call: creator_query },
+  { name: "manage", call: fraktal_fraktions_query },
+  { name: "owned", call: owner_query },
+  { name: "wallet", call: user_wallet_query },
+  { name: "bought", call: user_bought_query },
+  { name: "offers", call: user_offers_query },
+  { name: "listed_items", call: listedItems },
+  { name: LIMITED_ITEMS, call: limitedItems },
+  { name: "listed_items_by_fraktal_id", call: listedItemsByFraktalId },
+  { name: "fraktal", call: fraktalId_query },
+  { name: "fraktions", call: fraktions_query },
+  { name: "fraktal_owners", call: fraktalOwners },
+  { name: LIMITED_AUCTIONS, call: limitedAuctions },
+  { name: SEARCH_ITEMS, call: searchItems },
   { name: "auctions", call: listedAuctions },
   { name: "auctionsNFT", call:auctionFraktalNFT},
   { name: "singleAuction", call: getSingleAuction}
@@ -683,20 +694,17 @@ export const getSubgraphData = async (call, id, options = null) => {
     return err;
   }
 };
-export const getSubgraphAuction = async (call, id, options = null) => {
-  let callGql = auctionCalls.find(x => {
-    return x.name == call;
-  });
-  try {
-    const data = await request(APIURL, callGql.call, { id, ...options });
-    return data;
-  } catch (err) {
-    if (err.response.data) {
-      return err.response.data;
-    }
-    return err;
-  }
-};
+
+/**
+ * @deprecated
+ * @param call
+ * @param id
+ * @param options
+ * @returns {Promise<any|undefined>}
+ */
+export const getSubgraphAuction =  async (call, id, options = null) => {
+  return getSubgraphData(call, id, options);
+}
 
 export const getAddressAirdrop = async (id, options = null) =>{
   let callGql = gql`
