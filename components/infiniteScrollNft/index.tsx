@@ -38,6 +38,7 @@ const InfiniteScrollNft = ({getData, nftItems, setTokenToImport, hasMore, setImp
             >
                 {nftItems.map((item, index) => (
                     <NFTImportCardOS
+                        key={index}
                         item={item}
                         CTAText={'Import to market'}
                         onClick={() => {

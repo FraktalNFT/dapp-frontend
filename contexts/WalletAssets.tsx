@@ -19,7 +19,6 @@ import { getSubgraphData } from "@/utils/graphQueries";
  */
 import {
     createObject,
-    createObject2,
     createOpenSeaObject,
 } from "@/utils/nftHelpers";
 
@@ -76,7 +75,7 @@ export const WalletContextProviderFC = ({ children }) => {
                 let nftObjectsClean;
 
                 let openseaAssets = await assetsInWallet(account, {
-                    limit: 60,
+                    limit: 100,
                     offset: 0
                 });
 
@@ -111,13 +110,13 @@ export const WalletContextProviderFC = ({ children }) => {
 
                     let userFraktalObjects = await Promise.all(
                         userFraktalsFetched.map(x => {
-                            return createObject2(x);
+                            return createObject(x);
                         })
                     );
 
                     if (userFraktalObjects) {
                         fraktalsClean = userFraktalObjects.filter(x => {
-                            return x != null && x.imageURL.length;
+                            return x != null && x.imageURL;
                         });
                     }
 
@@ -168,7 +167,7 @@ export const WalletContextProviderFC = ({ children }) => {
 
                     if (nftObjects) {
                         nftObjectsClean = nftObjects.filter(x => {
-                            return x != null && x.imageURL.length;
+                            return x != null && x.imageURL;
                         });
                     } else {
                         nftObjectsClean = nftObjects;

@@ -18,6 +18,7 @@ import {createObject, createOpenSeaObject} from "@/utils/nftHelpers";
  * MyNFTWallet
  * @constructor
  */
+
 const MyNFTWallet = () => {
     const router = useRouter();
     const { account } = useWeb3Context();
