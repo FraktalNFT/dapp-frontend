@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 /**
  * Chakra
  */
-import { Image } from "@chakra-ui/image";
 import { HStack, VStack, Box, Stack, Spinner, useToast, Text} from "@chakra-ui/react";
 /**
  * Next
@@ -15,7 +14,6 @@ import { useRouter } from "next/router";
 /**
  * Components
  */
-
 import FraktionsList from "@/components/fraktionsList";
 import RevenuesList from "@/components/revenuesList";
 import UserOwnership from "@/components/userOwnership";
@@ -53,7 +51,7 @@ import {
 /**
  * Constants
  */
-import {EXPLORE} from "@/constants/routes";
+import {EXPLORE, MY_NFTS, NOT_FOUND} from "@/constants/routes";
 
 /**
  * DetailsView
@@ -86,6 +84,11 @@ export default function DetailsView() {
   const [airdropAmount, setAirdropAmount] = useState<string>("0");
   const [proof, setProof] = useState<Array<string>>(null);
 
+  const [fraktionsGot, setFraktionsGot] = useState(false);
+  const [fraktalsGot, setFraktalsGot] = useState(false);
+  const [offersGot, setOffersGot] = useState(false);
+  const [contractDataGot, setContractDataGot] = useState(false);
+  const toast = useToast();
 
   const airdropConnectToWalletId = 'connectToWallet';
   const listNFTToClaimId = 'listNFT';
@@ -143,6 +146,8 @@ export default function DetailsView() {
       if (revenuesValid) {
         setRevenues(revenuesValid);
       }
+    } else {
+      router.push(NOT_FOUND);
     }
   }
 
@@ -280,13 +285,6 @@ export default function DetailsView() {
       ),
     });
   };
-
-  const [fraktionsGot, setFraktionsGot] = useState(false);
-  const [fraktalsGot, setFraktalsGot] = useState(false);
-  const [offersGot, setOffersGot] = useState(false);
-  const [contractDataGot, setContractDataGot] = useState(false);
-  const toast = useToast();
-
   useEffect(() => {
     async function getAllData() {
       if (isPageReady) {
@@ -306,7 +304,9 @@ export default function DetailsView() {
           await getContractData();
           setContractDataGot(true);
         }
-        setIsLoading(false);
+        if (nftObject.id) {
+          setIsLoading(false);
+        }
       }
     }
     getAllData();
@@ -327,7 +327,7 @@ export default function DetailsView() {
   async function callUnlistItem() {
     let tx = await unlistItem(tokenAddress, provider, marketAddress);
     if (typeof tx !== "undefined") {
-      router.push("/my-nfts", null, {scroll: false});
+      router.push(MY_NFTS, null, {scroll: false});
     }
   }
 
