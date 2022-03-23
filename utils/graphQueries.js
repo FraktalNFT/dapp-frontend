@@ -4,7 +4,7 @@ const { CID } = require("ipfs-http-client");
 
 const APIURL =
     process.env.NEXT_PUBLIC_GRAPHQL_URL ? process.env.NEXT_PUBLIC_GRAPHQL_URL
-        : 'https://api.studio.thegraph.com/query/21128/marketplaceperformance/0.0.4';
+        : 'https://api.studio.thegraph.com/query/18518/fraktalmarket/0.27';
 
 const AIRDROPAPI = 'https://api.looksrare.org/graphql';
 
@@ -701,7 +701,7 @@ export const getSubgraphAuction = async (call, id, options = null) => {
 export const getAddressAirdrop = async (id, options = null) =>{
   let callGql = gql`
     query Airdrop($id: Address!) {
-      airdrop(address:$id, subgraphError: allow) {
+      airdrop(address:$id) {
         proof
         amount
       }

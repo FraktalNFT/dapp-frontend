@@ -41,7 +41,14 @@ function checkImageCID(cid) {
   } else if (cid.startsWith('ipfs://')) {
     let splitted = cid.split('ipfs://');
     correctedCid = splitted[1];
-    let cidv1 = toBase32(correctedCid);
+    try {
+      let cidv1 = toBase32(correctedCid);
+    } catch (e) {
+      if (!splitted[1].startsWith('ipfs/')) {
+        splitted[1] = 'ipfs/' + splitted[1];
+      }
+      return 'https://ipfs.io/' + splitted[1];
+    }
     return `https://${cidv1}.ipfs.dweb.link`;
   } else if (cid.startsWith('Qm')) {
     correctedCid = cid;
@@ -59,22 +66,29 @@ function toBase32(value) {
 }
 
 async function fetchNftMetadata(hash) {
+  if(window?.localStorage.getItem(JSON.stringify(hash))){
+    return JSON.parse(window?.localStorage.getItem(JSON.stringify(hash)));
+  }
+  console.log("Fetching new");
   if (hash.startsWith('ipfs://ipfs/Qm')) {
     hash = hash.slice(12)
-  }
-  else if (hash.startsWith('ipfs://Qm')) {
+  } else if (hash.startsWith('ipfs://Qm')) {
     hash = hash.slice(7)
+  } else if (hash.startsWith('ipfs://ba')) {
+    hash ='https://ipfs.io/ipfs/' + hash.slice(7);
   }
   if (hash.startsWith('Qm')) {
     let chunks;
     for await (const chunk of ipfsClient.cat(hash)) {
       chunks = binArrayToJson(chunk);
     }
+    window?.localStorage.setItem(JSON.stringify(hash), JSON.stringify(chunks));
     return chunks;
   } else {
     let res = await fetch(hash, {mode: 'no-cors'});
     if (res) {
       let result = res.json();
+      window?.localStorage.setItem(JSON.stringify(hash), JSON.stringify(result));
       return result;
     }
   }
@@ -117,7 +131,6 @@ export async function createOpenSeaObject(data) {
     }
     return response;
   } catch (e) {
-    console.log('error in createOpenSeaObject', e);
     return null;
   }
 }

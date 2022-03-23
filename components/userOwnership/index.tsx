@@ -75,7 +75,6 @@ const UserOwnership = ({
     // if(!isApproved){
     //   tx = await approveMarket(marketAddress, provider, tokenAddress)
     // }
-    console.log(collateral)
     if (tx || isApproved) {
       await exportFraktal(tokenAddress, provider, marketAddress);
       if (collateral) {

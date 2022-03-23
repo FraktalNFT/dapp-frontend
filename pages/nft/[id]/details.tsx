@@ -1,21 +1,45 @@
-import Link from "next/link";
-import { Text } from "@chakra-ui/react";
-import { BigNumber, utils } from "ethers";
-import FrakButton from "../../../components/button";
-import styles from "./auction.module.css";
-import { HStack, VStack, Box, Stack, Spinner, useToast } from "@chakra-ui/react";
+/**
+ * React
+ */
 import React, { useEffect, useState } from "react";
-import FraktionsList from "../../../components/fraktionsList";
-import RevenuesList from "../../../components/revenuesList";
-import UserOwnership from "../../../components/userOwnership";
-import BuyOutCard from "../../../components/buyOutCard";
-import FraktionOwners from "../../../components/fraktionOwners";
+/**
+ * Chakra
+ */
 import { Image } from "@chakra-ui/image";
-import {getExplorerUrl, shortenHash, timezone} from "../../../utils/helpers";
-import { getSubgraphData,getAddressAirdrop } from "../../../utils/graphQueries";
-import { createObject2 } from "../../../utils/nftHelpers";
-import { useWeb3Context } from "../../../contexts/Web3Context";
-import AirdropBanner from '../../../components/airdropBanner';
+import { HStack, VStack, Box, Stack, Spinner, useToast, Text} from "@chakra-ui/react";
+/**
+ * Next
+ */
+import Link from "next/link";
+import { useRouter } from "next/router";
+/**
+ * Components
+ */
+
+import FraktionsList from "@/components/fraktionsList";
+import RevenuesList from "@/components/revenuesList";
+import UserOwnership from "@/components/userOwnership";
+import BuyOutCard from "@/components/buyOutCard";
+import FraktionOwners from "@/components/fraktionOwners";
+import AirdropBanner from '@/components/airdropBanner';
+import FrakButton from "@/components/button";
+import NFTMedia from "@/components/media";
+import { BigNumber, utils } from "ethers";
+
+/**
+ * Styles
+ */
+import styles from "./auction.module.css";
+/**
+ * Utils
+ */
+import {getExplorerUrl, shortenHash, timezone} from "@/utils/helpers";
+import { getSubgraphData,getAddressAirdrop } from "@/utils/graphQueries";
+import { createObject2 } from "@/utils/nftHelpers";
+/**
+ * Contexts
+ */
+import { useWeb3Context } from "@/contexts/Web3Context";
 import {
   getBalanceFraktions,
   getMinimumOffer,
@@ -25,12 +49,19 @@ import {
   claimFraktalSold,
   isFraktalOwner,
   claimAirdrop,
-} from "../../../utils/contractCalls";
-import { useRouter } from "next/router";
+} from "@/utils/contractCalls";
+/**
+ * Constants
+ */
 import {EXPLORE} from "@/constants/routes";
+
+/**
+ * DetailsView
+ * @constructor
+ */
 export default function DetailsView() {
   const router = useRouter();
-  const { account, provider, marketAddress, factoryAddress,airdropAddress } = useWeb3Context();
+  const { account, provider, marketAddress, factoryAddress, airdropAddress } = useWeb3Context();
   const [offers, setOffers] = useState();
   const [minOffer, setMinOffer] = useState<BigNumber>(BigNumber.from(0));
   const [nftObject, setNftObject] = useState({});
@@ -48,11 +79,12 @@ export default function DetailsView() {
   const [fraktionsIndex, setFraktionsIndex] = useState();
   const [args, setArgs] = useState([]);
   const [investors, setInvestors] = useState(0);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   // use callbacks
 
   const [isLoading, setIsLoading] = useState(true);
-  const [airdropAmount,setAirdropAmount] = useState<string>("0");
-  const [proof,setProof] = useState<Array<string>>(null);
+  const [airdropAmount, setAirdropAmount] = useState<string>("0");
+  const [proof, setProof] = useState<Array<string>>(null);
 
 
   const airdropConnectToWalletId = 'connectToWallet';
@@ -96,7 +128,6 @@ export default function DetailsView() {
         let investorsWBalance = nftObjects.balances.filter(x => {
           return parseInt(x.amount) > 0;
         });
-        // console.log('investors',investorsWBalance)
         setInvestors(investorsWBalance.length);
         setNftObject(nftObjects);
       }
@@ -331,11 +362,10 @@ export default function DetailsView() {
               <Link href={EXPLORE}>
                 <div className={styles.goBack}>← back to all NFTS</div>
               </Link>
-              <Image
-                src={nftObject ? nftObject.imageURL : null}
-                w="400px"
-                h="400px"
-                style={{ borderRadius: "4px 4px 0px 0px", objectFit: `cover` }}
+              <NFTMedia
+                setIsImageLoaded={setIsImageLoaded}
+                type='details'
+                imageURL={nftObject.imageURL}
               />
               <HStack justifyContent="space-between" marginTop="16px">
                 <VStack>
@@ -518,14 +548,6 @@ export default function DetailsView() {
               <FraktionOwners data={nftObject.balances} nftObject={nftObject} />
             </div>
           </Stack>
-          {/*
-      <Modal
-        open={txInProgress}
-        onClose={()=>setTxInProgress(false)}
-      >
-        Tx's in course!
-      </Modal>
-    */}
         </Box>
       )}
     </>
