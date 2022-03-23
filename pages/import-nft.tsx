@@ -419,7 +419,6 @@ function ImportNFTPage() {
       totalAddresses = userFraktalAddresses.concat(userFraktionsAddreses);
     }
 
-//    console.log('assets', openseaAssets.assets.length)
     if (
         openseaAssets &&
         openseaAssets.assets &&
@@ -441,23 +440,17 @@ function ImportNFTPage() {
         totalAddresses = [];
       }
 
-      // NFTs filtering
-  //    console.log('totalAddresses', totalAddresses)
-   //   console.log('total', totalNFTs)
       let nftsFiltered = totalNFTs.map(x => {
         if (!totalAddresses.includes(x.asset_contract.address)) {
           return x;
         }
       });
 
-     // console.log('nftsFiltered', nftsFiltered)
       let nftObjects = await Promise.all(
           nftsFiltered.map(x => {
-       //     console.log('x', x)
             return createOpenSeaObject(x);
           })
       );
-    //console.log('nftObjects', nftObjects)
       if (nftObjects) {
         nftObjectsClean = nftObjects.filter(x => {
           return x != null && x.imageURL;

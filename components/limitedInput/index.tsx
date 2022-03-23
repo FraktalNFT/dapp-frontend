@@ -27,9 +27,7 @@ const LimitedInput = forwardRef<
     inputPlaceholder: string;
     currency: string;
     maxFraktions: string;
-}
-
-    >(
+}>(
     ({
          isReady,
          onClick,
@@ -41,7 +39,7 @@ const LimitedInput = forwardRef<
          ...rest
      }) => {
 
-        const [color, setColor] = useState("#000");
+        const [color, setColor] = useState<string>("#000");
 
         return (
             <div
@@ -65,7 +63,7 @@ const LimitedInput = forwardRef<
                     }}
                     onChange={(num) => {
                         setFunction(num);
-                        (parseInt(num) > parseInt(maxFraktions)) ? setColor("red") : setColor("#000");
+                        (parseInt(num) > parseInt(maxFraktions)) ? setColor("#ff0000") : setColor("#000");
                     }}
                 >
                     <NumberInputField
