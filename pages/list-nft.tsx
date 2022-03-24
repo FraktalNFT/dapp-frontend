@@ -281,6 +281,7 @@ const MintPage = (props) => {
       utils.parseUnits(totalAmount),
       provider,
       marketAddress,
+      name,
       actionOpts
     )
       .then(() => {
