@@ -39,7 +39,7 @@ import { BigNumber, utils } from 'ethers';
 /**
  * Contracts
  */
-import {getListingAmount, unlistItem, claimERC721, claimERC1155, approveMarket} from '@/utils/contractCalls';
+import {getListingAmount, unlistItem, claimERC721, claimERC1155, approveMarket,getApproved} from '@/utils/contractCalls';
 import toast from 'react-hot-toast';
 import { roundUp } from '@/utils/math';
 import {Workflow} from "@/types/workflow";
@@ -147,8 +147,13 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
         setIsClaiming(true);
         const actionOpts = { workflow: Workflow.CLAIM_NFT };
         try {
-          const receipt = await approveMarket(factoryAddress, provider, item.id, actionOpts);
-          if (!receipt?.error) {
+          const isApproved = await getApproved(account,factoryAddress,provider,item.id);
+          let receipt;
+          if(!isApproved){
+            receipt = await approveMarket(factoryAddress, provider, item.id, actionOpts);
+          }
+          
+          if (isApproved || !receipt?.error) {
             if (item.collateral.type == 'ERC721') {
               await claimERC721(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
                 closeLoadingModalAfterDelay();
