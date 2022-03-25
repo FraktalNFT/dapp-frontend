@@ -285,6 +285,7 @@ export default function DetailsView() {
       ),
     });
   };
+
   useEffect(() => {
     async function getAllData() {
       if (isPageReady) {

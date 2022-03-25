@@ -1,8 +1,37 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {Image} from "@chakra-ui/image";
 
 const NFTMedia = ({imageURL, setIsImageLoaded, type}) => {
 
+    const [isImageLoading, setIsImageLoading] = useState<boolean>(true);
+    const [image, setImage] = useState<string>("true");
+
+    async function loadImage() {
+        console.log('load')
+        try {
+            const loadImage = await fetch(imageURL);
+            console.log('loadImage', loadImage.headers.get('content-type') )
+            if (loadImage.headers.get('content-type') != 'image/gif') {
+                console.log(imageURL)
+                setImage('https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL));
+            } else {
+                console.log('imageURL', imageURL)
+                setImage(imageURL);
+                setIsImageLoaded(true);
+            }
+        } catch (e) {
+            console.log(e)
+        }
+        //  console.log(loadImage.headers.get('content-type'))
+    }
+    useEffect(() => {
+        console.log(type)
+        if (type == 'details') {
+            loadImage();
+        } else {
+            setImage('https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL));
+        }
+    }, []);
 
     const onImageLoad = (ms: number) => {
         setIsImageLoaded(true);
@@ -27,8 +56,8 @@ const NFTMedia = ({imageURL, setIsImageLoaded, type}) => {
                     <source src={imageURL} type="video/mp4"/>
                  </video>
                 ) : (
-                 <Image
-                    src={'https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL)}
+                image && <Image
+                    src={image}
                     width="100%"
                     height="100%"
                     objectFit="cover"

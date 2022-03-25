@@ -46,6 +46,7 @@ import { useLoadingScreenHandler } from "hooks/useLoadingScreen";
  * Components
  */
 import VerifyNFT from "@/components/verifyNFT";
+import NFTMedia from "@/components/media";
 
 /**
  * Auction NFT View
@@ -63,6 +64,7 @@ function AuctionNFTView({router}) {
   const [currentReserve,setCurrentReserve] = useState(-1);
   const [refresh,setRefresh] = useState(true);
   const [completed,setCompleted] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   const toast = useToast();
   const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
@@ -240,12 +242,11 @@ function AuctionNFTView({router}) {
         <div className={styles.header}>{nftObject?nftObject.name:''}</div>
         <VStack spacing="32px" marginTop="40px" align="flex-center">
           <div>
-              <Image
-              src={'https://image.fraktal.io/?height=650&image=' + encodeURIComponent(nftObject?nftObject.imageURL:exampleNFT.imageURL)}
-
-              w="100%"
-              style={{ borderRadius: "4px 4px 0px 0px" }}
-              />
+            <NFTMedia
+                setIsImageLoaded={setIsImageLoaded}
+                type='details'
+                imageURL={nftObject?nftObject.imageURL:exampleNFT.imageURL}
+            />
             <div className={styles.NFTCard}>
               <div className={styles.cardHeader}>Auctioneer</div>
               <div className={styles.cardText} style={{ color: "#985cff" }}>
