@@ -95,7 +95,8 @@ const lpStakingABI = [
   'function harvest() external',
   'function withdraw(uint256) external',
   'function calculatePendingRewards(address) external view returns (uint256)',
-  'function userInfo(address user) external view returns (uint256,uint256)'
+  'function userInfo(address user) external view returns (uint256,uint256)',
+  'function rewardPerBlock() external view returns (uint256)'
 ];
 const tradingRewardsABI = [
   'function canClaim(address,uint256,bytes32[]) external view returns (bool,uint256)',
@@ -1162,16 +1163,17 @@ export async function getAPY(
   provider,
   opts?: ActionOpts
 ) {
-  console.log("calling");
-  
   const signer = await loadSigner(provider);
   const customContract = new Contract("0x2763f944fc85CAEECD559F0f0a4667A68256144d", lpABI, signer);
   let tx = await customContract.getReserves();
 
   const frak:string = utils.formatEther(tx[0]);
 
+  const lpStakingContract = new Contract("0x9286Ea5E9b22262D4C1f142F1DD35Ffb1EaacD03", lpStakingABI, signer);
+  const frakPerBlock = Number(utils.formatEther(await lpStakingContract.rewardPerBlock()));
+
   const blocksPerYear = 31622400/15;
-  const frakPerYear = blocksPerYear*50;
+  const frakPerYear = blocksPerYear*frakPerBlock;
   const apy  = Math.round(frakPerYear/(Number(frak)*2) *100);
   
 
