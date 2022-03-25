@@ -32,7 +32,7 @@ import styles from "./auction.module.css";
  * Utils
  */
 import {getExplorerUrl, shortenHash, timezone} from "@/utils/helpers";
-import { getSubgraphData,getAddressAirdrop } from "@/utils/graphQueries";
+import {getSubgraphData, getAddressAirdrop} from "@/utils/graphQueries";
 import {createObject } from "@/utils/nftHelpers";
 /**
  * Contexts
