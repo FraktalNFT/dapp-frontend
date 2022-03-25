@@ -97,7 +97,6 @@ function ImportNFTPage() {
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
 
   const router = useRouter();
-
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [noNFTs, setNoNFTs] = useState<boolean>(false);
   const [nfts, setNFTs] = useState([]);
@@ -117,7 +116,6 @@ function ImportNFTPage() {
   const [totalPrice, setTotalPrice] = useState(0);
 
   const [tokenToImport, setTokenToImport] = useState<object>({});
-
   const [isAuction, setIsAuction] = useState(false);
 
   /**
@@ -285,6 +283,7 @@ function ImportNFTPage() {
       weiPerFrak, // price per fraktal
       provider,
       marketAddress,
+      NFTName,
       actionOpts
     )
       .then((receipt) => {
@@ -312,6 +311,7 @@ function ImportNFTPage() {
       utils.parseUnits(totalAmount),
       provider,
       marketAddress,
+      NFTName,
       actionOpts
     )
       .then((receipt) => {
@@ -605,6 +605,7 @@ function ImportNFTPage() {
                 >
                   <div>
                     <NFTCard
+                        nftName={NFTName}
                         setName={setNFTName}
                         setDescription={setNFTDescription}
                         addFile={() => {}}

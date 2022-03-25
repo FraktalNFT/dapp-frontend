@@ -32,6 +32,7 @@ import {
   OFFERING_BUYOUT,
   VOTING_BUYOUTS,
 } from '../redux/actions/contractActions';
+import {Web3Provider} from "@ethersproject/providers/src.ts/web3-provider";
 
 //tested
 const factoryAbi = [
@@ -517,12 +518,12 @@ export async function importERC1155(
 }
 
 export async function listItem(
-  tokenAddress,
-  amount,
-  price,
-  provider,
-  marketAddress,
-  name,
+  tokenAddress: string,
+  amount: BigNumber,
+  price: BigNumber,
+  provider: Web3Provider,
+  marketAddress: string,
+  name: string,
   opts?: ActionOpts
 ) {
   const override = { gasLimit: 300000 };
@@ -823,12 +824,12 @@ export async function participateAuction(
   return receipt;
 }
 export async function listItemAuction(
-  tokenAddress,
-  reservePrice,
-  numberOfShares,
-  provider,
-  marketAddress,
-  name,
+  tokenAddress: string,
+  reservePrice: BigNumber,
+  numberOfShares: BigNumber,
+  provider: Web3Provider,
+  marketAddress: string,
+  name: string,
   opts?: ActionOpts
 ) {
   const signer = await loadSigner(provider);

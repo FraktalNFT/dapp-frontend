@@ -267,6 +267,7 @@ function ImportNFTPage() {
             weiPerFrak, // price per fraktal
             provider,
             marketAddress,
+            NFTName,
             actionOpts
         )
             .then((receipt) => {
@@ -293,6 +294,7 @@ function ImportNFTPage() {
             utils.parseUnits(totalAmount),
             provider,
             marketAddress,
+            NFTName,
             actionOpts
         )
             .then((receipt) => {

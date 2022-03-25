@@ -5,7 +5,6 @@ import React, {useEffect, useState} from 'react';
 /**
  * Next
  */
-
 import {useRouter} from "next/router";
 /**
  * Chakra
@@ -53,7 +52,6 @@ const UserOwnership = ({
   const router = useRouter();
   const [isDefraking, setDefraking] = useState<boolean>(false);
   const [isClaiming, setClaiming] = useState<boolean>(false);
-
 
   async function claimNFT() {
     setClaiming(true);
@@ -246,9 +244,7 @@ const UserOwnership = ({
             {collateral && collateral.id && (
               <FrakButton onClick={() => claimNFT()}>Claim NFT</FrakButton>
             )}
-            <FrakButton onClick={() => importFraktalToMarket()}>
-              FRAK IT
-            </FrakButton>
+            <FrakButton onClick={() => importFraktalToMarket()}>FRAK IT</FrakButton>
           </HStack>
         </VStack>
       )}
