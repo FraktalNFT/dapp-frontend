@@ -4,15 +4,13 @@ import {Box, Spinner} from "@chakra-ui/react";
 
 const NFTMedia = ({imageURL, setIsImageLoaded, type, metadata={}}) => {
 
-    const [image, setImage] = useState<string>("");
+    const [image, setImage] = useState<string>('https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL));
     const [video, setVideo] = useState<string>("");
 
     async function loadMedia() {
         try {
             const loadImage = await fetch(imageURL);
-            if (loadImage.headers.get('content-type') != 'image/gif') {
-                setImage('https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL));
-            } else {
+            if (loadImage.headers.get('content-type') == 'image/gif') {
                 setImage(imageURL);
             }
             setIsImageLoaded(true);
@@ -22,7 +20,7 @@ const NFTMedia = ({imageURL, setIsImageLoaded, type, metadata={}}) => {
     }
 
     useEffect(() => {
-        setImage('https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL));
+       // setImage('https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL));
         if (type == 'details') {
             if (!loadVideo()) {
                 loadMedia();
@@ -40,6 +38,10 @@ const NFTMedia = ({imageURL, setIsImageLoaded, type, metadata={}}) => {
         }
         if (metadata.metadata.animation_url) {
             setVideo(metadata.metadata.animation_url);
+            return true;
+        }
+        if (metadata.metadata.properties && metadata.metadata.properties.preview_media_file2 && metadata.metadata.properties.preview_media_file2_type.description == 'mp4') {
+            setVideo(metadata.metadata.properties.preview_media_file2.description);
             return true;
         }
         const fileExtension = imageURL.split('.').pop();
