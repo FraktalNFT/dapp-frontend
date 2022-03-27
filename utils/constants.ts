@@ -35,6 +35,7 @@ export const airdropContract = [
 ];
 export const partnerAirdropContract = [
     {providerChainId:1, address:'0x418A5396e7E5d28CF64A58863382A5FB2671487E'},
+    {providerChainId:4, address:''},
 ];
 export const lpStakingContracts = [
     {providerChainId:1, address:'0x9286Ea5E9b22262D4C1f142F1DD35Ffb1EaacD03'},
