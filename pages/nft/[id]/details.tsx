@@ -73,7 +73,6 @@ export default function DetailsView() {
   const [isOwner, setIsOwner] = useState(false);
   const [revenues, setRevenues] = useState();
   const [isPageReady, setIsPageReady] = useState<boolean>(false);
-  // const [txInProgress, setTxInProgress] = useState(false);
   const [fraktionsIndex, setFraktionsIndex] = useState();
   const [args, setArgs] = useState([]);
   const [investors, setInvestors] = useState(0);
@@ -83,18 +82,13 @@ export default function DetailsView() {
   const [isLoading, setIsLoading] = useState(true);
   const [airdropAmount, setAirdropAmount] = useState<string>("0");
   const [proof, setProof] = useState<Array<string>>(null);
-
-  const [fraktionsGot, setFraktionsGot] = useState(false);
-  const [fraktalsGot, setFraktalsGot] = useState(false);
-  const [offersGot, setOffersGot] = useState(false);
-  const [contractDataGot, setContractDataGot] = useState(false);
   const toast = useToast();
 
   const airdropConnectToWalletId = 'connectToWallet';
   const listNFTToClaimId = 'listNFT';
   const claimToastId = 'claim';
   const learnToastId = 'learn';
-  const notEligible = 'notEligible'
+  const notEligible = 'notEligible';
 
   useEffect(() => {
     if (router.isReady) {
@@ -105,22 +99,37 @@ export default function DetailsView() {
         setArgs(pathname.split("/"));
         setIsPageReady(false);
       } while (args[2] === "[id]" || typeof args[2] === "undefined");
+
+      const tokenAddress = args[2];
+      const tokenAddressLowerCase = tokenAddress.toLocaleLowerCase();
+      setTokenAddress(tokenAddressLowerCase);
       setIsPageReady(true);
     }
   }, [router]);
 
+  useEffect(() => {
+    async function getAllData() {
+      if (isPageReady) {
+        await getFraktions();
+        await getContractData();
+        await getOffers();
+        await getFraktal();
+      }
+    }
+    getAllData();
+    }, [
+    isPageReady,
+  ]);
+
   async function getFraktal() {
-    const tokenAddress = args[2];
-    const tokenAddressSplitted = tokenAddress.toLocaleLowerCase();
-    setTokenAddress(tokenAddressSplitted);
     let fraktionsFetch = await getSubgraphData(
       "fraktions",
-      tokenAddressSplitted
+        tokenAddress
     );
     if (fraktionsFetch.listItems) {
       setFraktionsListed(fraktionsFetch.listItems);
     }
-    let fraktalFetch = await getSubgraphData("fraktal", tokenAddressSplitted);
+    let fraktalFetch = await getSubgraphData("fraktal", tokenAddress);
     if (
       fraktalFetch &&
       fraktalFetch.fraktalNfts &&
@@ -133,6 +142,7 @@ export default function DetailsView() {
         });
         setInvestors(investorsWBalance.length);
         setNftObject(nftObjects);
+        setIsLoading(false);
       }
       if (fraktalFetch.fraktalNfts[0].offers) {
         setOffers(fraktalFetch.fraktalNfts[0].offers);
@@ -286,44 +296,9 @@ export default function DetailsView() {
     });
   };
 
-  useEffect(() => {
-    async function getAllData() {
-      if (isPageReady) {
-        if (!fraktionsGot) {
-          await getFraktions();
-          setFraktionsGot(true);
-        }
-        if (!fraktalsGot) {
-          await getFraktal();
-          setFraktalsGot(true);
-        }
-        if (!offersGot) {
-          await getOffers();
-          setOffersGot(true);
-        }
-        if (!contractDataGot) {
-          await getContractData();
-          setContractDataGot(true);
-        }
-        if (nftObject.id) {
-          setIsLoading(false);
-        }
-      }
-    }
-    getAllData();
-  }, [
-    isPageReady,
-    account,
-    provider,
-    tokenAddress,
-    fraktionsListed,
-    nftObject,
-    marketAddress,
-  ]);
-
   useEffect(()=>{
     toastClaimAirdrop();
-  },[])
+  },[]);
 
   async function callUnlistItem() {
     let tx = await unlistItem(tokenAddress, provider, marketAddress);
