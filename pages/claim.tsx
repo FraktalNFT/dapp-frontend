@@ -4,29 +4,41 @@ import Head from "next/head";
 import { useWeb3Context } from "../contexts/Web3Context";
 import { useRouter } from "next/router";
 import { useENSAddress } from 'components/useENSAddress';
-import { claimAirdrop,claimAirdrop3160 } from '@/utils/contractCalls';
+import { claimPartnerAirdrop } from '@/utils/contractCalls';
 import { getAddressAirdrop } from '@/utils/graphQueries';
+import {getProofs} from '../utils/proofsGetter'
+import Countdown from 'react-countdown';
 
-export default function ArtistsView() {
-  const router = useRouter();
-  const SORT_TYPES = ["Popular", "New"];
-  const [selectionMode, setSelectionMode] = useState(false);
-  const [sortType, setSortType] = useState("Popular");
-  const [artists, setArtists] = useState([]);
-  const [artistsItems, setArtistsItems] = useState([]);
-  const [hasMore, setHasMore] = useState(true);
-  const { account, loading, airdropAddress, provider } = useWeb3Context();
-  const [artistAddress, setArtistAddress] = useState("");
+
+const Completionist = () => <span></span>;
+const renderer = ({ hours, minutes, seconds, completed }) => {
+  if (completed) {
+    // Render a completed state
+    return <Completionist />;
+  } else {
+    // Render a countdown
+    return <span>In {hours} hours {minutes} minutes :{seconds} seconds</span>;
+  }
+};
+
+export default function Claim() {
+  const { account, loading, partnerAirdropAddress, provider } = useWeb3Context();
   const [inputAddress, setInputAddress] = useState("");
   const [listedAddress, setListedAddress] = useState("");
+  const [proofs,setProofs] = useState("");
+  const [checkedEligible, setCheckedEligible] = useState(false);
+  const [eligible, setEligible] = useState(true);
   const toast = useToast()
 
   useEffect(() => {
       setInputAddress(account);
+      setCheckedEligible(false);
+      setEligible(true);
+      // setProofs(getProofs(account));
   }, [account]);
 
   const claimHandle = async () => {
-    if(inputAddress == "" || listedAddress == ""){
+    if(inputAddress == "" ){
         toast({
             title: `Some input missing`,
             status: "error",
@@ -35,74 +47,75 @@ export default function ArtistsView() {
           })
         return;
     }
-    const data = await getAddressAirdrop(inputAddress);
-    console.log(data);
-    if(data.airdrop == null){
+
+    if(checkedEligible && eligible){
+      const data = getProofs(inputAddress);
+      await userClaimAirdrop(data.amount, data.hexProof);
+    }else{
+      const data = getProofs(inputAddress);
+      console.log(data);
+      setCheckedEligible(true);
+      if(data === undefined){
+        setEligible(false);
         toast({
-            title: `Not eligible for claim`,
-            status: "error",
+            title: `Not eligible to claim...`,
+            status: "warning",
             isClosable: true,
             position: "top",
           })
-    }else{
-        console.log(data);
-        await userClaimAirdrop(data.airdrop.amount, data.airdrop.proof,listedAddress);
+      }else{
+          toast({
+              title: `Eligible to claim ${data.amount} FRAKs. Claim now!`,
+              status: "success",
+              isClosable: true,
+              position: "top",
+            })
+          
+      }
+
     }
+    
   }
   
   const onInputAddressChange = (event) => {
     setInputAddress(event.target.value);
   }
 
-  const onListedTokenChange = (event) => {
-      setListedAddress(event.target.value);
-  }
-
-  const userClaimAirdrop = async (_amount,_proof,_listedToken) => {
+  const userClaimAirdrop = async (_amount,_proof) => {
       try{
-        console.log("Amount :",_amount);
-        
-        if(_amount=="4540010700000000000000"){
-          await claimAirdrop3160(_amount,_proof,_listedToken,provider,airdropAddress);
-          
-        }else{
-          await claimAirdrop(_amount,_proof,_listedToken,provider,airdropAddress);
-        }
+        console.log("Amount :",_amount,_proof);
+        await claimPartnerAirdrop(_amount,_proof,provider,partnerAirdropAddress);
         
       }
       catch(error){
         toast({
-            title: error.message,
+            title: error.error.message,
             status: "error",
             isClosable: true,
             position: "top",
           });
-          console.log(error);
+          console.log({error});
       }
     
   }
-
+//1648382400000
   return (
     <VStack spacing="0" mb="12.8rem">
       <Head>
-        <title>Fraktal - Claim</title>
+        <title>Fraktal - Launch Partner Airdrop</title>
       </Head>
-      <HStack w="96.4rem" spacing="0" justifyContent="space-between" mb="4rem">
-        <Text className="semi-48">Claim Fraktal (manually)</Text>
-        
-
-      </HStack>
+      <VStack w="96.4rem" spacing="0" justifyContent="space-between" mb="4rem">
+        <Text className="semi-48">Launch Partner Airdrop🎉</Text><Countdown date={1648382400000} renderer={renderer}/>,
+        <Text fontSize='xl'>Check if your address eligible for the airdrop</Text>
+      </VStack>
       <>
         <InputGroup>
             <InputLeftAddon children='Your address:' />
             <Input onChange={onInputAddressChange} value={inputAddress}/>
         </InputGroup>
-        <InputGroup >
-            <InputLeftAddon children='Your listed Fraktal token address:' />
-            <Input onChange={onListedTokenChange} value={listedAddress}/>
-        </InputGroup>
-        <Button colorScheme='blue' size='lg' onClick={claimHandle} >
-            Claim
+        <Box height={"10px"} />
+        <Button colorScheme={checkedEligible?"green":"blue"} size='lg' onClick={claimHandle} disabled={!eligible} >
+            {checkedEligible?"Claim!":"Check"}
         </Button>
       </>
     </VStack>
