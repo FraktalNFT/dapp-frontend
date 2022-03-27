@@ -1,13 +1,13 @@
 import React, {useState, useEffect} from "react";
 import {Image} from "@chakra-ui/image";
 
-const NFTMedia = ({imageURL, setIsImageLoaded, type}) => {
+const NFTMedia = ({imageURL, setIsImageLoaded, type, metadata={}}) => {
 
     const [isImageLoading, setIsImageLoading] = useState<boolean>(true);
-    const [image, setImage] = useState<string>("true");
+    const [image, setImage] = useState<string>("");
+    const [video, setVideo] = useState<string>("");
 
-    async function loadImage() {
-        console.log('load')
+    async function loadMedia() {
         try {
             const loadImage = await fetch(imageURL);
             console.log('loadImage', loadImage.headers.get('content-type') )
@@ -24,12 +24,13 @@ const NFTMedia = ({imageURL, setIsImageLoaded, type}) => {
         }
         //  console.log(loadImage.headers.get('content-type'))
     }
+
     useEffect(() => {
-        console.log(type)
         if (type == 'details') {
-            loadImage();
+            loadVideo()
+         //   loadMedia();
         } else {
-            setImage('https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL));
+           // setImage('https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL));
         }
     }, []);
 
@@ -37,27 +38,39 @@ const NFTMedia = ({imageURL, setIsImageLoaded, type}) => {
         setIsImageLoaded(true);
     };
 
-    const isVideo = (imageURL: string) => {
+    const loadVideo = () => {
         if (!imageURL) {
             return null;
         }
+        if (metadata.metadata.animation_url) {
+            setVideo(metadata.metadata.animation_url);
+            return true;
+        }
         const fileExtension = imageURL.split('.').pop();
-        if (fileExtension !== 'mp4') {
+        if (fileExtension === 'mp4') {
+            setVideo(imageURL);
+            return true;
+        }
+    }
+
+    const isVideo = () => {
+        if (video === "") {
             return false;
         }
+        console.log('video', 'true')
         setIsImageLoaded(true);
         return true;
     }
 
     return (
         <>
-            {isVideo(imageURL) ? (
+            {isVideo ? (
                  <video autoPlay loop muted>
-                    <source src={imageURL} type="video/mp4"/>
+                    <source src={video} type="video/mp4"/>
                  </video>
                 ) : (
-                image && <Image
-                    src={image}
+                <Image
+                    src={'https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL)}
                     width="100%"
                     height="100%"
                     objectFit="cover"

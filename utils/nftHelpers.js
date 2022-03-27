@@ -90,6 +90,7 @@ export async function createObject(data) {
       object.description = nftMetadata.metadata.description;
     }
     object.imageURL = getImageUrl(nftMetadata);
+    object.metadata = nftMetadata
     return object;
   } catch {
     console.log('Error fetching 2 ', data);

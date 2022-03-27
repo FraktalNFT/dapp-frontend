@@ -243,6 +243,7 @@ function AuctionNFTView({router}) {
         <VStack spacing="32px" marginTop="40px" align="flex-center">
           <div>
             <NFTMedia
+                metadata={nftObject.metadata}
                 setIsImageLoaded={setIsImageLoaded}
                 type='details'
                 imageURL={nftObject?nftObject.imageURL:exampleNFT.imageURL}

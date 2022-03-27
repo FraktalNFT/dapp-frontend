@@ -364,6 +364,7 @@ export default function DetailsView() {
                 <div className={styles.goBack}>← back to all NFTS</div>
               </Link>
               <NFTMedia
+                metadata={nftObject.metadata}
                 setIsImageLoaded={setIsImageLoaded}
                 type='details'
                 imageURL={nftObject.imageURL}
