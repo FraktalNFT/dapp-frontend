@@ -1,36 +1,32 @@
 import React, {useState, useEffect} from "react";
 import {Image} from "@chakra-ui/image";
+import {Box, Spinner} from "@chakra-ui/react";
 
 const NFTMedia = ({imageURL, setIsImageLoaded, type, metadata={}}) => {
 
-    const [isImageLoading, setIsImageLoading] = useState<boolean>(true);
     const [image, setImage] = useState<string>("");
     const [video, setVideo] = useState<string>("");
 
     async function loadMedia() {
         try {
             const loadImage = await fetch(imageURL);
-            console.log('loadImage', loadImage.headers.get('content-type') )
             if (loadImage.headers.get('content-type') != 'image/gif') {
-                console.log(imageURL)
                 setImage('https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL));
             } else {
-                console.log('imageURL', imageURL)
                 setImage(imageURL);
-                setIsImageLoaded(true);
             }
+            setIsImageLoaded(true);
         } catch (e) {
             console.log(e)
         }
-        //  console.log(loadImage.headers.get('content-type'))
     }
 
     useEffect(() => {
+        setImage('https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL));
         if (type == 'details') {
-            loadVideo()
-         //   loadMedia();
-        } else {
-           // setImage('https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL));
+            if (!loadVideo()) {
+                loadMedia();
+            }
         }
     }, []);
 
@@ -51,26 +47,25 @@ const NFTMedia = ({imageURL, setIsImageLoaded, type, metadata={}}) => {
             setVideo(imageURL);
             return true;
         }
-    }
+    };
 
     const isVideo = () => {
         if (video === "") {
             return false;
         }
-        console.log('video', 'true')
         setIsImageLoaded(true);
         return true;
-    }
+    };
 
     return (
         <>
-            {isVideo ? (
+            {isVideo() ? (
                  <video autoPlay loop muted>
                     <source src={video} type="video/mp4"/>
                  </video>
                 ) : (
                 <Image
-                    src={'https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL)}
+                    src={image}
                     width="100%"
                     height="100%"
                     objectFit="cover"

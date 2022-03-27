@@ -150,12 +150,14 @@ function AuctionNFTView({router}) {
       });
 
       const item = await createListedAuction(obj.auction);
+      console.log('Item', item)
       Object.assign(obj.auction,{
         "hash":_hash.fraktalNft.hash,
         "name":item.name,
         "imageURL":item.imageURL,
         "seller": item.seller,
-        "collateral": _hash.fraktalNft.collateral
+        "collateral": _hash.fraktalNft.collateral,
+        "metadata": item.metadata
       });
 
     if(obj) {
@@ -242,12 +244,12 @@ function AuctionNFTView({router}) {
         <div className={styles.header}>{nftObject?nftObject.name:''}</div>
         <VStack spacing="32px" marginTop="40px" align="flex-center">
           <div>
-            <NFTMedia
+              {nftObject && <NFTMedia
                 metadata={nftObject.metadata}
                 setIsImageLoaded={setIsImageLoaded}
                 type='details'
                 imageURL={nftObject?nftObject.imageURL:exampleNFT.imageURL}
-            />
+            />}
             <div className={styles.NFTCard}>
               <div className={styles.cardHeader}>Auctioneer</div>
               <div className={styles.cardText} style={{ color: "#985cff" }}>
@@ -320,4 +322,3 @@ function AuctionNFTView({router}) {
 }
 
 export default withRouter(AuctionNFTView);
-
