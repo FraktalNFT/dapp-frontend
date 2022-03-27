@@ -4,7 +4,7 @@ import FrakButton from "../button";
 import { useWeb3Context } from "../../contexts/Web3Context";
 import { shortenHash } from "../../utils/helpers";
 import { useRouter } from "next/router";
-import {ARTISTS, CREATE_NFT, EXPLORE, LANDING, IMPORT_NFTS, REWARDS} from "@/constants/routes";
+import {ARTISTS, CREATE_NFT, EXPLORE, LANDING, IMPORT_NFTS, REWARDS, CLAIM} from "@/constants/routes";
 
 const Header = () => {
   const router = useRouter();
@@ -93,8 +93,30 @@ const Header = () => {
                         Rewards
                     </Link>
                 )}
-           </NextLink>
-           <Link
+          </NextLink>
+          <NextLink href={CLAIM}>
+              {router.pathname === CLAIM ? (
+                  <Link
+                      className="semi-16"
+                      borderRadius="25"
+                      padding="3"
+                      sx={{ backgroundColor: `black`, color: `white` }}
+                      _hover={{ backgroundColor: "black", textColor: "white" }}
+                  >
+                      Airdrop
+                  </Link>
+              ) : (
+                  <Link
+                      className="semi-16"
+                      borderRadius="25"
+                      padding="3"
+                      _hover={{ backgroundColor: "black", textColor: "white" }}
+                  >
+                      Airdrop
+                  </Link>
+              )}
+        </NextLink>
+      {/*      <Link
               href="https://docs.fraktal.io/marketplace/get-started"
               target="_blank"
               className="semi-16"
@@ -103,7 +125,7 @@ const Header = () => {
               _hover={{ backgroundColor: "black", textColor: "white" }}
             >
               How it Works
-            </Link>
+            </Link> */}
 
           </HStack>
           {!account ? (
