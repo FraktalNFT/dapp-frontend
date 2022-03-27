@@ -120,7 +120,7 @@ export default function DetailsView() {
     }, [
     isPageReady,
   ]);
-  
+
   async function getFraktal() {
     let fraktionsFetch = await getSubgraphData(
       "fraktions",
@@ -338,11 +338,25 @@ export default function DetailsView() {
               <Link href={EXPLORE}>
                 <div className={styles.goBack}>← back to all NFTS</div>
               </Link>
-              <NFTMedia
-                setIsImageLoaded={setIsImageLoaded}
-                type='details'
-                imageURL={nftObject.imageURL}
-              />
+              <Box
+                    rounded="md"
+                    borderWidth="1px"
+                    boxShadow="md"
+                    height="350px"
+                    sx={{
+                        display: 'grid',
+                        width: `100%`,
+                        placeItems: `center`,
+                    }}
+                >
+                      <NFTMedia
+                          metadata={nftObject.metadata||{}}
+                          setIsImageLoaded={setIsImageLoaded}
+                          type={"details"}
+                          imageURL={nftObject.imageURL}
+                      />
+                  {!isImageLoaded  &&   <Spinner size="xl" />}
+              </Box>
               <HStack justifyContent="space-between" marginTop="16px">
                 <VStack>
                   <div
