@@ -135,7 +135,6 @@ export async function createListed(data) {
       };
     }
   } catch (err) {
-    console.log('err', err)
     return { error: `Error: ${err}` };
   }
 }

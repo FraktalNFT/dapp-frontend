@@ -20,7 +20,6 @@ const NFTMedia = ({imageURL, setIsImageLoaded, type, metadata={}}) => {
     }
 
     useEffect(() => {
-       // setImage('https://image.fraktal.io/?height=350&image=' + encodeURIComponent(imageURL));
         if (type == 'details') {
             if (!loadVideo()) {
                 loadMedia();
@@ -37,7 +36,12 @@ const NFTMedia = ({imageURL, setIsImageLoaded, type, metadata={}}) => {
             return null;
         }
         if (metadata.metadata.animation_url) {
-            setVideo(metadata.metadata.animation_url);
+            if (metadata.metadata.animation_url.startsWith('ipfs://')) {
+                let hasIpfsProtocol = metadata.metadata.animation_url.split('ipfs://');
+                setVideo('https://ipfs.io/ipfs/' + hasIpfsProtocol[1]);
+            } else {
+                setVideo(metadata.metadata.animation_url);
+            }
             return true;
         }
         if (metadata.metadata.properties && metadata.metadata.properties.preview_media_file2 && metadata.metadata.properties.preview_media_file2_type.description == 'mp4') {
