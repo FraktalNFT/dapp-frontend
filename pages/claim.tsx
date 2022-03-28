@@ -70,13 +70,13 @@ export default function Claim() {
               isClosable: true,
               position: "top",
             })
-          
+
       }
 
     }
-    
+
   }
-  
+
   const onInputAddressChange = (event) => {
     setInputAddress(event.target.value);
   }
@@ -85,7 +85,7 @@ export default function Claim() {
       try{
         console.log("Amount :",_amount,_proof);
         await claimPartnerAirdrop(_amount,_proof,provider,partnerAirdropAddress);
-        
+
       }
       catch(error){
         toast({
@@ -96,7 +96,7 @@ export default function Claim() {
           });
           console.log({error});
       }
-    
+
   }
 //1648382400000
   return (
@@ -105,7 +105,7 @@ export default function Claim() {
         <title>Fraktal - Launch Partner Airdrop</title>
       </Head>
       <VStack w="96.4rem" spacing="0" justifyContent="space-between" mb="4rem">
-        <Text className="semi-48">Launch Partner Airdrop🎉</Text><Countdown date={1648382400000} renderer={renderer}/>,
+        <Text className="semi-48">Launch Partner + Bonus Airdrop🎉</Text><Countdown date={1648382400000} renderer={renderer}/>,
         <Text fontSize='xl'>Check if your address eligible for the airdrop</Text>
       </VStack>
       <>

@@ -4,7 +4,7 @@ import FrakButton from "../button";
 import { useWeb3Context } from "../../contexts/Web3Context";
 import { shortenHash } from "../../utils/helpers";
 import { useRouter } from "next/router";
-import {ARTISTS, CREATE_NFT, EXPLORE, LANDING, IMPORT_NFTS, REWARDS, CLAIM} from "@/constants/routes";
+import {ARTISTS, CREATE_NFT, EXPLORE, LANDING, IMPORT_NFTS, REWARDS, CLAIM, CLAIM_BONUS} from "@/constants/routes";
 
 const Header = () => {
   const router = useRouter();
@@ -94,8 +94,8 @@ const Header = () => {
                     </Link>
                 )}
           </NextLink>
-          <NextLink href={CLAIM}>
-              {router.pathname === CLAIM ? (
+          <NextLink href={CLAIM_BONUS}>
+              {router.pathname === CLAIM_BONUS ? (
                   <Link
                       className="semi-16"
                       borderRadius="25"
