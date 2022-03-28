@@ -15,15 +15,14 @@ const NFTMedia = ({imageURL, setIsImageLoaded, type, metadata={}}) => {
             }
             setIsImageLoaded(true);
         } catch (e) {
-            console.log(e)
+            //TODO - Add Error
         }
     }
 
     useEffect(() => {
+        loadVideo();
         if (type == 'details') {
-            if (!loadVideo()) {
-                loadMedia();
-            }
+            loadMedia();
         }
     }, []);
 
@@ -34,6 +33,14 @@ const NFTMedia = ({imageURL, setIsImageLoaded, type, metadata={}}) => {
     const loadVideo = () => {
         if (!imageURL) {
             return null;
+        }
+        const fileExtension = imageURL.split('.').pop();
+        if (fileExtension === 'mp4') {
+            setVideo(imageURL);
+            return true;
+        }
+        if (!metadata.metadata) {
+            return false;
         }
         if (metadata.metadata.animation_url) {
             if (metadata.metadata.animation_url.startsWith('ipfs://')) {
@@ -46,11 +53,6 @@ const NFTMedia = ({imageURL, setIsImageLoaded, type, metadata={}}) => {
         }
         if (metadata.metadata.properties && metadata.metadata.properties.preview_media_file2 && metadata.metadata.properties.preview_media_file2_type.description == 'mp4') {
             setVideo(metadata.metadata.properties.preview_media_file2.description);
-            return true;
-        }
-        const fileExtension = imageURL.split('.').pop();
-        if (fileExtension === 'mp4') {
-            setVideo(imageURL);
             return true;
         }
     };

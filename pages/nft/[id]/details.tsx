@@ -344,7 +344,6 @@ export default function DetailsView() {
                     boxShadow="md"
                     height="350px"
                     sx={{
-                        display: 'grid',
                         width: `100%`,
                         placeItems: `center`,
                     }}
@@ -355,7 +354,7 @@ export default function DetailsView() {
                           type={"details"}
                           imageURL={nftObject.imageURL}
                       />
-                  {!isImageLoaded  &&   <Spinner size="xl" />}
+                  {!isImageLoaded  &&  <Spinner size="xl" />}
               </Box>
               <HStack justifyContent="space-between" marginTop="16px">
                 <VStack>
