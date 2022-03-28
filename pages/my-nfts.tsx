@@ -85,7 +85,7 @@ function MyNFTsView() {
   const { isMinting, setIsMinting } = useMintingContext();
   const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
-  const { fraktals, fraktions, nfts, balance, loading } = useUserContext();
+  const { fraktals, fraktions, balance, loading } = useWalletContext();
 
   const canFrak = (item) =>
       item && !!(fraktals || []).find((fraktion) => fraktion.id === item.id);
