@@ -89,9 +89,8 @@ export async function createObject(data) {
     if (nftMetadata.metadata.description) {
       object.description = nftMetadata.metadata.description;
     }
-    if (nftMetadata.media[0]) {
-      object.imageURL = nftMetadata.media[0].gateway;
-    }
+    object.imageURL = getImageUrl(nftMetadata);
+    object.metadata = nftMetadata;
     return object;
   } catch {
     console.log('Error fetching 2 ', data);
@@ -99,10 +98,22 @@ export async function createObject(data) {
   }
 }
 
+const getImageUrl = (nftMetadata) => {
+  if (nftMetadata.media && nftMetadata.media[0] && nftMetadata.media[0].gateway !== '') {
+    return nftMetadata.media[0].gateway;
+  } else if (nftMetadata.metadata.imageUrl) {
+    return nftMetadata.metadata.imageUrl;
+  } else if (nftMetadata.metadata.image && nftMetadata.metadata.image.startsWith('ipfs://')) {
+    let hasIpfsProtocol = nftMetadata.metadata.image.split('ipfs://');
+    return 'https://ipfs.io/ipfs/' + hasIpfsProtocol[1];
+  }
+}
+
 export async function createListed(data) {
   try {
     const tokenId = (data.fraktal.collateral !== null && data.fraktal.collateral !== undefined) ? data.fraktal.collateral.tokenId : "1";
     const nftMetadata = await getNftMetadata(data.fraktal.id, tokenId);
+
     if (nftMetadata) {
       return {
         link: `/nft/${data.fraktal.id}/details`,
@@ -119,7 +130,8 @@ export async function createListed(data) {
         name: nftMetadata.metadata.name,
         value: nftMetadata.metadata.name,
         description: nftMetadata.metadata.description,
-        imageURL: nftMetadata.media[0].gateway
+        imageURL: getImageUrl(nftMetadata),
+        metadata: nftMetadata
       };
     }
   } catch (err) {
@@ -147,7 +159,8 @@ export async function createListedAuction(data) {
         name: nftMetadata.metadata.name,
         value: nftMetadata.metadata.name,
         description: nftMetadata.metadata.description,
-        imageURL: nftMetadata.media[0].gateway
+        imageURL: getImageUrl(nftMetadata),
+        metadata: nftMetadata
       };
     }
   } catch (err) {
