@@ -98,14 +98,14 @@ export default function DetailsView() {
         pathname = router.asPath;
         setArgs(pathname.split("/"));
         setIsPageReady(false);
-      } while (args[2] === "[id]" || typeof args[2] === "undefined");
+      } while (args[2] === "[id]" || typeof args[2] === "undefined" );
 
       const tokenAddress = args[2];
       const tokenAddressLowerCase = tokenAddress.toLocaleLowerCase();
       setTokenAddress(tokenAddressLowerCase);
       setIsPageReady(true);
     }
-  }, [router]);
+  }, [account]);
 
   useEffect(() => {
     async function getAllData() {
@@ -118,7 +118,7 @@ export default function DetailsView() {
     }
     getAllData();
     }, [
-    isPageReady,
+    isPageReady
   ]);
 
   async function getFraktal() {
