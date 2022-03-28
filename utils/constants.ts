@@ -33,6 +33,10 @@ export const airdropContract = [
     {providerChainId:1, address:'0x3CAf9755CE1b3db4eCF6498058E4cC5AD98446E9'},
     {providerChainId:4, address:'0xdA64d4c447476Ef26FD929d63Ec8f1C81C267854'},
 ];
+export const partnerAirdropContract = [
+    {providerChainId:1, address:'0x418A5396e7E5d28CF64A58863382A5FB2671487E'},
+    {providerChainId:4, address:''},
+];
 export const lpStakingContracts = [
     {providerChainId:1, address:'0x9286Ea5E9b22262D4C1f142F1DD35Ffb1EaacD03'},
     {providerChainId:4, address:'0x85F625355a5DeCebb5F1609c7197597F3B125411'},

@@ -39,7 +39,7 @@ import { BigNumber, utils } from 'ethers';
 /**
  * Contracts
  */
-import {getListingAmount, unlistItem, claimERC721, claimERC1155, approveMarket} from '@/utils/contractCalls';
+import {getListingAmount, unlistItem, claimERC721, claimERC1155, approveMarket,getApproved} from '@/utils/contractCalls';
 import toast from 'react-hot-toast';
 import { roundUp } from '@/utils/math';
 import {Workflow} from "@/types/workflow";
@@ -91,6 +91,9 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const [isVisible, setIsVisible] = useState(false);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const [isListed, setIsListed] = useState(false);
+    const [isUnlisting, setIsUnlisting] = useState(false);
+    const [isClaiming, setIsClaiming] = useState(false);
+    const { fraktions, fraktals } = useUserContext();
     const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
     const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
@@ -114,10 +117,13 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
 
     const unList = async () => {
       toast('Unlisting...');
+      setIsUnlisting(true);
       await unlistItem(item.id, provider, marketAddress).then(() => {
         closeLoadingModalAfterDelay()
         toast.success('Fraktion Unlisted');
         setIsListed(!isListed);
+      }).finally(() => {
+        setIsUnlisting(false);
       });
     };
 
@@ -147,27 +153,41 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
 
     const withdrawNFT = async (item, event) => {
         event.stopPropagation();
+        setIsClaiming(true);
         const actionOpts = { workflow: Workflow.CLAIM_NFT };
-        const receipt = await approveMarket(factoryAddress, provider, item.id, actionOpts);
-     //   console.log('receipt', receipt)
-        if (!receipt?.error) {
-     //     console.log('item.collateral', receipt)
-          if (item.collateral.type == 'ERC721') {
-            await claimERC721(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
-              closeLoadingModalAfterDelay();
-              setTimeout(() => {
-                router.reload()
-              }, 2500);
-            });
-          } else {
-            await claimERC1155(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
-              closeLoadingModalAfterDelay();
-              setTimeout(() => {
-                router.reload()
-              }, 2500);
-            });
+        try {
+          const isApproved = await getApproved(account,factoryAddress,provider,item.id);
+          let receipt;
+          if(!isApproved){
+            receipt = await approveMarket(factoryAddress, provider, item.id, actionOpts);
           }
+
+          if (isApproved || !receipt?.error) {
+            if (item.collateral.type == 'ERC721') {
+              await claimERC721(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
+                closeLoadingModalAfterDelay();
+                setTimeout(() => {
+                  router.reload()
+                }, 2500);
+              }).finally(() => {
+                setIsClaiming(false);
+              });
+            } else {
+              await claimERC1155(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
+                closeLoadingModalAfterDelay();
+                setTimeout(() => {
+                  router.reload()
+                }, 2500);
+              }).finally(() => {
+                setIsClaiming(false);
+              });
+            }
+          }
+        } catch (e) {
+          console.log(e)
+          setIsClaiming(false);
         }
+
 
     };
 
@@ -263,14 +283,20 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                   <NextLink href={`nft/${item.id}/details?frak=1`}>
                     <FrakButton size="sm">Frak it</FrakButton>
                   </NextLink>
-                  {item.collateral && (<FrakButton marginLeft="10px" size="sm" onClick={(e) => withdrawNFT(item, e)} >Withdraw NFT</FrakButton>)}
+                  {item.collateral && (
+                      <FrakButton marginLeft="10px"
+                                  size="sm"
+                                  disabled={isClaiming}
+                        onClick={(e) => withdrawNFT(item, e)}
+                      >Withdraw NFT</FrakButton>
+                  )}
                 </Box>
               )}
 
               {canList(item) && isListed && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={'my-nfts'} scroll={false}>
-                    <FrakButton size="sm" onClick={unList}>
+                    <FrakButton disabled={isUnlisting} size="sm" onClick={unList}>
                       Unlist Fraktions
                     </FrakButton>
                   </NextLink>

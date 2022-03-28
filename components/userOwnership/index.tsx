@@ -1,11 +1,10 @@
 /**
  * React
  */
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 /**
  * Next
  */
-
 import {useRouter} from "next/router";
 /**
  * Chakra
@@ -24,7 +23,7 @@ import {
   claimERC721,
   claimERC1155,
   exportFraktal,
-  getIndexUsed,
+  getIndexUsed, getFraktionsIndex,
 } from '@/utils/contractCalls';
 /**
  * Workflow
@@ -51,34 +50,43 @@ const UserOwnership = ({
   const { closeLoadingModalAfterDelay } = useLoadingScreenHandler();
 
   const router = useRouter();
+  const [isDefraking, setDefraking] = useState<boolean>(false);
+  const [isClaiming, setClaiming] = useState<boolean>(false);
 
   async function claimNFT() {
+    setClaiming(true);
     const actionOpts = { workflow: Workflow.CLAIM_NFT };
-    // this requires the factory to be approved
     if (!factoryApproved) {
-      await approveMarket(factoryAddress, provider, tokenAddress, actionOpts);
+      const result = await approveMarket(factoryAddress, provider, tokenAddress, actionOpts);
+      if (result.error) {
+        setClaiming(false);
+      }
     }
     if (collateral.type == 'ERC721') {
-      // i dont have market Id!!
       await claimERC721(marketId, provider, factoryAddress, actionOpts);
     } else {
       await claimERC1155(marketId, provider, factoryAddress, actionOpts);
     }
     closeLoadingModalAfterDelay();
+    setClaiming(false);
     setTimeout(() => {
-      router.reload()
+      router.reload();
     }, 2500);
   }
 
   async function defraktionalization() {
+    setDefraking(true);
     let tx;
-    // if(!isApproved){
-    //   tx = await approveMarket(marketAddress, provider, tokenAddress)
-    // }
     if (tx || isApproved) {
-      await exportFraktal(tokenAddress, provider, marketAddress);
+      try {
+        await exportFraktal(tokenAddress, provider, marketAddress);
+      } catch (e) {
+        setDefraking(false);
+      }
+      
       if (collateral) {
         await claimNFT();
+        setDefraking(false);
       } else {
         closeLoadingModalAfterDelay();
         setTimeout(() => {
@@ -90,6 +98,7 @@ const UserOwnership = ({
 
   async function importFraktalToMarket() {
     const actionOpts = { workflow: Workflow.FRAK_NFT };
+
     if (!isApproved) {
       await approveMarket(marketAddress, provider, tokenAddress, actionOpts);
     }
@@ -115,9 +124,15 @@ const UserOwnership = ({
   }
 
   useEffect(() => {
-    if (window.location.search.includes('?frak=1')) {
-      importFraktalToMarket();
+    async function checkImportedFraktal() {
+      if (window.location.search.includes('?frak=1')) {
+        const fraktionIndex = await getFraktionsIndex(provider, tokenAddress);
+        if (fraktionIndex === 0) {
+          importFraktalToMarket();
+        }
+      }
     }
+    checkImportedFraktal();
   }, []);
 
   return (
@@ -202,7 +217,7 @@ const UserOwnership = ({
 
           {fraktions == MAX_FRAKTIONS ? (
             <HStack>
-              <FrakButton onClick={() => defraktionalization()}>
+              <FrakButton disabled={isDefraking || isClaiming} onClick={() => defraktionalization()}>
                 DeFrak
               </FrakButton>
             </HStack>
@@ -229,9 +244,7 @@ const UserOwnership = ({
             {collateral && collateral.id && (
               <FrakButton onClick={() => claimNFT()}>Claim NFT</FrakButton>
             )}
-            <FrakButton onClick={() => importFraktalToMarket()}>
-              FRAK IT
-            </FrakButton>
+            <FrakButton onClick={() => importFraktalToMarket()}>FRAK IT</FrakButton>
           </HStack>
         </VStack>
       )}

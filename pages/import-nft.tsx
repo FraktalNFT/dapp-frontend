@@ -25,7 +25,7 @@ import FrakButton4 from '@/components/button4';
 import ListCardAuction from '@/components/listCardAuction';
 import NFTImportCardOS from '@/components/nft-importcard-opensea';
 import NFTCard from '@/components/nftCard';
-import ListCard from '../components/listCard';
+import ListCard from '@/components/listCard';
 /**
  * Redux
  */
@@ -94,7 +94,6 @@ import {MAX_FRAKTIONS} from "@/utils/constants";
 const actionOpts = { workflow: Workflow.IMPORT_NFT };
 
 function ImportNFTPage() {
-
   const router = useRouter();
 
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
@@ -117,7 +116,6 @@ function ImportNFTPage() {
   const [totalPrice, setTotalPrice] = useState(0);
 
   const [tokenToImport, setTokenToImport] = useState<object>({});
-
   const [isAuction, setIsAuction] = useState(false);
 
   /**
@@ -285,6 +283,7 @@ function ImportNFTPage() {
       weiPerFrak, // price per fraktal
       provider,
       marketAddress,
+      NFTName,
       actionOpts
     )
       .then((receipt) => {
@@ -312,6 +311,7 @@ function ImportNFTPage() {
       utils.parseUnits(totalAmount),
       provider,
       marketAddress,
+      NFTName,
       actionOpts
     )
       .then((receipt) => {
@@ -419,7 +419,6 @@ function ImportNFTPage() {
       totalAddresses = userFraktalAddresses.concat(userFraktionsAddreses);
     }
 
-//    console.log('assets', openseaAssets.assets.length)
     if (
         openseaAssets &&
         openseaAssets.assets &&
@@ -612,6 +611,7 @@ function ImportNFTPage() {
                 >
                   <div>
                     <NFTCard
+                        nftName={NFTName}
                         setName={setNFTName}
                         setDescription={setNFTDescription}
                         addFile={() => {}}

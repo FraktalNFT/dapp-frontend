@@ -77,14 +77,15 @@ import { EXPLORE } from '@/constants/routes';
 function MyNFTsView() {
   const router = useRouter();
   const toast = useToast();
-  const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
-  const { fraktals, fraktions, nfts, balance, loading } = useWalletContext();
   const [auctions, setAuctions] = useState(null);
   const [participatedAuctions, setParticipatedAuctions] = useState(null);
   const [userAccount, setUserAccount] = useState(null);
   const [refresh, setRefresh] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
   const { isMinting, setIsMinting } = useMintingContext();
   const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
+  const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
+  const { fraktals, fraktions, nfts, balance, loading } = useUserContext();
 
   const canFrak = (item) =>
       item && !!(fraktals || []).find((fraktion) => fraktion.id === item.id);
@@ -133,7 +134,7 @@ function MyNFTsView() {
           isClosable: true,
         });
         refreshPage();
-        closeLoadingModalAfterDelay()
+        closeLoadingModalAfterDelay();
       })
       .catch((e) => {
         toast({
@@ -190,6 +191,7 @@ function MyNFTsView() {
   };
 
   const sellerClaimEth = async (tokenAddress, seller, sellerNonce) => {
+    setIsClaiming(true);
     redeemAuctionSeller(
       tokenAddress,
       seller,
@@ -214,7 +216,9 @@ function MyNFTsView() {
           duration: 2000,
           isClosable: true,
         });
-      });
+      }).finally(() => {
+      setIsClaiming(false);
+    });
   };
 
   useEffect(() => {
@@ -674,6 +678,7 @@ function MyNFTsView() {
                   href={`/nft/${item.seller}-${item.sellerNonce}/auction`}
                 >
                   <NFTAuctionItem
+                    isClaiming={isClaiming}
                     item={item}
                     name={item.name}
                     amount={utils.formatEther(item?.amountOfShare)}

@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 import FrakButton3 from "../button3";
 import styles from "../../styles/mint-nft.module.css";
 import { Box, Input, Textarea } from "@chakra-ui/react";
-const NFTCard = ({ setName, setDescription, addFile, file, fileUpload=true }) => {
+const NFTCard = ({ setName, setDescription, addFile, file, fileUpload=true, nftName = "" }) => {
   function openLocal() {
     document.getElementById("imageInput").files = null;
     document.getElementById("imageInput").click();
@@ -24,6 +24,7 @@ const NFTCard = ({ setName, setDescription, addFile, file, fileUpload=true }) =>
         NAME
       </div>
       <Input
+        value={nftName}
         id="nameIn"
         placeholder="Give your NFT a Unique and Catchy Name"
         sx={{

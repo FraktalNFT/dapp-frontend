@@ -25,7 +25,8 @@ import {
   tradingRewardsContracts,
   feeSharingContracts,
   fraktalTokenContracts,
-  lpTokenContracts
+  lpTokenContracts,
+  partnerAirdropContract
 } from '@/utils/constants';
 
 import { getRPCUrl } from "@/utils/helpers";
@@ -42,6 +43,7 @@ type Web3ContextType = {
   feeSharingAddress: null | string;
   fraktalTokenAddress: null | string;
   lpTokenAddress: null | string;
+  partnerAirdropAddress: null | string;
 };
 
 const Web3Context = createContext<
@@ -59,6 +61,7 @@ const Web3Context = createContext<
   fraktalTokenAddress: null,
   lpTokenAddress: null,
   loading: false,
+  partnerAirdropAddress: null,
   connectWeb3: () => {},
 });
 
@@ -87,7 +90,7 @@ const web3Modal =
   });
 
 const Web3ContextProvider: React.FC = ({ children }) => {
-  const [{ account, providerChainId, provider, marketAddress, factoryAddress, airdropAddress, lpStakingAddress, tradingRewardsAddress, feeSharingAddress, fraktalTokenAddress, lpTokenAddress}, setWeb3State] =
+  const [{ account, providerChainId, provider, marketAddress, factoryAddress, airdropAddress, lpStakingAddress, tradingRewardsAddress, feeSharingAddress, fraktalTokenAddress, lpTokenAddress, partnerAirdropAddress}, setWeb3State] =
     useState<Web3ContextType>({
       account: null,
       provider: null,
@@ -99,7 +102,8 @@ const Web3ContextProvider: React.FC = ({ children }) => {
       tradingRewardsAddress: null,
       feeSharingAddress: null,
       fraktalTokenAddress: null,
-      lpTokenAddress: null
+      lpTokenAddress: null,
+      partnerAirdropAddress: null
     });
 
   const [loading, setLoading] = useState(true);
@@ -124,6 +128,7 @@ const Web3ContextProvider: React.FC = ({ children }) => {
           const feeSharingChainAddress = feeSharingContracts.find(x=>x.providerChainId === chainId).address;
           const fraktalTokenChainAddress = fraktalTokenContracts.find(x=>x.providerChainId === chainId).address;
           const lpTokenChainAddress = lpTokenContracts.find(x=>x.providerChainId === chainId).address;
+          const partnerAirdropChainAddress = partnerAirdropContract.find(x=>x.providerChainId === chainId).address;
           const account = initialCall
             ? await provider.getSigner().getAddress()
             : null;
@@ -141,7 +146,8 @@ const Web3ContextProvider: React.FC = ({ children }) => {
             tradingRewardsAddress: tradingRewardsChainAddress,
             feeSharingAddress: feeSharingChainAddress,
             fraktalTokenAddress: fraktalTokenChainAddress,
-            lpTokenAddress: lpTokenChainAddress
+            lpTokenAddress: lpTokenChainAddress,
+            partnerAirdropAddress: partnerAirdropChainAddress
           }));
         }
       } catch (err) {
@@ -170,7 +176,7 @@ const Web3ContextProvider: React.FC = ({ children }) => {
 
   return (
     <Web3Context.Provider
-      value={{ account, providerChainId, provider, loading, connectWeb3, marketAddress, factoryAddress, airdropAddress, lpStakingAddress, tradingRewardsAddress, feeSharingAddress, fraktalTokenAddress, lpTokenAddress }}
+      value={{ account, providerChainId, provider, loading, connectWeb3, marketAddress, factoryAddress, airdropAddress, lpStakingAddress, tradingRewardsAddress, feeSharingAddress, fraktalTokenAddress, lpTokenAddress,partnerAirdropAddress }}
     >
       {children}
     </Web3Context.Provider>

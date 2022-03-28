@@ -280,6 +280,7 @@ const MintPage = (props) => {
       utils.parseUnits(totalAmount),
       provider,
       marketAddress,
+      name,
       actionOpts
     )
       .then(() => {
@@ -389,6 +390,7 @@ const MintPage = (props) => {
           </div>
           <div>
             <NFTCard
+              nftName={name}
               setName={setName}
               setDescription={setDescription}
               addFile={addFile}

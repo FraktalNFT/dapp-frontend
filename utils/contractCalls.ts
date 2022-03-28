@@ -32,6 +32,7 @@ import {
   OFFERING_BUYOUT,
   VOTING_BUYOUTS,
 } from '../redux/actions/contractActions';
+import {Web3Provider} from "@ethersproject/providers/src.ts/web3-provider";
 
 //tested
 const factoryAbi = [
@@ -87,15 +88,17 @@ const revenuesAbi = [
     'function totalShares() external view returns (uint256)',
 ];
 const airdropABI = [
-  'function claim(uint256,bytes32[],address) external',
-  'function canClaim(address,uint256,bytes32[]) external view returns (bool)'
+  // 'function claim(uint256,bytes32[],address) external',
+  'function canClaim(address,uint256,bytes32[]) external view returns (bool)',
+  'function claim(uint256,bytes32[]) external',
 ];
 const lpStakingABI = [
   'function deposit(uint256) external',
   'function harvest() external',
   'function withdraw(uint256) external',
   'function calculatePendingRewards(address) external view returns (uint256)',
-  'function userInfo(address user) external view returns (uint256,uint256)'
+  'function userInfo(address user) external view returns (uint256,uint256)',
+  'function rewardPerBlock() external view returns (uint256)'
 ];
 const tradingRewardsABI = [
   'function canClaim(address,uint256,bytes32[]) external view returns (bool,uint256)',
@@ -516,12 +519,12 @@ export async function importERC1155(
 }
 
 export async function listItem(
-  tokenAddress,
-  amount,
-  price,
-  provider,
-  marketAddress,
-  name,
+  tokenAddress: string,
+  amount: BigNumber,
+  price: BigNumber,
+  provider: Web3Provider,
+  marketAddress: string,
+  name: string,
   opts?: ActionOpts
 ) {
   const override = { gasLimit: 300000 };
@@ -822,12 +825,12 @@ export async function participateAuction(
   return receipt;
 }
 export async function listItemAuction(
-  tokenAddress,
-  reservePrice,
-  numberOfShares,
-  provider,
-  marketAddress,
-  name,
+  tokenAddress: string,
+  reservePrice: BigNumber,
+  numberOfShares: BigNumber,
+  provider: Web3Provider,
+  marketAddress: string,
+  name: string,
   opts?: ActionOpts
 ) {
   const signer = await loadSigner(provider);
@@ -903,6 +906,23 @@ export async function claimAirdrop3160(
   const signer = await loadSigner(provider);
   const customContract = new Contract("0x273437BaD2C50c0582FD97b7bd68dbF06F747334", airdropABI, signer);
   let tx = await customContract.claim(amount,merkleProof,listedTokenAddress);
+  let receipt = await processTx(tx);
+  return receipt;
+}
+
+export async function claimPartnerAirdrop(
+  amount,
+  merkleProof,
+  provider,
+  airdropAddress,
+  opts?: ActionOpts
+) {
+  console.log({amount,merkleProof,provider,airdropAddress});
+  
+  const signer = await loadSigner(provider);
+  console.log({provider,airdropAddress, airdropABI, signer});
+  const customContract = new Contract(airdropAddress, airdropABI, signer);
+  let tx = await customContract.claim(amount,merkleProof);
   let receipt = await processTx(tx);
   return receipt;
 }
@@ -1162,16 +1182,17 @@ export async function getAPY(
   provider,
   opts?: ActionOpts
 ) {
-  console.log("calling");
-  
   const signer = await loadSigner(provider);
   const customContract = new Contract("0x2763f944fc85CAEECD559F0f0a4667A68256144d", lpABI, signer);
   let tx = await customContract.getReserves();
 
   const frak:string = utils.formatEther(tx[0]);
 
+  const lpStakingContract = new Contract("0x9286Ea5E9b22262D4C1f142F1DD35Ffb1EaacD03", lpStakingABI, signer);
+  const frakPerBlock = Number(utils.formatEther(await lpStakingContract.rewardPerBlock()));
+
   const blocksPerYear = 31622400/15;
-  const frakPerYear = blocksPerYear*50;
+  const frakPerYear = blocksPerYear*frakPerBlock;
   const apy  = Math.round(frakPerYear/(Number(frak)*2) *100);
   
 
