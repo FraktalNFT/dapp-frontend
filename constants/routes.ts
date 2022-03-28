@@ -9,6 +9,8 @@ export const MY_NFTS = '/my-nfts';
 export const REWARDS = '/rewards';
 export const NOT_FOUND = '/404';
 export const CLAIM = '/claim';
+export const CLAIM_BONUS = '/claim-bonus';
+
 
 export const resolveNFTRoute = (nftAddress: string) =>
   `/nft/${nftAddress}/details`;
