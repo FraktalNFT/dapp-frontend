@@ -296,10 +296,6 @@ export default function DetailsView() {
     });
   };
 
-  useEffect(()=>{
-    toastClaimAirdrop();
-  },[]);
-
   async function callUnlistItem() {
     let tx = await unlistItem(tokenAddress, provider, marketAddress);
     if (typeof tx !== "undefined") {
