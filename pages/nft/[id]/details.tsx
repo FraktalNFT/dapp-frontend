@@ -98,14 +98,14 @@ export default function DetailsView() {
         pathname = router.asPath;
         setArgs(pathname.split("/"));
         setIsPageReady(false);
-      } while (args[2] === "[id]" || typeof args[2] === "undefined");
+      } while (args[2] === "[id]" || typeof args[2] === "undefined" );
 
       const tokenAddress = args[2];
       const tokenAddressLowerCase = tokenAddress.toLocaleLowerCase();
       setTokenAddress(tokenAddressLowerCase);
       setIsPageReady(true);
     }
-  }, [router]);
+  }, [account]);
 
   useEffect(() => {
     async function getAllData() {
@@ -118,7 +118,7 @@ export default function DetailsView() {
     }
     getAllData();
     }, [
-    isPageReady,
+    isPageReady
   ]);
 
   async function getFraktal() {
@@ -296,10 +296,6 @@ export default function DetailsView() {
     });
   };
 
-  useEffect(()=>{
-    toastClaimAirdrop();
-  },[]);
-
   async function callUnlistItem() {
     let tx = await unlistItem(tokenAddress, provider, marketAddress);
     if (typeof tx !== "undefined") {
@@ -344,7 +340,6 @@ export default function DetailsView() {
                     boxShadow="md"
                     height="350px"
                     sx={{
-                        display: 'grid',
                         width: `100%`,
                         placeItems: `center`,
                     }}
@@ -355,7 +350,7 @@ export default function DetailsView() {
                           type={"details"}
                           imageURL={nftObject.imageURL}
                       />
-                  {!isImageLoaded  &&   <Spinner size="xl" />}
+                  {!isImageLoaded  &&  <Spinner size="xl" />}
               </Box>
               <HStack justifyContent="space-between" marginTop="16px">
                 <VStack>
