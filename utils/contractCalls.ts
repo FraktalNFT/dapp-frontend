@@ -129,7 +129,7 @@ export async function getShares(account, provider, revenueContract) {
     let shares = await customContract.shares(account);
     return shares;
   } catch {
-    return 'error getting shares';
+    return null;
   }
 }
 
@@ -139,7 +139,7 @@ export async function getTotalShares(provider, revenueContract) {
     let shares = await customContract.totalShares();
     return shares;
   } catch {
-    return 'error getting shares';
+    return null;
   }
 }
 export async function getReleased(account, provider, revenueContract) {
@@ -148,7 +148,7 @@ export async function getReleased(account, provider, revenueContract) {
     let released = await customContract.released(account);
     return released;
   } catch {
-    return 'error getting released';
+    return null;
   }
 }
 
