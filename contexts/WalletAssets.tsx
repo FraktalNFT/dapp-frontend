@@ -13,7 +13,7 @@ import {
  */
 import { useWeb3Context } from "./Web3Context";
 import { assetsInWallet } from "@/utils/openSeaAPI";
-import { getSubgraphData } from "@/utils/graphQueries";
+import {getSubgraphData, WALLET} from "@/utils/graphQueries";
 /**
  * Helpers
  */
@@ -62,7 +62,6 @@ export const WalletContextProviderFC = ({ children }) => {
         // if user not in subgraph, fails to complete and show other nfts !!
         async () => {
             try {
-                //TODO - REMOVE THIS
                 setLoading(true);
                 let totalNFTs = [];
                 let nftsERC721_wallet;
@@ -74,14 +73,15 @@ export const WalletContextProviderFC = ({ children }) => {
                 let totalAddresses: null | string[];
                 let nftObjectsClean;
 
-                let openseaAssets = await assetsInWallet(account, {
-                    limit: 100,
+                let openseaAssets = await assetsInWallet("sad", {
+                    limit: 5,
                     offset: 0
                 });
+                console.log('opeanSea Assets', openseaAssets)
 
                 setWalletAssets(openseaAssets.assets);
                 let fobjects = await getSubgraphData(
-                    "wallet",
+                    WALLET,
                     account.toLocaleLowerCase()
                 );
 

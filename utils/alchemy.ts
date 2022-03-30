@@ -10,7 +10,6 @@ export async function getNftMetadata(contractAddress, tokenId = "1") {
     const response = await web3.alchemy.getNftMetadata({
         contractAddress: contractAddress,
         tokenId: tokenId
-    })
-
+    });
     return response;
 }

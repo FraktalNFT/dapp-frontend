@@ -47,7 +47,6 @@ import { useLoadingScreenHandler } from 'hooks/useLoadingScreen';
 import store from "@/redux/store";
 import {MY_NFTS} from "@/constants/routes";
 import NFTMedia from "@/components/media";
-import {useWalletContext} from "@/contexts/WalletAssets";
 
 import { FrakCard } from '../../types';
 
@@ -93,7 +92,6 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const [isListed, setIsListed] = useState(false);
     const [isUnlisting, setIsUnlisting] = useState(false);
     const [isClaiming, setIsClaiming] = useState(false);
-    const { fraktions, fraktals } = useUserContext();
     const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
     const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 

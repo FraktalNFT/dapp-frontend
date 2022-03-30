@@ -79,7 +79,7 @@ import {
  */
 import {createObject, createOpenSeaObject} from "@/utils/nftHelpers";
 import {assetsInWallet} from "@/utils/openSeaAPI";
-import {getSubgraphData} from "@/utils/graphQueries";
+import {getSubgraphData, WALLET} from "@/utils/graphQueries";
 
 /**
  * Inifinte Scroll
@@ -372,7 +372,7 @@ function ImportNFTPage() {
     }
 
     let fobjects = await getSubgraphData(
-        "wallet",
+        WALLET,
         account.toLocaleLowerCase()
     );
 
@@ -452,7 +452,6 @@ function ImportNFTPage() {
      // console.log('nftsFiltered', nftsFiltered)
       let nftObjects = await Promise.all(
           nftsFiltered.map(x => {
-       //     console.log('x', x)
             return createOpenSeaObject(x);
           })
       );

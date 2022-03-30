@@ -62,7 +62,7 @@ import {
 /**
  * Utils
  */
-import { getSubgraphAuction } from 'utils/graphQueries';
+import {GET_ALL_AUCTIONS, getSubgraphAuction} from 'utils/graphQueries';
 import { createListedAuction } from 'utils/nftHelpers';
 import { utils } from 'ethers';
 /**
@@ -229,7 +229,7 @@ function MyNFTsView() {
 
   useEffect(() => {
     const getAuctions = async () => {
-      let auctionData = await getSubgraphAuction('auctions', '');
+      let auctionData = await getSubgraphAuction(GET_ALL_AUCTIONS, '');
       let auctionDataParticipated = { ...auctionData };
       auctionDataParticipated = auctionDataParticipated?.auctions?.filter(
         (x) => {

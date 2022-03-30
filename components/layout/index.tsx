@@ -39,7 +39,6 @@ import LoadScreens from '../load-screens';
 
 const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { providerChainId, connectWeb3, provider, airdropAddress, account } = useWeb3Context();
-  const { walletAssets } = useUserContext();
   const router = useRouter();
   const toast = useToast();
   const [isMobile, setIsMobile] = useState(false);
@@ -213,10 +212,6 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
       });
     }
   };
-
-  useEffect(() => {
-    showAirdropBanners();
-  }, [walletAssets]);
 
   const openLearnMore = () => {
     if (
