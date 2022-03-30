@@ -71,7 +71,6 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
         let userShares = await getShares(account, provider, revenueAddress);
         let userReleased = await getReleased(account, provider, revenueAddress);
         let totalShares = await getTotalShares(provider, revenueAddress);
-        console.log({userShares,userReleased, revenueAddress});
 
         if (userShares) {
           setShares(userShares);
@@ -133,13 +132,12 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
           gains
         </Text>
         {/* value = total value, shares = shares the user has */}
-
-            <div>
-              {(Number(value) / 10 ** 18) *
-                  (Number(utils.formatEther(shares)) /
-                      Number(utils.formatEther(totalShares)))}{' '}
-              ETH
-            </div>
+        <div>
+          {(Number(value) / 10 ** 18) *
+            (Number(utils.formatEther(shares)) /
+              Number(utils.formatEther(totalShares)))}{' '}
+          ETH
+        </div>
         {isClaimable() && (
           <div>
             {buyout && !isApproved ? (
