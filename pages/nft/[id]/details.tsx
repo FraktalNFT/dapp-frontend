@@ -105,7 +105,7 @@ export default function DetailsView() {
       setTokenAddress(tokenAddressLowerCase);
       setIsPageReady(true);
     }
-  }, [account]);
+  }, [account, router]);
 
   useEffect(() => {
     async function getAllData() {
