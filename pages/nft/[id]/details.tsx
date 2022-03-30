@@ -109,7 +109,6 @@ export default function DetailsView() {
 
   useEffect(() => {
     async function getAccountData() {
-      console.log('account account', account)
       if (isPageReady) {
         await getFraktions();
         await getContractData();
@@ -121,7 +120,6 @@ export default function DetailsView() {
   useEffect(() => {
     async function getNFTData() {
       if (isPageReady) {
-        console.log('account NFT', account)
         await getOffers();
         await getFraktal();
       }
