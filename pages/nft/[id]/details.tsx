@@ -105,21 +105,29 @@ export default function DetailsView() {
       setTokenAddress(tokenAddressLowerCase);
       setIsPageReady(true);
     }
-  }, [account, router]);
+  }, [router]);
 
   useEffect(() => {
-    async function getAllData() {
+    async function getAccountData() {
+      console.log('account account', account)
       if (isPageReady) {
         await getFraktions();
         await getContractData();
+      }
+    }
+    getAccountData();
+    }, [account]);
+
+  useEffect(() => {
+    async function getNFTData() {
+      if (isPageReady) {
+        console.log('account NFT', account)
         await getOffers();
         await getFraktal();
       }
     }
-    getAllData();
-    }, [
-    isPageReady
-  ]);
+    getNFTData();
+  }, [isPageReady]);
 
   async function getFraktal() {
     let fraktionsFetch = await getSubgraphData(
