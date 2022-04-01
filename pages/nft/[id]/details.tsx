@@ -105,21 +105,27 @@ export default function DetailsView() {
       setTokenAddress(tokenAddressLowerCase);
       setIsPageReady(true);
     }
-  }, [account]);
+  }, [router]);
 
   useEffect(() => {
-    async function getAllData() {
+    async function getAccountData() {
       if (isPageReady) {
         await getFraktions();
         await getContractData();
+      }
+    }
+    getAccountData();
+    }, [account]);
+
+  useEffect(() => {
+    async function getNFTData() {
+      if (isPageReady) {
         await getOffers();
         await getFraktal();
       }
     }
-    getAllData();
-    }, [
-    isPageReady
-  ]);
+    getNFTData();
+  }, [isPageReady]);
 
   async function getFraktal() {
     let fraktionsFetch = await getSubgraphData(
