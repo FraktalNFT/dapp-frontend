@@ -63,23 +63,11 @@ export const WalletContextProviderFC = ({ children }) => {
         async () => {
             try {
                 setLoading(true);
-                let totalNFTs = [];
-                let nftsERC721_wallet;
-                let nftsERC1155_wallet;
                 let fraktionsObjects;
                 let fraktionsObjectsClean;
                 let userBalanceFormatted;
                 let fraktalsClean: null | any[];
-                let totalAddresses: null | string[];
-                let nftObjectsClean;
 
-                let openseaAssets = await assetsInWallet("sad", {
-                    limit: 5,
-                    offset: 0
-                });
-                console.log('opeanSea Assets', openseaAssets)
-
-                setWalletAssets(openseaAssets.assets);
                 let fobjects = await getSubgraphData(
                     WALLET,
                     account.toLocaleLowerCase()
@@ -119,65 +107,11 @@ export const WalletContextProviderFC = ({ children }) => {
                             return x != null && x.imageURL;
                         });
                     }
-
-                    let userFraktalAddresses = fraktalsClean.map(x => {
-                        return x.id;
-                    });
-
-                    let userFraktionsAddreses = fraktionsObjectsClean.map(x => {
-                        return x.id;
-                    });
-
-                    totalAddresses = userFraktalAddresses.concat(userFraktionsAddreses);
                 }
 
-                if (
-                    openseaAssets &&
-                    openseaAssets.assets &&
-                    openseaAssets.assets.length
-                ) {
-                    nftsERC721_wallet = openseaAssets.assets.filter(x => {
-                        return x.asset_contract.schema_name == "ERC721";
-                    });
-
-                    if (nftsERC721_wallet && nftsERC721_wallet.length) {
-                        totalNFTs = totalNFTs.concat(nftsERC721_wallet);
-                    }
-                    nftsERC1155_wallet = openseaAssets.assets.filter(x => {
-                        return x.asset_contract.schema_name == "ERC1155";
-                    });
-
-                    totalNFTs = nftsERC721_wallet.concat(nftsERC1155_wallet);
-                    if (!fobjects || !fobjects.users[0] || !fobjects.users[0].fraktals) {
-                        totalAddresses = [];
-                    }
-
-                    // NFTs filtering
-                    let nftsFiltered = totalNFTs.map(x => {
-                        if (!totalAddresses.includes(x.asset_contract.address)) {
-                            return x;
-                        }
-                    });
-
-                    let nftObjects = await Promise.all(
-                        nftsFiltered.map(x => {
-                            return createOpenSeaObject(x);
-                        })
-                    );
-
-                    if (nftObjects) {
-                        nftObjectsClean = nftObjects.filter(x => {
-                            return x != null && x.imageURL;
-                        });
-                    } else {
-                        nftObjectsClean = nftObjects;
-                    }
-
-                    setFraktals(fraktalsClean);
-                    setFraktions(fraktionsObjectsClean);
-                    setNFTs(nftObjectsClean);
-                    setBalance(userBalanceFormatted);
-                }
+                setBalance(userBalanceFormatted);
+                setFraktions(fraktionsObjectsClean);
+                setFraktals(fraktalsClean);
                 //TODO: detect account and states change > refresh
             } catch (err) {
                 console.error(err.message);
@@ -190,7 +124,7 @@ export const WalletContextProviderFC = ({ children }) => {
 
     return (
         <WalletContext.Provider
-            value={{ fraktals, fraktions, nfts, balance, loading, fetchNFTs, walletAssets }}
+            value={{ fraktals, fraktions, nfts, balance, loading, fetchNFTs }}
         >
             {children}
         </WalletContext.Provider>
@@ -198,7 +132,7 @@ export const WalletContextProviderFC = ({ children }) => {
 };
 
 export const useWalletContext = () => {
-    const { fraktals, fraktions, nfts, balance, loading, fetchNFTs, walletAssets } = useContext(
+    const { fraktals, fraktions, nfts, balance, loading, fetchNFTs } = useContext(
         WalletContext
     );
     return {
@@ -207,7 +141,6 @@ export const useWalletContext = () => {
         nfts,
         balance,
         loading,
-        fetchNFTs,
-        walletAssets
+        fetchNFTs
     };
 };

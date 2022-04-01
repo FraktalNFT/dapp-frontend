@@ -1,22 +1,23 @@
-import { Button } from "@chakra-ui/button";
-import { Image } from "@chakra-ui/image";
-import { Box, Center, StackProps, Text, VStack } from "@chakra-ui/layout";
-import { formatEther } from "@ethersproject/units";
+/**
+ * REACT
+ */
+
 import React, { forwardRef } from "react";
+/**
+ * Cakra
+ */
+import { Image } from "@chakra-ui/image";
+import { Box, StackProps, Text, VStack } from "@chakra-ui/layout";
 import { FrakCard } from "../../types";
-import FrakButton from "../button";
-import NextLink from "next/link";
-import {useState} from 'react';
-import { useWeb3Context } from '../../contexts/Web3Context';
-import {approveMarket, importERC721, importERC1155} from '../../utils/contractCalls';
-// import { claimNFT } from '../../utils/helpers';
 
 interface NFTItemProps extends StackProps {
   item: FrakCard;
   CTAText?: string;
   onCollateralRequest?: void;
 };
-
+/**
+ * MFT Import Card
+ */
 const NFTImportCardOS = forwardRef<HTMLDivElement, NFTItemProps>(
   ({ item, onClick }, ref) => {
     return (
@@ -30,12 +31,34 @@ const NFTImportCardOS = forwardRef<HTMLDivElement, NFTItemProps>(
         sx={{transition: `all 0.25s`}}
         _hover={{transform: `translateY(-16px)`}}
       >
-        <Box minH='30rem' w='100%' position='relative' >
-          <Image src={item.imageURL} width='100%' height='100%' style={{verticalAlign:'auto'}}/>
+        <Box
+            rounded="md"
+            borderWidth="1px"
+            boxShadow="md"
+            height="350px"
+            sx={{
+              width: `100%`,
+              placeItems: `center`,
+            }}
+        >
+
+          <Image
+              width="100%"
+              height="100%"
+              objectFit="cover"
+              margin-left="auto"
+              margin-right="auto"
+              display="flex"
+              sx={{
+                objectFit: `cover`,
+              }}
+              style={{ verticalAlign: 'middle' }}
+              src={item.imageURL}/>
+
         </Box>
-          <Text mb='1.6rem' sx={{width: `100%`, padding: `0 1rem`, fontFamily: `Inter, sans-serif`, fontWeight: `700`}}>
-            {item?.name}
-          </Text>
+        <Text mb='1.6rem' sx={{width: `100%`, padding: `0 1rem`, fontFamily: `Inter, sans-serif`, fontWeight: `700`}}>
+          {item?.name}
+        </Text>
       </VStack>
     );
   }

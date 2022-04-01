@@ -210,8 +210,6 @@ const StakePanels = ({totalStaked, currency, provider, account,
 
     const onSetAmountToUnstake = (d) => {
         if (d > 0 && parseFloat(d) && d <= totalStaked) {
-            console.log(d);
-
             setUnstakeAmount(d);
             return setUnstakeIsReady(true);
         }
@@ -394,9 +392,7 @@ const ClaimRewards = ({currency, unclaimedRewards, type, provider, feeSharingAdd
             await tradingRewardsClaim(tradingRewardsAmount, tradingRewardsMerkleProof, provider, tradingRewardsAddress);
         }
         if(type === "lp"){
-            await lpStakingHarvest(provider,lpStakingAddress)
-            console.log("Claim LP");
-
+            await lpStakingHarvest(provider,lpStakingAddress);
         }
     };
 

@@ -150,7 +150,6 @@ function AuctionNFTView({router}) {
       });
 
       const item = await createListedAuction(obj.auction);
-      console.log('Item', item)
       Object.assign(obj.auction,{
         "hash":_hash.fraktalNft.hash,
         "name":item.name,

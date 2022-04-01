@@ -71,8 +71,6 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
         let userShares = await getShares(account, provider, revenueAddress);
         let userReleased = await getReleased(account, provider, revenueAddress);
         let totalShares = await getTotalShares(provider, revenueAddress);
-        // console.log({userShares,userReleased, revenueAddress});
-
         if (userShares) {
           setShares(userShares);
         }

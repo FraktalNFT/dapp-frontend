@@ -182,10 +182,8 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
             }
           }
         } catch (e) {
-          console.log(e)
           setIsClaiming(false);
         }
-
 
     };
 

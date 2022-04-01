@@ -14,7 +14,16 @@ const ASSETS_METHOD = 'assets';
  * @param address
  */
 export const assetsInWallet = (address, params = {}) => {
-  const url = apiURL + `assets?owner=${address}&order_direction=desc&offset=${params.offset}&limit=${params.limit}`;
+  let url = apiURL + `assets?owner=${address}&order_direction=desc`;
+  if (params.offset) {
+      url = apiURL + `&offset=${params.offset}`;
+  }
+  if (params.limit) {
+      url += `&limit=${params.limit}`;
+  }
+  if (params.cursor) {
+    url += `&cursor=${params.cursor}`;
+  }
   const data = fetch(url, options)
     .then(response => response.json())
     .then(data => {
