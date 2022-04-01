@@ -47,8 +47,6 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
     const [isApproving, setIsApproving] = useState(false);
     const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
-    // const buyout = true;
-
     useEffect(() => {
       async function getData() {
         if (buyout) {
@@ -71,6 +69,7 @@ const RevenuesDetail = forwardRef<HTMLDivElement, revenueItemProps>(
         let userShares = await getShares(account, provider, revenueAddress);
         let userReleased = await getReleased(account, provider, revenueAddress);
         let totalShares = await getTotalShares(provider, revenueAddress);
+
         if (userShares) {
           setShares(userShares);
         }
