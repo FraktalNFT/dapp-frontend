@@ -45,6 +45,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [canClaim,setCanClaim] = useState<Boolean>(false);
   const [airdropAmount,setAirdropAmount] = useState<string>("0");
   const [proof,setProof] = useState<Array<string>>(null);
+  const [isAirdropLive, setIsAirdropLive] = useState<Boolean>(false);
 
   const isValid = useMemo(
     () => [parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID)].includes(providerChainId),
@@ -55,7 +56,7 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const listNFTToClaimId = 'listNFT';
   const claimToastId = 'claim';
   const learnToastId = 'learn';
-  const notEligible = 'notEligible'
+  const notEligible = 'notEligible';
 
   useEffect(() => {
     const width = window?.innerWidth;
@@ -105,32 +106,37 @@ const Layout: React.FC<{ children: ReactNode }> = ({ children }) => {
  }
 
   useEffect(() => {
-    if (!isValid && !toast.isActive(airdropConnectToWalletId)) {
-      const title = 'FRAKs airdrop is live';
-      const subtitle = 'Connect your wallet to check if you are eligible.';
+    if (isAirdropLive) {
+        if (!isValid && !toast.isActive(airdropConnectToWalletId) ) {
+            const title = 'FRAKs airdrop is live';
+            const subtitle = 'Connect your wallet to check if you are eligible.';
 
-      toast.closeAll();
-      toast({
-        id: airdropConnectToWalletId,
-        position: 'top',
-        duration: null,
-        render: () => (
-          <AirdropBanner
-            icon={'🔥'}
-            buttonText={'Connect Wallet'}
-            onClick={connectWeb3}
-            title={title}
-            subtitle={subtitle}
-          />
-        ),
-      });
-    } else {
-      toast.closeAll();
-      showAirdropBanners();
+            toast.closeAll();
+            toast({
+                id: airdropConnectToWalletId,
+                position: 'top',
+                duration: null,
+                render: () => (
+                    <AirdropBanner
+                        icon={'🔥'}
+                        buttonText={'Connect Wallet'}
+                        onClick={connectWeb3}
+                        title={title}
+                        subtitle={subtitle}
+                    />
+                ),
+            });
+        } else {
+            toast.closeAll();
+            showAirdropBanners();
+        }
     }
   }, [isValid]);
 
   const showAirdropBanners = async () => {
+    if (!isAirdropLive) {
+       return false;
+    }
     if (!isValid || window?.localStorage.getItem('userClaimed') == 'true') {
       return;
     }
