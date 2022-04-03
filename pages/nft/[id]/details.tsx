@@ -120,7 +120,7 @@ export default function DetailsView() {
       }
     }
     getAccountData();
-    }, [account]);
+    }, [account, isPageReady]);
 
   useEffect(() => {
     async function getNFTData() {
@@ -185,6 +185,7 @@ export default function DetailsView() {
   }
 
   async function getContractData() {
+    console.log('account', account)
     if (tokenAddress && account && provider) {
       try {
         let index = await getFraktionsIndex(provider, tokenAddress);
