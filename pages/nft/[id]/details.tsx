@@ -115,7 +115,7 @@ export default function DetailsView() {
       }
     }
     getAccountData();
-    }, [account]);
+    }, [account, isPageReady]);
 
   useEffect(() => {
     async function getNFTData() {
