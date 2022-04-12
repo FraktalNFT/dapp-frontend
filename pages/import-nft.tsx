@@ -57,11 +57,11 @@ import {
   LISTING_NFT,
   rejectContract,
   closeModal,
-} from '../redux/actions/contractActions';
+} from '@/redux/actions/contractActions';
 /**
  * Redux
  */
-import store from '../redux/store';
+import store from '@/redux/store';
 /**
  * Contracts Calls
  */
@@ -79,7 +79,7 @@ import {
  */
 import {createObject, createOpenSeaObject} from "@/utils/nftHelpers";
 import {assetsInWallet} from "@/utils/openSeaAPI";
-import {getSubgraphData} from "@/utils/graphQueries";
+import {getSubgraphData, WALLET} from "@/utils/graphQueries";
 
 /**
  * Inifinte Scroll
@@ -94,9 +94,9 @@ import {MAX_FRAKTIONS} from "@/utils/constants";
 const actionOpts = { workflow: Workflow.IMPORT_NFT };
 
 function ImportNFTPage() {
-  const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
-
   const router = useRouter();
+
+  const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [noNFTs, setNoNFTs] = useState<boolean>(false);
   const [nfts, setNFTs] = useState([]);
@@ -340,16 +340,29 @@ function ImportNFTPage() {
       }
     }
   };
-
   // Show Loading State
   useEffect(() => {
     if (account) {
       setNFTs([]);
       setOffset(0);
       setIsLoading(true);
-      fetchNFTs();
+      getData();
     }
   }, [account]);
+
+  async function paginateAssets(account, params = {}) {
+    let openseaAssets = {
+      assets: []
+    }
+    let openseaRequest;
+    do {
+      openseaRequest = await assetsInWallet(account, {limit: params.limit, cursor: openseaRequest ? openseaRequest.next : null});
+      if (openseaRequest.assets) {
+        openseaAssets.assets = [...openseaAssets.assets, ...openseaRequest.assets]
+      }
+    } while (openseaRequest.next !== null);
+    return openseaAssets;
+  }
 
   async function getData() {
     let totalNFTs = [];
@@ -361,18 +374,9 @@ function ImportNFTPage() {
     let totalAddresses: null | string[];
     let nftObjectsClean;
 
-    let openseaAssets = await assetsInWallet(account, {
-      limit: limit,
-      offset: offset
-    });
-
-    if (openseaAssets && openseaAssets.assets && openseaAssets.assets.length === 0) {
-      setHasMore(false);
-      return;
-    }
-
+    let openseaAssets = await paginateAssets(account, {limit: 50});
     let fobjects = await getSubgraphData(
-        "wallet",
+        WALLET,
         account.toLocaleLowerCase()
     );
 
@@ -444,7 +448,7 @@ function ImportNFTPage() {
         if (!totalAddresses.includes(x.asset_contract.address)) {
           return x;
         }
-      });
+      }).filter(notUndefined => notUndefined !== undefined);
 
       let nftObjects = await Promise.all(
           nftsFiltered.map(x => {
@@ -458,19 +462,12 @@ function ImportNFTPage() {
       } else {
         nftObjectsClean = nftObjects;
       }
-      setHasMore(true);
-      setNFTs([...nfts, ...nftObjectsClean]);
+      setHasMore(false);
+      setNFTs(nftObjectsClean);
       setOffset(limit + offset);
       setIsLoading(false);
     }
   }
-
-  const fetchNFTs = useCallback(
-      async () => {
-        getData()
-      },
-      [account]
-  );
 
   // Set Stuff Up After Import Token Selected
   useEffect(() => {
@@ -481,74 +478,69 @@ function ImportNFTPage() {
 
   return (
       <>
-        {isLoading && <Spinner size="xl" />}
-        {!isLoading && (
-            <>
-              {/* Title Elements */}
-              <Box sx={{ display: `flex`, width: `100%`, alignItems: `center` }}>
-                <Text
-                    sx={{
-                      fontFamily: `Inter`,
-                      fontSize: `48px`,
-                      fontWeight: `700`,
-                      width: `clamp(175px, 33vw, 350px)`,
-                    }}
-                >
-                  Import NFT
-                </Text>
-                <Box
-                    sx={{
-                      display: `block`,
-                      padding: `1rem 2rem`,
-                      height: `auto`,
-                      margin: `0 1rem`,
-                    }}
-                    _hover={{
-                      backgroundColor: `black`,
-                      color: `white`,
-                      borderRadius: `24px`,
-                      cursor: `pointer`,
-                    }}
-                    onClick={() => router.push(CREATE_NFT)}
-                >
-                  Mint NFT
-                </Box>
-                <Box
-                    sx={{
-                      display: `block`,
-                      padding: `1rem 2rem`,
-                      backgroundColor: `black`,
-                      borderRadius: `24px`,
-                      color: `white`,
-                      height: `auto`,
-                    }}
-                    _hover={{ cursor: `pointer` }}
-                >
-                  Import NFT
-                </Box>
-              </Box>
-              {!importingNFT && (
-                  <Box sx={{ width: `100%` }}>
-                    <Text
-                        sx={{
-                          textTransform: `uppercase`,
-                          opacity: `0.8`,
-                          fontWeight: `700`,
-                        }}
-                    >
-                      Select an NFT from your wallet
-                    </Text>
-                  </Box>
-              )}
-              {/* End Title Elements */}
-            </>
+        {/* Title Elements */}
+        <Box width="1000px" sx={{ display: `flex`, width: `100%`, alignItems: `center` }}>
+          <Text
+              sx={{
+                fontFamily: `Inter`,
+                fontSize: `48px`,
+                fontWeight: `700`,
+                width: `clamp(175px, 33vw, 350px)`,
+              }}
+          >
+            Import NFT
+          </Text>
+          <Box
+              sx={{
+                display: `block`,
+                padding: `1rem 2rem`,
+                height: `auto`,
+                margin: `0 1rem`,
+              }}
+              _hover={{
+                backgroundColor: `black`,
+                color: `white`,
+                borderRadius: `24px`,
+                cursor: `pointer`,
+              }}
+              onClick={() => router.push(CREATE_NFT)}
+          >
+            Mint NFT
+          </Box>
+          <Box
+              sx={{
+                display: `block`,
+                padding: `1rem 2rem`,
+                backgroundColor: `black`,
+                borderRadius: `24px`,
+                color: `white`,
+                height: `auto`,
+              }}
+              _hover={{ cursor: `pointer` }}
+          >
+            Import NFT
+          </Box>
+        </Box>
+        {!importingNFT && (
+            <Box sx={{ width: `100%` }}>
+              <Text
+                  sx={{
+                    textTransform: `uppercase`,
+                    opacity: `0.8`,
+                    fontWeight: `700`,
+                  }}
+              >
+                Select an NFT from your wallet
+              </Text>
+            </Box>
         )}
+        {/* End Title Elements */}
+        {isLoading && <Spinner size="xl" />}
         {!importingNFT && nfts?.length >= 1 && (
             <InfiniteScrollNft
                 setImportingNFT={setImportingNFT}
                 setTokenToImport={setTokenToImport}
                 hasMore={hasMore}
-                getData={getData}
                 nftItems={nfts}/>
         )}
         {!isLoading && noNFTs && (

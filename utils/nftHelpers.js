@@ -1,5 +1,5 @@
 import { utils } from 'ethers';
-import {getSubgraphAuction, getSubgraphData} from './graphQueries';
+import {GET_FRAKTAL_BY_TOKEN_ADDRESS, getSubgraphAuction, getSubgraphData} from './graphQueries';
 import {getNftMetadata} from "@/utils/alchemy";
 
 let infuraAuth;
@@ -19,7 +19,7 @@ const infuraConfig = {
 };
 
 async function getFraktalData(address) {
-  let data = await getSubgraphData('fraktal', address);
+  let data = await getSubgraphData(GET_FRAKTAL_BY_TOKEN_ADDRESS, address);
   if (data?.fraktalNfts?.length) {
     return {
       fraktalId: data.fraktalNfts[0].marketId,

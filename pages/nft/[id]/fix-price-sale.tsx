@@ -8,7 +8,7 @@ import Button from "../../../components/button";
 import { Image } from "@chakra-ui/image";
 import styles from "./auction.module.css";
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
-import { getSubgraphData } from '../../../utils/graphQueries';
+import {getSubgraphData, LISTED_ITEM_BY_ID} from '../../../utils/graphQueries';
 import { createListed } from '../../../utils/nftHelpers';
 import { useWeb3Context } from '../../../contexts/Web3Context';
 import { buyFraktions, makeOffer, claimFraktalSold } from '../../../utils/contractCalls';
@@ -31,7 +31,7 @@ export default function FixPriceNFTView() {
   useEffect(async ()=>{
       const address = getParams('nft');
       const index = address.split('/fix-price-sale')[0]
-      let obj = await getSubgraphData('listed_itemsId',index)
+      let obj = await getSubgraphData(LISTED_ITEM_BY_ID, index)
       if(obj && account){
         if(obj && obj.listItems){
           setFraktalOwners(obj.listItems[0].fraktal.fraktions.length)

@@ -21,6 +21,7 @@
       "@/styles/*": ["styles/*"],
       "@/utils/*": ["utils/*"],
       "@/redux/*": ["redux/*"],
+      "@/hooks/*": ["hooks/*"],
       "@/types/*": ["types/*"]
     }
   },

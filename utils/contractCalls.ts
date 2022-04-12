@@ -884,10 +884,7 @@ export async function claimAirdrop(
   airdropAddress,
   opts?: ActionOpts
 ) {
-  console.log({amount,merkleProof,listedTokenAddress,provider,airdropAddress});
-  
   const signer = await loadSigner(provider);
-  console.log({provider,airdropAddress, airdropABI, signer});
   const customContract = new Contract(airdropAddress, airdropABI, signer);
   let tx = await customContract.claim(amount,merkleProof,listedTokenAddress);
   let receipt = await processTx(tx);
@@ -917,10 +914,7 @@ export async function claimPartnerAirdrop(
   airdropAddress,
   opts?: ActionOpts
 ) {
-  console.log({amount,merkleProof,provider,airdropAddress});
-  
   const signer = await loadSigner(provider);
-  console.log({provider,airdropAddress, airdropABI, signer});
   const customContract = new Contract(airdropAddress, airdropABI, signer);
   let tx = await customContract.claim(amount,merkleProof);
   let receipt = await processTx(tx);

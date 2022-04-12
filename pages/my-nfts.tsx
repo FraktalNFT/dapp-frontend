@@ -1,3 +1,10 @@
+/**
+ * React
+ */
+import React, { useEffect, useState } from 'react';
+/**
+ * Chakra
+ */
 import {
   Box,
   Center,
@@ -5,24 +12,39 @@ import {
   Grid,
   Link,
   Spacer,
+  Image,
   Text,
   VStack,
   Spinner,
   useToast,
 } from '@chakra-ui/react';
-import { Image } from '@chakra-ui/react';
+/**
+ * Next
+ */
+import { useRouter } from 'next/router';
 import Head from 'next/head';
-import React from 'react';
-import NFTItemOS from '../components/nft-item-opensea';
-import NFTItem from '../components/nft-item';
-import NFTAuctionItem from '@/components/nft-auction-item';
-import RescueCard from '../components/rescueCard';
 import NextLink from 'next/link';
-import styles from '../styles/my-nfts.module.css';
-import FrakButton from '../components/button';
-import { useWeb3Context } from '../contexts/Web3Context';
-import { useUserContext } from '../contexts/userContext';
+/**
+ * Components
+ */
+import NFTItemOS from '@/components/nft-item-opensea';
+import NFTItem from '@/components/nft-item';
+import NFTAuctionItem from '@/components/nft-auction-item';
+import RescueCard from '@/components/rescueCard';
+import FrakButton from '@/components/button';
+/**
+ * Styles
+ */
+import styles from '@/styles/my-nfts.module.css';
+/**
+ * Contexts
+ */
+import { useWeb3Context } from '@/contexts/Web3Context';
+import {WalletContextProviderFC, useWalletContext} from "@/contexts/WalletAssets";
 import { useMintingContext } from '@/contexts/NFTIsMintingContext';
+/**
+ * Contract Calls
+ */
 import {
   importFraktal,
   approveMarket,
@@ -30,26 +52,29 @@ import {
   importERC1155,
   getApproved,
   estimateRedeemAuctionSeller,
-  getListingAmount,
-} from '../utils/contractCalls';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { getSubgraphAuction } from 'utils/graphQueries';
-import { createListedAuction } from 'utils/nftHelpers';
-import { utils } from 'ethers';
-import {
   unlistAuctionItem,
   redeemAuctionSeller,
   redeemAuctionParticipant,
   getAuctionReserve,
   getParticipantContribution,
   getAuctionListings,
-} from '../utils/contractCalls';
-import { useLoadingScreenHandler } from '../hooks/useLoadingScreen'
-
+} from '@/utils/contractCalls';
+/**
+ * Utils
+ */
+import {GET_ALL_AUCTIONS, getSubgraphAuction} from 'utils/graphQueries';
+import { createListedAuction } from 'utils/nftHelpers';
+import { utils } from 'ethers';
+/**
+ * Hooks
+ */
+import { useLoadingScreenHandler } from '@/hooks/useLoadingScreen'
+/**
+ * Constants
+ */
 import { EXPLORE } from '@/constants/routes';
 
-export default function MyNFTsView() {
+function MyNFTsView() {
   const router = useRouter();
   const toast = useToast();
   const [auctions, setAuctions] = useState(null);
@@ -60,7 +85,13 @@ export default function MyNFTsView() {
   const { isMinting, setIsMinting } = useMintingContext();
   const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
   const { account, provider, factoryAddress, marketAddress } = useWeb3Context();
-  const { fraktals, fraktions, nfts, balance, loading } = useUserContext();
+  const { fraktals, fraktions, balance, loading } = useWalletContext();
+
+  const canFrak = (item) =>
+      item && !!(fraktals || []).find((fraktion) => fraktion.id === item.id);
+
+  const canList = (item) =>
+      item && !!(fraktions || []).find((fraktion) => fraktion.id === item.id);
 
   const refreshPage = () => {
     setRefresh(!refresh);
@@ -84,7 +115,6 @@ export default function MyNFTsView() {
           duration: 2000,
           isClosable: true,
         });
-        console.log(e);
       });
   };
 
@@ -199,7 +229,7 @@ export default function MyNFTsView() {
 
   useEffect(() => {
     const getAuctions = async () => {
-      let auctionData = await getSubgraphAuction('auctions', '');
+      let auctionData = await getSubgraphAuction(GET_ALL_AUCTIONS, '');
       let auctionDataParticipated = { ...auctionData };
       auctionDataParticipated = auctionDataParticipated?.auctions?.filter(
         (x) => {
@@ -395,14 +425,14 @@ export default function MyNFTsView() {
     if (done) {
       if (item.token_schema == 'ERC721') {
         res = await importERC721(
-            BigInt(item.tokenId),
+          BigInt(item.tokenId),
           item.id,
           provider,
           factoryAddress
         );
       } else {
         res = await importERC1155(
-            BigInt(item.tokenId),
+          BigInt(item.tokenId),
           item.id,
           provider,
           factoryAddress
@@ -462,6 +492,8 @@ export default function MyNFTsView() {
             <div key={item.id + '-' + item.tokenId}>
               <NextLink key={item.id} href={`/nft/${item.id}/details`}>
                 <NFTItem
+                  canFrak={canFrak}
+                  canList={canList}
                   item={item}
                   name={item.name}
                   amount={null}
@@ -522,6 +554,8 @@ export default function MyNFTsView() {
               fraktions.map((item) => (
                 <NextLink key={item.id} href={`/nft/${item.id}/details`}>
                   <NFTItem
+                    canFrak={canFrak}
+                    canList={canList}
                     item={item}
                     name={item.name}
                     amount={item.userBalance}
@@ -731,4 +765,13 @@ export default function MyNFTsView() {
       )} */}
     </VStack>
   );
+}
+
+
+export default function MyNFTPage()  {
+  return(
+      <WalletContextProviderFC>
+        <MyNFTsView/>
+      </WalletContextProviderFC>
+  )
 }

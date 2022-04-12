@@ -48,11 +48,23 @@ import store from "@/redux/store";
 import {MY_NFTS} from "@/constants/routes";
 import NFTMedia from "@/components/media";
 
+import { FrakCard } from '../../types';
+
 /**
  * Types
  */
-
-import { FrakCard } from '../../types';
+interface NFTItemProps extends StackProps {
+  item: FrakCard;
+  name: string;
+  amount: string;
+  price: number;
+  imageURL: string;
+  CTAText?: string;
+  wait?: number;
+  height?: string;
+  canFrak?: any;
+  canList?: any;
+}
 
 /**
  * NFTItem
@@ -69,6 +81,8 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
       CTAText,
       wait,
       height = '35rem',
+      canFrak = () => {},
+      canList = () => {},
     },
     ref
   ) => {
@@ -78,15 +92,8 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
     const [isListed, setIsListed] = useState(false);
     const [isUnlisting, setIsUnlisting] = useState(false);
     const [isClaiming, setIsClaiming] = useState(false);
-    const { fraktions, fraktals } = useUserContext();
     const { account, provider, marketAddress, factoryAddress } = useWeb3Context();
     const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
-
-    const canFrak =
-      item && !!(fraktals || []).find((fraktion) => fraktion.id === item.id);
-
-    const canList =
-      item && !!(fraktions || []).find((fraktion) => fraktion.id === item.id);
 
     useEffect(() => {
       if (item) {
@@ -152,7 +159,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
           if(!isApproved){
             receipt = await approveMarket(factoryAddress, provider, item.id, actionOpts);
           }
-          
+
           if (isApproved || !receipt?.error) {
             if (item.collateral.type == 'ERC721') {
               await claimERC721(item.marketId, provider, factoryAddress, actionOpts).then((response) => {
@@ -175,10 +182,8 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
             }
           }
         } catch (e) {
-          console.log(e)
           setIsClaiming(false);
         }
-
 
     };
 
@@ -269,7 +274,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 )}
               </Flex>
 
-              {canFrak && (
+              {canFrak(item) && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={`nft/${item.id}/details?frak=1`}>
                     <FrakButton size="sm">Frak it</FrakButton>
@@ -284,7 +289,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                 </Box>
               )}
 
-              {canList && isListed && (
+              {canList(item) && isListed && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={'my-nfts'} scroll={false}>
                     <FrakButton disabled={isUnlisting} size="sm" onClick={unList}>
@@ -293,7 +298,7 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
                   </NextLink>
                 </Box>
               )}
-              {canList && !isListed && (
+              {canList(item) && !isListed && (
                 <Box textAlign="center" marginTop={5}>
                   <NextLink href={`nft/${item.marketId}/list-item`}>
                     <FrakButton size="sm">Sell Fraktions</FrakButton>
@@ -308,15 +313,5 @@ const NFTItem = forwardRef<HTMLDivElement, NFTItemProps>(
   }
 );
 
-interface NFTItemProps extends StackProps {
-  item: FrakCard;
-  name: string;
-  amount: string;
-  price: number;
-  imageURL: string;
-  CTAText?: string;
-  wait?: number;
-  height?: string;
-}
 
 export default NFTItem;

@@ -32,7 +32,12 @@ import styles from "./auction.module.css";
  * Utils
  */
 import {getExplorerUrl, shortenHash, timezone} from "@/utils/helpers";
-import {getSubgraphData, getAddressAirdrop} from "@/utils/graphQueries";
+import {
+  getSubgraphData,
+  getAddressAirdrop,
+  GET_FRAKTAL_BY_TOKEN_ADDRESS,
+  FRAKTIONS_BY_TOKEN_ADDRESS
+} from "@/utils/graphQueries";
 import {createObject } from "@/utils/nftHelpers";
 /**
  * Contexts
@@ -129,13 +134,13 @@ export default function DetailsView() {
 
   async function getFraktal() {
     let fraktionsFetch = await getSubgraphData(
-      "fraktions",
+        FRAKTIONS_BY_TOKEN_ADDRESS,
         tokenAddress
     );
     if (fraktionsFetch.listItems) {
       setFraktionsListed(fraktionsFetch.listItems);
     }
-    let fraktalFetch = await getSubgraphData("fraktal", tokenAddress);
+    let fraktalFetch = await getSubgraphData(GET_FRAKTAL_BY_TOKEN_ADDRESS, tokenAddress);
     if (
       fraktalFetch &&
       fraktalFetch.fraktalNfts &&
@@ -169,7 +174,7 @@ export default function DetailsView() {
 
   async function getFraktions() {
     if (fraktionsListed && account && tokenAddress) {
-      let fraktionsFetch = await getSubgraphData("fraktions", tokenAddress);
+      let fraktionsFetch = await getSubgraphData(FRAKTIONS_BY_TOKEN_ADDRESS, tokenAddress);
       let userFraktionsListed = fraktionsFetch?.listItems?.find(
         x => x.seller.id == account.toLocaleLowerCase()
       );
@@ -180,6 +185,7 @@ export default function DetailsView() {
   }
 
   async function getContractData() {
+    console.log('account', account)
     if (tokenAddress && account && provider) {
       try {
         let index = await getFraktionsIndex(provider, tokenAddress);

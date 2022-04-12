@@ -17,9 +17,7 @@ import NFTImportCardOS from "@/components/nft-importcard-opensea";
  * @param nftItems
  * @constructor
  */
-const InfiniteScrollNft = ({getData, nftItems, setTokenToImport, hasMore, setImportingNFT}) => {
-
-
+const InfiniteScrollNft = ({getData = null, nftItems, setTokenToImport, hasMore, setImportingNFT}) => {
     return (
         <InfiniteScroll
             dataLength={nftItems?.length}
@@ -38,6 +36,7 @@ const InfiniteScrollNft = ({getData, nftItems, setTokenToImport, hasMore, setImp
             >
                 {nftItems.map((item, index) => (
                     <NFTImportCardOS
+                        key={index}
                         item={item}
                         CTAText={'Import to market'}
                         onClick={() => {

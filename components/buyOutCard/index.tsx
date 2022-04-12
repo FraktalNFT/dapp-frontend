@@ -39,11 +39,6 @@ const BuyOutCard = ({
   const [majority, setMajority] = useState(0);
   const { closeLoadingModalAfterDelay } = useLoadingScreenHandler()
 
-  // functions for the offers!
-  //claim Fraktal
-  // console.log({offers});
-
-
   useEffect(() => {
     if (account && offers && offers.length) {
       let userHasOffered = offers.find(

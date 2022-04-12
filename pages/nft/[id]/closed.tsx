@@ -7,7 +7,7 @@ import { Image } from "@chakra-ui/image";
 import styles from "./closed.module.css";
 import FrakButton from "../../../components/button";
 import {shortenHash, timezone, getParams} from '../../../utils/helpers';
-import {getSubgraphData} from '../../../utils/graphQueries';
+import {FRAKTALS_BY_MARKET_ID, getSubgraphData} from '../../../utils/graphQueries';
 import { createObject } from "utils/nftHelpers";
 import {EXPLORE} from "@/constants/routes";
 export default function ClosedNFTView() {
@@ -17,7 +17,7 @@ export default function ClosedNFTView() {
   useEffect(async ()=>{
     const address = getParams('nft');
     const index = parseFloat(address.split('/closed')[0])
-    let obj = await getSubgraphData('marketid_fraktal',index)
+    let obj = await getSubgraphData(FRAKTALS_BY_MARKET_ID ,index)
     if(obj && obj.fraktalNfts){
       let nftObjects = await createObject(obj.fraktalNfts[0])
       if(nftObjects){

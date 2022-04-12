@@ -23,7 +23,7 @@ import styles from "./auction.module.css";
  * Utils
  */
 import {shortenHash} from '@/utils/helpers';
-import {getSubgraphAuction } from '@/utils/graphQueries';
+import {GET_SINGLE_AUCTION_BY_ID, getSubgraphAuction} from '@/utils/graphQueries';
 import { createListedAuction } from "@/utils/nftHelpers";
 import { utils } from "ethers";
 /**
@@ -138,7 +138,7 @@ function AuctionNFTView({router}) {
         setIndex(index)
       }
 
-      let obj = await getSubgraphAuction('singleAuction', index);
+      let obj = await getSubgraphAuction(GET_SINGLE_AUCTION_BY_ID, index);
       if(obj?.auction == null){
         setError(true);
         return;
@@ -150,7 +150,6 @@ function AuctionNFTView({router}) {
       });
 
       const item = await createListedAuction(obj.auction);
-      console.log('Item', item)
       Object.assign(obj.auction,{
         "hash":_hash.fraktalNft.hash,
         "name":item.name,

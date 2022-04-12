@@ -2,13 +2,22 @@ import { gql, request } from "graphql-request";
 
 const APIURL =
     process.env.NEXT_PUBLIC_GRAPHQL_URL ? process.env.NEXT_PUBLIC_GRAPHQL_URL
-        : 'https://api.studio.thegraph.com/query/21128/marketplaceperformance/0.0.4';
+        : 'https://api.studio.thegraph.com/query/18518/fraktalmarket/0.27';
 
 const AIRDROPAPI = 'https://api.looksrare.org/graphql';
 
+export const GET_ALL_ARTISTS = "artists";
+export const GET_ALL_AUCTIONS = "auctions";
+export const FRAKTIONS_BY_TOKEN_ADDRESS = "fraktions";
+export const GET_FRAKTALS_BY_CREATOR = "creator";
+export const GET_FRAKTAL_BY_TOKEN_ADDRESS = "fraktal";
+export const FRAKTALS_BY_MARKET_ID = "marketid_fraktal";
+export const GET_SINGLE_AUCTION_BY_ID = "singleAuction";
 export const LIMITED_ITEMS = "limited_items";
 export const LIMITED_AUCTIONS = "limited_auctions";
+export const LISTED_ITEM_BY_ID = "listed_itemsId";
 export const SEARCH_ITEMS = "search_items";
+export const WALLET = "wallet";
 
 const creator_query = gql`
   query($id: ID!) {
@@ -437,33 +446,6 @@ const all_nfts = gql`
   }
 `;
 
-const listedItemsByFraktalId = gql`
-  query($id: ID!) {
-    listItems(where: { fraktal: $id }, subgraphError: allow) {
-      id
-      name
-      price
-      amount
-      gains
-      seller {
-        id
-      }
-      fraktal {
-        id
-        hash
-        marketId
-        createdAt
-        status
-        fraktions {
-          amount
-        }
-        creator {
-          id
-        }
-      }
-    }
-  }
-`;
 
 const limitedAuctions = gql`
   query($limit: Int!, $offset: Int!, $endTime: Int!, $orderDirection: String!) {
@@ -654,29 +636,29 @@ query($id: ID!) {
 }
 `;
 const calls = [
-  { name: "account_fraktions", call: account_fraktions_query },
-  { name: "marketid_fraktal", call: marketid_query },
-  { name: "listed_itemsId", call: listedItemsId },
-  { name: "artists", call: creators_review },
+  { name: GET_ALL_ARTISTS, call: creators_review },
+  { name: GET_ALL_AUCTIONS, call: listedAuctions },
+  { name: "auctionsNFT", call:auctionFraktalNFT},
+  { name: GET_FRAKTALS_BY_CREATOR, call: creator_query },
   { name: "firstArtists", call: creators_small_review },
-  { name: "all", call: all_nfts },
-  { name: "creator", call: creator_query },
-  { name: "manage", call: fraktal_fraktions_query },
-  { name: "owned", call: owner_query },
-  { name: "wallet", call: user_wallet_query },
-  { name: "bought", call: user_bought_query },
-  { name: "offers", call: user_offers_query },
+  { name: GET_FRAKTAL_BY_TOKEN_ADDRESS, call: fraktalId_query },
+  { name: FRAKTIONS_BY_TOKEN_ADDRESS, call: fraktions_query },
+  { name: FRAKTALS_BY_MARKET_ID, call: marketid_query },
   { name: "listed_items", call: listedItems },
   { name: LIMITED_ITEMS, call: limitedItems },
-  { name: "listed_items_by_fraktal_id", call: listedItemsByFraktalId },
-  { name: "fraktal", call: fraktalId_query },
-  { name: "fraktions", call: fraktions_query },
-  { name: "fraktal_owners", call: fraktalOwners },
   { name: LIMITED_AUCTIONS, call: limitedAuctions },
+  { name: LISTED_ITEM_BY_ID, call: listedItemsId },
   { name: SEARCH_ITEMS, call: searchItems },
-  { name: "auctions", call: listedAuctions },
-  { name: "auctionsNFT", call:auctionFraktalNFT},
-  { name: "singleAuction", call: getSingleAuction}
+  { name: GET_SINGLE_AUCTION_BY_ID, call: getSingleAuction},
+  { name: WALLET, call: user_wallet_query },
+  //DEPRECATED
+  { name: "account_fraktions", call: account_fraktions_query },
+  { name: "all", call: all_nfts },
+  { name: "bought", call: user_bought_query },
+  { name: "fraktal_owners", call: fraktalOwners },
+  { name: "manage", call: fraktal_fraktions_query },
+  { name: "offers", call: user_offers_query },
+  { name: "owned", call: owner_query },
 ];
 
 export const getSubgraphData = async (call, id, options = null) => {

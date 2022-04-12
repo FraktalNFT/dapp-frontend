@@ -23,7 +23,7 @@ import FrakButton from '@/components/button';
  * Utils
  */
 import {shortenHash, timezone} from '@/utils/helpers';
-import { getSubgraphData } from '@/utils/graphQueries';
+import {FRAKTALS_BY_MARKET_ID, getSubgraphData, LISTED_ITEM_BY_ID} from '@/utils/graphQueries';
 import { createListed, createObject} from '@/utils/nftHelpers';
 import { BigNumber, utils } from "ethers";
 import { useWeb3Context } from '@/contexts/Web3Context';
@@ -117,7 +117,7 @@ export default function ListNFTView() {
         // previously was account-index
         // let hexIndex = indexNumber.toString(16);
         let listingString = `${account.toLocaleLowerCase()}-${tokenAddress}`;
-        let listing = await getSubgraphData('listed_itemsId', listingString);
+        let listing = await getSubgraphData(LISTED_ITEM_BY_ID, listingString);
         // console.log('results ',listing)
         if(listing && listing.listItems.length > 0) {
           setUpdating(true)
@@ -138,7 +138,7 @@ export default function ListNFTView() {
             }
           // nftObject gets 2 different inputs (id is different for listed items)
           } else {
-            let obj = await getSubgraphData('marketid_fraktal', args[2])
+            let obj = await getSubgraphData(FRAKTALS_BY_MARKET_ID, args[2])
             if(obj && obj.fraktalNfts) {
               let nftObjects = await createObject(obj.fraktalNfts[0])
               if(nftObjects && account ){

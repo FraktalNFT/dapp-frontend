@@ -8,7 +8,7 @@ import FrakButton from "../components/button";
 import styles from "../styles/artists.module.css";
 import { Image } from "@chakra-ui/image";
 import { shortenHash } from "../utils/helpers";
-import { getSubgraphData } from "../utils/graphQueries";
+import {GET_ALL_ARTISTS, getSubgraphData} from "../utils/graphQueries";
 import {createObject } from "../utils/nftHelpers";
 import { useWeb3Context } from "../contexts/Web3Context";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -48,7 +48,7 @@ export default function ArtistsView() {
   }
 
   async function fetchNewArtists() {
-    const data = await getSubgraphData("artists", "");
+    const data = await getSubgraphData(GET_ALL_ARTISTS, "");
     if (data && factoryAddress) {
       let onlyCreators = data.users.filter(x => {
         return x.created.length > 0;

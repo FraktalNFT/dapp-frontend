@@ -7,7 +7,7 @@ import NFTItem from "../../components/nft-item";
 import FrakButton from "../../components/button";
 import NextLink from "next/link";
 import { shortenHash, getParams } from "../../utils/helpers";
-import { getSubgraphData } from "../../utils/graphQueries";
+import {GET_FRAKTALS_BY_CREATOR, getSubgraphData} from "../../utils/graphQueries";
 import {createObject } from "../../utils/nftHelpers";
 import toast from "react-hot-toast";
 import { useRouter } from "next/router";
@@ -46,7 +46,7 @@ export default function ArtistView() {
       try {
         if (address) {
           setArtistAddres(address);
-          let objects = await getSubgraphData("creator", address);
+          let objects = await getSubgraphData(GET_FRAKTALS_BY_CREATOR, address);
           await Promise.all(
             objects.fraktalNfts.map(x => {
               return createObject(x);

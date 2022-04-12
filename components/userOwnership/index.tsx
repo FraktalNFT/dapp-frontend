@@ -52,6 +52,7 @@ const UserOwnership = ({
   const router = useRouter();
   const [isDefraking, setDefraking] = useState<boolean>(false);
   const [isClaiming, setClaiming] = useState<boolean>(false);
+  const [isFraking, setFraking] = useState<boolean>(false);
 
   async function claimNFT() {
     setClaiming(true);
@@ -97,10 +98,13 @@ const UserOwnership = ({
   }
 
   async function importFraktalToMarket() {
+    setFraking(true);
     const actionOpts = { workflow: Workflow.FRAK_NFT };
-
     if (!isApproved) {
-      await approveMarket(marketAddress, provider, tokenAddress, actionOpts);
+      await approveMarket(marketAddress, provider, tokenAddress, actionOpts).
+      catch(e => {
+        setFraking(false);
+      });
     }
     let index = 0;
     let isUsed = true;
@@ -109,18 +113,22 @@ const UserOwnership = ({
       isUsed = await getIndexUsed(index, provider, tokenAddress);
     }
     if (isUsed == false) {
-      await importFraktal(
+      const response = await importFraktal(
         tokenAddress,
         index,
         provider,
         marketAddress,
         actionOpts
-      );
+      ).then(r => {
+        closeLoadingModalAfterDelay();
+        setTimeout(() => {
+          router.reload()
+        }, 2500);
+      }).
+      finally(() => {
+        setFraking(false);
+      });
     }
-    closeLoadingModalAfterDelay();
-    setTimeout(() => {
-      router.reload()
-    }, 2500);
   }
 
   useEffect(() => {
@@ -244,7 +252,7 @@ const UserOwnership = ({
             {collateral && collateral.id && (
               <FrakButton onClick={() => claimNFT()}>Claim NFT</FrakButton>
             )}
-            <FrakButton onClick={() => importFraktalToMarket()}>FRAK IT</FrakButton>
+            <FrakButton disabled={isFraking} onClick={() => importFraktalToMarket()}>FRAK IT</FrakButton>
           </HStack>
         </VStack>
       )}
