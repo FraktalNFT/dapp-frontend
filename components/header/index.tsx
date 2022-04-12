@@ -94,28 +94,7 @@ const Header = () => {
                     </Link>
                 )}
           </NextLink>
-          <NextLink href={CLAIM_BONUS}>
-              {router.pathname === CLAIM_BONUS ? (
-                  <Link
-                      className="semi-16"
-                      borderRadius="25"
-                      padding="3"
-                      sx={{ backgroundColor: `black`, color: `white` }}
-                      _hover={{ backgroundColor: "black", textColor: "white" }}
-                  >
-                      Airdrop
-                  </Link>
-              ) : (
-                  <Link
-                      className="semi-16"
-                      borderRadius="25"
-                      padding="3"
-                      _hover={{ backgroundColor: "black", textColor: "white" }}
-                  >
-                      Airdrop
-                  </Link>
-              )}
-        </NextLink>
+        
       {/*      <Link
               href="https://docs.fraktal.io/marketplace/get-started"
               target="_blank"
